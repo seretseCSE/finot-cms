@@ -3,13 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\DashboardWidgetFactory;
-use Filament\Pages\Page;
-use Illuminate\Support\Facades\Auth;
+use Filament\Pages\Dashboard as BaseDashboard;
 
-class Dashboard extends Page
+class Dashboard extends BaseDashboard
 {
-    protected string $view = 'filament.pages.dashboard';
-
     protected static ?string $title = 'Dashboard';
 
     public static function getNavigationLabel(): string { return 'Dashboard'; }

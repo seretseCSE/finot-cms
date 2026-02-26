@@ -12,9 +12,3 @@
         {{ __('Welcome, :name', ['name' => filament()->auth()->user()->name]) }}
     </h2>
 @endsection
-
-@section('content')
-    <div class="space-y-6">
-        {{ $this->getWidgets() }}
-    </div>
-@endsection
