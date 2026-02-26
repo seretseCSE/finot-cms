@@ -166,7 +166,7 @@ class BeneficiaryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBeneficiariesPage::class,
+            'index' => Pages\ListBeneficiaries::class,
         ];
     }
 

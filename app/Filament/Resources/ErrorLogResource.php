@@ -78,7 +78,7 @@ class ErrorLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListErrorLogsPage::class,
+            'index' => Pages\ListErrorLogs::class,
         ];
     }
 

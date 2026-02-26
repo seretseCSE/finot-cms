@@ -66,6 +66,16 @@ class AdminPanelProvider extends PanelProvider
                 ManageActiveSessions::class,
                 ManageCustomOptions::class,
             ])
+            ->bootUsing(function () {
+                foreach (\Filament\Facades\Filament::getResources() as $resourceClass) {
+                    $pages = $resourceClass::getPages();
+                    foreach ($pages as $key => $reg) {
+                        if (is_string($reg)) {
+                            \Illuminate\Support\Facades\Log::error("Bad string in getPages() - Resource: {$resourceClass}, Key: {$key}, Value: {$reg}");
+                        }
+                    }
+                }
+            })
             ->middleware([
                 'web',
             ])
