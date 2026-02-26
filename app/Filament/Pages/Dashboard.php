@@ -26,12 +26,5 @@ class Dashboard extends Page
         return DashboardWidgetFactory::getWidgets();
     }
 
-    /**
-     * Get the page's middleware.
-     */
-    public function getMiddleware(): array
-    {
-        return ['auth'];
-    }
 }
 
