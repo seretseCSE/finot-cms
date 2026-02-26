@@ -100,7 +100,7 @@ class ParentResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
-                
+
                 Tables\Actions\Action::make('view_linked_children')
                     ->label('View Linked Children')
                     ->icon('heroicon-o-users')
@@ -128,17 +128,17 @@ class ParentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListParents::class,
-            'create' => Pages\CreateParent::class,
-            'edit' => Pages\EditParent::class,
-            'view' => Pages\ViewParent::class,
+            'index' => Pages\ListParents::route('/'),
+            'create' => Pages\CreateParent::route('/create'),
+            'edit' => Pages\EditParent::route('/{record}/edit'),
+            'view' => Pages\ViewParent::route('/{record}'),
         ];
     }
 
     public static function canViewAny(): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'hr_head',
             'admin',
@@ -149,7 +149,7 @@ class ParentResource extends Resource
     public static function canCreate(): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'hr_head',
             'admin',
@@ -160,7 +160,7 @@ class ParentResource extends Resource
     public static function canEdit($record): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'hr_head',
             'admin',
@@ -171,7 +171,7 @@ class ParentResource extends Resource
     public static function canDelete($record): bool
     {
         $user = Auth::user();
-        
+
         if (!$user->hasRole(['hr_head', 'admin', 'superadmin'])) {
             return false;
         }
@@ -183,7 +183,7 @@ class ParentResource extends Resource
     public static function canRestore($record): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'admin',
             'superadmin'

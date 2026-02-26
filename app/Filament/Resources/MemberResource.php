@@ -497,8 +497,8 @@ class MemberResource extends Resource
                                         ->with('group')
                                         ->latest()
                                         ->take(5)
-                                        ->map(fn ($assignment) => 
-                                            $assignment->group->name . ' - ' . 
+                                        ->map(fn ($assignment) =>
+                                            $assignment->group->name . ' - ' .
                                             $assignment->assigned_at->format('M d, Y')
                                         )
                                         ->join("\n") ?: 'No assignments yet'),
@@ -607,7 +607,7 @@ class MemberResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
-                
+
                 Tables\Actions\Action::make('remove_from_group')
                     ->label('Remove from Group')
                     ->icon('heroicon-o-user-minus')
@@ -615,14 +615,14 @@ class MemberResource extends Resource
                     ->visible(fn ($record) => $record->currentGroup)
                     ->requiresConfirmation()
                     ->modalHeading('Remove Member from Group')
-                    ->modalDescription(fn ($record) => 
+                    ->modalDescription(fn ($record) =>
                         "Are you sure you want to remove {$record->full_name} from {$record->currentGroup->name}?"
                     )
                     ->action(function ($record) {
                         try {
                             if ($record->currentGroup) {
                                 $record->currentGroup->removeMember($record->id);
-                                
+
                                 \Filament\Notifications\Notification::make()
                                     ->title('Member Removed')
                                     ->body("{$record->full_name} has been removed from {$record->currentGroup->name}")
@@ -759,21 +759,21 @@ class MemberResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMembers::class,
-            'create' => Pages\CreateMember::class,
-            'edit' => Pages\EditMember::class,
-            'view' => Pages\ViewMember::class,
-            'timeline' => Pages\Timeline::class,
+            'index' => Pages\ListMembers::route('/'),
+            'create' => Pages\CreateMember::route('/create'),
+            'edit' => Pages\EditMember::route('/{record}/edit'),
+            'view' => Pages\ViewMember::route('/{record}'),
+            'timeline' => Pages\Timeline::route('/{record}/timeline'),
         ];
     }
 
     public static function canViewAny(): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'admin',
-            'superadmin', 
+            'superadmin',
             'hr_head',
             'education_head',
             'finance_head',
@@ -787,7 +787,7 @@ class MemberResource extends Resource
     public static function canCreate(): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'hr_head',
             'admin',
@@ -798,7 +798,7 @@ class MemberResource extends Resource
     public static function canEdit($record): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'hr_head',
             'admin',
@@ -809,7 +809,7 @@ class MemberResource extends Resource
     public static function canDelete($record): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'hr_head',
             'admin',

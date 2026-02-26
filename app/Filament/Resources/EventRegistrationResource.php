@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EventRegistrationResource\Pages\ListEventRegistrations;
+use App\Filament\Resources\EventRegistrationResource\Pages;
 use App\Models\EventRegistration;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -99,7 +99,7 @@ class EventRegistrationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEventRegistrations::class,
+            'index' => Pages\ListEventRegistrations::route('/'),
         ];
     }
 

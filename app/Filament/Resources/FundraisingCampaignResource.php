@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\FundraisingCampaignResource\Pages\ListFundraisingCampaigns;
+use App\Filament\Resources\FundraisingCampaignResource\Pages;
 use App\Models\FundraisingCampaign;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -141,7 +141,7 @@ class FundraisingCampaignResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFundraisingCampaigns::class,
+            'index' => Pages\ListFundraisingCampaigns::route('/'),
         ];
     }
 

@@ -202,7 +202,7 @@ class InventoryResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
                     ->visible(fn ($record) => static::canEdit($record)),
-                
+
                 Tables\Actions\Action::make('record_movement')
                     ->label('Record Movement')
                     ->icon('heroicon-o-arrow-path')
@@ -255,7 +255,7 @@ class InventoryResource extends Resource
                     ])
                     ->action(function ($record, array $data) {
                         $currentStock = $record->current_stock;
-                        
+
                         if ($data['movement_type'] === 'Stock Out' && $data['quantity'] > $currentStock) {
                             if (Auth::user()?->hasRole(['admin', 'superadmin'])) {
                                 // Admin override
@@ -362,10 +362,10 @@ class InventoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListInventory::class,
-            'create' => Pages\CreateInventory::class,
-            'edit' => Pages\EditInventory::class,
-            'analytics' => Pages\InventoryAnalytics::class,
+            'index' => Pages\ListInventory::route('/'),
+            'create' => Pages\CreateInventory::route('/create'),
+            'edit' => Pages\EditInventory::route('/{record}/edit'),
+            'analytics' => Pages\InventoryAnalytics::route('/analytics'),
         ];
     }
 }

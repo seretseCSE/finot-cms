@@ -47,7 +47,7 @@ class ContributionAmountResource extends Resource
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']) 
+        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin'])
                && $record->canBeDeleted();
     }
 
@@ -185,9 +185,9 @@ class ContributionAmountResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContributionAmounts::class,
-            'create' => Pages\CreateContributionAmount::class,
-            'edit' => Pages\EditContributionAmount::class,
+            'index' => Pages\ListContributionAmounts::route('/'),
+            'create' => Pages\CreateContributionAmount::route('/create'),
+            'edit' => Pages\EditContributionAmount::route('/{record}/edit'),
         ];
     }
 

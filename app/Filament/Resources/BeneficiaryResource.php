@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BeneficiaryResource\Pages\ListBeneficiaries;
+use App\Filament\Resources\BeneficiaryResource\Pages;
 use App\Filament\Resources\BeneficiaryResource\RelationManager\AidDistributionsRelationManager;
 use App\Models\Beneficiary;
 use Filament\Forms;
@@ -166,7 +166,7 @@ class BeneficiaryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBeneficiaries::class,
+            'index' => Pages\ListBeneficiaries::route('/'),
         ];
     }
 

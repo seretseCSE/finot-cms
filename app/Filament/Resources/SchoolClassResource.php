@@ -97,9 +97,9 @@ class SchoolClassResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSchoolClasses::class,
-            'create' => Pages\CreateSchoolClass::class,
-            'edit' => Pages\EditSchoolClass::class,
+            'index' => Pages\ListSchoolClasses::route('/'),
+            'create' => Pages\CreateSchoolClass::route('/create'),
+            'edit' => Pages\EditSchoolClass::route('/{record}/edit'),
         ];
     }
 

@@ -73,7 +73,7 @@ class ContributionResource extends Resource
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                 $memberId = $state;
                                 $academicYearId = $get('academic_year_id');
-                                
+
                                 if ($memberId && $academicYearId) {
                                     static::checkExistingContribution($memberId, $academicYearId, null, $set);
                                 }
@@ -100,7 +100,7 @@ class ContributionResource extends Resource
                                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                         $memberId = $get('../../member_id');
                                         $academicYearId = $get('../../academic_year_id');
-                                        
+
                                         if ($memberId && $academicYearId && $state) {
                                             static::checkExistingContribution($memberId, $academicYearId, $state, $set);
                                             static::checkUnusualAmount($memberId, $state, $get('amount'), $set);
@@ -116,7 +116,7 @@ class ContributionResource extends Resource
                                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                         $memberId = $get('../../member_id');
                                         $monthName = $get('month_name');
-                                        
+
                                         if ($memberId && $monthName && $state) {
                                             static::checkUnusualAmount($memberId, $monthName, $state, $set);
                                         }
@@ -162,7 +162,7 @@ class ContributionResource extends Resource
     private static function checkExistingContribution($memberId, $academicYearId, $monthName, callable $set)
     {
         $existingAmount = Contribution::getTotalForMemberInYearForMonth($memberId, $academicYearId, $monthName);
-        
+
         if ($existingAmount > 0) {
             $member = Member::find($memberId);
             Notification::make()
@@ -179,7 +179,7 @@ class ContributionResource extends Resource
         if (Contribution::isAmountUnusual($memberId, $monthName, $amount)) {
             $member = Member::find($memberId);
             $expectedAmount = Contribution::getExpectedAmountForMemberAndMonth($memberId, $monthName);
-            
+
             Notification::make()
                 ->title('Unusual Amount Detected')
                 ->body("Note: Amount differs significantly from expected Birr {$expectedAmount} for {$member->memberGroup?->name}")
@@ -385,10 +385,10 @@ class ContributionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContributions::class,
-            'create' => Pages\CreateContribution::class,
-            'edit' => Pages\EditContribution::class,
-            'view' => Pages\ViewContribution::class,
+            'index' => Pages\ListContributions::route('/'),
+            'create' => Pages\CreateContribution::route('/create'),
+            'edit' => Pages\EditContribution::route('/{record}/edit'),
+            'view' => Pages\ViewContribution::route('/{record}'),
         ];
     }
 
@@ -398,7 +398,7 @@ class ContributionResource extends Resource
         if (isset($data['contributions'])) {
             $contributions = $data['contributions'];
             unset($data['contributions']);
-            
+
             // Store contributions for later processing
             $data['_contributions_to_save'] = $contributions;
         }
@@ -427,7 +427,7 @@ class ContributionResource extends Resource
                         'recorded_by' => Auth::id(),
                     ]);
                 }
-                
+
                 // Delete the main record if it was just a placeholder
                 $record->delete();
             });

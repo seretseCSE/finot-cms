@@ -215,9 +215,9 @@ class AcademicYearResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAcademicYears::class,
-            'create' => Pages\CreateAcademicYear::class,
-            'edit' => Pages\EditAcademicYear::class,
+            'index' => Pages\ListAcademicYears::route('/'),
+            'create' => Pages\CreateAcademicYear::route('/create'),
+            'edit' => Pages\EditAcademicYear::route('/{record}/edit'),
         ];
     }
 }

@@ -176,7 +176,7 @@ class TourResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->visible(fn (Tour $record) => static::canEdit($record)),
-                
+
                 Tables\Actions\Action::make('publish')
                     ->label('Publish Tour')
                     ->icon('heroicon-o-eye')
@@ -185,7 +185,7 @@ class TourResource extends Resource
                     ->action(function (Tour $record) {
                         $record->update(['status' => 'Published']);
                     }),
-                
+
                 Tables\Actions\Action::make('mark_in_progress')
                     ->label('Mark In Progress')
                     ->icon('heroicon-o-play')
@@ -194,7 +194,7 @@ class TourResource extends Resource
                     ->action(function (Tour $record) {
                         $record->update(['status' => 'In Progress']);
                     }),
-                
+
                 Tables\Actions\Action::make('mark_completed')
                     ->label('Mark Completed')
                     ->icon('heroicon-o-check-circle')
@@ -203,7 +203,7 @@ class TourResource extends Resource
                     ->action(function (Tour $record) {
                         $record->update(['status' => 'Completed']);
                     }),
-                
+
                 Tables\Actions\Action::make('cancel')
                     ->label('Cancel Tour')
                     ->icon('heroicon-o-x-circle')
@@ -218,10 +218,10 @@ class TourResource extends Resource
                     ->action(function (Tour $record, array $data) {
                         $record->cancel($data['cancellation_reason'], Auth::id());
                     }),
-                
+
                 GenerateAttendanceAction::make()
                     ->visible(fn (Tour $record) => $record->status === 'In Progress' && static::canEdit($record)),
-                
+
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn (Tour $record) => static::canDelete($record))
                     ->before(function (Tour $record) {
@@ -255,9 +255,9 @@ class TourResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTours::class,
-            'create' => Pages\CreateTour::class,
-            'edit' => Pages\EditTour::class,
+            'index' => Pages\ListTours::route('/'),
+            'create' => Pages\CreateTour::route('/create'),
+            'edit' => Pages\EditTour::route('/{record}/edit'),
         ];
     }
 }

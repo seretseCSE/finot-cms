@@ -94,7 +94,7 @@ class SyncConflictsResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSyncConflicts::class,
+            'index' => Pages\ListSyncConflicts::route('/'),
         ];
     }
 }

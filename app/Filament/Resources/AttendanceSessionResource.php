@@ -201,11 +201,11 @@ class AttendanceSessionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAttendanceSessions::class,
-            'create' => Pages\CreateAttendanceSession::class,
-            'edit' => Pages\EditAttendanceSession::class,
-            'view' => Pages\ViewAttendanceSession::class,
-            'mark' => Pages\MarkAttendance::class,
+            'index' => Pages\ListAttendanceSessions::route('/'),
+            'create' => Pages\CreateAttendanceSession::route('/create'),
+            'edit' => Pages\EditAttendanceSession::route('/{record}/edit'),
+            'view' => Pages\ViewAttendanceSession::route('/{record}'),
+            'mark' => Pages\MarkAttendance::route('/{record}/mark'),
         ];
     }
 }

@@ -32,32 +32,32 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                    
+
                 Forms\Components\TextInput::make('phone')
                     ->required()
                     ->tel()
                     ->unique(ignoreRecord: true),
-                    
+
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->unique(ignoreRecord: true)
                     ->nullable(),
-                    
+
                 Forms\Components\Select::make('language_preference')
                     ->options([
                         'am' => 'Amharic (አማርኛ)',
                         'en' => 'English',
                     ])
                     ->default('am'),
-                    
+
                 Forms\Components\Toggle::make('is_active')
                     ->label('Active')
                     ->default(true),
-                    
+
                 Forms\Components\Toggle::make('temp_password_changed')
                     ->label('Password Changed')
                     ->default(true),
-                    
+
                 Forms\Components\Select::make('department_id')
                     ->relationship('department')
                     ->searchable()
@@ -73,21 +73,21 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable()
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()
                     ->sortable(),
-                    
+
                 Tables\Columns\IconColumn::make('is_locked')
                     ->label('Locked')
                     ->boolean()
@@ -96,7 +96,7 @@ class UserResource extends Resource
                         true => 'danger',
                         false => 'success',
                     }),
-                    
+
                 Tables\Columns\TextColumn::make('language_preference')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -104,21 +104,21 @@ class UserResource extends Resource
                         'en' => 'primary',
                     })
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('failed_login_attempts')
                     ->label('Failed Attempts')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('locked_until')
                     ->label('Locked Until')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(fn (User $record): string => 
+                    ->formatStateUsing(fn (User $record): string =>
                         $record->locked_until?->format('M j, Y H:i') ?? 'Not locked'
                     ),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -130,13 +130,13 @@ class UserResource extends Resource
                         '1' => 'Active',
                         '0' => 'Inactive',
                     ]),
-                    
+
                 Tables\Filters\SelectFilter::make('is_locked')
                     ->options([
                         '1' => 'Locked',
                         '0' => 'Not Locked',
                     ]),
-                    
+
                 Tables\Filters\SelectFilter::make('language_preference')
                     ->options([
                         'am' => 'Amharic',
@@ -145,7 +145,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                
+
                 Tables\Actions\Action::make('lock')
                     ->label('Lock Account')
                     ->icon('heroicon-o-lock-closed')
@@ -164,7 +164,7 @@ class UserResource extends Resource
                     })
                     ->successNotificationTitle('Account locked')
                     ->failureNotificationTitle('Failed to lock account'),
-                    
+
                 Tables\Actions\Action::make('unlock')
                     ->label('Unlock Account')
                     ->icon('heroicon-o-lock-open')
@@ -183,7 +183,7 @@ class UserResource extends Resource
                     })
                     ->successNotificationTitle('Account unlocked')
                     ->failureNotificationTitle('Failed to unlock account'),
-                    
+
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn (User $record): bool => Auth::user()->can('delete', $record)),
             ])
@@ -209,7 +209,7 @@ class UserResource extends Resource
                             }
                         })
                         ->deselectRecordsAfterCompletion(),
-                        
+
                     Tables\Actions\BulkAction::make('unlock')
                         ->label('Unlock Selected')
                         ->icon('heroicon-o-lock-open')
@@ -246,13 +246,13 @@ class UserResource extends Resource
         ];
     }
 
-    
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::class,
-            'create' => Pages\CreateUser::class,
-            'edit' => Pages\EditUser::class,
+            'index' => Pages\ListUsers::route('/'),
+            'create' => Pages\CreateUser::route('/create'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 

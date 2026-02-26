@@ -117,7 +117,7 @@ class MediaResource extends Resource
                             ->directory(fn (callable $get) => $get('type') === 'Photo' ? 'media/photos' : 'media/videos')
                             ->visibility('public')
                             ->acceptedFileTypes(function (callable $get) {
-                                return $get('type') === 'Photo' 
+                                return $get('type') === 'Photo'
                                     ? ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
                                     : ['video/mp4', 'video/quicktime', 'video/x-msvideo'];
                             })
@@ -125,7 +125,7 @@ class MediaResource extends Resource
                                 return $get('type') === 'Photo' ? 10240 : 51200; // 10MB for photos, 50MB for videos
                             })
                             ->helperText(function (callable $get) {
-                                return $get('type') === 'Photo' 
+                                return $get('type') === 'Photo'
                                     ? 'JPG, PNG, GIF, WEBP files, max 10MB'
                                     : 'MP4, MOV, AVI files, max 50MB';
                             })
@@ -321,9 +321,9 @@ class MediaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMedia::class,
-            'create' => Pages\CreateMedia::class,
-            'edit' => Pages\EditMedia::class,
+            'index' => Pages\ListMedia::route('/'),
+            'create' => Pages\CreateMedia::route('/create'),
+            'edit' => Pages\EditMedia::route('/{record}/edit'),
         ];
     }
 }

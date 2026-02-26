@@ -128,8 +128,8 @@ class UserSessionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserSessions::class,
-            'view' => Pages\ViewUserSession::class,
+            'index' => Pages\ListUserSessions::route('/'),
+            'view' => Pages\ViewUserSession::route('/{record}'),
         ];
     }
 

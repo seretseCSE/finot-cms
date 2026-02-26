@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AuditLogResource\Pages\ListAuditLogs;
+use App\Filament\Resources\AuditLogResource\Pages;
 use App\Models\AuditLog;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -95,7 +95,7 @@ class AuditLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAuditLogs::class,
+            'index' => Pages\ListAuditLogs::route('/'),
         ];
     }
 

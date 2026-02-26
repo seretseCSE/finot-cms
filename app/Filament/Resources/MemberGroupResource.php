@@ -121,7 +121,7 @@ class MemberGroupResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
-                
+
                 Tables\Actions\Action::make('assign_member')
                     ->label('Assign Member')
                     ->icon('heroicon-o-user-plus')
@@ -164,7 +164,7 @@ class MemberGroupResource extends Resource
                     ->action(function (array $data, MemberGroup $record) {
                         try {
                             $record->assignMember($data['member_id'], $data['effective_from']);
-                            
+
                             \Filament\Notifications\Notification::make()
                                 ->title('Member Assigned')
                                 ->body("Member successfully assigned to {$record->name}")
@@ -200,18 +200,18 @@ class MemberGroupResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMemberGroups::class,
-            'create' => Pages\CreateMemberGroup::class,
-            'edit' => Pages\EditMemberGroup::class,
-            'view' => Pages\ViewMemberGroup::class,
-            'assignment-history' => Pages\GroupAssignmentHistory::class,
+            'index' => Pages\ListMemberGroups::route('/'),
+            'create' => Pages\CreateMemberGroup::route('/create'),
+            'edit' => Pages\EditMemberGroup::route('/{record}/edit'),
+            'view' => Pages\ViewMemberGroup::route('/{record}'),
+            'assignment-history' => Pages\GroupAssignmentHistory::route('/{record}/assignment-history'),
         ];
     }
 
     public static function canViewAny(): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'admin',
             'superadmin',
@@ -223,7 +223,7 @@ class MemberGroupResource extends Resource
     public static function canCreate(): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'admin',
             'superadmin',
@@ -235,7 +235,7 @@ class MemberGroupResource extends Resource
     public static function canEdit($record): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'admin',
             'superadmin',
@@ -247,7 +247,7 @@ class MemberGroupResource extends Resource
     public static function canDelete($record): bool
     {
         $user = Auth::user();
-        
+
         if (!$user->hasRole(['admin', 'superadmin'])) {
             return false;
         }
@@ -259,7 +259,7 @@ class MemberGroupResource extends Resource
     public static function canRestore($record): bool
     {
         $user = Auth::user();
-        
+
         return $user->hasRole([
             'admin',
             'superadmin'

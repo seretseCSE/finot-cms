@@ -306,9 +306,9 @@ class StudentEnrollmentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListStudentEnrollments::class,
-            'create' => Pages\CreateStudentEnrollment::class,
-            'edit' => Pages\EditStudentEnrollment::class,
+            'index' => Pages\ListStudentEnrollments::route('/'),
+            'create' => Pages\CreateStudentEnrollment::route('/create'),
+            'edit' => Pages\EditStudentEnrollment::route('/{record}/edit'),
         ];
     }
 }

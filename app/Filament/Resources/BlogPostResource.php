@@ -226,9 +226,9 @@ class BlogPostResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBlogPosts::class,
-            'create' => Pages\CreateBlogPost::class,
-            'edit' => Pages\EditBlogPost::class,
+            'index' => Pages\ListBlogPosts::route('/'),
+            'create' => Pages\CreateBlogPost::route('/create'),
+            'edit' => Pages\EditBlogPost::route('/{record}/edit'),
         ];
     }
 }

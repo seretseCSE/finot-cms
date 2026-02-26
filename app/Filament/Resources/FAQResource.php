@@ -224,9 +224,9 @@ class FAQResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFAQs::class,
-            'create' => Pages\CreateFAQ::class,
-            'edit' => Pages\EditFAQ::class,
+            'index' => Pages\ListFAQs::route('/'),
+            'create' => Pages\CreateFAQ::route('/create'),
+            'edit' => Pages\EditFAQ::route('/{record}/edit'),
         ];
     }
 }

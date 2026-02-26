@@ -180,9 +180,9 @@ class SongCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSongCategories::class,
-            'create' => Pages\CreateSongCategory::class,
-            'edit' => Pages\EditSongCategory::class,
+            'index' => Pages\ListSongCategories::route('/'),
+            'create' => Pages\CreateSongCategory::route('/create'),
+            'edit' => Pages\EditSongCategory::route('/{record}/edit'),
         ];
     }
 }

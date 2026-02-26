@@ -273,9 +273,9 @@ class SongResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSongs::class,
-            'create' => Pages\CreateSong::class,
-            'edit' => Pages\EditSong::class,
+            'index' => Pages\ListSongs::route('/'),
+            'create' => Pages\CreateSong::route('/create'),
+            'edit' => Pages\EditSong::route('/{record}/edit'),
         ];
     }
 }

@@ -241,10 +241,10 @@ class DonationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDonations::class,
-            'create' => Pages\CreateDonation::class,
-            'edit' => Pages\EditDonation::class,
-            'view' => Pages\ViewDonation::class,
+            'index' => Pages\ListDonations::route('/'),
+            'create' => Pages\CreateDonation::route('/create'),
+            'edit' => Pages\EditDonation::route('/{record}/edit'),
+            'view' => Pages\ViewDonation::route('/{record}'),
         ];
     }
 

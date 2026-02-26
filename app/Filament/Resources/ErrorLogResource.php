@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ErrorLogResource\Pages\ListErrorLogs;
+use App\Filament\Resources\ErrorLogResource\Pages;
 use App\Models\ErrorLog;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -78,7 +78,7 @@ class ErrorLogResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListErrorLogs::class,
+            'index' => Pages\ListErrorLogs::route('/'),
         ];
     }
 
