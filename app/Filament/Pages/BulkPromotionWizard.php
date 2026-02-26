@@ -20,7 +20,7 @@ class BulkPromotionWizard extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    public static function getNavigationIcon(): ?string { return 'heroicono-arrow-up-tray'; }
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-arrow-up-tray'; }
 
     protected string $view = 'filament.pages.bulk-promotion-wizard';
 

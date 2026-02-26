@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\Auth\ChangeInitialPassword;
 use App\Filament\Pages\EditProfile;
 use App\Filament\Pages\ManageActiveSessions;
@@ -61,6 +62,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->pages([
+                \App\Filament\Pages\Dashboard::class,
                 ChangeInitialPassword::class,
                 EditProfile::class,
                 ManageActiveSessions::class,

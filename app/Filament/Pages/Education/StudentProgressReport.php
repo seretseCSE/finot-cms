@@ -14,7 +14,7 @@ use Filament\Schemas\Schema;
 
 class StudentProgressReport extends Page
 {
-    public static function getNavigationIcon(): ?string { return 'heroicono-academic-cap'; }
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-academic-cap'; }
 
     protected string $view = 'filament.pages.education.student-progress-report';
 
@@ -49,7 +49,7 @@ class StudentProgressReport extends Page
                     ->options(function (callable $get) {
                         $yearId = $get('academic_year_id');
                         if (!$yearId) return [];
-                        
+
                         return ClassModel::where('academic_year_id', $yearId)
                             ->with('subject')
                             ->get()
@@ -63,7 +63,7 @@ class StudentProgressReport extends Page
                     ->options(function (callable $get) {
                         $classId = $get('class_id');
                         if (!$classId) return [];
-                        
+
                         return Member::whereHas('educationHistory', function ($query) use ($classId) {
                             $query->where('class_id', $classId);
                         })->pluck('full_name', 'id');
@@ -76,7 +76,7 @@ class StudentProgressReport extends Page
     public function getProgressData(): array
     {
         $filters = $this->form->getState();
-        
+
         if (!$filters['member_id']) {
             return [];
         }
@@ -161,7 +161,7 @@ class StudentProgressReport extends Page
     public function generateReportCard()
     {
         $data = $this->getProgressData();
-        
+
         // Implementation for PDF report card generation
         return response()->json($data);
     }

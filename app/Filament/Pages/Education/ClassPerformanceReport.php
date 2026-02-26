@@ -13,7 +13,7 @@ use Filament\Schemas\Schema;
 
 class ClassPerformanceReport extends Page
 {
-    public static function getNavigationIcon(): ?string { return 'heroicono-presentation-chart-bar'; }
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-presentation-chart-bar'; }
 
     protected string $view = 'filament.pages.education.class-performance-report';
 
@@ -47,7 +47,7 @@ class ClassPerformanceReport extends Page
                     ->options(function (callable $get) {
                         $yearId = $get('academic_year_id');
                         if (!$yearId) return [];
-                        
+
                         return ClassModel::where('academic_year_id', $yearId)
                             ->with('subject')
                             ->get()
@@ -61,7 +61,7 @@ class ClassPerformanceReport extends Page
     public function getClassPerformanceData(): array
     {
         $filters = $this->form->getState();
-        
+
         if (!$filters['class_id']) {
             return [];
         }
@@ -166,7 +166,7 @@ class ClassPerformanceReport extends Page
     public function exportClassReport()
     {
         $data = $this->getClassPerformanceData();
-        
+
         // Implementation for Excel export
         return response()->json($data);
     }
