@@ -160,24 +160,24 @@ class ContributionAmountResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->visible(fn (ContributionAmount $record) => static::canEdit($record)),
 
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn (ContributionAmount $record) => static::canDelete($record))
                     ->requiresConfirmation()
                     ->modalHeading('Delete Contribution Amount')
                     ->modalDescription('Are you sure you want to delete this contribution amount? This action cannot be undone.'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()
+                Actions\DeleteBulkAction::make()
                     ->visible(fn () => static::canDelete(null))
                     ->requiresConfirmation()
                     ->modalHeading('Delete Selected Contribution Amounts')
                     ->modalDescription('Are you sure you want to delete the selected contribution amounts? This action cannot be undone.'),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ]);
     }

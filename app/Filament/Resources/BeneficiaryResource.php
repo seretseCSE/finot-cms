@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BeneficiaryResource\Pages;
 use App\Filament\Resources\BeneficiaryResource\RelationManager\AidDistributionsRelationManager;
 use App\Models\Beneficiary;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -141,10 +142,10 @@ class BeneficiaryResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make()
                     ->visible(fn ($record) => $record->canBeDeleted()),
-                Tables\Actions\Action::make('mark_completed')
+                Actions\Action::make('mark_completed')
                     ->label('Mark Completed')
                     ->icon('heroicon-o-check')
                     ->color('success')
@@ -152,7 +153,7 @@ class BeneficiaryResource extends Resource
                     ->action(fn ($record) => $record->markAsCompleted()),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Actions\DeleteBulkAction::make(),
             ]);
     }
 

@@ -13,7 +13,7 @@ class ErrorLogResource extends Resource
 {
     protected static ?string $model = ErrorLog::class;
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-bug-ant'; }
+    public static function getNavigationIcon(): ?string { return null; }
 
     public static function getNavigationGroup(): ?string { return 'System'; }
 
@@ -59,11 +59,11 @@ class ErrorLogResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
+                Actions\ViewAction::make()
                     ->label('View Details'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()
+                Actions\DeleteBulkAction::make()
                     ->visible(fn () => auth()->user()->role === 'superadmin'),
             ]);
     }

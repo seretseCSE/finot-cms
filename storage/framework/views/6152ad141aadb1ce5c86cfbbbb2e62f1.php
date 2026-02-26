@@ -1,0 +1,1 @@
+<?php echo e($this->getId()); ?>.table.selection.indicator<?php /**PATH C:\xampp\htdocs\Laravel\Github_repo\finot-cms\storage\framework\views/d1406d9eeac9343d4df7e011e39722f5.blade.php ENDPATH**/ ?>

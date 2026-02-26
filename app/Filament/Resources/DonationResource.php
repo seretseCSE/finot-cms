@@ -82,8 +82,7 @@ class DonationResource extends Resource
                             'Building Fund' => 'Building Fund',
                             'Missionary Support' => 'Missionary Support',
                             'Charity/Aid' => 'Charity/Aid',
-                        ])
-                            ->required()
+                        ], true)
                             ->helperText('Select the fund or purpose for this donation'),
 
                         Forms\Components\Textarea::make('notes')
@@ -186,10 +185,10 @@ class DonationResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->visible(fn (Donation $record) => static::canEdit($record)),
 
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn (Donation $record) => static::canDelete($record))
                     ->requiresConfirmation()
                     ->modalHeading('Delete Donation')
@@ -209,7 +208,7 @@ class DonationResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()
+                Actions\DeleteBulkAction::make()
                     ->visible(fn () => static::canDelete(null))
                     ->requiresConfirmation()
                     ->modalHeading('Delete Selected Donations')
@@ -230,7 +229,7 @@ class DonationResource extends Resource
                     }),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ])
             ->emptyStateHeading('No donations recorded')

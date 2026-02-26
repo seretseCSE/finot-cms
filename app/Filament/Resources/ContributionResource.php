@@ -10,6 +10,7 @@ use App\Models\AcademicYear;
 use App\Models\Contribution;
 use App\Models\ContributionAmount;
 use App\Models\Member;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -282,10 +283,10 @@ class ContributionResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->visible(fn (Contribution $record) => static::canEdit($record)),
 
-                Tables\Actions\Action::make('archive')
+                Actions\Action::make('archive')
                     ->label(fn ($record) => $record->is_archived ? 'Unarchive' : 'Archive')
                     ->icon(fn ($record) => $record->is_archived ? 'heroicon-o-arrow-uturn-left' : 'heroicon-o-archive-box')
                     ->color(fn ($record) => $record->is_archived ? 'warning' : 'gray')
@@ -306,7 +307,7 @@ class ContributionResource extends Resource
                     })
                     ->visible(fn (Contribution $record) => static::canEdit($record)),
 
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn (Contribution $record) => static::canDelete($record))
                     ->requiresConfirmation()
                     ->modalHeading('Delete Contribution')
@@ -325,8 +326,8 @@ class ContributionResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('archive')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('archive')
                         ->label('Archive Selected')
                         ->icon('heroicon-o-archive-box')
                         ->color('gray')
@@ -341,7 +342,7 @@ class ContributionResource extends Resource
                         })
                         ->visible(fn () => static::canEdit(null)),
 
-                    Tables\Actions\BulkAction::make('unarchive')
+                    Actions\BulkAction::make('unarchive')
                         ->label('Unarchive Selected')
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('warning')
@@ -356,7 +357,7 @@ class ContributionResource extends Resource
                         })
                         ->visible(fn () => static::canEdit(null)),
 
-                    Tables\Actions\DeleteBulkAction::make()
+                    Actions\DeleteBulkAction::make()
                         ->visible(fn () => static::canDelete(null))
                         ->requiresConfirmation()
                         ->modalHeading('Delete Selected Contributions')
@@ -377,7 +378,7 @@ class ContributionResource extends Resource
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ]);
     }

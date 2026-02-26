@@ -58,8 +58,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Content Management')
                     ->icon('heroicon-o-document-text'),
                 NavigationGroup::make('System')
-                    ->label('System')
-                    ->icon('heroicon-o-cog-6-tooth'),
+                    ->label('System'),
             ])
             ->pages([
                 \App\Filament\Pages\Dashboard::class,

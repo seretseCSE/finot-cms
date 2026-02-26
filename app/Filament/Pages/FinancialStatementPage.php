@@ -10,6 +10,8 @@ use App\Models\Donation;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Auth;
@@ -50,9 +52,9 @@ class FinancialStatementPage extends Page
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Section::make('Statement Period')
+            Section::make('Statement Period')
                 ->schema([
-                    Forms\Components\Grid::make(3)
+                    Grid::make(3)
                         ->schema([
                             Forms\Components\Select::make('periodType')
                                 ->label('Period Type')

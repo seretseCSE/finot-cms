@@ -8,6 +8,7 @@ use App\Jobs\GenerateEndOfYearReport;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\AcademicYear;
 use App\Models\StudentEnrollment;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -109,7 +110,7 @@ class AcademicYearResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('activate')
+                Actions\Action::make('activate')
                     ->label('Activate')
                     ->icon('heroicon-o-bolt')
                     ->color('success')
@@ -163,7 +164,7 @@ class AcademicYearResource extends Resource
                         Notification::make()->title('Academic year activated')->success()->send();
                     }),
 
-                Tables\Actions\Action::make('deactivate')
+                Actions\Action::make('deactivate')
                     ->label('Deactivate')
                     ->icon('heroicon-o-pause')
                     ->color('danger')
@@ -196,7 +197,7 @@ class AcademicYearResource extends Resource
                         Notification::make()->title('Academic year deactivated')->success()->send();
                     }),
 
-                Tables\Actions\Action::make('reactivate')
+                Actions\Action::make('reactivate')
                     ->label('Reactivate')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')

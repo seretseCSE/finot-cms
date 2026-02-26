@@ -4,10 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SchoolClassResource\Pages;
 use App\Models\ClassModel;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables; 
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
@@ -77,17 +78,17 @@ class SchoolClassResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->toggleable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make()
                     ->visible(fn (ClassModel $record) => $record->canBeDeleted()),
-                Tables\Actions\Action::make('archive')
+                Actions\Action::make('archive')
                     ->label('Archive')
                     ->icon('heroicon-o-archive-box')
                     ->color('warning')
                     ->visible(fn (ClassModel $record) => ! $record->canBeDeleted())
                     ->requiresConfirmation()
                     ->action(fn (ClassModel $record) => $record->delete()),
-                Tables\Actions\RestoreAction::make(),
+                Actions\RestoreAction::make(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),

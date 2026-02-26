@@ -8,6 +8,7 @@ use App\Models\Teacher;
 use App\Models\TeacherAttendance;
 use App\Models\TeacherAssignment;
 use App\Models\AcademicYear;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -230,10 +231,10 @@ class TeacherResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make()
                     ->visible(fn (Teacher $record) => $record->canDelete()),
-                Tables\Actions\Action::make('set_status')
+                Actions\Action::make('set_status')
                     ->label('Change Status')
                     ->icon('heroicon-o-arrow-path')
                     ->form([
@@ -272,7 +273,7 @@ class TeacherResource extends Resource
 
                         Notification::make()->title('Status updated')->success()->send();
                     }),
-                Tables\Actions\RestoreAction::make()
+                Actions\RestoreAction::make()
                     ->visible(fn (Teacher $record) => $record->trashed()),
             ]);
     }

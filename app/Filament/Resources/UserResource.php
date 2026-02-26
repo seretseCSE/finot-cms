@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -19,7 +20,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string | null | BackedEnum $navigationIcon = 'heroicon-o-users';
+    protected static string | null | BackedEnum $navigationIcon = null;
 
     protected static string | null | UnitEnum $navigationGroup = 'Administration';
 
@@ -144,9 +145,9 @@ class UserResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Actions\EditAction::make(),
 
-                Tables\Actions\Action::make('lock')
+                Actions\Action::make('lock')
                     ->label('Lock Account')
                     ->icon('heroicon-o-lock-closed')
                     ->color('danger')
@@ -165,7 +166,7 @@ class UserResource extends Resource
                     ->successNotificationTitle('Account locked')
                     ->failureNotificationTitle('Failed to lock account'),
 
-                Tables\Actions\Action::make('unlock')
+                Actions\Action::make('unlock')
                     ->label('Unlock Account')
                     ->icon('heroicon-o-lock-open')
                     ->color('success')
@@ -184,12 +185,12 @@ class UserResource extends Resource
                     ->successNotificationTitle('Account unlocked')
                     ->failureNotificationTitle('Failed to unlock account'),
 
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn (User $record): bool => Auth::user()->can('delete', $record)),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('lock')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('lock')
                         ->label('Lock Selected')
                         ->icon('heroicon-o-lock-closed')
                         ->color('danger')
@@ -210,7 +211,7 @@ class UserResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\BulkAction::make('unlock')
+                    Actions\BulkAction::make('unlock')
                         ->label('Unlock Selected')
                         ->icon('heroicon-o-lock-open')
                         ->color('success')
@@ -235,7 +236,7 @@ class UserResource extends Resource
                     ->visible(fn (): bool => Auth::user()->can('lock', User::class)),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
+                Actions\CreateAction::make(),
             ]);
     }
 

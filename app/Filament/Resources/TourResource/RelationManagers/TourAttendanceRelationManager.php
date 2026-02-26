@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TourResource\RelationManagers;
 
 use App\Models\TourAttendance;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -89,7 +90,7 @@ class TourAttendanceRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('mark_all_present')
+                Actions\Action::make('mark_all_present')
                     ->label('Mark All Present')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -101,7 +102,7 @@ class TourAttendanceRelationManager extends RelationManager
                         }
                     }),
 
-                Tables\Actions\Action::make('complete_attendance')
+                Actions\Action::make('complete_attendance')
                     ->label('Complete Attendance')
                     ->icon('heroicon-o-check')
                     ->color('primary')
@@ -131,7 +132,7 @@ class TourAttendanceRelationManager extends RelationManager
                         return $data;
                     }),
 
-                Tables\Actions\Action::make('call_passenger')
+                Actions\Action::make('call_passenger')
                     ->label('Call')
                     ->icon('heroicon-o-phone')
                     ->color('primary')

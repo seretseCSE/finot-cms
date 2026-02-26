@@ -12,6 +12,8 @@ use App\Models\Member;
 use App\Models\MemberGroup;
 use App\Models\SchoolClass;
 use Filament\Forms;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -175,7 +177,7 @@ class ContributionReportPage extends Page
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Section::make('Report Filters')
+            Section::make('Report Filters')
                 ->schema([
                     Forms\Components\Select::make('selectedAcademicYear')
                         ->label('Academic Year')
@@ -220,7 +222,7 @@ class ContributionReportPage extends Page
                         ->columns(3)
                         ->afterStateUpdated(fn () => $this->resetPage()),
 
-                    Forms\Components\Grid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Forms\Components\DatePicker::make('dateFrom')
                                 ->label('Date From')

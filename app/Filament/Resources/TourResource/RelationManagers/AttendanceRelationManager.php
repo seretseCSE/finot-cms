@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TourResource\RelationManagers;
 
 use App\Models\TourAttendanceSession;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -78,7 +79,7 @@ class AttendanceRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('generate_attendance')
+                Actions\Action::make('generate_attendance')
                     ->label('Generate Attendance List')
                     ->icon('heroicon-o-users')
                     ->color('success')
@@ -124,19 +125,19 @@ class AttendanceRelationManager extends RelationManager
                         ]);
                     }),
 
-                Tables\Actions\Action::make('view_attendance')
+                Actions\Action::make('view_attendance')
                     ->label('View Attendance')
                     ->icon('heroicon-eye')
                     ->url(fn ($record) => route('filament.admin.resources.tour-attendances.index', ['tour' => $this->ownerRecord->id, 'session' => $record->id]))
                     ->visible(fn () => $this->ownerRecord->attendanceSessions()->exists()),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_details')
+                Actions\Action::make('view_details')
                     ->label('View Details')
                     ->icon('heroicon-eye')
                     ->url(fn ($record) => route('filament.admin.resources.tour-attendances.index', ['tour' => $this->ownerRecord->id, 'session' => $record->id])),
 
-                Tables\Actions\Action::make('complete_attendance')
+                Actions\Action::make('complete_attendance')
                     ->label('Complete Attendance')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -146,7 +147,7 @@ class AttendanceRelationManager extends RelationManager
                     }),
             ])
             ->emptyStateActions([
-                Tables\Actions\Action::make('generate_attendance')
+                Actions\Action::make('generate_attendance')
                     ->label('Generate Attendance List')
                     ->icon('heroicon-o-users')
                     ->color('success')

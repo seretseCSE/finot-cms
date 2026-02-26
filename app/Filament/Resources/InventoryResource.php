@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Filament\Resources\InventoryResource\RelationManagers;
 use App\Models\InventoryItem;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -199,11 +200,11 @@ class InventoryResource extends Resource
                     ->query(fn ($query) => $query->whereRaw('(quantity + (SELECT COALESCE(SUM(CASE WHEN movement_type = \'Stock In\' THEN quantity ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN movement_type = \'Stock Out\' THEN quantity ELSE 0 END), 0)) FROM inventory_movements WHERE item_id = inventory_items.id) < 5')),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make()
+                Actions\ViewAction::make(),
+                Actions\EditAction::make()
                     ->visible(fn ($record) => static::canEdit($record)),
 
-                Tables\Actions\Action::make('record_movement')
+                Actions\Action::make('record_movement')
                     ->label('Record Movement')
                     ->icon('heroicon-o-arrow-path')
                     ->color('primary')
@@ -278,7 +279,7 @@ class InventoryResource extends Resource
                         ]);
                     }),
 
-                Tables\Actions\Action::make('mark_damaged')
+                Actions\Action::make('mark_damaged')
                     ->label('Mark Damaged')
                     ->icon('heroicon-o-exclamation-triangle')
                     ->color('warning')
@@ -293,7 +294,7 @@ class InventoryResource extends Resource
                         $record->markAsDamaged($data['notes']);
                     }),
 
-                Tables\Actions\Action::make('mark_lost')
+                Actions\Action::make('mark_lost')
                     ->label('Mark Lost')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
@@ -308,7 +309,7 @@ class InventoryResource extends Resource
                         $record->markAsLost($data['notes']);
                     }),
 
-                Tables\Actions\Action::make('mark_disposed')
+                Actions\Action::make('mark_disposed')
                     ->label('Mark Disposed')
                     ->icon('heroicon-o-trash')
                     ->color('gray')
@@ -323,12 +324,12 @@ class InventoryResource extends Resource
                         $record->markAsDisposed($data['notes']);
                     }),
 
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn ($record) => static::canDelete($record)),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('mark_damaged')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('mark_damaged')
                         ->label('Mark Damaged')
                         ->icon('heroicon-o-exclamation-triangle')
                         ->color('warning')
@@ -340,11 +341,11 @@ class InventoryResource extends Resource
                             }
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ])
             ->emptyStateHeading('No inventory items found')

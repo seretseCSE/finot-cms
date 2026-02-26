@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TourResource\RelationManagers;
 
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -145,7 +146,7 @@ class InternalRegistrationRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('add_passenger')
+                Actions\Action::make('add_passenger')
                     ->label('Add Passenger')
                     ->icon('heroicon-o-user-plus')
                     ->modalHeading('Add Internal Passenger')
@@ -178,7 +179,7 @@ class InternalRegistrationRelationManager extends RelationManager
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 
-                Tables\Actions\Action::make('confirm')
+                Actions\Action::make('confirm')
                     ->label('Confirm')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -187,7 +188,7 @@ class InternalRegistrationRelationManager extends RelationManager
                         $record->confirm();
                     }),
 
-                Tables\Actions\Action::make('cancel_registration')
+                Actions\Action::make('cancel_registration')
                     ->label('Cancel Registration')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -242,7 +243,7 @@ class InternalRegistrationRelationManager extends RelationManager
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\Action::make('add_passenger')
+                Actions\Action::make('add_passenger')
                     ->label('Add Passenger')
                     ->icon('heroicon-o-user-plus'),
             ])

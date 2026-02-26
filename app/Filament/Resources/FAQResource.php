@@ -161,15 +161,15 @@ class FAQResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make()
+                Actions\ViewAction::make(),
+                Actions\EditAction::make()
                     ->visible(fn ($record) => static::canEdit($record)),
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn ($record) => static::canDelete($record)),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('activate')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -179,7 +179,7 @@ class FAQResource extends Resource
                             }
                         }),
 
-                    Tables\Actions\BulkAction::make('deactivate')
+                    Actions\BulkAction::make('deactivate')
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -189,7 +189,7 @@ class FAQResource extends Resource
                             }
                         }),
 
-                    Tables\Actions\BulkAction::make('feature')
+                    Actions\BulkAction::make('feature')
                         ->label('Feature Selected')
                         ->icon('heroicon-o-star')
                         ->color('warning')
@@ -199,7 +199,7 @@ class FAQResource extends Resource
                             }
                         }),
 
-                    Tables\Actions\BulkAction::make('unfeature')
+                    Actions\BulkAction::make('unfeature')
                         ->label('Unfeature Selected')
                         ->icon('heroicon-o-star')
                         ->color('gray')
@@ -209,11 +209,11 @@ class FAQResource extends Resource
                             }
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ])
             ->emptyStateHeading('No FAQs found')

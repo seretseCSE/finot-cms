@@ -5,6 +5,7 @@ namespace App\Filament\Forms\Components;
 use App\Models\CustomOption;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Group;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -154,14 +155,19 @@ class CustomOptionSelect extends Select
      * Convenience helper to render Select + inline "Other" TextInput.
      *
      * @param  array<string, string>  $predefinedOptions
+     * @param  bool  $required
      */
-    public static function makeWithOther(string $name, string $fieldName, array $predefinedOptions = []): Forms\Components\Group
+    public static function makeWithOther(string $name, string $fieldName, array $predefinedOptions = [], bool $required = false): Group
     {
         $select = static::make($name)
             ->label(Str::of($name)->replace('_', ' ')->title()->toString())
             ->customOptions($fieldName, $predefinedOptions);
+        
+        if ($required) {
+            $select->required();
+        }
 
-        return Forms\Components\Group::make([
+        return Group::make([
             $select,
             $select->getOtherTextInput(),
         ])->columns(1);

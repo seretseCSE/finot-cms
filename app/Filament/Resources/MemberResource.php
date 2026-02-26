@@ -9,8 +9,10 @@ use App\Helpers\EthiopianDateHelper;
 use App\Models\Department;
 use App\Models\MemberGroupAssignment;
 use App\Models\Member;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -42,7 +44,7 @@ class MemberResource extends Resource
                 // Tab 1 - Personal Information
                 Forms\Components\Tabs\Tab::make('Personal Information / የግል መረጃ')
                     ->schema([
-                        Forms\Components\Section::make()
+                        Section::make()
                             ->schema([
                                 \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('title', 'title', [
                                         'Dn.' => 'Dn. (ዲ.)',
@@ -52,15 +54,13 @@ class MemberResource extends Resource
                                         'Mrs.' => 'Mrs. (ወ/ሮ)',
                                         'Ms.' => 'Ms. (ወ/ሪት)',
                                         'Dr.' => 'Dr.',
-                                    ])
-                                    ->required(),
+                                    ], true),
 
                                 \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('member_type', 'member_type', [
                                         'Kids' => 'Kids',
                                         'Youth' => 'Youth',
                                         'Adult' => 'Adult',
-                                    ])
-                                    ->required()
+                                    ], true)
                                     ->live(),
 
                                 Forms\Components\TextInput::make('first_name')
@@ -129,7 +129,7 @@ class MemberResource extends Resource
                 // Tab 2 - Address & Contact
                 Forms\Components\Tabs\Tab::make('Address & Contact')
                     ->schema([
-                        Forms\Components\Section::make('Residential Address / የመኖሪያ አድራሻ')
+                        Section::make('Residential Address / የመኖሪያ አድራሻ')
                             ->schema([
                                 Forms\Components\TextInput::make('city')
                                     ->label('City / የመኖሪያ ከተማ')
@@ -160,7 +160,7 @@ class MemberResource extends Resource
                             ])
                             ->columns(2),
 
-                        Forms\Components\Section::make('Contact Information / የግንኙነት መረጃ')
+                        Section::make('Contact Information / የግንኙነት መረጃ')
                             ->schema([
                                 Forms\Components\TextInput::make('phone')
                                     ->label('Personal Phone / ስልክ')
@@ -180,7 +180,7 @@ class MemberResource extends Resource
                 // Tab 3 - Emergency & Spiritual
                 Forms\Components\Tabs\Tab::make('Emergency & Spiritual')
                     ->schema([
-                        Forms\Components\Section::make('Emergency Contact / የቅርብ ጓደኛ')
+                        Section::make('Emergency Contact / የቅርብ ጓደኛ')
                             ->schema([
                                 Forms\Components\TextInput::make('emergency_contact_name')
                                     ->label('Emergency Contact Name / የቅርብ ጓደኛ ስም')
@@ -194,7 +194,7 @@ class MemberResource extends Resource
                             ])
                             ->columns(2),
 
-                        Forms\Components\Section::make('Spiritual Information / መንፈሳዊ መረጃ')
+                        Section::make('Spiritual Information / መንፈሳዊ መረጃ')
                             ->schema([
                                 Forms\Components\TextInput::make('confession_father_name')
                                     ->label('Confession Father\'s Name / የንስሀ አባት ስም')
@@ -211,7 +211,7 @@ class MemberResource extends Resource
                 Forms\Components\Tabs\Tab::make('Additional Information')
                     ->schema([
                         // Kids: Parent/Guardian Information
-                        Forms\Components\Section::make('Parent/Guardian Information / የወላጅ/አሳዲጊ መረጃ')
+                        Section::make('Parent/Guardian Information / የወላጅ/አሳዲጊ መረጃ')
                             ->schema([
                                 Forms\Components\Repeater::make('parent_guardians')
                                     ->label('')
@@ -302,7 +302,7 @@ class MemberResource extends Resource
                             ])
                             ->visible(fn (callable $get) => $get('member_type') === 'Kids'),
 
-                        Forms\Components\Section::make('Additional Kids Information')
+                        Section::make('Additional Kids Information')
                             ->schema([
                                 Forms\Components\Select::make('spiritual_education_level')
                                     ->label('Spiritual Education Level / የመንፈሳዊ ት/ት ደረጃ')
@@ -320,7 +320,7 @@ class MemberResource extends Resource
                             ->visible(fn (callable $get) => $get('member_type') === 'Kids'),
 
                         // Youth/Adult: Family Information
-                        Forms\Components\Section::make('Family Information / የቤተሰብ መረጃ')
+                        Section::make('Family Information / የቤተሰብ መረጃ')
                             ->schema([
                                 Forms\Components\TextInput::make('family_size')
                                     ->label('Total Family Size / ቤተሰብ ብዛት')
@@ -354,7 +354,7 @@ class MemberResource extends Resource
                             ->visible(fn (callable $get) => in_array($get('member_type'), ['Youth', 'Adult'])),
 
                         // Youth/Adult: Occupation Information
-                        Forms\Components\Section::make('Occupation / ሙያ')
+                        Section::make('Occupation / ሙያ')
                             ->schema([
                                 \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('occupation_status', 'occupation_status', [
                                         'Student' => 'Student',
@@ -415,7 +415,7 @@ class MemberResource extends Resource
                             ->visible(fn (callable $get) => in_array($get('member_type'), ['Youth', 'Adult'])),
 
                         // Marital Status & Children
-                        Forms\Components\Section::make('Marital Status & Children')
+                        Section::make('Marital Status & Children')
                             ->schema([
                                 \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('marital_status', 'marital_status', [
                                         'Single' => 'Single',
@@ -467,15 +467,14 @@ class MemberResource extends Resource
                 // Tab 5 - Status & History
                 Forms\Components\Tabs\Tab::make('Status & History')
                     ->schema([
-                        Forms\Components\Section::make('Member Status')
+                        Section::make('Member Status')
                             ->schema([
                                 \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('status', 'member_status', [
                                         'Draft' => 'Draft',
                                         'Member' => 'Member',
                                         'Active' => 'Active',
                                         'Former' => 'Former',
-                                    ])
-                                    ->required()
+                                    ], true)
                                     ->disabled(fn () => !Auth::user()->hasRole(['hr_head', 'admin', 'superadmin'])),
 
                                 Forms\Components\DatePicker::make('member_since')
@@ -489,7 +488,7 @@ class MemberResource extends Resource
                                     ->disabled(fn () => !Auth::user()->hasRole(['hr_head', 'admin', 'superadmin'])),
                             ]),
 
-                        Forms\Components\Section::make('Assignment History')
+                        Section::make('Assignment History')
                             ->schema([
                                 Forms\Components\Placeholder::make('assignment_history')
                                     ->label('Recent Group Assignments')
@@ -604,11 +603,11 @@ class MemberResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
+                Actions\RestoreAction::make(),
 
-                Tables\Actions\Action::make('remove_from_group')
+                Actions\Action::make('remove_from_group')
                     ->label('Remove from Group')
                     ->icon('heroicon-o-user-minus')
                     ->color('danger')
@@ -639,12 +638,12 @@ class MemberResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ExportBulkAction::make()
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                    Actions\ExportBulkAction::make()
                         ->exporter(MemberExporter::class),
 
-                    Tables\Actions\BulkAction::make('assign_to_group')
+                    Actions\BulkAction::make('assign_to_group')
                         ->label('Assign to Group')
                         ->icon('heroicon-o-user-plus')
                         ->accessSelectedRecords()

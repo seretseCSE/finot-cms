@@ -13,6 +13,7 @@ use App\Models\TeacherAttendance;
 use App\Models\TeacherAssignment;
 use App\Models\Teacher;
 use App\Models\StudentEnrollment;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -29,7 +30,7 @@ class AttendanceSessionResource extends Resource
 
     public static function getNavigationGroup(): ?string { return 'Education'; }
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-clipboard-list'; }
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-clipboard-document-list'; }
 
     public static function getNavigationLabel(): string { return 'Attendance Sessions'; }
 
@@ -137,13 +138,13 @@ class AttendanceSessionResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('mark_attendance')
+                Actions\Action::make('mark_attendance')
                     ->label('Mark Attendance')
                     ->icon('heroicon-o-pencil-square')
                     ->url(fn (AttendanceSession $record): string => static::getUrl('mark', ['record' => $record]))
                     ->visible(fn (AttendanceSession $record): bool => static::canMarkAttendance($record)),
 
-                Tables\Actions\Action::make('lock')
+                Actions\Action::make('lock')
                     ->label('Lock')
                     ->icon('heroicon-o-lock-closed')
                     ->color('warning')
@@ -159,7 +160,7 @@ class AttendanceSessionResource extends Resource
                         Notification::make()->title('Session locked')->success()->send();
                     }),
 
-                Tables\Actions\Action::make('unlock')
+                Actions\Action::make('unlock')
                     ->label('Unlock')
                     ->icon('heroicon-o-lock-open')
                     ->color('danger')

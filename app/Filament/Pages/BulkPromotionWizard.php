@@ -6,6 +6,7 @@ use App\Models\Member;
 use App\Models\MemberEducationHistory;
 use App\Models\ClassModel;
 use App\Models\AcademicYear;
+use Filament\Actions;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -285,7 +286,7 @@ class BulkPromotionWizard extends Page implements HasTable
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_timeline')
+                Actions\Action::make('view_timeline')
                     ->label('View Timeline')
                     ->icon('heroicono-clock')
                     ->url(fn ($record) => route('filament.admin.resources.members.timeline', $record)),

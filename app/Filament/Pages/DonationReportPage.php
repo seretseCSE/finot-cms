@@ -7,6 +7,8 @@ use App\Filament\Widgets\DonationReportChartsWidget;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\Donation;
 use Filament\Forms;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 
@@ -108,9 +110,9 @@ class DonationReportPage extends Page
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Section::make('Report Filters')
+            Section::make('Report Filters')
                 ->schema([
-                    Forms\Components\Grid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Forms\Components\DatePicker::make('dateFrom')
                                 ->label('Date From')

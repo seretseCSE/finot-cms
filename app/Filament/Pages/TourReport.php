@@ -147,18 +147,18 @@ class TourReport extends Page implements HasTable
                     ->default('all'),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_details')
+                Actions\Action::make('view_details')
                     ->label('View Details')
                     ->icon('heroicon-o-eye')
                     ->url(fn ($record) => route('filament.admin.resources.tours.view', $record)),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('export_excel')
+                Actions\Action::make('export_excel')
                     ->label('Export Excel')
                     ->icon('heroicono-document-arrow-down')
                     ->action(fn () => $this->exportToExcel()),
                 
-                Tables\Actions\Action::make('export_pdf')
+                Actions\Action::make('export_pdf')
                     ->label('Export PDF')
                     ->icon('heroicono-document-arrow-down')
                     ->action(fn () => $this->exportToPdf()),

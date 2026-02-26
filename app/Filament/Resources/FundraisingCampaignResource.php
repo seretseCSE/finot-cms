@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FundraisingCampaignResource\Pages;
 use App\Models\FundraisingCampaign;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -110,9 +111,9 @@ class FundraisingCampaignResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make('update_total_raised')
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
+                Actions\Action::make('update_total_raised')
                     ->label('Update Total Raised')
                     ->icon('heroicon-o-currency-dollar')
                     ->form([
@@ -127,7 +128,7 @@ class FundraisingCampaignResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Actions\DeleteBulkAction::make(),
             ]);
     }
 

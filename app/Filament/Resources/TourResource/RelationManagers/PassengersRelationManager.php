@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TourResource\RelationManagers;
 
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -150,7 +151,7 @@ class PassengersRelationManager extends RelationManager
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 
-                Tables\Actions\Action::make('confirm')
+                Actions\Action::make('confirm')
                     ->label('Confirm')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -159,7 +160,7 @@ class PassengersRelationManager extends RelationManager
                         $record->confirm();
                     }),
 
-                Tables\Actions\Action::make('cancel_registration')
+                Actions\Action::make('cancel_registration')
                     ->label('Cancel Registration')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')

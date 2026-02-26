@@ -14,7 +14,7 @@ class UserSessionResource extends Resource
 {
     protected static ?string $model = UserSession::class;
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-computer-desktop'; }
+    public static function getNavigationIcon(): ?string { return null; }
 
     public static function getNavigationGroup(): ?string { return 'Security & System'; }
 
@@ -94,7 +94,7 @@ class UserSessionResource extends Resource
                     ->default(true),
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->label('Terminate Session')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
@@ -104,8 +104,8 @@ class UserSessionResource extends Resource
                     ->modalSubmitActionLabel('Terminate'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make()
                         ->label('Terminate Sessions')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')

@@ -6,6 +6,7 @@ use App\Filament\Resources\BlogPostResource\Pages;
 use App\Models\BlogPost;
 use Filament\Forms;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -47,7 +48,7 @@ class BlogPostResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Content')
+                Section::make('Content')
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->label('Title (English)')
@@ -69,7 +70,7 @@ class BlogPostResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Publication Settings')
+                Section::make('Publication Settings')
                     ->schema([
                         Forms\Components\DatePicker::make('publish_date')
                             ->label('Publish Date')
@@ -100,7 +101,7 @@ class BlogPostResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Media & Tags')
+                Section::make('Media & Tags')
                     ->schema([
                         Forms\Components\FileUpload::make('featured_image')
                             ->label('Featured Image')
@@ -181,15 +182,15 @@ class BlogPostResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make()
+                Actions\ViewAction::make(),
+                Actions\EditAction::make()
                     ->visible(fn ($record) => static::canEdit($record)),
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn ($record) => static::canDelete($record)),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('publish')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('publish')
                         ->label('Publish Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -201,7 +202,7 @@ class BlogPostResource extends Resource
                             }
                         }),
 
-                    Tables\Actions\BulkAction::make('archive')
+                    Actions\BulkAction::make('archive')
                         ->label('Archive Selected')
                         ->icon('heroicon-o-archive-box')
                         ->color('danger')
@@ -211,11 +212,11 @@ class BlogPostResource extends Resource
                             }
                         }),
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ])
             ->emptyStateHeading('No blog posts found')

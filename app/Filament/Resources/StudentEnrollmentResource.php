@@ -10,6 +10,7 @@ use App\Models\ClassModel;
 use App\Models\Member;
 use App\Models\StudentEnrollment;
 use App\Rules\EnrollmentUniquePerYear;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -154,9 +155,9 @@ class StudentEnrollmentResource extends Resource
                     ->options(fn () => AcademicYear::query()->orderByDesc('start_date')->pluck('name', 'id')->all()),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Actions\EditAction::make(),
 
-                Tables\Actions\Action::make('withdraw')
+                Actions\Action::make('withdraw')
                     ->label('Withdraw')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
@@ -166,8 +167,7 @@ class StudentEnrollmentResource extends Resource
                                 'Moved Away' => 'Moved Away',
                                 'Transferred' => 'Transferred',
                                 'Graduated' => 'Graduated',
-                            ])
-                            ->required(),
+                            ], true),
                         Forms\Components\Textarea::make('withdrawal_notes')
                             ->label('Notes')
                             ->maxLength(500),
@@ -200,7 +200,7 @@ class StudentEnrollmentResource extends Resource
                         Notification::make()->title('Student withdrawn')->success()->send();
                     }),
 
-                Tables\Actions\Action::make('promote')
+                Actions\Action::make('promote')
                     ->label('Promote')
                     ->icon('heroicon-o-arrow-up')
                     ->color('warning')

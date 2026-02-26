@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BeneficiaryResource\RelationManager;
 
 use App\Models\AidDistribution;
+use Filament\Actions;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -58,13 +59,13 @@ class AidDistributionsRelationManager extends RelationManager
                     ->visible(fn ($record) => $record->canBeEdited()),
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn ($record) => $record->canBeEdited()),
-                Tables\Actions\Action::make('lock')
+                Actions\Action::make('lock')
                     ->label('Lock')
                     ->icon('heroicon-o-lock-closed')
                     ->color('warning')
                     ->visible(fn ($record) => !$record->is_locked)
                     ->action(fn ($record) => $record->lock()),
-                Tables\Actions\Action::make('unlock')
+                Actions\Action::make('unlock')
                     ->label('Unlock')
                     ->icon('heroicon-o-lock-open')
                     ->color('success')

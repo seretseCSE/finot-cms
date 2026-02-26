@@ -95,7 +95,7 @@ class ManageActiveSessions extends Page
                     ->alignCenter(),
             ])
             ->actions([
-                Tables\Actions\Action::make('revoke')
+                Actions\Action::make('revoke')
                     ->label('Revoke')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
@@ -109,7 +109,7 @@ class ManageActiveSessions extends Page
             ->emptyStateHeading('No Active Sessions')
             ->emptyStateDescription('You currently have no active sessions on other devices.')
             ->emptyStateActions([
-                Tables\Actions\Action::make('refresh')
+                Actions\Action::make('refresh')
                     ->label('Refresh')
                     ->icon('heroicon-o-arrow-path')
                     ->action('refreshTable'),

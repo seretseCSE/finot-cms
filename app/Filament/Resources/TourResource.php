@@ -6,6 +6,7 @@ use App\Filament\Forms\Components\EthiopianDatePicker;
 use App\Filament\Resources\TourResource\Pages;
 use App\Filament\Resources\TourResource\Pages\GenerateAttendanceAction;
 use App\Models\Tour;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -174,10 +175,10 @@ class TourResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->visible(fn (Tour $record) => static::canEdit($record)),
 
-                Tables\Actions\Action::make('publish')
+                Actions\Action::make('publish')
                     ->label('Publish Tour')
                     ->icon('heroicon-o-eye')
                     ->color('success')
@@ -186,7 +187,7 @@ class TourResource extends Resource
                         $record->update(['status' => 'Published']);
                     }),
 
-                Tables\Actions\Action::make('mark_in_progress')
+                Actions\Action::make('mark_in_progress')
                     ->label('Mark In Progress')
                     ->icon('heroicon-o-play')
                     ->color('warning')
@@ -195,7 +196,7 @@ class TourResource extends Resource
                         $record->update(['status' => 'In Progress']);
                     }),
 
-                Tables\Actions\Action::make('mark_completed')
+                Actions\Action::make('mark_completed')
                     ->label('Mark Completed')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -204,7 +205,7 @@ class TourResource extends Resource
                         $record->update(['status' => 'Completed']);
                     }),
 
-                Tables\Actions\Action::make('cancel')
+                Actions\Action::make('cancel')
                     ->label('Cancel Tour')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -222,7 +223,7 @@ class TourResource extends Resource
                 GenerateAttendanceAction::make()
                     ->visible(fn (Tour $record) => $record->status === 'In Progress' && static::canEdit($record)),
 
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn (Tour $record) => static::canDelete($record))
                     ->before(function (Tour $record) {
                         if (!$record->canBeDeleted()) {
@@ -231,11 +232,11 @@ class TourResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn () => static::canDelete(null)),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ])
             ->emptyStateHeading('No tours found')
