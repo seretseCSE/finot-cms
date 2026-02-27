@@ -113,6 +113,14 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Get the department that the user belongs to.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    /**
      * Get the preferred locale.
      */
     public function getPreferredLocale(): string

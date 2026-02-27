@@ -23,14 +23,20 @@ class AttendanceSummaryReport extends Page
     public static function getNavigationSort(): ?int { return 1; }
 
     public ?array $filters = [];
+public ?array $reportData = null;
+public bool $isLoading = false;
 
     public function mount(): void
     {
         $this->form->fill([
-            'academic_year_id' => AcademicYear::where('is_active', true)->first()?->id,
+            'academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
             'class_id' => null,
-            'date_range' => 'month',
+            'start_date' => now()->subMonth()->format('Y-m-d'),
+            'end_date' => now()->format('Y-m-d'),
         ]);
+        
+        // Try to load initial data
+        $this->updateReportData();
     }
 
     public function form(Schema $schema): Schema
@@ -40,35 +46,83 @@ class AttendanceSummaryReport extends Page
                 Forms\Components\Select::make('academic_year_id')
                     ->label('Academic Year')
                     ->options(AcademicYear::pluck('name', 'id'))
-                    ->required()
                     ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('class_id', null)),
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $set('class_id', null);
+                        $this->updateReportData();
+                    }),
 
                 Forms\Components\Select::make('class_id')
                     ->label('Class')
                     ->options(function (callable $get) {
                         $yearId = $get('academic_year_id');
-                        if (!$yearId) return [];
                         
-                        return ClassModel::where('academic_year_id', $yearId)
-                            ->with('subject')
-                            ->get()
-                            ->mapWithKeys(fn ($class) => [$class->id => "{$class->subject->name} - {$class->name}"]);
+                        // Get all classes, but prioritize those with sessions in the selected year
+                        $query = ClassModel::query();
+                        
+                        if ($yearId) {
+                            // Get classes that have sessions in this year
+                            $classesWithSessions = ClassModel::whereHas('attendanceSessions', function ($query) use ($yearId) {
+                                $query->where('academic_year_id', $yearId);
+                            })->pluck('id')->toArray();
+                            
+                            // Get all classes and mark those with sessions
+                            $allClasses = ClassModel::orderBy('name')->get();
+                            
+                            return $allClasses->mapWithKeys(function ($class) use ($classesWithSessions, $yearId) {
+                                $hasSessions = in_array($class->id, $classesWithSessions);
+                                $label = $class->name . ($hasSessions ? ' ✓' : ' (No sessions)');
+                                return [$class->id => $label];
+                            });
+                        } else {
+                            return ClassModel::orderBy('name')
+                                ->get()
+                                ->mapWithKeys(fn ($class) => [$class->id => $class->name]);
+                        }
                     })
-                    ->required(),
+                    ->reactive()
+                    ->afterStateUpdated(function () {
+                        $this->updateReportData();
+                    }),
 
-                Forms\Components\Select::make('date_range')
-                    ->label('Date Range')
-                    ->options([
-                        'week' => 'Last Week',
-                        'month' => 'Last Month',
-                        'quarter' => 'Last Quarter',
-                        'year' => 'Last Year',
-                    ])
-                    ->default('month')
-                    ->required(),
+                Forms\Components\DatePicker::make('start_date')
+                    ->label('Start Date')
+                    ->reactive()
+                    ->afterStateUpdated(function () {
+                        $this->updateReportData();
+                    }),
+
+                Forms\Components\DatePicker::make('end_date')
+                    ->label('End Date')
+                    ->reactive()
+                    ->afterStateUpdated(function () {
+                        $this->updateReportData();
+                    }),
             ])
-            ->columns(3);
+            ->columns(4);
+    }
+
+    public function updateReportData(): void
+    {
+        $formData = $this->form->getState();
+        
+        // Only load data if we have the basic required fields
+        if ($formData['academic_year_id'] && $formData['start_date'] && $formData['end_date']) {
+            $this->isLoading = true;
+            
+            // Load the report data
+            $this->reportData = $this->getReportData();
+            
+            $this->isLoading = false;
+        } else {
+            $this->reportData = null;
+            $this->isLoading = false;
+        }
+    }
+
+    public function generateReport(): void
+    {
+        $this->reportData = $this->getReportData();
     }
 
     public function getReportData(): array
@@ -86,16 +140,8 @@ class AttendanceSummaryReport extends Page
             });
 
         // Apply date range filter
-        $dateFilter = match($filters['date_range']) {
-            'week' => now()->subWeek(),
-            'month' => now()->subMonth(),
-            'quarter' => now()->subQuarter(),
-            'year' => now()->subYear(),
-            default => now()->subMonth(),
-        };
-        
-        $query->whereHas('session', function (Builder $query) use ($dateFilter) {
-            $query->where('date', '>=', $dateFilter);
+        $query->whereHas('session', function (Builder $query) use ($filters) {
+            $query->whereBetween('date', [$filters['start_date'], $filters['end_date']]);
         });
 
         $attendances = $query->get();
@@ -151,7 +197,11 @@ class AttendanceSummaryReport extends Page
 
     public function exportToExcel()
     {
-        $data = $this->getReportData();
+        if (!$this->reportData) {
+            $this->reportData = $this->getReportData();
+        }
+        
+        $data = $this->reportData;
         
         // Implementation for Excel export
         // This would use Laravel Excel package
@@ -160,7 +210,11 @@ class AttendanceSummaryReport extends Page
 
     public function exportToPdf()
     {
-        $data = $this->getReportData();
+        if (!$this->reportData) {
+            $this->reportData = $this->getReportData();
+        }
+        
+        $data = $this->reportData;
         
         // Implementation for PDF export
         // This would use DomPDF or similar

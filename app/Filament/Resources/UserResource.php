@@ -60,7 +60,7 @@ class UserResource extends Resource
                     ->default(true),
 
                 Forms\Components\Select::make('department_id')
-                    ->relationship('department')
+                    ->relationship('department', 'name_en')
                     ->searchable()
                     ->preload()
                     ->nullable(),
@@ -138,11 +138,10 @@ class UserResource extends Resource
                         '0' => 'Not Locked',
                     ]),
 
-                Tables\Filters\SelectFilter::make('language_preference')
-                    ->options([
-                        'am' => 'Amharic',
-                        'en' => 'English',
-                    ]),
+                Tables\Filters\SelectFilter::make('role')
+                    ->relationship('roles', 'name')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Actions\EditAction::make(),
@@ -232,7 +231,6 @@ class UserResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion(),
                 ])
-                    ->deselectRecordsAfterCompletion()
                     ->visible(fn (): bool => Auth::user()->can('lock', User::class)),
             ])
             ->emptyStateActions([
