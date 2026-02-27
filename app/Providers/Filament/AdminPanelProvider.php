@@ -39,6 +39,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->navigationGroups([
+                NavigationGroup::make('System')
+                    ->label('System')
+                    ->collapsible(false),
                 NavigationGroup::make('Membership Management')
                     ->label('Membership Management')
                     ->icon('heroicon-o-users'),
@@ -57,8 +60,6 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Content Management')
                     ->label('Content Management')
                     ->icon('heroicon-o-document-text'),
-                NavigationGroup::make('System')
-                    ->label('System'),
             ])
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
@@ -66,6 +67,16 @@ class AdminPanelProvider extends PanelProvider
                 EditProfile::class,
                 ManageActiveSessions::class,
                 ManageCustomOptions::class,
+                \App\Filament\Pages\GlobalOversight::class,
+                \App\Filament\Pages\GlobalChurchSettings::class,
+                \App\Filament\Pages\BackupRestore::class,
+                \App\Filament\Pages\ExportAuditLogs::class,
+            ])
+            ->widgets([
+                \App\Filament\Widgets\SystemHealthWidget::class,
+                \App\Filament\Widgets\GlobalOversightStatsOverview::class,
+                \App\Filament\Widgets\GlobalOversightChart::class,
+                \App\Filament\Widgets\GlobalOversightErrorLogs::class,
             ])
             ->bootUsing(function () {
                 foreach (\Filament\Facades\Filament::getResources() as $resourceClass) {
