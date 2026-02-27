@@ -32,8 +32,8 @@ class AcademicYearObserver
      */
     public function deleted(AcademicYear $academicYear): void
     {
-        // Archive contributions if academic year is deleted
-        if (!$academicYear->is_active) {
+        // Archive contributions if academic year is deleted and was not active
+        if ($academicYear->status !== 'Active') {
             ArchiveContributionsJob::dispatch($academicYear->id);
             
             Log::info('Academic Year deleted - archival job dispatched', [

@@ -65,7 +65,7 @@ class GenerateAttendanceAction extends Actions\Action
                 'tour_passenger_id' => $passenger->id,
                 'status' => 'Present',
                 'marked_at' => now(),
-                'marked_by' => auth()->id(),
+                'marked_by' => auth()->user()->id(),
             ]);
 
             $attendanceCount++;

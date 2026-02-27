@@ -10,11 +10,9 @@ use Illuminate\Support\Carbon;
  */
 class EthiopianDatePicker extends TextInput
 {
-    protected string $view = 'filament.forms.components.ethiopian-date-picker';
-
-    public function __construct(string $name)
+    protected function setUp(): void
     {
-        parent::__construct($name);
+        parent::setUp();
         
         $this->type('date')
             ->default(Carbon::now()->format('Y-m-d'));

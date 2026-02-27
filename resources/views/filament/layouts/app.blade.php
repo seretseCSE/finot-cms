@@ -1,5 +1,11 @@
 @extends('filament::layouts.app')
 
+@push('head')
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+@endpush
+
 @push('scripts')
 @vite(['resources/js/app.js'])
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

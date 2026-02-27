@@ -43,7 +43,7 @@ class CreateContribution extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Set recorded_by to current user
-        $data['recorded_by'] = auth()->id();
+        $data['recorded_by'] = auth()->user()->id();
 
         return $data;
     }

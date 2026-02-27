@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SchoolClassResource\Pages;
+use App\Filament\Resources\SchoolClassResource\RelationManagers\TeachersRelationManager;
 use App\Models\ClassModel;
 use Filament\Actions;
 use Filament\Forms;
@@ -107,7 +108,7 @@ class SchoolClassResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\TeachersRelationManager::class,
+            TeachersRelationManager::class,
         ];
     }
 }

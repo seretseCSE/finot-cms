@@ -27,7 +27,7 @@ class StudentProgressReport extends Page
     public function mount(): void
     {
         $this->form->fill([
-            'academic_year_id' => AcademicYear::where('is_active', true)->first()?->id,
+            'academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
             'class_id' => null,
             'member_id' => null,
         ]);
@@ -50,10 +50,11 @@ class StudentProgressReport extends Page
                         $yearId = $get('academic_year_id');
                         if (!$yearId) return [];
 
-                        return ClassModel::where('academic_year_id', $yearId)
-                            ->with('subject')
+                        return ClassModel::whereHas('attendanceSessions', function ($query) use ($yearId) {
+                            $query->where('academic_year_id', $yearId);
+                        })
                             ->get()
-                            ->mapWithKeys(fn ($class) => [$class->id => "{$class->subject->name} - {$class->name}"]);
+                            ->mapWithKeys(fn ($class) => [$class->id => $class->name]);
                     })
                     ->reactive()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('member_id', null)),

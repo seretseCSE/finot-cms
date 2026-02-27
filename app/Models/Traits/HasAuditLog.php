@@ -14,9 +14,15 @@ trait HasAuditLog
     protected static function bootHasAuditLog(): void
     {
         static::created(function (Model $model) {
-            if (in_array('App\Models\Traits\HasAuditLog', class_uses($model))) {
-                $model->observe();
-            }
+            $model->logModelCreation();
+        });
+
+        static::updated(function (Model $model) {
+            $model->logModelUpdate();
+        });
+
+        static::deleted(function (Model $model) {
+            $model->logModelDeletion();
         });
     }
 

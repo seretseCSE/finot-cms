@@ -28,7 +28,7 @@ class AttendanceRelationManager extends RelationManager
                     ->default(fn () => $this->ownerRecord->tour_date),
 
                 Forms\Components\Hidden::make('created_by')
-                    ->default(fn () => auth()->id()),
+                    ->default(fn () => auth()->user()->id()),
             ]);
     }
 
@@ -98,7 +98,7 @@ class AttendanceRelationManager extends RelationManager
                             'tour_id' => $this->ownerRecord->id,
                             'session_date' => $this->ownerRecord->tour_date,
                             'status' => 'Open',
-                            'created_by' => auth()->id(),
+                            'created_by' => auth()->user()->id(),
                         ]);
 
                         // Create attendance records for all confirmed passengers
@@ -120,7 +120,7 @@ class AttendanceRelationManager extends RelationManager
                                 'tour_id' => $this->ownerRecord->id,
                                 'passenger_count' => $this->ownerRecord->confirmedPassengers->count(),
                             ]),
-                            'user_id' => auth()->id(),
+                            'user_id' => auth()->user()->id(),
                             'timestamp' => now()->toDateTimeString(),
                         ]);
                     }),
@@ -158,7 +158,7 @@ class AttendanceRelationManager extends RelationManager
                             'tour_id' => $this->ownerRecord->id,
                             'session_date' => $this->ownerRecord->tour_date,
                             'status' => 'Open',
-                            'created_by' => auth()->id(),
+                            'created_by' => auth()->user()->id(),
                         ]);
 
                         // Create attendance records for all confirmed passengers

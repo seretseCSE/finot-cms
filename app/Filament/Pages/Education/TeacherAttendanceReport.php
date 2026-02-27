@@ -32,7 +32,7 @@ class TeacherAttendanceReport extends Page implements HasTable
     public function mount(): void
     {
         $this->form->fill([
-            'academic_year_id' => AcademicYear::where('is_active', true)->first()?->id,
+            'academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
             'teacher_id' => null,
             'date_range' => 'month',
         ]);
@@ -110,7 +110,7 @@ class TeacherAttendanceReport extends Page implements HasTable
                     ->options(function () {
                         return Teacher::where('status', 'Active')
                             ->whereHas('assignments', function ($query) {
-                                $query->where('academic_year_id', AcademicYear::where('is_active', true)->first()?->id);
+                                $query->where('academic_year_id', AcademicYear::where('status', 'Active')->first()?->id);
                             })
                             ->with('assignments')
                             ->get()

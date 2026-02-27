@@ -90,7 +90,7 @@ class AidDistribution extends BaseModel
             'entity_type' => 'aid_distribution',
             'old_value' => json_encode(['is_locked' => false]),
             'new_value' => json_encode(['is_locked' => true]),
-            'user_id' => $user?->id ?? auth()->id(),
+            'user_id' => $user?->id ?? auth()->user()->id(),
             'timestamp' => now()->toDateTimeString(),
         ]);
     }

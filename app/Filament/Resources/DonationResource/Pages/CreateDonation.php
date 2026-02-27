@@ -42,7 +42,7 @@ class CreateDonation extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Set recorded_by to current user
-        $data['recorded_by'] = auth()->id();
+        $data['recorded_by'] = auth()->user()->id();
 
         // Handle Anonymous donor
         if (empty($data['donor_name'])) {

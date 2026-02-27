@@ -160,7 +160,7 @@ class InternalRegistrationRelationManager extends RelationManager
                         $data['registration_date'] = now()->toDateString();
                         
                         // Set registered by
-                        $data['registered_by'] = auth()->id();
+                        $data['registered_by'] = auth()->user()->id();
                         
                         return $data;
                     })

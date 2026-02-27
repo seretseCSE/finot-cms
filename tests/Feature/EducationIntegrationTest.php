@@ -41,7 +41,7 @@ class EducationIntegrationTest extends TestCase
             'start_date' => '2026-09-01',
             'end_date' => '2027-07-31',
             'status' => 'Active',
-            'is_active' => true,
+            'created_by' => 1,
         ]);
     }
 

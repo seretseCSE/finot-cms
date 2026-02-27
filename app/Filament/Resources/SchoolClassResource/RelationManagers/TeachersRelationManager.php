@@ -63,8 +63,8 @@ class TeachersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('subject.name')->label('Subject')->sortable()->searchable(),
                 Tables\Columns\BadgeColumn::make('is_active')
                     ->label('Status')
-                    ->boolean()
-                    ->getStateUsing(fn ($record) => $record->is_active),
+                    ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
+                    ->color(fn ($state) => $state ? 'success' : 'danger'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('subject_id')

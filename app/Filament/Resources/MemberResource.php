@@ -711,7 +711,7 @@ class MemberResource extends Resource
                                             'member_id' => $member->id,
                                             'group_id' => $group->id,
                                             'effective_from' => $effectiveFrom,
-                                            'assigned_by' => auth()->id(),
+                                            'assigned_by' => auth()->user()->id(),
                                         ]);
 
                                         Log::channel('audit')->warning('Tier 2 Audit Log', [
@@ -722,7 +722,7 @@ class MemberResource extends Resource
                                             'group_id' => $group->id,
                                             'group_name' => $group->name,
                                             'effective_from' => $assignment->effective_from?->toDateString(),
-                                            'assigned_by' => auth()->id(),
+                                            'assigned_by' => auth()->user()->id(),
                                             'timestamp' => now()->toDateTimeString(),
                                         ]);
                                     }

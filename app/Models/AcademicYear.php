@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
 
 class AcademicYear extends Model
 {
@@ -14,7 +15,6 @@ class AcademicYear extends Model
         'name',
         'start_date',
         'end_date',
-        'is_active',
         'status',
         'activated_at',
         'deactivated_at',
@@ -26,7 +26,6 @@ class AcademicYear extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'is_active' => 'boolean',
         'activated_at' => 'datetime',
         'deactivated_at' => 'datetime',
     ];
@@ -84,5 +83,65 @@ class AcademicYear extends Model
     public static function getNavigationGroup(): ?string
     {
         return 'Education';
+    }
+
+    /**
+     * Check if the academic year is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'Active';
+    }
+
+    /**
+     * Scope to get only active academic years.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'Active');
+    }
+
+    /**
+     * Boot the model and add validation.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($academicYear) {
+            // Validate date constraint
+            if ($academicYear->start_date && $academicYear->end_date) {
+                if ($academicYear->start_date >= $academicYear->end_date) {
+                    throw new \Illuminate\Validation\ValidationException(
+                        validator()->make([], []),
+                        new \Illuminate\Support\MessageBag(['end_date' => 'End date must be after start date.'])
+                    );
+                }
+            }
+        });
+
+        static::updated(function ($academicYear) {
+            // If this academic year was just activated, deactivate all others
+            if ($academicYear->wasChanged('status') && $academicYear->status === 'Active') {
+                static::where('id', '!=', $academicYear->id)
+                    ->where('status', 'Active')
+                    ->update([
+                        'status' => 'Deactivated',
+                        'deactivated_at' => now(),
+                    ]);
+            }
+        });
+
+        static::created(function ($academicYear) {
+            // If a new academic year is created as Active, deactivate all others
+            if ($academicYear->status === 'Active') {
+                static::where('id', '!=', $academicYear->id)
+                    ->where('status', 'Active')
+                    ->update([
+                        'status' => 'Deactivated',
+                        'deactivated_at' => now(),
+                    ]);
+            }
+        });
     }
 }

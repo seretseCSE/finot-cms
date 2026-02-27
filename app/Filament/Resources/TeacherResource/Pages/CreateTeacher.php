@@ -12,7 +12,7 @@ class CreateTeacher extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['created_by'] = Auth::id();
+        $data['created_by'] = Auth::user()->id;
         return $data;
     }
 }

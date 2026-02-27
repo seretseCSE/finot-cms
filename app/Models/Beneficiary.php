@@ -85,7 +85,7 @@ class Beneficiary extends BaseModel
             'entity_type' => 'beneficiary',
             'old_value' => json_encode(['status' => 'Active']),
             'new_value' => json_encode(['status' => 'Completed']),
-            'user_id' => auth()->id(),
+            'user_id' => auth()->user()->id(),
             'timestamp' => now()->toDateTimeString(),
         ]);
     }

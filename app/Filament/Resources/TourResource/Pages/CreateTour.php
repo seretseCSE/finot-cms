@@ -18,7 +18,7 @@ class CreateTour extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Set created_by to current user
-        $data['created_by'] = auth()->id();
+        $data['created_by'] = auth()->user()->id;
 
         return $data;
     }
@@ -37,7 +37,7 @@ class CreateTour extends CreateRecord
                 'tour_date' => $this->record->tour_date,
                 'start_time' => $this->record->start_time,
             ]),
-            'user_id' => auth()->id(),
+            'user_id' => auth()->user()->id(),
             'timestamp' => now()->toDateTimeString(),
         ]);
     }

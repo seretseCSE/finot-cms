@@ -8,6 +8,7 @@ use App\Jobs\GenerateEndOfYearReport;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\AcademicYear;
 use App\Models\StudentEnrollment;
+use Illuminate\Support\Carbon;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -71,13 +72,21 @@ class AcademicYearResource extends Resource
                     ->required()
                     ->maxLength(200),
 
-                EthiopianDatePicker::make('start_date')
+                Forms\Components\DatePicker::make('start_date')
                     ->label('Start Date')
-                    ->required(),
+                    ->required()
+                    ->default(Carbon::now()->format('Y-m-d')),
 
-                EthiopianDatePicker::make('end_date')
+                Forms\Components\DatePicker::make('end_date')
                     ->label('End Date')
-                    ->required(),
+                    ->required()
+                    ->default(Carbon::now()->addYear()->format('Y-m-d'))
+                    ->reactive()
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('end_date', $state))
+                    ->rules(function (callable $get) {
+                        $startDate = $get('start_date');
+                        return $startDate ? ['after:' . $startDate] : [];
+                    }),
 
                 Forms\Components\Select::make('status')
                     ->options([
@@ -85,7 +94,8 @@ class AcademicYearResource extends Resource
                         'Active' => 'Active',
                         'Deactivated' => 'Deactivated',
                     ])
-                    ->disabled(),
+                    ->default('Draft')
+                    ->disabled(fn ($record) => ! static::canEdit($record)),
             ]);
     }
 
@@ -110,100 +120,11 @@ class AcademicYearResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Actions\Action::make('activate')
-                    ->label('Activate')
-                    ->icon('heroicon-o-bolt')
-                    ->color('success')
-                    ->visible(fn (AcademicYear $record): bool => in_array($record->status, ['Draft', 'Deactivated'], true))
-                    ->requiresConfirmation()
-                    ->action(function (AcademicYear $record): void {
-                        $thisYear = $record;
-
-                        $active = AcademicYear::query()->where('is_active', true)->first();
-
-                        if ($active && self::rangesOverlap($active->start_date, $active->end_date, $thisYear->start_date, $thisYear->end_date)) {
-                            Notification::make()->title('Cannot activate due to overlapping dates')->danger()->send();
-                            return;
-                        }
-
-                        DB::transaction(function () use ($thisYear, $active): void {
-                            if ($active) {
-                                $active->update([
-                                    'is_active' => false,
-                                    'status' => 'Deactivated',
-                                    'deactivated_at' => now(),
-                                    'deactivated_by' => Auth::id(),
-                                ]);
-
-                                StudentEnrollment::query()
-                                    ->where('academic_year_id', $active->getKey())
-                                    ->where('status', 'Enrolled')
-                                    ->update(['status' => 'Completed', 'completion_date' => now()->toDateString(), 'completed_by' => Auth::id()]);
-
-                                GenerateEndOfYearReport::dispatch($active->getKey());
-                            }
-
-                            $thisYear->update([
-                                'is_active' => true,
-                                'status' => 'Active',
-                                'activated_at' => now(),
-                                'activated_by' => Auth::id(),
-                            ]);
-
-                            \Log::channel('audit')->warning('Tier 2 Audit Log', [
-                                'tier' => 2,
-                                'action' => 'academic_year_activated',
-                                'academic_year_id' => $thisYear->getKey(),
-                                'academic_year_name' => $thisYear->name,
-                                'previous_academic_year_id' => $active?->getKey(),
-                                'activated_by' => Auth::id(),
-                                'timestamp' => now()->toDateTimeString(),
-                            ]);
-                        });
-
-                        Notification::make()->title('Academic year activated')->success()->send();
-                    }),
-
-                Actions\Action::make('deactivate')
-                    ->label('Deactivate')
-                    ->icon('heroicon-o-pause')
-                    ->color('danger')
-                    ->visible(fn (AcademicYear $record): bool => $record->status === 'Active')
-                    ->requiresConfirmation()
-                    ->action(function (AcademicYear $record): void {
-                        DB::transaction(function () use ($record): void {
-                            $record->update([
-                                'is_active' => false,
-                                'status' => 'Deactivated',
-                                'deactivated_at' => now(),
-                                'deactivated_by' => Auth::id(),
-                            ]);
-
-                            StudentEnrollment::query()
-                                ->where('academic_year_id', $record->getKey())
-                                ->where('status', 'Enrolled')
-                                ->update(['status' => 'Completed', 'completion_date' => now()->toDateString(), 'completed_by' => Auth::id()]);
-
-                            \Log::channel('audit')->warning('Tier 2 Audit Log', [
-                                'tier' => 2,
-                                'action' => 'academic_year_deactivated',
-                                'academic_year_id' => $record->getKey(),
-                                'academic_year_name' => $record->name,
-                                'deactivated_by' => Auth::id(),
-                                'timestamp' => now()->toDateTimeString(),
-                            ]);
-                        });
-
-                        Notification::make()->title('Academic year deactivated')->success()->send();
-                    }),
-
-                Actions\Action::make('reactivate')
-                    ->label('Reactivate')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('warning')
-                    ->visible(fn (AcademicYear $record): bool => $record->status === 'Deactivated' && Auth::user()?->hasRole(['admin', 'superadmin']))
-                    ->requiresConfirmation()
-                    ->action(fn (AcademicYear $record) => $record->update(['status' => 'Draft', 'is_active' => false])),
+                Actions\EditAction::make()
+                    ->visible(fn (AcademicYear $record): bool => static::canEdit($record)),
+                
+                Actions\DeleteAction::make()
+                    ->visible(fn (AcademicYear $record): bool => static::canDelete($record)),
             ])
             ->defaultSort('start_date', 'desc');
     }
@@ -219,7 +140,73 @@ class AcademicYearResource extends Resource
             'index' => Pages\ListAcademicYears::route('/'),
             'create' => Pages\CreateAcademicYear::route('/create'),
             'edit' => Pages\EditAcademicYear::route('/{record}/edit'),
+            'view' => Pages\ViewAcademicYear::route('/{record}'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->latest('start_date');
+    }
+
+    /**
+     * Ensure only one academic year can be active at a time
+     */
+    public static function ensureSingleActiveYear(AcademicYear $newYear): void
+    {
+        \Log::info('ensureSingleActiveYear called for academic year: ' . $newYear->id . ' (' . $newYear->name . ')');
+        
+        DB::transaction(function () use ($newYear): void {
+            // Deactivate all other active academic years
+            $deactivatedCount = AcademicYear::query()
+                ->where('status', 'Active')
+                ->where('id', '!=', $newYear->id)
+                ->update([
+                    'status' => 'Deactivated',
+                    'deactivated_at' => now(),
+                    'deactivated_by' => Auth::user()->id,
+                ]);
+
+            \Log::info('Deactivated ' . $deactivatedCount . ' other active academic years');
+
+            // Activate the new academic year
+            $newYear->update([
+                'status' => 'Active',
+                'activated_at' => now(),
+                'activated_by' => Auth::user()->id,
+            ]);
+
+            \Log::info('Activated academic year: ' . $newYear->id . ' (' . $newYear->name . ')');
+
+            // Complete enrollments from previous active year
+            $previousActive = AcademicYear::query()
+                ->where('status', 'Deactivated')
+                ->where('deactivated_at', '>=', now()->subMinutes(5))
+                ->first();
+
+            if ($previousActive) {
+                StudentEnrollment::query()
+                    ->where('academic_year_id', $previousActive->id)
+                    ->where('status', 'Enrolled')
+                    ->update([
+                        'status' => 'Completed',
+                        'completion_date' => now()->toDateString(),
+                        'completed_by' => Auth::user()->id,
+                    ]);
+
+                \Log::info('Completed enrollments for previous active year: ' . $previousActive->id);
+            }
+
+            // Log the activation
+            \Log::channel('audit')->info('Academic Year Activated', [
+                'action' => 'academic_year_activated',
+                'academic_year_id' => $newYear->id,
+                'academic_year_name' => $newYear->name,
+                'previous_academic_year_id' => $previousActive?->id,
+                'activated_by' => Auth::user()->id,
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+        });
     }
 }
 

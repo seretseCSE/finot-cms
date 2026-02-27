@@ -135,7 +135,7 @@ class MemberGroup extends BaseModel
             'member_id' => $memberId,
             'group_id' => $this->id,
             'effective_from' => $effectiveFromDate ?? now()->toDateString(),
-            'assigned_by' => $assignedBy ?? auth()->id(),
+            'assigned_by' => $assignedBy ?? auth()->user()->id(),
         ]);
     }
 
@@ -155,7 +155,7 @@ class MemberGroup extends BaseModel
 
         $assignment->update([
             'effective_to' => now()->toDateString(),
-            'removed_by' => $removedBy ?? auth()->id(),
+            'removed_by' => $removedBy ?? auth()->user()->id(),
         ]);
 
         return $assignment;

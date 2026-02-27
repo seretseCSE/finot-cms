@@ -98,7 +98,7 @@ class EditTour extends EditRecord
     {
         // Set created_by if not set
         if (!isset($data['created_by'])) {
-            $data['created_by'] = auth()->id();
+            $data['created_by'] = auth()->user()->id;
         }
 
         return $data;
@@ -118,7 +118,7 @@ class EditTour extends EditRecord
                 'entity_type' => 'tour',
                 'old_value' => json_encode(['status' => $original['status']]),
                 'new_value' => json_encode(['status' => $current['status']]),
-                'user_id' => auth()->id(),
+                'user_id' => auth()->user()->id(),
                 'timestamp' => now()->toDateTimeString(),
             ]);
         }

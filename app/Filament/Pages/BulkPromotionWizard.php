@@ -36,8 +36,8 @@ class BulkPromotionWizard extends Page implements HasTable
     public function mount(): void
     {
         $this->form->fill([
-            'from_academic_year_id' => AcademicYear::where('is_active', true)->first()?->id,
-            'to_academic_year_id' => AcademicYear::where('is_active', false)->orderBy('end_date', 'desc')->first()?->id,
+            'from_academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
+            'to_academic_year_id' => AcademicYear::where('status', '!=', 'Active')->orderBy('end_date', 'desc')->first()?->id,
         ]);
     }
 
@@ -61,10 +61,11 @@ class BulkPromotionWizard extends Page implements HasTable
                                     $yearId = $get('from_academic_year_id');
                                     if (!$yearId) return [];
 
-                                    return ClassModel::where('academic_year_id', $yearId)
-                                        ->with('subject')
+                                    return ClassModel::whereHas('attendanceSessions', function ($query) use ($yearId) {
+                                        $query->where('academic_year_id', $yearId);
+                                    })
                                         ->get()
-                                        ->mapWithKeys(fn ($class) => [$class->id => "{$class->subject->name} - {$class->name}"]);
+                                        ->mapWithKeys(fn ($class) => [$class->id => $class->name]);
                                 })
                                 ->required()
                                 ->reactive(),
@@ -83,10 +84,11 @@ class BulkPromotionWizard extends Page implements HasTable
                                     $yearId = $get('to_academic_year_id');
                                     if (!$yearId) return [];
 
-                                    return ClassModel::where('academic_year_id', $yearId)
-                                        ->with('subject')
+                                    return ClassModel::whereHas('attendanceSessions', function ($query) use ($yearId) {
+                                        $query->where('academic_year_id', $yearId);
+                                    })
                                         ->get()
-                                        ->mapWithKeys(fn ($class) => [$class->id => "{$class->subject->name} - {$class->name}"]);
+                                        ->mapWithKeys(fn ($class) => [$class->id => $class->name]);
                                 })
                                 ->required(),
 
@@ -238,8 +240,8 @@ class BulkPromotionWizard extends Page implements HasTable
 
         // Reset form
         $this->form->fill([
-            'from_academic_year_id' => AcademicYear::where('is_active', true)->first()?->id,
-            'to_academic_year_id' => AcademicYear::where('is_active', false)->orderBy('end_date', 'desc')->first()?->id,
+            'from_academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
+            'to_academic_year_id' => AcademicYear::where('status', '!=', 'Active')->orderBy('end_date', 'desc')->first()?->id,
         ]);
 
         $this->notify('success', "Successfully promoted {$promotedCount} students. " . ($failedCount > 0 ? "Failed to promote {$failedCount} students." : ''));

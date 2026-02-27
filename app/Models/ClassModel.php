@@ -35,7 +35,7 @@ class ClassModel extends BaseModel
 
     public function attendanceSessions()
     {
-        return $this->hasMany(AttendanceSession::class, 'school_class_id');
+        return $this->hasMany(AttendanceSession::class, 'class_id');
     }
 
     public function scopeActive($query)
@@ -50,7 +50,7 @@ class ClassModel extends BaseModel
 
     public function canBeDeleted(): bool
     {
-        $hasActiveEnrollments = $this->enrollments()->where('is_active', true)->exists();
+        $hasActiveEnrollments = $this->enrollments()->where('status', 'Enrolled')->exists();
         $hasAttendance = $this->attendanceSessions()->exists();
 
         return ! $hasActiveEnrollments && ! $hasAttendance;

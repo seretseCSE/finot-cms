@@ -10,6 +10,7 @@ use App\Models\TeacherAssignment;
 use App\Models\AcademicYear;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -52,9 +53,9 @@ class TeacherResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Tabs::make('teacher_mode')
+                Tabs::make('teacher_mode')
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('External Teacher')
+                        Tabs\Tab::make('External Teacher')
                             ->schema([
                                 Forms\Components\Hidden::make('member_id')
                                     ->dehydrated(true),
@@ -84,7 +85,7 @@ class TeacherResource extends Resource
                                     ->default('Active'),
                             ]),
 
-                        Forms\Components\Tabs\Tab::make('Member Teacher')
+                        Tabs\Tab::make('Member Teacher')
                             ->schema([
                                 Forms\Components\Select::make('member_id')
                                     ->label('Member')

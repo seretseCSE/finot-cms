@@ -124,7 +124,7 @@ class FundraisingCampaign extends BaseModel
         $oldAmount = $this->total_raised;
         $this->update([
             'total_raised' => $amount,
-            'updated_by' => $user ? $user->id : auth()->id(),
+            'updated_by' => $user ? $user->id : auth()->user()->id(),
         ]);
 
         // Log to Tier 2 audit trail
@@ -135,7 +135,7 @@ class FundraisingCampaign extends BaseModel
             'entity_type' => 'fundraising_campaign',
             'old_value' => json_encode(['total_raised' => $oldAmount]),
             'new_value' => json_encode(['total_raised' => $amount]),
-            'user_id' => $user ? $user->id : auth()->id(),
+            'user_id' => $user ? $user->id : auth()->user()->id(),
             'timestamp' => now()->toDateTimeString(),
         ]);
     }
