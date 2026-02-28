@@ -9,6 +9,9 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 
 class UserSessionResource extends Resource
 {
@@ -94,7 +97,7 @@ class UserSessionResource extends Resource
                     ->default(true),
             ])
             ->actions([
-                Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->label('Terminate Session')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
@@ -104,8 +107,8 @@ class UserSessionResource extends Resource
                     ->modalSubmitActionLabel('Terminate'),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make()
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->label('Terminate Sessions')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')

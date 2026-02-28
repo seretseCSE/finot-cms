@@ -9,6 +9,7 @@ use App\Models\Contribution;
 use App\Models\ContributionAmount;
 use App\Models\Member;
 use App\Models\MemberGroup;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Pages\Page;
 use Filament\Tables;
@@ -48,6 +49,45 @@ class OutstandingContributionsPage extends Page
         return [
             OutstandingSummaryWidget::class,
         ];
+    }
+
+    /**
+     * Calculate the aging bucket for an outstanding contribution month.
+     * Maps Ethiopian months to approximate Gregorian dates for aging calculation.
+     */
+    protected function getAgingBucket(string $monthName): array
+    {
+        // Ethiopian months mapped to approximate Gregorian month indices
+        $monthOrder = EthiopianDateHelper::getMonthsForContribution();
+        $monthIndex = array_search($monthName, $monthOrder);
+
+        if ($monthIndex === false) {
+            return ['bucket' => 'Unknown', 'days' => 0];
+        }
+
+        // Each Ethiopian month starts roughly 30 days after the previous.
+        // The expected payment date for month N is roughly the end of that month.
+        // We calculate days overdue from current date to the end of that month.
+        $yearStart = $this->activeYear->start_date ?? now()->startOfYear();
+        if (is_string($yearStart)) {
+            $yearStart = Carbon::parse($yearStart);
+        }
+        $expectedDate = $yearStart->copy()->addMonths($monthIndex + 1);
+        $daysOverdue = max(0, (int) now()->diffInDays($expectedDate, false) * -1);
+
+        if ($daysOverdue <= 0) {
+            $bucket = 'Current';
+        } elseif ($daysOverdue <= 30) {
+            $bucket = '1-30 days';
+        } elseif ($daysOverdue <= 60) {
+            $bucket = '31-60 days';
+        } elseif ($daysOverdue <= 90) {
+            $bucket = '61-90 days';
+        } else {
+            $bucket = '90+ days';
+        }
+
+        return ['bucket' => $bucket, 'days' => $daysOverdue];
     }
 
     public function getTableData(): array
@@ -98,20 +138,25 @@ class OutstandingContributionsPage extends Page
                         continue;
                     }
 
+                    // Calculate aging bucket
+                    $aging = $this->getAgingBucket($monthName);
+
                     $outstandingData[] = [
                         'member' => $member,
                         'month' => $monthName,
                         'expected' => $expectedAmount,
                         'paid' => $paidAmount,
                         'outstanding' => $outstanding,
+                        'aging_bucket' => $aging['bucket'],
+                        'days_overdue' => $aging['days'],
                     ];
                 }
             }
         }
 
-        // Sort by outstanding amount descending
+        // Sort by days overdue descending (most overdue first)
         usort($outstandingData, function ($a, $b) {
-            return $b['outstanding'] <=> $a['outstanding'];
+            return $b['days_overdue'] <=> $a['days_overdue'];
         });
 
         return $outstandingData;
@@ -125,6 +170,10 @@ class OutstandingContributionsPage extends Page
                 'total_collected' => 0,
                 'total_outstanding' => 0,
                 'collection_rate' => 0,
+                'aging_30' => 0,
+                'aging_60' => 0,
+                'aging_90' => 0,
+                'aging_over_90' => 0,
             ];
         }
 
@@ -135,11 +184,21 @@ class OutstandingContributionsPage extends Page
         $totalOutstanding = array_sum(array_column($data, 'outstanding'));
         $collectionRate = $totalExpected > 0 ? (($totalCollected / $totalExpected) * 100) : 0;
 
+        // Aging summary: total outstanding amounts by bucket
+        $aging30 = array_sum(array_map(fn ($r) => $r['aging_bucket'] === '1-30 days' ? $r['outstanding'] : 0, $data));
+        $aging60 = array_sum(array_map(fn ($r) => $r['aging_bucket'] === '31-60 days' ? $r['outstanding'] : 0, $data));
+        $aging90 = array_sum(array_map(fn ($r) => $r['aging_bucket'] === '61-90 days' ? $r['outstanding'] : 0, $data));
+        $agingOver90 = array_sum(array_map(fn ($r) => $r['aging_bucket'] === '90+ days' ? $r['outstanding'] : 0, $data));
+
         return [
             'total_expected' => $totalExpected,
             'total_collected' => $totalCollected,
             'total_outstanding' => $totalOutstanding,
             'collection_rate' => round($collectionRate, 2),
+            'aging_30' => $aging30,
+            'aging_60' => $aging60,
+            'aging_90' => $aging90,
+            'aging_over_90' => $agingOver90,
         ];
     }
 

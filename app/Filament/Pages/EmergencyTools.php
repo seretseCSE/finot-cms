@@ -40,6 +40,42 @@ class EmergencyTools extends Page
                 ->action(function () {
                     $this->checkSystemStatus();
                 }),
+
+            Action::make('force_logout_all')
+                ->label('Force Logout All Users')
+                ->icon('heroicon-o-arrow-right-on-rectangle')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->modalHeading('Force Logout All Users')
+                ->modalDescription('This will immediately terminate all user sessions except yours. Users will need to log in again.')
+                ->modalSubmitActionLabel('Yes, Force Logout')
+                ->action(function () {
+                    $this->forceLogoutAllUsers();
+                }),
+
+            Action::make('permission_override')
+                ->label('Emergency Permission Override')
+                ->icon('heroicon-o-shield-check')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('Emergency Permission Override')
+                ->modalDescription('This will grant you temporary access to all system functions. This action should only be used in emergencies and will be logged.')
+                ->modalSubmitActionLabel('Yes, Enable Override')
+                ->action(function () {
+                    $this->enablePermissionOverride();
+                }),
+
+            Action::make('clear_caches')
+                ->label('Clear All Caches')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('Clear All Caches')
+                ->modalDescription('This will clear all system caches. May temporarily slow down the system.')
+                ->modalSubmitActionLabel('Yes, Clear Caches')
+                ->action(function () {
+                    $this->clearAllCaches();
+                }),
         ];
     }
 
@@ -88,6 +124,52 @@ class EmergencyTools extends Page
                 ->danger()
                 ->send();
         }
+    }
+
+    /**
+     * Enable emergency permission override.
+     */
+    public function enablePermissionOverride(): void
+    {
+        try {
+            $user = Auth::user();
+            
+            // Store override in session
+            session(['emergency_permission_override' => true, 'override_enabled_at' => now(), 'override_enabled_by' => $user->id]);
+            
+            // Log the emergency override
+            activity()
+                ->causedBy($user)
+                ->performedOn($user)
+                ->withProperties([
+                    'action' => 'emergency_permission_override_enabled',
+                    'override_enabled_at' => now(),
+                    'user_ip' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ])
+                ->log('Emergency permission override enabled');
+
+            Notification::make()
+                ->title('Emergency Override Enabled')
+                ->body('You now have temporary access to all system functions. This action has been logged.')
+                ->warning()
+                ->send();
+
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Override Failed')
+                ->body('Failed to enable emergency override: ' . $e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    /**
+     * Check if emergency override is active.
+     */
+    public function hasEmergencyOverride(): bool
+    {
+        return session('emergency_permission_override', false);
     }
 
     /**

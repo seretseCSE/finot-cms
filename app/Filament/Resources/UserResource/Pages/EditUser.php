@@ -7,8 +7,8 @@ use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
 
 class EditUser extends EditRecord
 {
@@ -70,8 +70,8 @@ class EditUser extends EditRecord
         if ($this->roleChanged && $this->newRole) {
             $user->syncRoles([$this->newRole]);
             
-            // Force logout if role changed
-            Session::where('user_id', $user->id)->delete();
+            // Force logout by destroying all of the user's database-backed sessions
+            DB::table('sessions')->where('user_id', $user->id)->delete();
             
             // Log role change
             activity()
@@ -88,7 +88,7 @@ class EditUser extends EditRecord
         
         // Handle force logout
         if ($this->forceLogout) {
-            Session::where('user_id', $user->id)->delete();
+            DB::table('sessions')->where('user_id', $user->id)->delete();
             
             activity()
                 ->causedBy($currentUser)

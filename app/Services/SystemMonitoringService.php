@@ -92,7 +92,14 @@ class SystemMonitoringService
     protected function getServerUptime(): array
     {
         $uptime = shell_exec('uptime 2>/dev/null') ?: 'Unknown';
-        $load = sys_getloadavg() ?: [0, 0, 0];
+        
+        // Get system load average with Windows compatibility
+        if (function_exists('sys_getloadavg')) {
+            $load = sys_getloadavg();
+        } else {
+            // Windows fallback - use CPU usage as alternative metric
+            $load = $this->getWindowsCpuUsage();
+        }
         
         return [
             'uptime' => $uptime,
@@ -100,6 +107,24 @@ class SystemMonitoringService
             'formatted' => $this->formatUptime($uptime),
             'status' => $load[0] > 2 ? 'critical' : ($load[0] > 1 ? 'warning' : 'good'),
         ];
+    }
+
+    protected function getWindowsCpuUsage(): array
+    {
+        // Windows-specific CPU usage detection
+        try {
+            // Try to get CPU usage via Windows Performance Counters
+            $cpu_usage = shell_exec('wmic cpu get loadpercentage /value 2>/dev/null | findstr LoadPercentage');
+            if ($cpu_usage && preg_match('/LoadPercentage=(\d+)/', $cpu_usage, $matches)) {
+                $cpu_percent = (float) $matches[1] / 100; // Convert to decimal
+                return [$cpu_percent, $cpu_percent, $cpu_percent];
+            }
+        } catch (\Exception $e) {
+            // Fallback if command fails
+        }
+        
+        // Final fallback - return zeros
+        return [0, 0, 0];
     }
 
     protected function getStorageUsage(): array
@@ -157,7 +182,13 @@ class SystemMonitoringService
 
     protected function getCpuUsage(): array
     {
-        $load = sys_getloadavg();
+        // Get system load average with Windows compatibility
+        if (function_exists('sys_getloadavg')) {
+            $load = sys_getloadavg();
+        } else {
+            // Windows fallback - use CPU usage as alternative metric
+            $load = $this->getWindowsCpuUsage();
+        }
         
         return [
             'load_1min' => $load[0],
@@ -243,7 +274,13 @@ class SystemMonitoringService
 
     protected function getSystemLoadChart(): array
     {
-        $load = sys_getloadavg();
+        // Get system load average with Windows compatibility
+        if (function_exists('sys_getloadavg')) {
+            $load = sys_getloadavg();
+        } else {
+            // Windows fallback - use CPU usage as alternative metric
+            $load = $this->getWindowsCpuUsage();
+        }
         
         return [
             'labels' => ['1 min', '5 min', '15 min'],

@@ -20,6 +20,10 @@ class Announcement extends BaseModel
         'end_date',
         'is_urgent',
         'status',
+        'is_global',
+        'target_audience',
+        'broadcast_channels',
+        'acknowledged_by',
         'created_by',
     ];
 
@@ -27,6 +31,9 @@ class Announcement extends BaseModel
         'start_date' => 'date',
         'end_date' => 'date',
         'is_urgent' => 'boolean',
+        'is_global' => 'boolean',
+        'broadcast_channels' => 'array',
+        'acknowledged_by' => 'array',
     ];
 
     protected $dates = [
@@ -100,6 +107,174 @@ class Announcement extends BaseModel
         return $this->status === 'Active' &&
                $this->end_date &&
                $this->end_date->lt(now());
+    }
+
+    /**
+     * Check if announcement is global
+     */
+    public function isGlobalAnnouncement(): bool
+    {
+        return $this->is_global === true;
+    }
+
+    /**
+     * Get target audience options
+     */
+    public static function getTargetAudienceOptions(): array
+    {
+        return [
+            'all_users' => 'All Users',
+            'admin_only' => 'Admin Only',
+            'department_heads' => 'Department Heads',
+            'specific_departments' => 'Specific Departments',
+            'specific_roles' => 'Specific Roles',
+        ];
+    }
+
+    /**
+     * Get broadcast channel options
+     */
+    public static function getBroadcastChannelOptions(): array
+    {
+        return [
+            'in_app' => 'In-App Notification',
+            'email' => 'Email',
+            'push_notification' => 'Push Notification',
+        ];
+    }
+
+    /**
+     * Check if user has acknowledged this announcement
+     */
+    public function isAcknowledgedBy($userId): bool
+    {
+        if (!$this->acknowledged_by) {
+            return false;
+        }
+        
+        return in_array($userId, $this->acknowledged_by);
+    }
+
+    /**
+     * Mark announcement as acknowledged by user
+     */
+    public function acknowledgeBy($userId): void
+    {
+        $acknowledged = $this->acknowledged_by ?? [];
+        
+        if (!in_array($userId, $acknowledged)) {
+            $acknowledged[] = $userId;
+            $this->update(['acknowledged_by' => $acknowledged]);
+        }
+    }
+
+    /**
+     * Get unacknowledged count for global announcements
+     */
+    public function getUnacknowledgedCount(): int
+    {
+        if (!$this->isGlobalAnnouncement()) {
+            return 0;
+        }
+
+        $totalUsers = \App\Models\User::count();
+        $acknowledgedCount = count($this->acknowledged_by ?? []);
+        
+        return $totalUsers - $acknowledgedCount;
+    }
+
+    /**
+     * Broadcast the global announcement to target users
+     */
+    public function broadcast(): void
+    {
+        if (!$this->isGlobalAnnouncement()) {
+            return;
+        }
+
+        $channels = $this->broadcast_channels ?? ['in_app'];
+        
+        // Get target users based on audience
+        $query = \App\Models\User::query();
+        
+        match($this->target_audience) {
+            'admin_only' => $query->whereHas('roles', function ($q) {
+                $q->whereIn('name', ['admin', 'superadmin']);
+            }),
+            'department_heads' => $query->whereHas('roles', function ($q) {
+                $q->where('name', 'like', '%_head');
+            }),
+            'specific_departments' => $query->whereIn('department_id', $this->specific_departments ?? []),
+            'specific_roles' => $query->whereHas('roles', function ($q) {
+                $q->whereIn('name', $this->specific_roles ?? []);
+            }),
+            default => null, // all_users - no filtering
+        };
+
+        $users = $query->get();
+
+        // Send notifications based on selected channels
+        foreach ($users as $user) {
+            $notificationChannels = [];
+            
+            if (in_array('in_app', $channels)) {
+                $notificationChannels[] = 'database';
+            }
+            
+            if (in_array('email', $channels)) {
+                $notificationChannels[] = 'mail';
+            }
+
+            if (!empty($notificationChannels)) {
+                $user->notify(new \App\Notifications\GlobalAnnouncementNotification($this, $notificationChannels));
+            }
+        }
+
+        // Log the broadcast
+        \Log::channel('audit')->info('Global Announcement Broadcast', [
+            'announcement_id' => $this->id,
+            'title' => $this->title,
+            'target_audience' => $this->target_audience,
+            'channels' => $channels,
+            'users_count' => $users->count(),
+            'broadcast_by' => auth()->id(),
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+    }
+
+    /**
+     * Get users who need to acknowledge this announcement
+     */
+    public function getUsersNeedingAcknowledgment(): \Illuminate\Database\Eloquent\Collection
+    {
+        if (!$this->isGlobalAnnouncement()) {
+            return collect();
+        }
+
+        $query = \App\Models\User::query();
+        
+        // Filter by target audience
+        match($this->target_audience) {
+            'admin_only' => $query->whereHas('roles', function ($q) {
+                $q->whereIn('name', ['admin', 'superadmin']);
+            }),
+            'department_heads' => $query->whereHas('roles', function ($q) {
+                $q->where('name', 'like', '%_head');
+            }),
+            'specific_departments' => $query->whereIn('department_id', $this->specific_departments ?? []),
+            'specific_roles' => $query->whereHas('roles', function ($q) {
+                $q->whereIn('name', $this->specific_roles ?? []);
+            }),
+            default => null, // all_users - no filtering
+        };
+
+        // Exclude users who have already acknowledged
+        $acknowledgedIds = $this->acknowledged_by ?? [];
+        if (!empty($acknowledgedIds)) {
+            $query->whereNotIn('id', $acknowledgedIds);
+        }
+
+        return $query->get();
     }
 
     /**

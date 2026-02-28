@@ -18,8 +18,10 @@ class AcademicYear extends Model
         'status',
         'activated_at',
         'deactivated_at',
+        'reactivated_at',
         'activated_by',
         'deactivated_by',
+        'reactivated_by',
         'created_by',
     ];
 
@@ -28,6 +30,7 @@ class AcademicYear extends Model
         'end_date' => 'date',
         'activated_at' => 'datetime',
         'deactivated_at' => 'datetime',
+        'reactivated_at' => 'datetime',
     ];
 
     /**
@@ -46,6 +49,11 @@ class AcademicYear extends Model
     public function deactivatedBy()
     {
         return $this->belongsTo(User::class, 'deactivated_by');
+    }
+
+    public function reactivatedBy()
+    {
+        return $this->belongsTo(User::class, 'reactivated_by');
     }
 
     public function createdBy()

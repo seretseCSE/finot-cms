@@ -145,10 +145,42 @@ class ContributionReportPage extends Page
                 return [
                     'member' => $group->first()->member,
                     'total' => $group->sum('amount'),
+                    'count' => $group->count(),
                 ];
             })
             ->sortByDesc('total')
             ->take(5)
+            ->values();
+
+        // Payment method breakdown
+        $paymentMethodBreakdown = $contributions
+            ->groupBy('payment_method')
+            ->map(function ($group) {
+                return [
+                    'method' => $group->first()->payment_method,
+                    'amount' => $group->sum('amount'),
+                    'count' => $group->count(),
+                    'percentage' => $totalCollected > 0 ? (($group->sum('amount') / $totalCollected) * 100) : 0,
+                ];
+            })
+            ->sortByDesc('amount')
+            ->values();
+
+        // Month-over-month trends (last 6 months)
+        $monthTrends = $this->getMonthTrends($contributions);
+
+        // Group performance metrics
+        $groupPerformance = $contributions
+            ->groupBy('member.memberGroup.name')
+            ->map(function ($group) {
+                return [
+                    'group' => $group->first()->member->memberGroup->name,
+                    'total' => $group->sum('amount'),
+                    'count' => $group->count(),
+                    'average' => $group->count() > 0 ? $group->sum('amount') / $group->count() : 0,
+                ];
+            })
+            ->sortByDesc('total')
             ->values();
 
         return [
@@ -158,7 +190,37 @@ class ContributionReportPage extends Page
             'totalOutstanding' => $totalOutstanding,
             'collectionRate' => round($collectionRate, 2),
             'topContributors' => $topContributors,
+            'paymentMethodBreakdown' => $paymentMethodBreakdown,
+            'monthTrends' => $monthTrends,
+            'groupPerformance' => $groupPerformance,
+            'totalContributors' => $contributions->groupBy('member_id')->count(),
+            'averageContribution' => $totalCollected > 0 ? $totalCollected / $contributions->groupBy('member_id')->count() : 0,
         ];
+    }
+
+    /**
+     * Get month-over-month trends
+     */
+    private function getMonthTrends($contributions): array
+    {
+        $months = EthiopianDateHelper::getMonthsForContribution();
+        $trends = [];
+        
+        // Get last 6 months
+        $lastSixMonths = array_slice($months, -6, 6, true);
+        
+        foreach ($lastSixMonths as $monthName) {
+            $monthContributions = $contributions->where('month_name', $monthName);
+            
+            $trends[] = [
+                'month' => $monthName,
+                'amount' => $monthContributions->sum('amount'),
+                'count' => $monthContributions->count(),
+                'contributors' => $monthContributions->groupBy('member_id')->count(),
+            ];
+        }
+        
+        return $trends;
     }
 
     protected function getViewData(): array

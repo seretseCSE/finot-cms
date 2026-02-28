@@ -5,20 +5,26 @@ namespace App\Filament\Pages;
 use App\Models\SiteSetting;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 
-class GlobalChurchSettings extends Page
+class GlobalChurchSettings extends Page implements HasForms
 {
     use WithFileUploads;
+    use InteractsWithForms;
 
     protected static ?string $title = 'Global Church Settings';
 
     protected static ?int $navigationSort = 3;
+
+    public ?array $data = [];
 
     public static function getNavigationIcon(): ?string
     {
@@ -50,16 +56,18 @@ class GlobalChurchSettings extends Page
             'church_email' => SiteSetting::get('church_email', ''),
             'default_language' => SiteSetting::get('default_language', 'am'),
             'maintenance_mode' => SiteSetting::get('maintenance_mode', false),
+            'footer_text' => SiteSetting::get('footer_text', ''),
             'logo' => SiteSetting::get('logo'),
         ]);
     }
 
-    protected function getFormSchema(): array
+    public function form(\Filament\Schemas\Schema $form): \Filament\Schemas\Schema
     {
-        return [
-            \Filament\Schemas\Components\Section::make('Church Information')
-                ->description('Basic church information and contact details')
-                ->schema([
+        return $form
+            ->schema([
+                \Filament\Schemas\Components\Section::make('Church Information')
+                    ->description('Basic church information and contact details')
+                    ->schema([
                     Forms\Components\TextInput::make('church_name_en')
                         ->label('Church Name (English)')
                         ->required()
@@ -101,6 +109,13 @@ class GlobalChurchSettings extends Page
                         ->label('Maintenance Mode')
                         ->helperText('When enabled, only Superadmin can access the system')
                         ->reactive(),
+
+                    Forms\Components\Textarea::make('footer_text')
+                        ->label('Footer Text')
+                        ->helperText('Custom text displayed in the website footer')
+                        ->rows(2)
+                        ->maxLength(500)
+                        ->columnSpanFull(),
                 ])
                 ->columns(2),
 
@@ -122,7 +137,8 @@ class GlobalChurchSettings extends Page
                             }
                         }),
                 ]),
-        ];
+        ])
+            ->statePath('data');
     }
 
     protected function getFormActions(): array
@@ -150,6 +166,22 @@ class GlobalChurchSettings extends Page
     {
         $data = $this->form->getState();
 
+        // Capture old values BEFORE saving for audit diff
+        $oldValues = [];
+        $newValues = [];
+        $settingsKeys = ['church_name_en', 'church_name_am', 'church_address', 'church_phone',
+                         'church_email', 'default_language', 'maintenance_mode', 'footer_text'];
+
+        foreach ($settingsKeys as $key) {
+            if (isset($data[$key])) {
+                $oldVal = SiteSetting::get($key);
+                if ($oldVal !== $data[$key]) {
+                    $oldValues[$key] = $oldVal;
+                    $newValues[$key] = $data[$key];
+                }
+            }
+        }
+
         // Handle logo upload
         if (isset($data['logo']) && $data['logo']) {
             // Delete old logo if exists
@@ -159,8 +191,12 @@ class GlobalChurchSettings extends Page
             }
             
             // Store new logo
-            $logoPath = $data['logo']->store('logos', 'public');
-            $data['logo'] = $logoPath;
+            if (is_object($data['logo'])) {
+                $logoPath = $data['logo']->store('logos', 'public');
+                $data['logo'] = $logoPath;
+                $oldValues['logo'] = $oldLogo;
+                $newValues['logo'] = $logoPath;
+            }
         } else {
             // Keep existing logo if not changed
             unset($data['logo']);
@@ -171,19 +207,24 @@ class GlobalChurchSettings extends Page
             SiteSetting::set($key, $value);
         }
 
-        // Log the action
+        // Log the action with old → new value diff
         activity()
             ->causedBy(Auth::user())
             ->performedOn(new SiteSetting())
             ->withProperties([
                 'action' => 'update_global_settings',
-                'settings_updated' => array_keys($data),
+                'old_values' => $oldValues,
+                'new_values' => $newValues,
+                'settings_updated' => array_keys($newValues),
             ])
             ->log('Updated global church settings');
 
+        // Clear all config/view/route caches after settings change
+        Artisan::call('optimize:clear');
+
         Notification::make()
             ->title('Settings Saved')
-            ->body('Global church settings have been updated successfully.')
+            ->body('Global church settings have been updated. Cache has been cleared automatically.')
             ->success()
             ->send();
 
@@ -207,6 +248,7 @@ class GlobalChurchSettings extends Page
             'church_email' => '',
             'default_language' => 'am',
             'maintenance_mode' => false,
+            'footer_text' => '',
             'logo' => null,
         ];
 

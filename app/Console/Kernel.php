@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\FinanceNotifyOutstandingCommand::class,
         \App\Console\Commands\ScheduleTestCommand::class,
         \App\Console\Commands\MediaAutoArchiveCommand::class,
+        \App\Console\Commands\BroadcastGlobalAnnouncementsCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -60,6 +61,10 @@ class Kernel extends ConsoleKernel
         // Every 15 minutes
         $schedule->command('system:check-health')->everyFifteenMinutes()
             ->description('Check system health every 15 minutes');
+
+        // Every 30 minutes for global announcements
+        $schedule->command('announcements:broadcast-global')->everyThirtyMinutes()
+            ->description('Broadcast active global announcements every 30 minutes');
 
         // Monthly
         $schedule->command('finance:notify-outstanding')->monthly()

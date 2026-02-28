@@ -67,9 +67,7 @@ class ManageActiveSessions extends Page implements HasTable
 
     public function refreshTable(): void
     {
-        $this->table->resetFilters();
-        $this->table->resetSearch();
-        $this->table->resetPage();
+        // Filament tables with polling or Livewire actions refresh automatically.
     }
 
     public function table(Table $table): Table
@@ -151,9 +149,7 @@ class ManageActiveSessions extends Page implements HasTable
             ->send();
         
         // Refresh the table
-        $this->table->resetFilters();
-        $this->table->resetSearch();
-        $this->table->resetPage();
+        // Filament auto-refreshes the table after an action.
     }
 
     protected function formatDeviceInfo(?string $deviceInfo): string

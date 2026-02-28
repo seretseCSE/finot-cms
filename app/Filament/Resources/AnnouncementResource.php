@@ -49,38 +49,82 @@ class AnnouncementResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\TextInput::make('title')
-                    ->label('Title (English)')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Section::make('Basic Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->label('Title (English)')
+                            ->required()
+                            ->maxLength(255),
 
-                Forms\Components\TextInput::make('title_am')
-                    ->label('Title (Amharic)')
-                    ->maxLength(255),
+                        Forms\Components\TextInput::make('title_am')
+                            ->label('Title (Amharic)')
+                            ->maxLength(255),
 
-                Forms\Components\RichEditor::make('content')
-                    ->label('Content (English)')
-                    ->required()
-                    ->columnSpanFull(),
+                        Forms\Components\RichEditor::make('content')
+                            ->label('Content (English)')
+                            ->required()
+                            ->columnSpanFull(),
 
-                Forms\Components\RichEditor::make('content_am')
-                    ->label('Content (Amharic)')
-                    ->columnSpanFull(),
+                        Forms\Components\RichEditor::make('content_am')
+                            ->label('Content (Amharic)')
+                            ->columnSpanFull(),
+                    ]),
 
-                Forms\Components\DatePicker::make('start_date')
-                    ->label('Start Date')
-                    ->required()
-                    ->native(false),
+                Forms\Components\Section::make('Scheduling')
+                    ->schema([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Start Date')
+                            ->required()
+                            ->native(false),
 
-                Forms\Components\DatePicker::make('end_date')
-                    ->label('End Date')
-                    ->helperText('Leave empty for ongoing announcement')
-                    ->native(false),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label('End Date')
+                            ->helperText('Leave empty for ongoing announcement')
+                            ->native(false),
 
-                Forms\Components\Toggle::make('is_urgent')
-                    ->label('Is Urgent')
-                    ->default(false)
-                    ->helperText('Urgent announcements will have red border and be pinned to top'),
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'Draft' => 'Draft',
+                                'Active' => 'Active',
+                                'Expired' => 'Expired',
+                                'Archived' => 'Archived',
+                            ])
+                            ->default('Draft')
+                            ->required(),
+
+                        Forms\Components\Toggle::make('is_urgent')
+                            ->label('Is Urgent')
+                            ->default(false)
+                            ->helperText('Urgent announcements will have red border and be pinned to top'),
+                    ]),
+
+                Forms\Components\Section::make('Global Announcement Settings')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_global')
+                            ->label('Global Announcement')
+                            ->default(false)
+                            ->helperText('Global announcements will be broadcast system-wide and require acknowledgment')
+                            ->reactive()
+                            ->afterStateUpdated(fn ($state, callable $set) => 
+                                $state ? $set('target_audience', 'all_users') : null
+                            ),
+
+                        Forms\Components\Select::make('target_audience')
+                            ->label('Target Audience')
+                            ->options(Announcement::getTargetAudienceOptions())
+                            ->default('all_users')
+                            ->required(fn (callable $get) => $get('is_global'))
+                            ->visible(fn (callable $get) => $get('is_global')),
+
+                        Forms\Components\CheckboxList::make('broadcast_channels')
+                            ->label('Broadcast Channels')
+                            ->options(Announcement::getBroadcastChannelOptions())
+                            ->default(['in_app'])
+                            ->required(fn (callable $get) => $get('is_global'))
+                            ->visible(fn (callable $get) => $get('is_global'))
+                            ->helperText('Select how this announcement should be delivered'),
+                    ])
+                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
             ]);
     }
 
@@ -93,6 +137,15 @@ class AnnouncementResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                Tables\Columns\IconColumn::make('is_global')
+                    ->label('Global')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-globe-alt')
+                    ->falseIcon('heroicon-o-globe-alt')
+                    ->trueColor('primary')
+                    ->falseColor('gray')
+                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+
                 Tables\Columns\IconColumn::make('is_urgent')
                     ->label('Urgent')
                     ->boolean()
@@ -100,6 +153,11 @@ class AnnouncementResource extends Resource
                     ->falseIcon('heroicon-o-check-circle')
                     ->trueColor('danger')
                     ->falseColor('success'),
+
+                Tables\Columns\TextColumn::make('target_audience')
+                    ->label('Target Audience')
+                    ->formatStateUsing(fn ($state) => Announcement::getTargetAudienceOptions()[$state] ?? $state)
+                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
 
                 Tables\Columns\TextColumn::make('ethiopian_start_date')
                     ->label('Start Date')
@@ -136,6 +194,18 @@ class AnnouncementResource extends Resource
                         'Archived' => 'Archived',
                     ]),
 
+                Tables\Filters\TernaryFilter::make('is_global')
+                    ->label('Global Announcements')
+                    ->placeholder('All announcements')
+                    ->trueLabel('Global only')
+                    ->falseLabel('Regular only')
+                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+
+                Tables\Filters\SelectFilter::make('target_audience')
+                    ->label('Target Audience')
+                    ->options(Announcement::getTargetAudienceOptions())
+                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+
                 Tables\Filters\Filter::make('date_range')
                     ->form([
                         Forms\Components\DatePicker::make('start_date')
@@ -167,6 +237,76 @@ class AnnouncementResource extends Resource
                     ->visible(fn ($record) => static::canEdit($record)),
                 Actions\DeleteAction::make()
                     ->visible(fn ($record) => static::canDelete($record)),
+
+                // Broadcast Global Announcement
+                Tables\Actions\Action::make('broadcast')
+                    ->label('Broadcast')
+                    ->icon('heroicon-o-broadcast')
+                    ->color('success')
+                    ->visible(fn (Announcement $record): bool => 
+                        $record->is_global && 
+                        $record->status === 'Active' && 
+                        Auth::user()->hasRole(['admin', 'superadmin'])
+                    )
+                    ->requiresConfirmation()
+                    ->modalHeading('Broadcast Global Announcement')
+                    ->modalDescription('This will send the announcement to all target users via selected channels.')
+                    ->modalSubmitActionLabel('Yes, Broadcast')
+                    ->action(function (Announcement $record) {
+                        try {
+                            $record->broadcast();
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Announcement Broadcasted')
+                                ->body("Global announcement '{$record->title}' has been successfully broadcasted to target users.")
+                                ->success()
+                                ->send();
+
+                        } catch (\Exception $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Broadcast Failed')
+                                ->body('Failed to broadcast announcement: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+
+                // View Acknowledgment Status
+                Tables\Actions\Action::make('acknowledgments')
+                    ->label('View Acknowledgments')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('info')
+                    ->visible(fn (Announcement $record): bool => 
+                        $record->is_global && Auth::user()->hasRole(['admin', 'superadmin'])
+                    )
+                    ->modalContent(function (Announcement $record) {
+                        $totalUsers = \App\Models\User::count();
+                        $acknowledgedCount = count($record->acknowledged_by ?? []);
+                        $pendingCount = $record->getUnacknowledgedCount();
+                        
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='space-y-4'>
+                                <div class='grid grid-cols-3 gap-4'>
+                                    <div class='text-center'>
+                                        <div class='text-2xl font-bold text-blue-600'>{$totalUsers}</div>
+                                        <div class='text-sm text-gray-600'>Total Users</div>
+                                    </div>
+                                    <div class='text-center'>
+                                        <div class='text-2xl font-bold text-green-600'>{$acknowledgedCount}</div>
+                                        <div class='text-sm text-gray-600'>Acknowledged</div>
+                                    </div>
+                                    <div class='text-center'>
+                                        <div class='text-2xl font-bold text-orange-600'>{$pendingCount}</div>
+                                        <div class='text-sm text-gray-600'>Pending</div>
+                                    </div>
+                                </div>
+                                <div class='w-full bg-gray-200 rounded-full h-2.5'>
+                                    <div class='bg-green-600 h-2.5 rounded-full' style='width: " . ($totalUsers > 0 ? ($acknowledgedCount / $totalUsers * 100) : 0) . "%'></div>
+                                </div>
+                                <p class='text-sm text-gray-600 text-center'>" . round($totalUsers > 0 ? ($acknowledgedCount / $totalUsers * 100) : 0, 1) . "% Complete</p>
+                            </div>
+                        ");
+                    }),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([

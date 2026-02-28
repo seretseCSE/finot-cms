@@ -10,22 +10,18 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password; 
+use Illuminate\Validation\Rules\Password;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Hidden;
 
 class EditProfile extends Page implements HasForms
 {
     use InteractsWithForms;
 
     protected static ?string $title = 'Edit Profile';
-
-    public static function getNavigationIcon(): ?string 
-    { 
-        return 'heroicon-o-user'; 
-    }
 
     public ?array $data = [];
 
@@ -57,6 +53,12 @@ class EditProfile extends Page implements HasForms
     public static function canAccess(): bool
     {
         return auth()->check();
+    }
+
+    // Remove from navigation panel
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
     }
 
     public function form(\Filament\Schemas\Schema $form): \Filament\Schemas\Schema
@@ -113,6 +115,7 @@ class EditProfile extends Page implements HasForms
                 TextInput::make('current_password')
                     ->label('Current Password')
                     ->password()
+                    ->revealable()
                     ->required(fn ($get) => filled($get('new_password')))
                     ->currentPassword()
                     ->helperText('Enter your current password to confirm the change'),
@@ -120,6 +123,7 @@ class EditProfile extends Page implements HasForms
                 TextInput::make('new_password')
                     ->label('New Password')
                     ->password()
+                    ->revealable()
                     ->confirmed()
                     ->required(fn ($get) => filled($get('current_password')))
                     ->rules([
@@ -133,31 +137,12 @@ class EditProfile extends Page implements HasForms
                 TextInput::make('new_password_confirmation')
                     ->label('Confirm New Password')
                     ->password()
+                    ->revealable()
                     ->required(fn ($get) => filled($get('new_password')))
                     ->dehydrated(false),
 
-                // Account Information Header
-                \Filament\Forms\Components\Placeholder::make('account_header')
-                    ->label('Account Information')
-                    ->content('Your account details and status')
-                    ->columnSpanFull(),
-
-                Placeholder::make('role')
-                    ->label('Role')
-                    ->content(fn () => Auth::user()->roles->first()?->name ?? 'No Role'),
-
-                Placeholder::make('department')
-                    ->label('Department')
-                    ->content(fn () => Auth::user()->department?->name_en ?? 'Not Assigned'),
-
-                Placeholder::make('status')
-                    ->label('Account Status')
-                    ->content(fn () => Auth::user()->is_active ? 'Active' : 'Inactive')
-                    ->color(fn () => Auth::user()->is_active ? 'success' : 'danger'),
-
-                Placeholder::make('last_login')
-                    ->label('Last Login')
-                    ->content(fn () => Auth::user()->last_login_at?->format('Y-m-d H:i:s') ?? 'Never'),
+                // Hidden form field (customizable as needed)
+                Hidden::make('hidden_field'),
             ])
             ->columns(2)
             ->statePath('data');
@@ -193,12 +178,19 @@ class EditProfile extends Page implements HasForms
             $user->language_preference = $data['language_preference'];
 
             // Update password if provided
+            $passwordChanged = false;
             if (!empty($data['new_password'])) {
                 $user->password = Hash::make($data['new_password']);
                 $user->temp_password_changed = true;
+                $passwordChanged = true;
             }
 
             $user->save();
+
+            // If password was changed, re-authenticate to keep session active
+            if ($passwordChanged) {
+                Auth::login($user);
+            }
 
             // Profile updated successfully
             Notification::make()

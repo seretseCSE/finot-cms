@@ -1,14 +1,8 @@
 <x-filament-panels::page>
     <div class="space-y-6">
-        <!-- Header with Actions -->
-        <div class="flex justify-between items-center">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900">Global Oversight Dashboard</h2>
-                <p class="text-gray-600 mt-1">Real-time system monitoring and analytics</p>
-            </div>
-            <div class="flex space-x-2">
-                {{ $this->getHeaderActions() }}
-            </div>
+        <!-- Custom Subtitle -->
+        <div class="-mt-4 mb-2">
+            <p class="text-gray-600">Real-time system monitoring and analytics</p>
         </div>
 
         <!-- System Health Stats -->

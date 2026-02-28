@@ -4,8 +4,10 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ListUsers extends ListRecords
 {
@@ -21,6 +23,44 @@ class ListUsers extends ListRecords
                 ->url(UserResource::getUrl('create'))
                 ->icon('heroicon-o-user-plus')
                 ->visible(fn () => $currentUser->hasRole(['superadmin', 'admin'])),
+
+            // Force Logout All Users — emergency action for Superadmin/Admin
+            Actions\Action::make('force_logout_all')
+                ->label('Force Logout All Users')
+                ->icon('heroicon-o-arrow-right-on-rectangle')
+                ->color('danger')
+                ->visible(fn () => $currentUser->hasRole(['superadmin', 'admin']))
+                ->requiresConfirmation()
+                ->modalHeading('⚠️ Force Logout All Users')
+                ->modalDescription(
+                    'This will immediately terminate ALL active user sessions across the entire system. ' .
+                    'Every user (except you) will be logged out and must log in again. ' .
+                    'Use this only in emergencies (e.g., security breach, critical role changes).'
+                )
+                ->modalSubmitActionLabel('Yes, Logout Everyone')
+                ->action(function () use ($currentUser) {
+                    // Delete all sessions except the current user's
+                    $currentSessionId = session()->getId();
+                    DB::table('sessions')
+                        ->where('id', '!=', $currentSessionId)
+                        ->delete();
+
+                    // Audit trail
+                    activity()
+                        ->causedBy($currentUser)
+                        ->withProperties([
+                            'action' => 'force_logout_all_users',
+                            'reason' => 'Admin-initiated global force logout',
+                            'sessions_cleared' => true,
+                        ])
+                        ->log('force_logout_all_users');
+
+                    Notification::make()
+                        ->title('All Users Logged Out')
+                        ->body('All active sessions have been terminated. Users must log in again.')
+                        ->success()
+                        ->send();
+                }),
 
             Actions\Action::make('bulk_import')
                 ->label('Bulk Import')
