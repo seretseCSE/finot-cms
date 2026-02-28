@@ -22,7 +22,7 @@ class PasswordHistory extends Model
     /**
      * Keep only last 3 password records for each user
      */
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 

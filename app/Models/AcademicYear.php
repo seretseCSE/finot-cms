@@ -104,7 +104,7 @@ class AcademicYear extends Model
     /**
      * Boot the model and add validation.
      */
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 

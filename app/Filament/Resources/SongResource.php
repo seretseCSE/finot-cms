@@ -47,7 +47,7 @@ class SongResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Song Information')
+                \Filament\Schemas\Components\Section::make('Song Information')
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->label('Title')
@@ -99,7 +99,7 @@ class SongResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Media Files')
+                \Filament\Schemas\Components\Section::make('Media Files')
                     ->schema([
                         Forms\Components\FileUpload::make('audio_file')
                             ->label('Audio File')
@@ -121,7 +121,7 @@ class SongResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Settings')
+                \Filament\Schemas\Components\Section::make('Settings')
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
@@ -279,4 +279,5 @@ class SongResource extends Resource
         ];
     }
 }
+
 

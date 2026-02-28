@@ -24,7 +24,7 @@ class ContributionReportPage extends Page
 
     public static function getNavigationLabel(): string { return 'Contribution Report'; }
 
-    public static function getNavigationGroup(): ?string { return 'Finance'; }
+    public static function getNavigationGroup(): ?string { return 'Reports'; }
 
     protected string $view = 'filament.pages.contribution-report';
 

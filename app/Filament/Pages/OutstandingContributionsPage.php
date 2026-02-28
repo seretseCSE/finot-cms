@@ -175,7 +175,7 @@ class OutstandingContributionsPage extends Page
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Section::make('Filters')
+            \Filament\Schemas\Components\Section::make('Filters')
                 ->schema([
                     Forms\Components\Select::make('selectedGroup')
                         ->label('Member Group')
@@ -203,4 +203,5 @@ class OutstandingContributionsPage extends Page
         ];
     }
 }
+
 

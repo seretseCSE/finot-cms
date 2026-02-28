@@ -30,7 +30,7 @@ class MemberGroupResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make()
+                \Filament\Schemas\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Group Name')
@@ -41,11 +41,11 @@ class MemberGroupResource extends Resource
                         Forms\Components\Select::make('group_type')
                             ->label('Group Type')
                             ->options([
-                                'Kids' => 'Kids',
-                                'Youth' => 'Youth',
-                                'Adult' => 'Adult',
-                                'Ministry' => 'Ministry',
-                                'Other' => 'Other',
+                                'Kids' => 'Kids / ሕጻናት',
+                                'Elder Kids' => 'Elder Kids / ዐቢይ ሕጻናት',
+                                'Youngsters' => 'Youngsters / አዳጊ',
+                                'Youth' => 'Youth / ወጣት',
+                                'Finot Family' => 'Finot Family / ፍኖት ቤተሰብ',
                             ])
                             ->nullable(),
 
@@ -71,10 +71,10 @@ class MemberGroupResource extends Resource
                     ->label('Type')
                     ->colors([
                         'info' => 'Kids',
-                        'warning' => 'Youth',
-                        'success' => 'Adult',
-                        'primary' => 'Ministry',
-                        'secondary' => 'Other',
+                        'success' => 'Elder Kids',
+                        'warning' => 'Youngsters',
+                        'danger' => 'Youth',
+                        'primary' => 'Finot Family',
                     ]),
 
                 Tables\Columns\TextColumn::make('active_member_count')
@@ -101,11 +101,11 @@ class MemberGroupResource extends Resource
                 Tables\Filters\SelectFilter::make('group_type')
                     ->label('Group Type')
                     ->options([
-                        'Kids' => 'Kids',
-                        'Youth' => 'Youth',
-                        'Adult' => 'Adult',
-                        'Ministry' => 'Ministry',
-                        'Other' => 'Other',
+                        'Kids' => 'Kids / ሕጻናት',
+                        'Elder Kids' => 'Elder Kids / ዐቢይ ሕጻናት',
+                        'Youngsters' => 'Youngsters / አዳጊ',
+                        'Youth' => 'Youth / ወጣት',
+                        'Finot Family' => 'Finot Family / ፍኖት ቤተሰብ',
                     ]),
 
                 Tables\Filters\SelectFilter::make('is_active')
@@ -187,6 +187,9 @@ class MemberGroupResource extends Resource
                     Actions\DeleteBulkAction::make(),
                     Actions\RestoreBulkAction::make(),
                 ]),
+            ])
+            ->emptyStateActions([
+                Actions\CreateAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -272,4 +275,5 @@ class MemberGroupResource extends Resource
         return parent::getTableQuery()->withCount(['activeAssignments']);
     }
 }
+
 

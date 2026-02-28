@@ -119,7 +119,7 @@ class PassengersRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->label('Add Passenger')
                     ->modalHeading('Add Passenger')
                     ->mutateFormDataUsing(function (array $data): array {
@@ -127,13 +127,13 @@ class PassengersRelationManager extends RelationManager
                         $lastPassenger = \App\Models\TourPassenger::orderBy('id', 'desc')->first();
                         $lastCode = $lastPassenger ? intval(substr($lastPassenger->passenger_code, 3)) : 0;
                         $data['passenger_code'] = 'TP-' . str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-                        
+
                         // Set registration date
                         $data['registration_date'] = now()->toDateString();
-                        
+
                         // Set registered by
                         $data['registered_by'] = Auth::id();
-                        
+
                         return $data;
                     })
                     ->before(function (array $data) {
@@ -141,16 +141,16 @@ class PassengersRelationManager extends RelationManager
                         $exists = \App\Models\TourPassenger::where('tour_id', $this->ownerRecord->id)
                             ->where('phone', $data['phone'])
                             ->exists();
-                        
+
                         if ($exists) {
                             throw new \Exception('This phone number is already registered for this tour');
                         }
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+
                 Actions\Action::make('confirm')
                     ->label('Confirm')
                     ->icon('heroicon-o-check-circle')
@@ -175,7 +175,7 @@ class PassengersRelationManager extends RelationManager
                         $record->cancel($data['cancellation_reason']);
                     }),
 
-                Tables\Actions\DeleteAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -215,7 +215,7 @@ class PassengersRelationManager extends RelationManager
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->label('Add Passenger'),
             ])
             ->emptyStateHeading('No passengers registered')
@@ -226,7 +226,7 @@ class PassengersRelationManager extends RelationManager
     protected function getTableSummary(): array
     {
         $records = $this->getRecords();
-        
+
         $pendingCount = $records->where('status', 'Pending')->count();
         $confirmedCount = $records->where('status', 'Confirmed')->count();
         $cancelledCount = $records->where('status', 'Cancelled')->count();
@@ -241,4 +241,3 @@ class PassengersRelationManager extends RelationManager
         ];
     }
 }
-

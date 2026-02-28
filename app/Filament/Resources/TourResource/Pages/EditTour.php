@@ -29,7 +29,7 @@ class EditTour extends EditRecord
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Section::make('Tour Information')
+            \Filament\Schemas\Components\Section::make('Tour Information')
                 ->schema([
                     Forms\Components\TextInput::make('place')
                         ->label('Tour Place')
@@ -81,7 +81,7 @@ class EditTour extends EditRecord
                 ->columns(2),
 
             // Add Passenger Management Section
-            Forms\Components\Section::make('Passenger Management')
+            \Filament\Schemas\Components\Section::make('Passenger Management')
                 ->schema([
                     // This will be handled by the relation manager
                 ])
@@ -129,4 +129,5 @@ class EditTour extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 }
+
 

@@ -36,8 +36,10 @@ class EthiopianDateHelper
     /**
      * Convert Gregorian to Ethiopian (simplified - just returns Gregorian)
      */
-    public function toEthiopian(Carbon|string $gregorianDate): array
+    public static function toEthiopian(Carbon|string $gregorianDate): array
     {
+        $instance = new self();
+        
         if (is_string($gregorianDate)) {
             $gregorianDate = Carbon::parse($gregorianDate);
         }
@@ -46,8 +48,8 @@ class EthiopianDateHelper
             'year' => $gregorianDate->year,
             'month' => $gregorianDate->month,
             'day' => $gregorianDate->day,
-            'month_name_am' => $this->months[$gregorianDate->month] ?? '',
-            'month_name_en' => $this->months[$gregorianDate->month] ?? '',
+            'month_name_am' => $instance->months[$gregorianDate->month] ?? '',
+            'month_name_en' => $instance->months[$gregorianDate->month] ?? '',
         ];
     }
 
@@ -78,9 +80,10 @@ class EthiopianDateHelper
     /**
      * Get months for contribution
      */
-    public function getMonthsForContribution(): array
+    public static function getMonthsForContribution(): array
     {
-        return $this->months;
+        $instance = new self();
+        return $instance->months;
     }
 
     /**

@@ -26,9 +26,15 @@ class MemberGroup extends BaseModel
         'is_active' => 'boolean',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
+
+        static::creating(function ($group) {
+            if (!$group->created_by && auth()->check()) {
+                $group->created_by = auth()->id();
+            }
+        });
 
         static::deleting(function ($group) {
             // Check for active assignments before allowing delete

@@ -48,7 +48,7 @@ class SongCategoryResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Category Information')
+                \Filament\Schemas\Components\Section::make('Category Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Category Name')
@@ -186,4 +186,5 @@ class SongCategoryResource extends Resource
         ];
     }
 }
+
 

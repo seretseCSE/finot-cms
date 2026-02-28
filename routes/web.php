@@ -8,6 +8,15 @@ use App\Http\Controllers\ProductTourController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ProgramsController;
 use App\Http\Controllers\BlogController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Include backup routes
+require __DIR__.'/backup.php';
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\EventController;

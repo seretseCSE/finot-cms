@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasAuditLog;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
 
 class CustomOption extends Model
 {
-    use SoftDeletes;
-
-    protected $table = 'custom_options';
+    use HasFactory, HasAuditLog, SoftDeletes;
 
     public $timestamps = false;
 
@@ -21,67 +20,108 @@ class CustomOption extends Model
         'option_value',
         'status',
         'added_by',
-        'approved_by',
-        'added_at',
-        'approved_at',
         'usage_count',
-        'display_order',
     ];
 
     protected $casts = [
-        'added_at' => 'datetime',
-        'approved_at' => 'datetime',
+        'status' => 'string',
         'usage_count' => 'integer',
-        'display_order' => 'integer',
     ];
 
-    public function addedBy()
+    /**
+     * Get the user who added this option.
+     */
+    public function addedByUser()
     {
         return $this->belongsTo(User::class, 'added_by');
     }
 
-    public function approvedBy()
+    /**
+     * Scope a query to only include options with a specific status.
+     */
+    public function scopeStatus($query, $status)
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $query->where('status', $status);
     }
 
-    public function scopeApproved(Builder $query): Builder
+    /**
+     * Scope a query to only include options for a specific field.
+     */
+    public function scopeForField($query, $fieldName)
+    {
+        return $query->where('field_name', $fieldName);
+    }
+
+    /**
+     * Scope a query to only include approved options.
+     */
+    public function scopeApproved($query)
     {
         return $query->where('status', 'approved');
     }
 
-    public function scopePending(Builder $query): Builder
+    /**
+     * Scope a query to only include pending options.
+     */
+    public function scopePending($query)
     {
         return $query->where('status', 'pending');
     }
 
-    public static function getOptionsForField(string $fieldName): array
+    /**
+     * Scope a query to only include rejected options.
+     */
+    public function scopeRejected($query)
     {
-        $predefined = (array) (config('custom_options.predefined.' . $fieldName) ?? []);
-
-        $approved = static::query()
-            ->approved()
-            ->where('field_name', $fieldName)
-            ->orderByRaw('display_order is null')
-            ->orderBy('display_order')
-            ->orderBy('usage_count', 'desc')
-            ->orderBy('option_value')
-            ->pluck('option_value')
-            ->all();
-
-        $merged = array_values(array_unique(array_merge($predefined, $approved)));
-
-        return array_combine($merged, $merged);
+        return $query->where('status', 'rejected');
     }
 
-    public static function recordUsage(string $fieldName, string $value): void
+    /**
+     * Increment the usage count.
+     */
+    public function incrementUsage()
     {
-        static::query()
-            ->where('field_name', $fieldName)
-            ->where('option_value', $value)
-            ->whereIn('status', ['approved', 'pending'])
-            ->update([
-                'usage_count' => DB::raw('usage_count + 1'),
-            ]);
+        $this->increment('usage_count');
+    }
+
+    /**
+     * Decrement the usage count.
+     */
+    public function decrementUsage()
+    {
+        if ($this->usage_count > 0) {
+            $this->decrement('usage_count');
+        }
+    }
+
+    /**
+     * Get all available field names.
+     */
+    public static function getFieldNames(): array
+    {
+        return static::distinct('field_name')
+            ->orderBy('field_name')
+            ->pluck('field_name')
+            ->toArray();
+    }
+
+    /**
+     * Get approved options for a specific field.
+     */
+    public static function getApprovedOptions(string $fieldName): array
+    {
+        return static::forField($fieldName)
+            ->approved()
+            ->orderBy('option_value')
+            ->pluck('option_value', 'id')
+            ->toArray();
+    }
+
+    /**
+     * Check if option can be deleted (usage count must be 0).
+     */
+    public function canBeDeleted(): bool
+    {
+        return $this->usage_count === 0;
     }
 }

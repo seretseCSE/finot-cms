@@ -51,56 +51,52 @@ class TourResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Tour Information')
-                    ->schema([
-                        Forms\Components\TextInput::make('place')
-                            ->label('Tour Place')
-                            ->required()
-                            ->maxLength(255),
+                Forms\Components\TextInput::make('place')
+                    ->label('Tour Place')
+                    ->required()
+                    ->maxLength(255),
 
-                        Forms\Components\Textarea::make('description')
-                            ->label('Description')
-                            ->rows(3),
+                Forms\Components\Textarea::make('description')
+                    ->label('Description')
+                    ->rows(3),
 
-                        EthiopianDatePicker::make('tour_date')
-                            ->label('Tour Date')
-                            ->required()
-                            ->disabled(fn ($record) => !$record->canEditDate()),
+                EthiopianDatePicker::make('tour_date')
+                    ->label('Tour Date')
+                    ->required()
+                    ->disabled(fn ($record) => !$record->canEditDate()),
 
-                        Forms\Components\TimePicker::make('start_time')
-                            ->label('Start Time')
-                            ->required()
-                            ->withoutSeconds(),
+                Forms\Components\TimePicker::make('start_time')
+                    ->label('Start Time')
+                    ->required()
+                    ->withoutSeconds(),
 
-                        Forms\Components\TextInput::make('cost_per_person')
-                            ->label('Cost Per Person (Birr)')
-                            ->numeric()
-                            ->step(0.01)
-                            ->nullable(),
+                Forms\Components\TextInput::make('cost_per_person')
+                    ->label('Cost Per Person (Birr)')
+                    ->numeric()
+                    ->step(0.01)
+                    ->nullable(),
 
-                        EthiopianDatePicker::make('registration_deadline')
-                            ->label('Registration Deadline')
-                            ->nullable(),
+                EthiopianDatePicker::make('registration_deadline')
+                    ->label('Registration Deadline')
+                    ->nullable(),
 
-                        Forms\Components\TextInput::make('max_capacity')
-                            ->label('Maximum Capacity')
-                            ->numeric()
-                            ->integer()
-                            ->nullable(),
+                Forms\Components\TextInput::make('max_capacity')
+                    ->label('Maximum Capacity')
+                    ->numeric()
+                    ->integer()
+                    ->nullable(),
 
-                        Forms\Components\Select::make('status')
-                            ->label('Status')
-                            ->options([
-                                'Draft' => 'Draft',
-                                'Published' => 'Published',
-                                'In Progress' => 'In Progress',
-                                'Completed' => 'Completed',
-                                'Cancelled' => 'Cancelled',
-                            ])
-                            ->required()
-                            ->disabled(fn ($record) => $record && in_array($record->status, ['In Progress', 'Completed'])),
+                Forms\Components\Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'Draft' => 'Draft',
+                        'Published' => 'Published',
+                        'In Progress' => 'In Progress',
+                        'Completed' => 'Completed',
+                        'Cancelled' => 'Cancelled',
                     ])
-                    ->columns(2),
+                    ->required()
+                    ->disabled(fn ($record) => $record && in_array($record->status, ['In Progress', 'Completed'])),
             ]);
     }
 
@@ -168,7 +164,7 @@ class TourResource extends Resource
                         Forms\Components\DatePicker::make('end_date')
                             ->label('End Date'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $data['start_date'] && $data['end_date']
                             ? $query->whereBetween('tour_date', [$data['start_date'], $data['end_date']])
                             : $query;

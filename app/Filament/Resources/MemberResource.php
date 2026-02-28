@@ -7,6 +7,7 @@ use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Forms\Components\CustomOptionSelect;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\Department;
+use App\Models\MemberGroup;
 use App\Models\MemberGroupAssignment;
 use App\Models\Member;
 use Filament\Actions;
@@ -572,7 +573,7 @@ class MemberResource extends Resource
 
                 Tables\Filters\SelectFilter::make('department_id')
                     ->label('Department')
-                    ->relationship('department', 'name')
+                    ->relationship('department', 'name_en')
                     ->searchable()
                     ->preload(),
 

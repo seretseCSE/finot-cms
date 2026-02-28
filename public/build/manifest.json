@@ -1,0 +1,26 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-CWIRa2gk.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Dh4etEgi.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "resources/js/pwa-tour.js"
+    ]
+  },
+  "resources/js/pwa-tour.js": {
+    "file": "assets/pwa-tour-BU22hBz1.js",
+    "name": "pwa-tour",
+    "src": "resources/js/pwa-tour.js",
+    "isEntry": true
+  }
+}

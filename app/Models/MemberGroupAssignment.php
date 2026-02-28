@@ -122,7 +122,7 @@ class MemberGroupAssignment extends BaseModel
             ->get();
     }
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 

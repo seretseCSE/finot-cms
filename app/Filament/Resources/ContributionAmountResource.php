@@ -2,11 +2,16 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Forms\Components\EthiopianDatePicker;
 use App\Filament\Resources\ContributionAmountResource\Pages;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\ContributionAmount;
 use App\Models\MemberGroup;
+// Filament v5: Action classes live under Filament\Actions, not Filament\Tables\Actions
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -51,47 +56,57 @@ class ContributionAmountResource extends Resource
                && $record->canBeDeleted();
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Contribution Details')
-                    ->schema([
-                        Forms\Components\Select::make('group_id')
-                            ->label('Member Group')
-                            ->relationship('group', 'name')
-                            ->options(fn () => MemberGroup::query()->active()->orderBy('name')->pluck('name', 'id')->all())
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->reactive(),
+                Forms\Components\Select::make('group_id')
+                    ->label('Member Group')
+                    ->relationship('group', 'name')
+                    ->options(fn () => MemberGroup::query()->active()->orderBy('name')->pluck('name', 'id')->all())
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->live(),
 
-                        Forms\Components\Select::make('month_name')
-                            ->label('Month')
-                            ->options(EthiopianDateHelper::getMonthsForContribution())
-                            ->searchable()
-                            ->required()
-                            ->reactive(),
-
-                        Forms\Components\TextInput::make('amount')
-                            ->label('Amount (Birr)')
-                            ->numeric()
-                            ->step(0.01)
-                            ->min(0.01)
-                            ->required()
-                            ->prefix('Birr'),
-
-                        EthiopianDatePicker::make('effective_from')
-                            ->label('Effective From')
-                            ->required()
-                            ->reactive(),
-
-                        EthiopianDatePicker::make('effective_to')
-                            ->label('Effective To')
-                            ->nullable(),
+                Forms\Components\Select::make('month_name')
+                    ->label('Month')
+                    ->options([
+                        'January' => 'January',
+                        'February' => 'February',
+                        'March' => 'March',
+                        'April' => 'April',
+                        'May' => 'May',
+                        'June' => 'June',
+                        'July' => 'July',
+                        'August' => 'August',
+                        'September' => 'September',
+                        'October' => 'October',
+                        'November' => 'November',
+                        'December' => 'December',
                     ])
-                    ->columns(2),
-            ]);
+                    ->searchable()
+                    ->required()
+                    ->live(),
+
+                Forms\Components\TextInput::make('amount')
+                    ->label('Amount (Birr)')
+                    ->numeric()
+                    ->step(0.01)
+                    ->minValue(0.01)
+                    ->required()
+                    ->prefix('Birr'),
+
+                Forms\Components\DatePicker::make('effective_from')
+                    ->label('Effective From')
+                    ->required()
+                    ->live(),
+
+                Forms\Components\DatePicker::make('effective_to')
+                    ->label('Effective To')
+                    ->nullable(),
+            ])
+            ->columns(2);
     }
 
     public static function table(Table $table): Table
@@ -159,26 +174,26 @@ class ContributionAmountResource extends Resource
                         blank: fn (Builder $query) => $query,
                     ),
             ])
+            // Filament v5: Use Filament\Actions\EditAction and DeleteAction for row actions
             ->actions([
-                Actions\EditAction::make()
-                    ->visible(fn (ContributionAmount $record) => static::canEdit($record)),
+                EditAction::make(),
 
-                Actions\DeleteAction::make()
-                    ->visible(fn (ContributionAmount $record) => static::canDelete($record))
-                    ->requiresConfirmation()
+                DeleteAction::make()
                     ->modalHeading('Delete Contribution Amount')
                     ->modalDescription('Are you sure you want to delete this contribution amount? This action cannot be undone.'),
             ])
+            // Filament v5: Bulk actions require Filament\Actions\BulkAction or built-in bulk actions
             ->bulkActions([
-                Actions\DeleteBulkAction::make()
-                    ->visible(fn () => static::canDelete(null))
-                    ->requiresConfirmation()
+                DeleteBulkAction::make()
                     ->modalHeading('Delete Selected Contribution Amounts')
                     ->modalDescription('Are you sure you want to delete the selected contribution amounts? This action cannot be undone.'),
             ])
+            // Filament v5: Use Filament\Actions\Action for custom empty-state actions
             ->emptyStateActions([
-                Actions\CreateAction::make()
-                    ->visible(fn () => static::canCreate()),
+                Action::make('create')
+                    ->label('Create Contribution Amount')
+                    ->icon('heroicon-o-plus')
+                    ->url(fn () => route('filament.admin.resources.contribution-amounts.create')),
             ]);
     }
 
@@ -217,4 +232,3 @@ class ContributionAmountResource extends Resource
         return $data;
     }
 }
-

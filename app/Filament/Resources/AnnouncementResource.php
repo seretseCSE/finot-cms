@@ -4,11 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AnnouncementResource\Pages;
 use App\Models\Announcement;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class AnnouncementResource extends Resource
@@ -47,46 +49,38 @@ class AnnouncementResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Content')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->label('Title (English)')
-                            ->required()
-                            ->maxLength(255),
+                Forms\Components\TextInput::make('title')
+                    ->label('Title (English)')
+                    ->required()
+                    ->maxLength(255),
 
-                        Forms\Components\TextInput::make('title_am')
-                            ->label('Title (Amharic)')
-                            ->maxLength(255),
+                Forms\Components\TextInput::make('title_am')
+                    ->label('Title (Amharic)')
+                    ->maxLength(255),
 
-                        Forms\Components\RichEditor::make('content')
-                            ->label('Content (English)')
-                            ->required()
-                            ->columnSpanFull(),
+                Forms\Components\RichEditor::make('content')
+                    ->label('Content (English)')
+                    ->required()
+                    ->columnSpanFull(),
 
-                        Forms\Components\RichEditor::make('content_am')
-                            ->label('Content (Amharic)')
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+                Forms\Components\RichEditor::make('content_am')
+                    ->label('Content (Amharic)')
+                    ->columnSpanFull(),
 
-                Forms\Components\Section::make('Schedule & Display')
-                    ->schema([
-                        Forms\Components\DatePicker::make('start_date')
-                            ->label('Start Date')
-                            ->required()
-                            ->native(false),
+                Forms\Components\DatePicker::make('start_date')
+                    ->label('Start Date')
+                    ->required()
+                    ->native(false),
 
-                        Forms\Components\DatePicker::make('end_date')
-                            ->label('End Date')
-                            ->helperText('Leave empty for ongoing announcement')
-                            ->native(false),
+                Forms\Components\DatePicker::make('end_date')
+                    ->label('End Date')
+                    ->helperText('Leave empty for ongoing announcement')
+                    ->native(false),
 
-                        Forms\Components\Toggle::make('is_urgent')
-                            ->label('Is Urgent')
-                            ->default(false)
-                            ->helperText('Urgent announcements will have red border and be pinned to top'),
-                    ])
-                    ->columns(2),
+                Forms\Components\Toggle::make('is_urgent')
+                    ->label('Is Urgent')
+                    ->default(false)
+                    ->helperText('Urgent announcements will have red border and be pinned to top'),
             ]);
     }
 
@@ -151,7 +145,7 @@ class AnnouncementResource extends Resource
                             ->label('End Date')
                             ->native(false),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $data['start_date'] && $data['end_date']
                             ? $query->whereBetween('start_date', [$data['start_date'], $data['end_date']])
                             : $query;

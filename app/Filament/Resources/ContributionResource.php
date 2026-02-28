@@ -59,7 +59,7 @@ class ContributionResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('contribution_details')
+                \Filament\Schemas\Components\Section::make('contribution_details')
                     ->label('Contribution Details')
                     ->description('Record member contributions for specific months')
                     ->schema([
@@ -435,4 +435,5 @@ class ContributionResource extends Resource
         }
     }
 }
+
 

@@ -23,7 +23,7 @@ class TeacherAttendanceReport extends Page implements HasTable
 
     protected string $view = 'filament.pages.education.teacher-attendance-report';
 
-    public static function getNavigationGroup(): ?string { return 'Education'; }
+    public static function getNavigationGroup(): ?string { return 'Reports'; }
 
     public static function getNavigationSort(): ?int { return 2; }
 

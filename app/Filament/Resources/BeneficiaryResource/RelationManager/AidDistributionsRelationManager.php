@@ -55,9 +55,9 @@ class AidDistributionsRelationManager extends RelationManager
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->visible(fn ($record) => $record->canBeEdited()),
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn ($record) => $record->canBeEdited()),
                 Actions\Action::make('lock')
                     ->label('Lock')
@@ -73,7 +73,7 @@ class AidDistributionsRelationManager extends RelationManager
                     ->action(fn ($record) => $record->unlock()),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->label('Add Distribution'),
             ]);
     }
@@ -88,4 +88,3 @@ class AidDistributionsRelationManager extends RelationManager
         return in_array(auth()->user()->role, ['charity_head', 'admin', 'superadmin']);
     }
 }
-

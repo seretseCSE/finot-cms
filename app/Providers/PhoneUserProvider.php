@@ -7,37 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 
 class PhoneUserProvider extends EloquentUserProvider
 {
-    /**
-     * Retrieve a user by the unique identifier.
-     */
-    public function retrieveById($identifier)
-    {
-        return $this->createModel()->newQuery()
-            ->where(function ($query) use ($identifier) {
-                $query->where('email', $identifier)
-                      ->orWhere('phone', $identifier);
-            })
-            ->first();
-    }
 
-    /**
-     * Retrieve a user by their unique identifier and "remember me" token.
-     */
-    public function retrieveByToken($identifier, $token)
-    {
-        $model = $this->createModel();
-
-        $retrievedModel = $model->newQuery()
-            ->where($model->getAuthIdentifierName(), $identifier)
-            ->where($model->getRememberTokenName(), $token)
-            ->first();
-
-        if (! $retrievedModel) {
-            return null;
-        }
-
-        return $retrievedModel;
-    }
 
     /**
      * Retrieve a user by the given credentials.

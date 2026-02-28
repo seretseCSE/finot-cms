@@ -50,120 +50,109 @@ class MediaResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Media Information')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->label('Title')
-                            ->required()
-                            ->maxLength(255),
+                Forms\Components\TextInput::make('title')
+                    ->label('Title')
+                    ->required()
+                    ->maxLength(255),
 
-                        Forms\Components\Radio::make('type')
-                            ->label('Type')
-                            ->options([
-                                'Photo' => 'Photo',
-                                'Video' => 'Video',
-                            ])
-                            ->required()
-                            ->inline(),
-
-                        Forms\Components\Select::make('category_id')
-                            ->label('Category')
-                            ->relationship('category', 'name')
-                            ->options(function () {
-                                return \App\Models\MediaCategory::where('status', 'Active')
-                                    ->orderBy('display_order')
-                                    ->pluck('name', 'id');
-                            })
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('subcategory_id', null)),
-
-                        Forms\Components\Select::make('subcategory_id')
-                            ->label('Sub-category')
-                            ->relationship('subcategory', 'name')
-                            ->options(function (callable $get) {
-                                $categoryId = $get('category_id');
-                                if (!$categoryId) {
-                                    return [];
-                                }
-                                return \App\Models\MediaSubcategory::where('category_id', $categoryId)
-                                    ->where('status', 'Active')
-                                    ->orderBy('display_order')
-                                    ->pluck('name', 'id');
-                            })
-                            ->disabled(fn (callable $get) => !$get('category_id')),
-
-                        Forms\Components\Textarea::make('description')
-                            ->label('Description')
-                            ->rows(3),
-
-                        Forms\Components\TextInput::make('event_album')
-                            ->label('Event Album')
-                            ->maxLength(255)
-                            ->helperText('Optional: Group related media items together'),
-
-                        Forms\Components\TagsInput::make('tags')
-                            ->label('Tags')
-                            ->placeholder('Add tags...')
-                            ->separator(','),
+                Forms\Components\Radio::make('type')
+                    ->label('Type')
+                    ->options([
+                        'Photo' => 'Photo',
+                        'Video' => 'Video',
                     ])
-                    ->columns(2),
+                    ->required()
+                    ->inline(),
 
-                Forms\Components\Section::make('File Upload')
-                    ->schema([
-                        Forms\Components\FileUpload::make('file_path')
-                            ->label('File')
-                            ->required()
-                            ->directory(fn (callable $get) => $get('type') === 'Photo' ? 'media/photos' : 'media/videos')
-                            ->visibility('public')
-                            ->acceptedFileTypes(function (callable $get) {
-                                return $get('type') === 'Photo'
-                                    ? ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-                                    : ['video/mp4', 'video/quicktime', 'video/x-msvideo'];
-                            })
-                            ->maxSize(function (callable $get) {
-                                return $get('type') === 'Photo' ? 10240 : 51200; // 10MB for photos, 50MB for videos
-                            })
-                            ->helperText(function (callable $get) {
-                                return $get('type') === 'Photo'
-                                    ? 'JPG, PNG, GIF, WEBP files, max 10MB'
-                                    : 'MP4, MOV, AVI files, max 50MB';
-                            })
-                            ->imageEditor()
-                            ->imageEditorAspectRatios([
-                                null,
-                                '16:9',
-                                '4:3',
-                                '1:1',
-                            ]),
+                Forms\Components\Select::make('category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name')
+                    ->options(function () {
+                        return \App\Models\MediaCategory::where('status', 'Active')
+                            ->orderBy('display_order')
+                            ->pluck('name', 'id');
+                    })
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('subcategory_id', null)),
+
+                Forms\Components\Select::make('subcategory_id')
+                    ->label('Sub-category')
+                    ->relationship('subcategory', 'name')
+                    ->options(function (callable $get) {
+                        $categoryId = $get('category_id');
+                        if (!$categoryId) {
+                            return [];
+                        }
+                        return \App\Models\MediaSubcategory::where('category_id', $categoryId)
+                            ->where('status', 'Active')
+                            ->orderBy('display_order')
+                            ->pluck('name', 'id');
+                    })
+                    ->disabled(fn (callable $get) => !$get('category_id')),
+
+                Forms\Components\Textarea::make('description')
+                    ->label('Description')
+                    ->rows(3),
+
+                Forms\Components\TextInput::make('event_album')
+                    ->label('Event Album')
+                    ->maxLength(255)
+                    ->helperText('Optional: Group related media items together'),
+
+                Forms\Components\TagsInput::make('tags')
+                    ->label('Tags')
+                    ->placeholder('Add tags...')
+                    ->separator(','),
+
+                Forms\Components\FileUpload::make('file_path')
+                    ->label('File')
+                    ->required()
+                    ->directory(fn (callable $get) => $get('type') === 'Photo' ? 'media/photos' : 'media/videos')
+                    ->visibility('public')
+                    ->acceptedFileTypes(function (callable $get) {
+                        return $get('type') === 'Photo'
+                            ? ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+                            : ['video/mp4', 'video/quicktime', 'video/x-msvideo'];
+                    })
+                    ->maxSize(function (callable $get) {
+                        return $get('type') === 'Photo' ? 10240 : 51200; // 10MB for photos, 50MB for videos
+                    })
+                    ->helperText(function (callable $get) {
+                        return $get('type') === 'Photo'
+                            ? 'JPG, PNG, GIF, WEBP files, max 10MB'
+                            : 'MP4, MOV, AVI files, max 50MB';
+                    })
+                    ->imageEditor()
+                    ->imageEditorAspectRatios([
+                        null,
+                        '16:9',
+                        '4:3',
+                        '1:1',
                     ]),
 
-                Forms\Components\Section::make('Visibility Settings')
-                    ->schema([
-                        Forms\Components\Select::make('visibility')
-                            ->label('Visibility')
-                            ->options([
-                                'Public' => 'Public',
-                                'Members Only' => 'Members Only',
-                                'Department Only' => 'Department Only',
-                            ])
-                            ->required()
-                            ->default('Public')
-                            ->reactive()
-                            ->afterStateUpdated(function (callable $set, $state) {
-                                if ($state === 'Department Only') {
-                                    $set('department_id', Auth::user()->department_id);
-                                }
-                            }),
-
-                        Forms\Components\Select::make('department_id')
-                            ->label('Department')
-                            ->relationship('department', 'name')
-                            ->default(fn () => Auth::user()->department_id)
-                            ->visible(fn (callable $get) => $get('visibility') === 'Department Only')
-                            ->required(fn (callable $get) => $get('visibility') === 'Department Only'),
+                Forms\Components\Select::make('visibility')
+                    ->label('Visibility')
+                    ->options([
+                        'Public' => 'Public',
+                        'Members Only' => 'Members Only',
+                        'Department Only' => 'Department Only',
                     ])
-                    ->columns(2),
+                    ->required()
+                    ->default('Public')
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        if ($state === 'Department Only') {
+                            $set('department_id', Auth::user()->department_id);
+                        }
+                    }),
+
+                Forms\Components\Select::make('department_id')
+                    ->label('Department')
+                    ->relationship('department', 'name_en')
+                    ->default(fn () => Auth::user()->department_id)
+                    ->visible(fn (callable $get) => $get('visibility') === 'Department Only')
+                    ->required(fn (callable $get) => $get('visibility') === 'Department Only'),
             ]);
     }
 

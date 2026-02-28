@@ -47,7 +47,7 @@ class FAQResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Content')
+                \Filament\Schemas\Components\Section::make('Content')
                     ->schema([
                         Forms\Components\Textarea::make('question')
                             ->label('Question (English)')
@@ -69,7 +69,7 @@ class FAQResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Display Settings')
+                \Filament\Schemas\Components\Section::make('Display Settings')
                     ->schema([
                         Forms\Components\TextInput::make('display_order')
                             ->label('Display Order')
@@ -230,4 +230,5 @@ class FAQResource extends Resource
         ];
     }
 }
+
 

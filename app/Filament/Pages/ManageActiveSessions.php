@@ -9,11 +9,22 @@ use Filament\Forms;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
 
-class ManageActiveSessions extends Page
+class ManageActiveSessions extends Page implements HasTable
 {
+    use InteractsWithTable;
+
     protected static ?string $title = 'Manage Sessions';
+    
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-computer-desktop'; }
+
+    public static function getNavigationGroup(): ?string { return 'System'; }
+
+    public static function getNavigationLabel(): string { return 'Manage Sessions'; }
 
     public function getTitle(): string
     {
@@ -31,6 +42,16 @@ class ManageActiveSessions extends Page
         $maxSessions = 3;
         
         return "You have {$activeCount} of {$maxSessions} allowed active sessions";
+    }
+
+    public function getView(): string
+    {
+        return 'filament.pages.manage-active-sessions';
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->check();
     }
 
     protected function getTableActions(): array
@@ -57,7 +78,7 @@ class ManageActiveSessions extends Page
         
         return $table
             ->query(
-                Auth::user()->activeSessions()->orderBy('last_activity', 'desc')
+                fn () => Auth::user()->activeSessions()->orderBy('last_activity', 'desc')
             )
             ->columns([
                 Tables\Columns\IconColumn::make('is_current')
@@ -123,7 +144,11 @@ class ManageActiveSessions extends Page
         $session->delete();
         
         // Show success message
-        $this->notify('success', 'Session revoked successfully');
+        Notification::make()
+            ->title('Session Revoked')
+            ->body('The session has been terminated successfully.')
+            ->success()
+            ->send();
         
         // Refresh the table
         $this->table->resetFilters();
@@ -178,11 +203,6 @@ class ManageActiveSessions extends Page
         } catch (\Exception $e) {
             return $dateTime->format('M d, Y H:i');
         }
-    }
-
-    public static function canAccess(array $parameters = []): bool
-    {
-        return auth()->check();
     }
 }
 

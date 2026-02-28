@@ -31,8 +31,12 @@ class User extends Authenticatable implements FilamentUser
         'temp_password_changed',
         'failed_login_attempts',
         'locked_until',
+        'lock_reason',
+        'locked_by',
+        'locked_at',
         'department_id',
         'language_preference',
+        'last_login_at',
     ];
 
     /**
@@ -57,7 +61,9 @@ class User extends Authenticatable implements FilamentUser
         'password_history' => 'array',
         'language_preference' => 'string',
         'locked_until' => 'datetime',
+        'locked_at' => 'datetime',
         'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime',
         'password' => 'hashed',
     ];
 
@@ -70,6 +76,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
             'is_locked' => 'boolean',
@@ -121,6 +128,14 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Get the user who locked this account.
+     */
+    public function lockedBy()
+    {
+        return $this->belongsTo(User::class, 'locked_by');
+    }
+
+    /**
      * Get the preferred locale.
      */
     public function getPreferredLocale(): string
@@ -168,15 +183,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->email;
     }
 
-    /**
-     * Get the name of the unique identifier for the user.
-     *
-     * @return string
-     */
-    public function getAuthIdentifierName()
-    {
-        return 'phone';
-    }
+
 
     /**
      * Get the email field name for authentication compatibility.
@@ -429,5 +436,112 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return "Account is locked. Please try again in {$remainingMinutes} minutes.";
+    }
+
+    /**
+     * Lock the user account.
+     */
+    public function lockAccount(string $reason, string $duration, int $lockedBy = null): bool
+    {
+        $lockedUntil = match($duration) {
+            '1h' => now()->addHour(),
+            '24h' => now()->addDay(),
+            '7d' => now()->addWeek(),
+            'permanent' => null,
+            default => now()->addHour(),
+        };
+
+        $this->update([
+            'is_locked' => true,
+            'locked_until' => $lockedUntil,
+            'lock_reason' => $reason,
+            'locked_by' => $lockedBy,
+            'locked_at' => now(),
+        ]);
+
+        // Log the lock action
+        activity()
+            ->causedBy($lockedBy ? User::find($lockedBy) : null)
+            ->performedOn($this)
+            ->withProperties([
+                'reason' => $reason,
+                'duration' => $duration,
+                'locked_until' => $lockedUntil,
+            ])
+            ->log('account_locked');
+
+        return true;
+    }
+
+    /**
+     * Unlock the user account.
+     */
+    public function unlockAccount(int $unlockedBy = null): bool
+    {
+        $this->update([
+            'is_locked' => false,
+            'locked_until' => null,
+            'lock_reason' => null,
+            'locked_by' => null,
+            'locked_at' => null,
+        ]);
+
+        // Log the unlock action
+        activity()
+            ->causedBy($unlockedBy ? User::find($unlockedBy) : null)
+            ->performedOn($this)
+            ->withProperties([
+                'unlocked_at' => now(),
+            ])
+            ->log('account_unlocked');
+
+        return true;
+    }
+
+    /**
+     * Check if the account is currently locked.
+     */
+    public function isCurrentlyLocked(): bool
+    {
+        if (!$this->is_locked) {
+            return false;
+        }
+
+        if ($this->locked_until && $this->locked_until->isPast()) {
+            // Auto-unlock if lock time has passed
+            $this->unlockAccount();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get lock status badge data.
+     */
+    public function getLockStatusBadge(): array
+    {
+        if (!$this->isCurrentlyLocked()) {
+            return [
+                'status' => 'Active',
+                'color' => 'success',
+                'icon' => 'heroicon-o-check-circle',
+            ];
+        }
+
+        if ($this->locked_until === null) {
+            return [
+                'status' => 'Permanently Locked',
+                'color' => 'danger',
+                'icon' => 'heroicon-o-lock-closed',
+            ];
+        }
+
+        return [
+            'status' => 'Locked',
+            'color' => 'danger',
+            'icon' => 'heroicon-o-lock-closed',
+            'until' => $this->locked_until->format('M j, Y H:i'),
+        ];
     }
 }

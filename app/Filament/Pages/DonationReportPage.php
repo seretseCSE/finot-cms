@@ -18,7 +18,7 @@ class DonationReportPage extends Page
 
     public static function getNavigationLabel(): string { return 'Donation Report'; }
 
-    public static function getNavigationGroup(): ?string { return 'Finance'; }
+    public static function getNavigationGroup(): ?string { return 'Reports'; }
 
     protected string $view = 'filament.pages.donation-report';
 

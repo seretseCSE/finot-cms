@@ -18,7 +18,7 @@ class AttendanceSummaryReport extends Page
 
     protected string $view = 'filament.pages.education.attendance-summary-report';
 
-    public static function getNavigationGroup(): ?string { return 'Education'; }
+    public static function getNavigationGroup(): ?string { return 'Reports'; }
 
     public static function getNavigationSort(): ?int { return 1; }
 

@@ -13,6 +13,8 @@ class SchoolClass extends BaseModel
 {
     use HasFactory, ScopedByDepartment, HasAuditLog, GeneratesAutoId;
 
+    protected $table = 'classes';
+
     protected $fillable = [
         'name',
         'academic_year_id',

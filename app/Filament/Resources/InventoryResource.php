@@ -49,7 +49,7 @@ class InventoryResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Item Information')
+                \Filament\Schemas\Components\Section::make('Item Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Item Name')
@@ -96,7 +96,7 @@ class InventoryResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Purchase Information')
+                \Filament\Schemas\Components\Section::make('Purchase Information')
                     ->schema([
                         Forms\Components\DatePicker::make('purchase_date')
                             ->label('Purchase Date')
@@ -113,7 +113,7 @@ class InventoryResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Status')
+                \Filament\Schemas\Components\Section::make('Status')
                     ->schema([
                         Forms\Components\Placeholder::make('status_display')
                             ->label('Current Status')
@@ -370,4 +370,5 @@ class InventoryResource extends Resource
         ];
     }
 }
+
 

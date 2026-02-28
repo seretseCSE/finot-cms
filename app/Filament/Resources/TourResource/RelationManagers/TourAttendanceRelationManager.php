@@ -112,7 +112,7 @@ class TourAttendanceRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->modalHeading('Edit Attendance')
                     ->mutateFormDataUsing(function (array $data, $record) {
                         $oldStatus = $record->status;
@@ -175,7 +175,7 @@ class TourAttendanceRelationManager extends RelationManager
     protected function getTableSummary(): array
     {
         $records = $this->getRecords();
-        
+
         $presentCount = $records->where('status', 'Present')->count();
         $notPresentCount = $records->where('status', 'Not Present')->count();
         $totalCount = $records->count();
@@ -189,4 +189,3 @@ class TourAttendanceRelationManager extends RelationManager
         ];
     }
 }
-

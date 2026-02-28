@@ -57,7 +57,7 @@ class GlobalChurchSettings extends Page
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Section::make('Church Information')
+            \Filament\Schemas\Components\Section::make('Church Information')
                 ->description('Basic church information and contact details')
                 ->schema([
                     Forms\Components\TextInput::make('church_name_en')
@@ -86,7 +86,7 @@ class GlobalChurchSettings extends Page
                 ])
                 ->columns(2),
 
-            Forms\Components\Section::make('System Settings')
+            \Filament\Schemas\Components\Section::make('System Settings')
                 ->description('System-wide configuration')
                 ->schema([
                     Forms\Components\Select::make('default_language')
@@ -104,7 +104,7 @@ class GlobalChurchSettings extends Page
                 ])
                 ->columns(2),
 
-            Forms\Components\Section::make('Logo Management')
+            \Filament\Schemas\Components\Section::make('Logo Management')
                 ->description('Upload and manage church logo')
                 ->schema([
                     Forms\Components\FileUpload::make('logo')
@@ -238,3 +238,4 @@ class GlobalChurchSettings extends Page
         return $this->getUrl();
     }
 }
+

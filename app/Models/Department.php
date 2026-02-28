@@ -5,18 +5,20 @@ namespace App\Models;
 use App\Models\Traits\ScopedByDepartment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
 {
-    use HasFactory, ScopedByDepartment;
+    use HasFactory, ScopedByDepartment, SoftDeletes;
 
     protected $fillable = [
-        'id',
         'name_en',
         'name_am',
+        'code',
+        'description',
+        'icon',
+        'head_user_id',
         'is_active',
-        'created_at',
-        'updated_at',
     ];
 
     protected $casts = [
@@ -29,6 +31,14 @@ class Department extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Get the department head user.
+     */
+    public function headUser()
+    {
+        return $this->belongsTo(User::class, 'head_user_id');
     }
 
     /**

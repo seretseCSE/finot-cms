@@ -56,7 +56,7 @@ class ExportAuditLogs extends Page
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Section::make('Export Filters')
+            \Filament\Schemas\Components\Section::make('Export Filters')
                 ->description('Configure the audit log export parameters')
                 ->schema([
                     Forms\Components\Select::make('date_range')
@@ -416,3 +416,4 @@ class ExportAuditLogs extends Page
         return $stats;
     }
 }
+

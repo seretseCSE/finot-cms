@@ -67,10 +67,6 @@ class SyncConflictsResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('class_id')
-                    ->label('Class')
-                    ->relationship('session.class')
-                    ->getOptionLabelUsing(fn ($record) => $record->name),
                 Tables\Filters\Filter::make('date_range')
                     ->form([
                         Forms\Components\DatePicker::make('from')
@@ -80,7 +76,7 @@ class SyncConflictsResource extends Resource
                             ->label('Until')
                             ->required(),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         $from = $data['from'] ?? null;
                         $until = $data['until'] ?? null;
                         if ($from && $until) {

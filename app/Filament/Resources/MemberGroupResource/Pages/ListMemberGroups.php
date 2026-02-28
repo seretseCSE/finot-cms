@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MemberGroupResource\Pages;
 
 use App\Filament\Resources\MemberGroupResource;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 class ListMemberGroups extends ListRecords
 {
@@ -12,7 +13,7 @@ class ListMemberGroups extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            //
+            Actions\CreateAction::make(),
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Models\AcademicYear;
 use App\Models\ClassModel;
 use App\Models\Subject;
 use App\Models\TeacherAssignment;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -81,13 +82,13 @@ class TeacherAssignmentsRelationManager extends RelationManager
                     ->falseLabel('Inactive'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                Actions\CreateAction::make()
                     ->visible(fn () => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin'])),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
+                Actions\EditAction::make()
                     ->visible(fn () => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin'])),
-                Tables\Actions\DeleteAction::make()
+                Actions\DeleteAction::make()
                     ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
             ])
             ->bulkActions([
@@ -98,4 +99,3 @@ class TeacherAssignmentsRelationManager extends RelationManager
             ]);
     }
 }
-

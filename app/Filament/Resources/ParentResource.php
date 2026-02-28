@@ -30,7 +30,7 @@ class ParentResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make()
+                \Filament\Schemas\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('full_name')
                             ->label('Full Name')
@@ -196,4 +196,5 @@ class ParentResource extends Resource
         return parent::getTableQuery()->withCount('members');
     }
 }
+
 

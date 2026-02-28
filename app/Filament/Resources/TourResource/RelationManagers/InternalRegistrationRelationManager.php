@@ -42,7 +42,7 @@ class InternalRegistrationRelationManager extends RelationManager
                                     if ($data['member_id']) {
                                         $set('member_id', $data['member_id']);
                                     }
-                                    
+
                                     // Show success message
                                     $set('lookup_status', $data['message']);
                                     $set('lookup_color', 'green');
@@ -63,7 +63,7 @@ class InternalRegistrationRelationManager extends RelationManager
                     ->extraAttributes(fn ($get) => [
                         'class' => match($get('lookup_color')) {
                             'green' => 'text-green-600',
-                            'orange' => 'text-orange-600', 
+                            'orange' => 'text-orange-600',
                             'red' => 'text-red-600',
                             default => 'text-gray-600',
                         }
@@ -155,13 +155,13 @@ class InternalRegistrationRelationManager extends RelationManager
                         $lastPassenger = \App\Models\TourPassenger::orderBy('id', 'desc')->first();
                         $lastCode = $lastPassenger ? intval(substr($lastPassenger->passenger_code, 3)) : 0;
                         $data['passenger_code'] = 'TP-' . str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
-                        
+
                         // Set registration date
                         $data['registration_date'] = now()->toDateString();
-                        
+
                         // Set registered by
                         $data['registered_by'] = auth()->user()->id();
-                        
+
                         return $data;
                     })
                     ->before(function (array $data) {
@@ -169,16 +169,16 @@ class InternalRegistrationRelationManager extends RelationManager
                         $exists = \App\Models\TourPassenger::where('tour_id', $this->ownerRecord->id)
                             ->where('phone', $data['phone'])
                             ->exists();
-                        
+
                         if ($exists) {
                             throw new \Exception('This phone number is already registered for this tour');
                         }
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+
                 Actions\Action::make('confirm')
                     ->label('Confirm')
                     ->icon('heroicon-o-check-circle')
@@ -203,7 +203,7 @@ class InternalRegistrationRelationManager extends RelationManager
                         $record->cancel($data['cancellation_reason']);
                     }),
 
-                Tables\Actions\DeleteAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -252,4 +252,3 @@ class InternalRegistrationRelationManager extends RelationManager
             ->emptyStateIcon('heroicon-o-user-plus');
     }
 }
-

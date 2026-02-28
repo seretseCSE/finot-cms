@@ -16,7 +16,7 @@ class UserSessionResource extends Resource
 
     public static function getNavigationIcon(): ?string { return null; }
 
-    public static function getNavigationGroup(): ?string { return 'Security & System'; }
+    public static function getNavigationGroup(): ?string { return 'System'; }
 
     public static function getNavigationSort(): ?int { return 2; }
 

@@ -28,7 +28,7 @@ class ParentModel extends BaseModel
         'is_active' => 'boolean',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 

@@ -11,6 +11,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\AvatarProviders\UiAvatarsProvider;
+use Filament\Navigation\MenuItem;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -77,6 +78,12 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\GlobalOversightStatsOverview::class,
                 \App\Filament\Widgets\GlobalOversightChart::class,
                 \App\Filament\Widgets\GlobalOversightErrorLogs::class,
+            ])
+            ->userMenuItems([
+                'profile' => MenuItem::make()
+                    ->label('Edit Profile')
+                    ->url(fn () => EditProfile::getUrl())
+                    ->icon('heroicon-o-user-circle'),
             ])
             ->bootUsing(function () {
                 foreach (\Filament\Facades\Filament::getResources() as $resourceClass) {

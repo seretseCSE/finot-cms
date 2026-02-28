@@ -56,7 +56,7 @@ class DonationResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Section::make('Donation Details')
+                \Filament\Schemas\Components\Section::make('Donation Details')
                     ->schema([
                         Forms\Components\TextInput::make('donor_name')
                             ->label('Donor Name')
@@ -278,4 +278,5 @@ class DonationResource extends Resource
             ->send();
     }
 }
+
 
