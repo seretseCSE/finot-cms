@@ -12,6 +12,7 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 
@@ -50,7 +51,7 @@ class GlobalChurchSettings extends Page implements HasForms
     {
         $this->form->fill([
             'church_name_en' => SiteSetting::get('church_name_en', 'FINOTE TSIDIK'),
-            'church_name_am' => SiteSetting::get('church_name_am', 'ፊኖተ ጽዲክ'),
+            'church_name_am' => SiteSetting::get('church_name_am', ''),
             'church_address' => SiteSetting::get('church_address', ''),
             'church_phone' => SiteSetting::get('church_phone', ''),
             'church_email' => SiteSetting::get('church_email', ''),
@@ -144,7 +145,7 @@ class GlobalChurchSettings extends Page implements HasForms
     protected function getFormActions(): array
     {
         return [
-            Action::make('save')
+            Action::make('save_settings')
                 ->label('Save Settings')
                 ->action('saveSettings')
                 ->icon('heroicon-o-check')
@@ -184,21 +185,9 @@ class GlobalChurchSettings extends Page implements HasForms
 
         // Handle logo upload
         if (isset($data['logo']) && $data['logo']) {
-            // Delete old logo if exists
-            $oldLogo = SiteSetting::get('logo');
-            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
-                Storage::disk('public')->delete($oldLogo);
-            }
-            
-            // Store new logo
-            if (is_object($data['logo'])) {
-                $logoPath = $data['logo']->store('logos', 'public');
-                $data['logo'] = $logoPath;
-                $oldValues['logo'] = $oldLogo;
-                $newValues['logo'] = $logoPath;
-            }
+            $logoPath = $data['logo']->store('logos', 'public');
+            $data['logo'] = $logoPath;
         } else {
-            // Keep existing logo if not changed
             unset($data['logo']);
         }
 
@@ -207,17 +196,15 @@ class GlobalChurchSettings extends Page implements HasForms
             SiteSetting::set($key, $value);
         }
 
-        // Log the action with old → new value diff
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn(new SiteSetting())
-            ->withProperties([
-                'action' => 'update_global_settings',
+        // Log the changes
+        if (!empty($oldValues)) {
+            Log::info('Global church settings updated', [
+                'user_id' => Auth::id(),
                 'old_values' => $oldValues,
                 'new_values' => $newValues,
-                'settings_updated' => array_keys($newValues),
-            ])
-            ->log('Updated global church settings');
+                'ip' => request()->ip(),
+            ]);
+        }
 
         // Clear all config/view/route caches after settings change
         Artisan::call('optimize:clear');
@@ -257,13 +244,11 @@ class GlobalChurchSettings extends Page implements HasForms
         }
 
         // Log the action
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn(new SiteSetting())
-            ->withProperties([
-                'action' => 'reset_global_settings',
-            ])
-            ->log('Reset global church settings to defaults');
+        Log::info('Reset global church settings to defaults', [
+            'user_id' => Auth::id(),
+            'action' => 'reset_global_settings',
+            'ip' => request()->ip(),
+        ]);
 
         Notification::make()
             ->title('Settings Reset')
@@ -278,6 +263,12 @@ class GlobalChurchSettings extends Page implements HasForms
     public function getRedirectUrl(): string
     {
         return $this->getUrl();
+    }
+
+    // Add alias method for backward compatibility
+    public function save(): void
+    {
+        $this->saveSettings();
     }
 }
 

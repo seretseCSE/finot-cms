@@ -1,10 +1,10 @@
 <x-filament-panels::page>
-    <form wire:submit="save">
+    <form wire:submit="saveSettings">
         {{ $this->form }}
         
         <div class="mt-6">
             <x-filament::button type="submit" wire:loading.attr="disabled">
-                <x-filament::loading-indicator wire:loading wire:target="save" />
+                <x-filament::loading-indicator wire:loading wire:target="saveSettings" />
                 Save Settings
             </x-filament::button>
         </div>

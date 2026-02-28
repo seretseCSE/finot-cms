@@ -143,10 +143,10 @@
                         <div class="text-sm text-gray-600 mt-1">Total Users</div>
                     </div>
 
-                    <!-- Students -->
+                    <!-- Members -->
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-pink-600">{{ number_format($overviewStats['students']) }}</div>
-                        <div class="text-sm text-gray-600 mt-1">Students</div>
+                        <div class="text-3xl font-bold text-pink-600">{{ number_format($overviewStats['total_members']) }}</div>
+                        <div class="text-sm text-gray-600 mt-1">Members</div>
                     </div>
 
                     <!-- Teachers -->
