@@ -3,22 +3,34 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Exports\MemberExporter;
-use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Forms\Components\CustomOptionSelect;
+use App\Filament\Resources\MemberResource\Pages;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\Department;
+use App\Models\Member;
 use App\Models\MemberGroup;
 use App\Models\MemberGroupAssignment;
-use App\Models\Member;
 use Filament\Actions;
-use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Forms;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Forms\Components\Repeater;
+use Filament\Resources\Resource;  
 use Filament\Schemas\Components\Section;
-use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
+use Filament\Support\Exceptions\Cancel;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Notifications\Notification;
-use Filament\Support\Exceptions\Cancel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +39,15 @@ use Illuminate\Support\Facades\Log;
 class MemberResource extends Resource
 {
     protected static ?string $model = Member::class;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        
+        // Show for HR Head, Internal Relations Head, Admin, Superadmin
+        return $user->hasRole(['hr_head', 'internal_relations_head', 'admin', 'superadmin']);
+    }
 
     public static function getNavigationIcon(): ?string { return 'heroicon-o-users'; }
 
@@ -42,13 +63,13 @@ class MemberResource extends Resource
     {
         return $schema
             ->schema([
-                // Tab 1 - Personal Information
-                Forms\Components\Tabs\Tab::make('Personal / የሰብት')
+                Tabs::make('MemberTabs')->tabs([
+                    Tab::make('Personal / የሰብት')
                     ->icon('heroicon-o-user')
                     ->schema([
-                        Section::make('Basic Information / መሰብት')
+                        \Filament\Schemas\Components\Section::make('Basic Information / መሰብት')
                             ->schema([
-                                Forms\Components\TextInput::make('title')
+                                Select::make('title')
                                     ->label('Title / የርክ')
                                     ->options(fn () => [
                                         'Brother' => 'Brother / ወወክ',
@@ -59,39 +80,39 @@ class MemberResource extends Resource
                                         'Other' => 'Other / ሌለ',
                                     ])
                                     ->required()
-                                    ->maxLength(50),
+                            ]),
 
-                                Forms\Components\TextInput::make('first_name')
+                        TextInput::make('first_name')
                                     ->label('First Name / ስም')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('father_name')
+                                TextInput::make('father_name')
                                     ->label('Father Name / የህክ')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('grandfather_name')
+                                TextInput::make('grandfather_name')
                                     ->label('Grandfather Name / አስክክ')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('mother_name')
+                                TextInput::make('mother_name')
                                     ->label('Mother Name / እሲክ')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('grandmother_name')
+                                TextInput::make('grandmother_name')
                                     ->label('Grandmother Name / አስክክ')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\DatePicker::make('date_of_birth')
+                                DatePicker::make('date_of_birth')
                                     ->label('Date of Birth / የልቀት')
                                     ->required()
                                     ->maxDate('today'),
 
-                                Forms\Components\Select::make('gender')
+                                Select::make('gender')
                                     ->label('Gender / ጾብች')
                                     ->options([
                                         'Male' => 'Male / ወር',
@@ -99,59 +120,58 @@ class MemberResource extends Resource
                                     ])
                                     ->required(),
 
-                                Forms\Components\TextInput::make('phone')
+                                TextInput::make('phone')
                                     ->label('Phone Number / ስልቁር')
                                     ->tel()
                                     ->regex('/^\+251[79]\d{8}$/')
                                     ->required()
-                                    ->unique('members', 'phone', ignore: $record?->id),
+                                    ->unique('members', 'phone', ignoreRecord: true),
 
-                                Forms\Components\TextInput::make('email')
+                                TextInput::make('email')
                                     ->label('Email Address / ኢሜማር')
                                     ->email()
                                     ->maxLength(255),
 
-                                Forms\Components\TextInput::make('member_since')
+                                DatePicker::make('member_since')
                                     ->label('Member Since / ከተብት')
-                                    ->date()
                                     ->required(),
                             ])
                             ->columns(3),
 
                         // Tab 2 - Address & Emergency Contact
-                        Section::make('Address & Emergency Contact / አልቀትእቅ')
+                        \Filament\Schemas\Components\Section::make('Address & Emergency Contact / አልቀትእቅ')
                             ->schema([
-                                Forms\Components\TextInput::make('city')
+                                TextInput::make('city')
                                     ->label('City / ከተር')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('sub_city')
+                                TextInput::make('sub_city')
                                     ->label('Sub City / ንጅር')
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('woreda')
+                                TextInput::make('woreda')
                                     ->label('Woreda / ወረደ')
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('zone')
+                                TextInput::make('zone')
                                     ->label('Zone / ዞንን')
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('block')
+                                TextInput::make('block')
                                     ->label('Block / ምልቅ')
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('neighborhood')
+                                TextInput::make('neighborhood')
                                     ->label('Neighborhood / አልቅቅ')
                                     ->maxLength(200),
 
-                                Forms\Components\Textarea::make('emergency_contact_name')
+                                Textarea::make('emergency_contact_name')
                                     ->label('Emergency Contact Name / የልቀትእቅ')
                                     ->rows(2)
                                     ->maxLength(200),
 
-                                Forms\Components\TextInput::make('emergency_contact_phone')
+                                TextInput::make('emergency_contact_phone')
                                     ->label('Emergency Contact Phone / የልቀትእቅ')
                                     ->tel()
                                     ->regex('/^\+251[79]\d{8}$/'),
@@ -159,13 +179,13 @@ class MemberResource extends Resource
                             ->columns(2),
 
                         // Tab 3 - Spiritual & Family Information
-                        Section::make('Spiritual & Family Information / መሰብትቃ')
+                        \Filament\Schemas\Components\Section::make('Spiritual & Family Information / መሰብትቃ')
                             ->schema([
-                                Forms\Components\TextInput::make('christian_name')
+                                TextInput::make('christian_name')
                                     ->label('Christian Name / ክርስንክ')
                                     ->maxLength(200),
 
-                                Forms\Components\Select::make('spiritual_education_level')
+                                Select::make('spiritual_education_level')
                                     ->label('Spiritual Education Level / መሰብትት')
                                     ->options([
                                         'None' => 'None',
@@ -176,14 +196,14 @@ class MemberResource extends Resource
                                     ])
                                     ->required(),
 
-                                Forms\Components\Select::make('family_confession_father')
+                                Select::make('family_confession_father')
                                     ->label('Family Confession Father / ቤተሰብት')
                                     ->relationship('familyConfessionFather', 'full_name')
                                     ->searchable()
                                     ->preload()
                                     ->nullable(),
 
-                                Forms\Components\Select::make('special_talents')
+                                Select::make('special_talents')
                                     ->label('Special Talents / ልልቅት')
                                     ->options([
                                         'music' => 'Music',
@@ -198,41 +218,41 @@ class MemberResource extends Resource
                                     ->multiple()
                                     ->nullable(),
 
-                                Forms\Components\Textarea::make('past_service_departments')
+                                Textarea::make('past_service_departments')
                                     ->label('Past Service Departments / ያገባቸው')
                                     ->rows(3)
                                     ->helperText('List previous departments where member served'),
 
-                                Forms\Components\Toggle::make('is_married')
+                                Toggle::make('is_married')
                                     ->label('Married / ተሰሰር')
                                     ->default(false),
 
-                                Forms\Components\TextInput::make('spouse_name')
+                                TextInput::make('spouse_name')
                                     ->label('Spouse Name / የህክ')
                                     ->maxLength(200)
                                     ->visible(fn (callable $get) => $get('is_married')),
 
-                                Forms\Components\TextInput::make('spouse_phone')
+                                TextInput::make('spouse_phone')
                                     ->label('Spouse Phone / የህክ')
                                     ->tel()
                                     ->regex('/^\+251[79]\d{8}$/')
                                     ->visible(fn (callable $get) => $get('is_married')),
 
-                                Forms\Components\TextInput::make('children_count')
+                                TextInput::make('children_count')
                                     ->label('Number of Children / የልቅት')
                                     ->numeric()
-                                    ->min(0)
-                                    ->max(20)
+                                    ->minValue(0)
+                                    ->maxValue(20)
                                     ->default(0),
 
-                                Forms\Components\Repeater::make('children')
+                                Repeater::make('children')
                                     ->label('Children / የልቅት')
                                     ->schema([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->label('Child Name / የህክ')
                                             ->required(),
 
-                                        Forms\Components\Select::make('gender')
+                                        Select::make('gender')
                                             ->label('Gender / ጾብች')
                                             ->options([
                                                 'Male' => 'Male / ወር',
@@ -240,7 +260,7 @@ class MemberResource extends Resource
                                             ])
                                             ->required(),
 
-                                        Forms\Components\DatePicker::make('date_of_birth')
+                                        DatePicker::make('date_of_birth')
                                             ->label('Date of Birth / የልቀት')
                                             ->required(),
                                     ])
@@ -249,9 +269,9 @@ class MemberResource extends Resource
                             ->columns(2),
 
                         // Tab 4 - Employment & Education Information
-                        Section::make('Employment & Education Information / ስምትት')
+                        \Filament\Schemas\Components\Section::make('Employment & Education Information / ስምትት')
                             ->schema([
-                                Forms\Components\Select::make('occupation_status')
+                                Select::make('occupation_status')
                                     ->label('Occupation Status / ስምት')
                                     ->options([
                                         'Student' => 'Student / ተተብት',
@@ -262,45 +282,45 @@ class MemberResource extends Resource
                                     ->required()
                                     ->reactive(),
 
-                                Forms\Components\TextInput::make('school_name')
+                                TextInput::make('school_name')
                                     ->label('School Name / ትምት')
                                     ->maxLength(200)
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Student'),
 
-                                Forms\Components\TextInput::make('education_level')
+                                TextInput::make('education_level')
                                     ->label('Education Level / መሰብት')
                                     ->maxLength(100)
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Student'),
 
-                                Forms\Components\TextInput::make('education_department')
+                                TextInput::make('education_department')
                                     ->label('Education Department / መሰብት')
                                     ->maxLength(100)
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Student'),
 
                                 // Employee Fields
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('employment_status', 'employment_status', [
+                                CustomOptionSelect::makeWithOther('employment_status', 'employment_status', [
                                     'Hired' => 'Hired / ሰሰብት',
                                     'Not Hired' => 'Not Hired / ሰሰብት',
                                     'Private Sector' => 'Private Sector / ልልትት',
                                 ])
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Employee'),
 
-                                Forms\Components\TextInput::make('company_name')
+                                TextInput::make('company_name')
                                     ->label('Company Name / ኩርር')
                                     ->required(fn (callable $get) => in_array($get('employment_status'), ['Hired', 'Private Sector']))
                                     ->maxLength(200),
 
-                                Forms\Components\TextInput::make('job_role')
+                                TextInput::make('job_role')
                                     ->label('Job Role / ስምት')
                                     ->required(fn (callable $get) => in_array($get('employment_status'), ['Hired', 'Private Sector']))
                                     ->maxLength(200),
 
-                                Forms\Components\Textarea::make('company_address')
+                                Textarea::make('company_address')
                                     ->label('Company Address / ኩርር')
                                     ->rows(3)
                                     ->visible(fn (callable $get) => in_array($get('employment_status'), ['Hired', 'Private Sector'])),
 
-                                Forms\Components\Toggle::make('is_current')
+                                Toggle::make('is_current')
                                     ->label('Currently Enrolled / የልተብት')
                                     ->default(false)
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Student'),
@@ -308,13 +328,13 @@ class MemberResource extends Resource
                             ->columns(2),
 
                         // Tab 5 - Parent/Guardian (only for Kids, or read-only historical for former Kids)
-                        Section::make('Parent/Guardian / ወላጅ')
+                        \Filament\Schemas\Components\Section::make('Parent/Guardian / ወላጅ')
                             ->schema([
                                 // Active parent/guardian repeater — only editable for Kids
-                                Forms\Components\Repeater::make('parent_guardians')
+                                Repeater::make('parent_guardians')
                                     ->label('')
                                     ->schema([
-                                        Forms\Components\Select::make('parent_id')
+                                        Select::make('parent_id')
                                             ->label('Select Existing Parent')
                                             ->options(function () {
                                                 return \App\Models\ParentModel::active()
@@ -334,12 +354,12 @@ class MemberResource extends Resource
                                                 }
                                             }),
 
-                                        Forms\Components\TextInput::make('parent_name')
+                                        TextInput::make('parent_name')
                                             ->label('Parent/Guardian Name / የላጅ')
                                             ->required(fn (callable $get) => !$get('parent_id'))
                                             ->maxLength(200),
 
-                                        Forms\Components\Select::make('relationship')
+                                        Select::make('relationship')
                                             ->label('Relationship / ግንኙ')
                                             ->options([
                                                 'Father' => 'Father / የህክ',
@@ -350,14 +370,14 @@ class MemberResource extends Resource
                                             ->required()
                                             ->disabled(fn (callable $get) => $get('parent_id')),
 
-                                        Forms\Components\TextInput::make('phone')
+                                        TextInput::make('phone')
                                             ->label('Phone Number / ስልቁር')
                                             ->tel()
                                             ->regex('/^\+251[79]\d{8}$/')
                                             ->required(fn (callable $get) => !$get('parent_id'))
                                             ->maxLength(20),
 
-                                        Forms\Components\TextInput::make('email')
+                                        TextInput::make('email')
                                             ->label('Email Address / ኢሜማር')
                                             ->email()
                                             ->required(fn (callable $get) => !$get('parent_id'))
@@ -366,10 +386,10 @@ class MemberResource extends Resource
                                     ->columns(3),
 
                                 // Historical parent data — read-only for Youth/Adults who were Kids
-                                Section::make('Historical Parent/Guardian Records (Read-Only)')
+                                \Filament\Schemas\Components\Section::make('Historical Parent/Guardian Records (Read-Only)')
                                     ->description('This member was previously registered as a Kid. Parent/guardian records from that period are preserved below for reference.')
                                     ->schema([
-                                        Forms\Components\Placeholder::make('historical_parents')
+                                        Placeholder::make('historical_parents')
                                             ->label('')
                                             ->content(fn ($record) => $record?->parentGuardians()
                                                 ->get()
@@ -377,27 +397,29 @@ class MemberResource extends Resource
                                                     "• **{$pg->parent_name}** ({$pg->relationship}) — " .
                                                     ($pg->phone ?? 'No phone')
                                                 )
-                                                ->join("\n") ?: 'No historical parent records found.'),
+                                                ->join("\n") ?: 'No historical parent records found.')
+                                            ->visible(fn ($record) => $record && $record->parentGuardians()->exists()),
                                     ])
                                     ->collapsed()
                                     ->visible(fn ($record, callable $get) =>
                                         in_array($get('member_type'), ['Youth', 'Adult']) &&
-                                        $record?->parentGuardians()->exists()
+                                        $record && $record->parentGuardians()->exists()
                                     ),
                             ])
                             ->visible(fn ($record, callable $get) =>
                                 // Show tab for Kids always, or for Youth/Adult with historical parent data
                                 $get('member_type') === 'Kids' ||
-                                (in_array($get('member_type'), ['Youth', 'Adult']) && $record?->parentGuardians()->exists())
+                                (in_array($get('member_type'), ['Youth', 'Adult']) && $record && $record->parentGuardians()->exists())
                             ),
                     ])
                     ->columnSpanFull(),
+
                 // Tab 1 - Personal Information
-                Forms\Components\Tabs\Tab::make('Personal Information / የግል መረጃ')
+                Tab::make('Personal Information / የግል መረጃ')
                     ->schema([
-                        Section::make()
+                        \Filament\Schemas\Components\Section::make()
                             ->schema([
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('title', 'title', [
+                                CustomOptionSelect::makeWithOther('title', 'title', [
                                         'Dn.' => 'Dn. (ዲ.)',
                                         'Br.' => 'Br. (ወ.)',
                                         'Sr.' => 'Sr. (ሰ.)',
@@ -406,40 +428,39 @@ class MemberResource extends Resource
                                         'Ms.' => 'Ms. (ወ/ሪት)',
                                         'Dr.' => 'Dr.',
                                     ], true),
-
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('member_type', 'member_type', [
+                                CustomOptionSelect::makeWithOther('member_type', 'member_type', [
                                         'Kids' => 'Kids',
                                         'Youth' => 'Youth',
                                         'Adult' => 'Adult',
                                     ], true)
                                     ->live(),
 
-                                Forms\Components\TextInput::make('first_name')
+                               TextInput::make('first_name')
                                     ->label('First Name / ስም')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('father_name')
+                               TextInput::make('father_name')
                                     ->label('Father\'s Name / የአባት ስም')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('grandfather_name')
+                               TextInput::make('grandfather_name')
                                     ->label('Grandfather\'s Name / የአያት ስም')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('mother_name')
+                               TextInput::make('mother_name')
                                     ->label('Mother\'s Name / የእናት ስም')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\DatePicker::make('date_of_birth')
+                               DatePicker::make('date_of_birth')
                                     ->label('Date of Birth / የትውልድ ቀን')
                                     ->required()
                                     ->maxDate(now()),
 
-                                Forms\Components\Radio::make('gender')
+                               Radio::make('gender')
                                     ->label('Gender / ፆታ')
                                     ->options([
                                         'Male' => 'Male',
@@ -447,16 +468,16 @@ class MemberResource extends Resource
                                     ])
                                     ->required(),
 
-                                Forms\Components\TextInput::make('christian_name')
+                               TextInput::make('christian_name')
                                     ->label('Christian Name / የክርስትና ስም')
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('member_code')
+                               TextInput::make('member_code')
                                     ->label('Member Code')
                                     ->disabled()
                                     ->dehydrated(false),
 
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('status', 'member_status', [
+                                CustomOptionSelect::makeWithOther('status', 'member_status', [
                                         'Draft' => 'Draft',
                                         'Member' => 'Member',
                                         'Active' => 'Active',
@@ -464,63 +485,62 @@ class MemberResource extends Resource
                                     ])
                                     ->default('Draft'),
 
-                                Forms\Components\FileUpload::make('photo')
+                               FileUpload::make('photo')
                                     ->disk('members')
                                     ->image()
                                     ->acceptedFileTypes(['image/*'])
                                     ->maxSize(5120),
 
-                                Forms\Components\Toggle::make('consent_for_photography')
+                               Toggle::make('consent_for_photography')
                                     ->label('Parent/Guardian has given consent for photography'),
                             ])
                             ->columns(2),
-                    ])
-                    ->activeTab(0),
+                    ]),
 
                 // Tab 2 - Address & Contact
-                Forms\Components\Tabs\Tab::make('Address & Contact')
+                Tab::make('Address & Contact')
                     ->schema([
-                        Section::make('Residential Address / የመኖሪያ አድራሻ')
+                        \Filament\Schemas\Components\Section::make('Residential Address / የመኖሪያ አድራሻ')
                             ->schema([
-                                Forms\Components\TextInput::make('city')
+                                TextInput::make('city')
                                     ->label('City / የመኖሪያ ከተማ')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('sub_city')
+                                TextInput::make('sub_city')
                                     ->label('Sub-City / ክ/ከተማ')
                                     ->required()
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('woreda')
+                                TextInput::make('woreda')
                                     ->label('Woreda / ወረዳ')
                                     ->required()
                                     ->maxLength(50),
 
-                                Forms\Components\TextInput::make('zone')
+                                TextInput::make('zone')
                                     ->label('Zone/Keten / ቀጠና')
                                     ->maxLength(100),
 
-                                Forms\Components\TextInput::make('block')
+                                TextInput::make('block')
                                     ->label('Block / ብሎክ')
                                     ->maxLength(50),
 
-                                Forms\Components\TextInput::make('neighborhood')
+                                TextInput::make('neighborhood')
                                     ->label('Neighborhood Specific Name / የሠፈር ልዩ ስም')
                                     ->maxLength(200),
                             ])
                             ->columns(2),
 
-                        Section::make('Contact Information / የግንኙነት መረጃ')
+                        \Filament\Schemas\Components\Section::make('Contact Information / የግንኙነት መረጃ')
                             ->schema([
-                                Forms\Components\TextInput::make('phone')
+                                TextInput::make('phone')
                                     ->label('Personal Phone / ስልክ')
                                     ->required()
                                     ->regex('/^(\+251|0)?9\d{8}$/')
                                     ->unique(ignoreRecord: true)
                                     ->live(debounce: 500),
 
-                                Forms\Components\TextInput::make('email')
+                                TextInput::make('email')
                                     ->label('Email (Optional)')
                                     ->email()
                                     ->maxLength(191),
@@ -529,29 +549,29 @@ class MemberResource extends Resource
                     ]),
 
                 // Tab 3 - Emergency & Spiritual
-                Forms\Components\Tabs\Tab::make('Emergency & Spiritual')
+                Tab::make('Emergency & Spiritual')
                     ->schema([
-                        Section::make('Emergency Contact / የቅርብ ጓደኛ')
+                        \Filament\Schemas\Components\Section::make('Emergency Contact / የቅርብ ጓደኛ')
                             ->schema([
-                                Forms\Components\TextInput::make('emergency_contact_name')
+                                TextInput::make('emergency_contact_name')
                                     ->label('Emergency Contact Name / የቅርብ ጓደኛ ስም')
                                     ->required()
                                     ->maxLength(200),
 
-                                Forms\Components\TextInput::make('emergency_contact_phone')
+                                TextInput::make('emergency_contact_phone')
                                     ->label('Emergency Contact Phone / የቅርብ ጓደኛ ስልክ')
                                     ->required()
                                     ->regex('/^(\+251|0)?9\d{8}$/'),
                             ])
                             ->columns(2),
 
-                        Section::make('Spiritual Information / መንፈሳዊ መረጃ')
+                        \Filament\Schemas\Components\Section::make('Spiritual Information / መንፈሳዊ መረጃ')
                             ->schema([
-                                Forms\Components\TextInput::make('confession_father_name')
+                                TextInput::make('confession_father_name')
                                     ->label('Confession Father\'s Name / የንስሀ አባት ስም')
                                     ->maxLength(200),
 
-                                Forms\Components\TextInput::make('confession_father_phone')
+                                TextInput::make('confession_father_phone')
                                     ->label('Confession Father\'s Phone / የንሰሐ አባት ስልክ')
                                     ->regex('/^(\+251|0)?9\d{8}$/'),
                             ])
@@ -559,15 +579,15 @@ class MemberResource extends Resource
                     ]),
 
                 // Tab 4 - Parent/Guardian (only for Kids, or read-only historical for former Kids)
-                Forms\Components\Tabs\Tab::make('Parent/Guardian / ወላጅ')
+                Tab::make('Parent/Guardian / ወላጅ')
                     ->schema([
                         // Active parent/guardian repeater — only editable for Kids
-                        Section::make('Parent/Guardian Information / የወላጅ/አሳዲጊ መረጃ')
+                        \Filament\Schemas\Components\Section::make('Parent/Guardian Information / የወላጅ/አሳዲጊ መረጃ')
                             ->schema([
-                                Forms\Components\Repeater::make('parent_guardians')
+                                Repeater::make('parent_guardians')
                                     ->label('')
                                     ->schema([
-                                        Forms\Components\Select::make('parent_id')
+                                        Select::make('parent_id')
                                             ->label('Select Existing Parent')
                                             ->options(function () {
                                                 return \App\Models\ParentModel::active()
@@ -586,13 +606,13 @@ class MemberResource extends Resource
                                                 }
                                             }),
 
-                                        Forms\Components\TextInput::make('parent_name')
+                                        TextInput::make('parent_name')
                                             ->label('Parent/Guardian Name / ስም')
                                             ->required(fn (callable $get) => !$get('parent_id'))
                                             ->maxLength(200)
                                             ->disabled(fn (callable $get) => $get('parent_id')),
 
-                                        Forms\Components\Select::make('relationship')
+                                        Select::make('relationship')
                                             ->label('Relationship / ግንኙነት')
                                             ->options([
                                                 'Father' => 'Father',
@@ -610,7 +630,7 @@ class MemberResource extends Resource
                                             ->disabled(fn (callable $get) => $get('parent_id'))
                                             ->live(),
 
-                                        Forms\Components\TextInput::make('phone')
+                                        TextInput::make('phone')
                                             ->label('Phone / ስልክ')
                                             ->required(fn (callable $get) => !$get('parent_id'))
                                             ->regex('/^(\+251|0)?9\d{8}$/')
@@ -622,7 +642,7 @@ class MemberResource extends Resource
                                     ->maxItems(10)
                                     ->addActionLabel('+ Add Parent/Guardian / ወላጅ/አሳዲጊ ጨምር')
                                     ->collapsible()
-                                    ->mutateRelationshipDataBeforeCreate(function (array $data): array {
+                                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                                         // Handle parent linking/creation logic
                                         if (isset($data['parent_id']) && $data['parent_id']) {
                                             // Link to existing parent
@@ -649,22 +669,22 @@ class MemberResource extends Resource
                                                 'is_external' => false,
                                             ];
                                         }
-                                    }),
+                                    })
                             ])
                             ->visible(fn (callable $get) => $get('member_type') === 'Kids'),
 
-                        Section::make('Additional Kids Information')
+                        \Filament\Schemas\Components\Section::make('Additional Kids Information')
                             ->schema([
-                                Forms\Components\Select::make('spiritual_education_level')
+                                Select::make('spiritual_education_level')
                                     ->label('Spiritual Education Level / የመንፈሳዊ ት/ት ደረጃ')
                                     ->options([
                                         'Beginner' => 'Beginner',
                                         'Intermediate' => 'Intermediate',
                                         'Advanced' => 'Advanced',
                                     ])
-                                    ->maxLength(100),
+                                    ->required(),
 
-                                Forms\Components\Textarea::make('special_talents')
+                                Textarea::make('special_talents')
                                     ->label('Special Talents / ልዩ ተሰጥዖ')
                                     ->rows(3),
                             ])
@@ -672,10 +692,10 @@ class MemberResource extends Resource
 
                         // Historical Parent Data — read-only for Youth/Adults who were Kids
                         // This allows HR to see past parent info when a Kid transitions to Youth/Adult
-                        Section::make('Historical Parent/Guardian Records (Read-Only)')
+                        \Filament\Schemas\Components\Section::make('Historical Parent/Guardian Records (Read-Only)')
                             ->description('This member was previously registered as a Kid. Parent/guardian records from that period are preserved below for reference.')
                             ->schema([
-                                Forms\Components\Placeholder::make('historical_parents')
+                                Placeholder::make('historical_parents')
                                     ->label('')
                                     ->content(fn ($record) => $record?->parentGuardians()
                                         ->get()
@@ -683,86 +703,87 @@ class MemberResource extends Resource
                                             "• **{$pg->parent_name}** ({$pg->relationship}) — " .
                                             ($pg->phone ?? 'No phone')
                                         )
-                                        ->join("\n") ?: 'No historical parent records found.'),
+                                        ->join("\n") ?: 'No historical parent records found.')
+                                    ->visible(fn ($record) => $record && $record->parentGuardians()->exists()),
                             ])
                             ->collapsed()
                             ->visible(fn ($record, callable $get) =>
                                 // Show only for Youth/Adult members who HAVE parent records
                                 // (i.e., they transitioned from Kids)
                                 in_array($get('member_type'), ['Youth', 'Adult']) &&
-                                $record?->parentGuardians()->exists()
+                                $record && $record->parentGuardians()->exists()
                             ),
                     ])
                     ->visible(fn ($record, callable $get) =>
                         // Show tab for Kids always, or for Youth/Adult with historical parent data
                         $get('member_type') === 'Kids' ||
-                        (in_array($get('member_type'), ['Youth', 'Adult']) && $record?->parentGuardians()->exists())
+                        (in_array($get('member_type'), ['Youth', 'Adult']) && $record && $record->parentGuardians()->exists())
                     ),
 
                 // Tab 5 - Family & Occupation (only for Youth/Adult)
-                Forms\Components\Tabs\Tab::make('Family & Occupation / ቤተሰብ')
+                Tab::make('Family & Occupation / ቤተሰብ')
                     ->schema([
                         // Youth/Adult: Family Information
-                        Section::make('Family Information / የቤተሰብ መረጃ')
+                        \Filament\Schemas\Components\Section::make('Family Information / የቤተሰብ መረጃ')
                             ->schema([
-                                Forms\Components\TextInput::make('family_size')
+                                TextInput::make('family_size')
                                     ->label('Total Family Size / ቤተሰብ ብዛት')
                                     ->numeric()
                                     ->minValue(1),
 
-                                Forms\Components\TextInput::make('brothers_count')
+                                TextInput::make('brothers_count')
                                     ->label('Number of Brothers / ወንድም ብዛት')
                                     ->numeric()
                                     ->minValue(0),
 
-                                Forms\Components\TextInput::make('sisters_count')
+                                TextInput::make('sisters_count')
                                     ->label('Number of Sisters / እህት ብዛት')
                                     ->numeric()
                                     ->minValue(0),
 
-                                Forms\Components\TextInput::make('family_confession_father')
+                                TextInput::make('family_confession_father')
                                     ->label('Family Confession Father Name')
                                     ->maxLength(200),
 
-                                Forms\Components\DatePicker::make('sunday_school_entry_year')
+                                DatePicker::make('sunday_school_entry_year')
                                     ->label('Sunday School Entry Year / ሰንበት ት/ቤት ዓ.ም')
                                     ->format('Y')
                                     ->displayFormat('Y'),
 
-                                Forms\Components\Textarea::make('past_service_departments')
+                                Textarea::make('past_service_departments')
                                     ->label('Past Service Departments / ያገለገሉባቸው')
                                     ->rows(3),
                             ])
                             ->columns(2),
 
                         // Youth/Adult: Occupation Information
-                        Section::make('Occupation / ሙያ')
+                        \Filament\Schemas\Components\Section::make('Occupation / ሙያ')
                             ->schema([
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('occupation_status', 'occupation_status', [
+                                CustomOptionSelect::makeWithOther('occupation_status', 'occupation_status', [
                                         'Student' => 'Student',
                                         'Employee' => 'Employee',
                                     ])
                                     ->live(),
 
                                 // Student Fields
-                                Forms\Components\Repeater::make('education_history')
+                                Repeater::make('education_history')
                                     ->label('Education History')
                                     ->schema([
-                                        Forms\Components\TextInput::make('school_name')
+                                        TextInput::make('school_name')
                                             ->label('School Name')
                                             ->required()
                                             ->maxLength(200),
 
-                                        Forms\Components\TextInput::make('education_level')
+                                        TextInput::make('education_level')
                                             ->label('Education Level')
                                             ->required()
                                             ->maxLength(100),
 
-                                        Forms\Components\TextInput::make('education_department')
+                                        TextInput::make('education_department')
                                             ->label('Department')
                                             ->maxLength(100),
 
-                                        Forms\Components\Toggle::make('is_current')
+                                        Toggle::make('is_current')
                                             ->label('Currently Enrolled')
                                             ->default(false),
                                     ])
@@ -770,69 +791,69 @@ class MemberResource extends Resource
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Student'),
 
                                 // Employee Fields
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('employment_status', 'employment_status', [
+                                CustomOptionSelect::makeWithOther('employment_status', 'employment_status', [
                                     'Hired' => 'Hired',
                                     'Not Hired' => 'Not Hired',
                                     'Private Sector' => 'Private Sector',
                                 ])
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Employee'),
 
-                                Forms\Components\TextInput::make('company_name')
+                                TextInput::make('company_name')
                                     ->label('Company Name')
                                     ->required(fn (callable $get) => in_array($get('employment_status'), ['Hired', 'Private Sector']))
                                     ->maxLength(200)
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Employee' && in_array($get('employment_status'), ['Hired', 'Private Sector'])),
 
-                                Forms\Components\TextInput::make('job_role')
+                                TextInput::make('job_role')
                                     ->label('Job Role')
                                     ->required(fn (callable $get) => in_array($get('employment_status'), ['Hired', 'Private Sector']))
                                     ->maxLength(200)
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Employee' && in_array($get('employment_status'), ['Hired', 'Private Sector'])),
 
-                                Forms\Components\Textarea::make('company_address')
+                                Textarea::make('company_address')
                                     ->label('Company Address')
                                     ->rows(3)
                                     ->visible(fn (callable $get) => $get('occupation_status') === 'Employee' && in_array($get('employment_status'), ['Hired', 'Private Sector'])),
                             ]),
 
                         // Marital Status & Children
-                        Section::make('Marital Status & Children')
+                        \Filament\Schemas\Components\Section::make('Marital Status & Children')
                             ->schema([
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('marital_status', 'marital_status', [
+                                CustomOptionSelect::makeWithOther('marital_status', 'marital_status', [
                                         'Single' => 'Single',
                                         'Married' => 'Married',
                                     ])
                                     ->live(),
 
-                                Forms\Components\DatePicker::make('marriage_year')
+                                DatePicker::make('marriage_year')
                                     ->label('Marriage Year / ጋብቻ ዓ.ም')
                                     ->format('Y')
                                     ->displayFormat('Y')
                                     ->required(fn (callable $get) => $get('marital_status') === 'Married')
                                     ->visible(fn (callable $get) => $get('marital_status') === 'Married'),
 
-                                Forms\Components\TextInput::make('spouse_name')
+                                TextInput::make('spouse_name')
                                     ->label('Spouse Name / የባለቤት ስም')
                                     ->required(fn (callable $get) => $get('marital_status') === 'Married')
                                     ->maxLength(200)
                                     ->visible(fn (callable $get) => $get('marital_status') === 'Married'),
 
-                                Forms\Components\TextInput::make('spouse_phone')
+                                TextInput::make('spouse_phone')
                                     ->label('Spouse Phone / የባለቤት ስልክ')
                                     ->regex('/^(\+251|0)?9\d{8}$/')
                                     ->visible(fn (callable $get) => $get('marital_status') === 'Married'),
 
-                                Forms\Components\TextInput::make('children_count')
+                                TextInput::make('children_count')
                                     ->label('Number of Children / ልጆች ብዛት')
                                     ->numeric()
                                     ->minValue(0)
                                     ->live()
                                     ->visible(fn (callable $get) => $get('marital_status') === 'Married'),
 
-                                Forms\Components\Repeater::make('children')
+                                Repeater::make('children')
                                     ->label('Children Names')
                                     ->schema([
-                                        Forms\Components\TextInput::make('name')
+                                        TextInput::make('name')
                                             ->label(fn ($state, callable $get) => 'Child ' . ($get('index') + 1) . ' / ልጅ ' . ($get('index') + 1))
                                             ->required()
                                             ->maxLength(200),
@@ -846,11 +867,11 @@ class MemberResource extends Resource
                     ->visible(fn (callable $get) => in_array($get('member_type'), ['Youth', 'Adult'])),
 
                 // Tab 6 - Status & History
-                Forms\Components\Tabs\Tab::make('Status & History')
+                Tab::make('Status & History')
                     ->schema([
-                        Section::make('Member Status')
+                        \Filament\Schemas\Components\Section::make('Member Status')
                             ->schema([
-                                \App\Filament\Forms\Components\CustomOptionSelect::makeWithOther('status', 'member_status', [
+                                CustomOptionSelect::makeWithOther('status', 'member_status', [
                                         'Draft' => 'Draft',
                                         'Member' => 'Member',
                                         'Active' => 'Active',
@@ -858,20 +879,20 @@ class MemberResource extends Resource
                                     ], true)
                                     ->disabled(fn () => !Auth::user()->hasRole(['hr_head', 'admin', 'superadmin'])),
 
-                                Forms\Components\DatePicker::make('member_since')
+                                DatePicker::make('member_since')
                                     ->label('Member Since / አባልነት ጀምሮ')
                                     ->format('Y-m-d')
                                     ->displayFormat('M d, Y'),
 
-                                Forms\Components\Textarea::make('hr_notes')
+                                Textarea::make('hr_notes')
                                     ->label('HR Notes')
                                     ->rows(3)
                                     ->disabled(fn () => !Auth::user()->hasRole(['hr_head', 'admin', 'superadmin'])),
                             ]),
 
-                        Section::make('Assignment History')
+                        \Filament\Schemas\Components\Section::make('Assignment History')
                             ->schema([
-                                Forms\Components\Placeholder::make('assignment_history')
+                                Placeholder::make('assignment_history')
                                     ->label('Recent Group Assignments')
                                     ->content(fn ($record) => $record?->groupAssignments()
                                         ->with('group')
@@ -881,17 +902,13 @@ class MemberResource extends Resource
                                             $assignment->group->name . ' - ' .
                                             $assignment->assigned_at->format('M d, Y')
                                         )
-                                        ->join("\n") ?: 'No assignments yet'),
-
-                                Forms\Components\Actions::make([
-                                    Forms\Components\Actions\Action::make('view_timeline')
-                                        ->label('View Full Timeline →')
-                                        ->url(fn ($record) => static::getUrl('timeline', ['member_id' => $record?->id]))
-                                        ->icon('heroicon-o-clock'),
-                                ]),
+                                        ->join("\n") ?: 'No assignments yet')
+                                    ->visible(fn ($record) => $record && $record->groupAssignments()->exists()),
                             ]),
-                    ]),
-            ]);
+                    ])
+                ->activeTab(1)    
+                ->columnSpanFull(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -951,7 +968,7 @@ class MemberResource extends Resource
                         'Adult' => 'Adult',
                     ]),
 
-                Tables\Filters\SelectFilter::make('department_id')
+                Tables\Filters\SelectFilter::make('department')
                     ->label('Department')
                     ->relationship('department', 'name_en')
                     ->searchable()
@@ -1122,14 +1139,14 @@ class MemberResource extends Resource
                             }
                         })
                         ->form([
-                            Forms\Components\Select::make('group_id')
+                            Select::make('group_id')
                                 ->label('Group')
                                 ->options(fn () => MemberGroup::query()->active()->orderBy('name')->pluck('name', 'id')->all())
                                 ->searchable()
                                 ->preload()
                                 ->required(),
 
-                            Forms\Components\DatePicker::make('effective_from')
+                            DatePicker::make('effective_from')
                                 ->label('Effective From Date')
                                 ->default(now())
                                 ->required(),
@@ -1250,6 +1267,7 @@ class MemberResource extends Resource
 
         return $user->hasRole([
             'hr_head',
+            'internal_relations_head',
             'admin',
             'superadmin'
         ]);
@@ -1261,6 +1279,7 @@ class MemberResource extends Resource
 
         return $user->hasRole([
             'hr_head',
+            'internal_relations_head',
             'admin',
             'superadmin'
         ]);
@@ -1272,6 +1291,7 @@ class MemberResource extends Resource
 
         return $user->hasRole([
             'hr_head',
+            'internal_relations_head',
             'admin',
             'superadmin'
         ]);
