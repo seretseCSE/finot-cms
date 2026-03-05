@@ -20,16 +20,35 @@ class CustomOption extends Model
         'option_value',
         'status',
         'added_by',
+        'approved_by',
+        'approved_at',
         'usage_count',
     ];
 
     protected $casts = [
         'status' => 'string',
         'usage_count' => 'integer',
+        'approved_at' => 'datetime',
     ];
 
     /**
      * Get the user who added this option.
+     */
+    public function addedBy()
+    {
+        return $this->belongsTo(User::class, 'added_by');
+    }
+
+    /**
+     * Get the user who approved this option.
+     */
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the user who added this option (alias).
      */
     public function addedByUser()
     {

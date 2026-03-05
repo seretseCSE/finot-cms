@@ -1109,22 +1109,27 @@ php artisan icons:cache
 
 ### **3.2 Parent/Guardian Rules**
 
-* ✅ **Parents stored separately from members table**  
-* ✅ Not all parents are church members  
-* ✅ One parent can be linked to **multiple children**  
-* ✅ One child can have **multiple parents/guardians** (up to 10\)  
-* ✅ **Required fields:** Full Name, Phone, Relationship Type  
-* ✅ **Relationship types:** Father, Mother, Guardian, GrandFather, GrandMother, Uncle, Brother, Aunt, Sister, Other  
-* ✅ Cannot delete parent if linked to any active member  
-* ✅ Soft delete only (mark as inactive)
+* **Flexible Registration Options:**
+  * **Option 1:** Select from existing members (Youth/Adult members can be parents)
+  * **Option 2:** Register new parent/guardian (saved to parents table, not as members)
+* **Parents can be members OR non-members** - registration is optional
+* **One parent can be linked to multiple children**  
+* **One child can have multiple parents/guardians** (up to 4)  
+* **For second+ children:** Existing parents automatically appear in dropdown for easy selection
+* **Required fields:** Parent Type, Full Name, Phone, Relationship Type  
+* **Relationship types:** Father, Mother, Guardian, GrandFather, GrandMother, Uncle, Brother, Aunt, Sister, Other  
+* **Parent Type Selection:** Radio button to choose between "Existing Member" vs "New Parent"
+* **Auto-registration:** New parents are automatically saved to parents table when child is registered
+* **Cannot delete parent if linked to any active member  
+* **Soft delete only** (mark as inactive)
 
 ### **3.3 Member Group Rules**
 
-* ✅ **Group types are DYNAMIC** (not hardcoded as Kids/Youth/Adults)  
-* ✅ Admin, HR Head, Internal Relations Department Head can create custom group types and names  
-* ✅ **Example names:** "Little Angels" (Kids type), "Fire Starters" (Youth type), "Pillars" (Adult type), "Deacons" (Ministry type)  
-* ✅ **One member \= ONE group at a time** (no simultaneous group assignments)  
-* ✅ Group assignment fields:  
+* **Group types are DYNAMIC** (not hardcoded as Kids/Youth/Adults)  
+* Admin, HR Head, Internal Relations Department Head can create custom group types and names  
+* **Example names:** "Little Angels" (Kids type), "Fire Starters" (Youth type), "Pillars" (Adult type), "Deacons" (Ministry type)  
+* **One member \= ONE group at a time** (no simultaneous group assignments)  
+* **Group assignment fields:**  
   * `effective_from` (defaults to current date if not specified)  
   * `effective_to` (optional when assigning, set when removing from group)  
 * ✅ **Group assignment history never deleted** (audit trail preserved)  

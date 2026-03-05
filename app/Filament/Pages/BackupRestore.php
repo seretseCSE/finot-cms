@@ -17,7 +17,7 @@ class BackupRestore extends Page
 {
     protected static ?string $title = 'Backup & Restore';
 
-    protected static ?int $navigationSort = 4;
+    public static function getNavigationSort(): ?int { return 4; }
 
     public static function getNavigationIcon(): ?string
     {

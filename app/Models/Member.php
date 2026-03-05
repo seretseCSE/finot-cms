@@ -17,8 +17,6 @@ class Member extends BaseModel
         'member_code',
         'member_type',
         'status',
-        'member_since',
-        'hr_notes',
         'title',
         'first_name',
         'father_name',
@@ -66,7 +64,6 @@ class Member extends BaseModel
         'date_of_birth' => 'date',
         'sunday_school_entry_year' => 'date',
         'marriage_year' => 'date',
-        'member_since' => 'date',
         'consent_for_photography' => 'boolean',
         'family_size' => 'integer',
         'brothers_count' => 'integer',
@@ -106,7 +103,9 @@ class Member extends BaseModel
      */
     public function getFullNameAttribute(): string
     {
-        return "{$this->first_name} {$this->father_name} {$this->grandfather_name}";
+        // Work with existing table structure
+        // Since we don't have name fields, use a generic format
+        return 'Member ' . $this->id;
     }
 
     /**

@@ -3,18 +3,17 @@
 namespace App\Filament\Pages;
 
 use App\Models\CustomOption;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +42,7 @@ class ManageCustomOptions extends Page implements HasTable
         return 'filament.pages.manage-custom-options';
     }
 
-    public static function canAccess(array $parameters = []): bool
+    public static function canAccess(): bool
     {
         return Auth::user()?->hasRole(['admin', 'superadmin']);
     }
@@ -65,15 +64,13 @@ class ManageCustomOptions extends Page implements HasTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('status')
+                Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending'  => 'warning',
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        default    => 'gray',
-                    }),
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'approved',
+                        'danger' => 'rejected',
+                    ]),
 
                 TextColumn::make('addedBy.name')
                     ->label('Added By')
@@ -185,9 +182,9 @@ class ManageCustomOptions extends Page implements HasTable
                     ->label('Approve Selected')
                     ->icon('heroicon-o-check')
                     ->color('success')
-                    ->action(function (Collection $records): void {
+                    ->action(function (array $records): void {
                         CustomOption::query()
-                            ->whereIn('id', $records->pluck('id'))
+                            ->whereIn('id', collect($records)->pluck('id'))
                             ->where('status', 'pending')
                             ->update([
                                 'status' => 'approved',
@@ -200,9 +197,9 @@ class ManageCustomOptions extends Page implements HasTable
                     ->label('Reject Selected')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
-                    ->action(function (Collection $records): void {
+                    ->action(function (array $records): void {
                         CustomOption::query()
-                            ->whereIn('id', $records->pluck('id'))
+                            ->whereIn('id', collect($records)->pluck('id'))
                             ->where('status', 'pending')
                             ->update([
                                 'status' => 'rejected',
@@ -249,4 +246,3 @@ class ManageCustomOptions extends Page implements HasTable
             ->update([$target['column'] => $toValue]);
     }
 }
-

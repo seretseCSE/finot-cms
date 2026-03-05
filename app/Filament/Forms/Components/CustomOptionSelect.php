@@ -40,8 +40,7 @@ class CustomOptionSelect extends Select
                 ->orderBy('display_order')
                 ->orderBy('usage_count', 'desc')
                 ->orderBy('option_value')
-                ->pluck('option_value')
-                ->all();
+                ->get();
 
             $pending = CustomOption::query()
                 ->pending()
@@ -49,8 +48,7 @@ class CustomOptionSelect extends Select
                 ->orderByRaw('display_order is null')
                 ->orderBy('display_order')
                 ->orderBy('added_at', 'desc')
-                ->pluck('option_value')
-                ->all();
+                ->get();
 
             $options = [];
 
@@ -58,12 +56,12 @@ class CustomOptionSelect extends Select
                 $options[$v] = $v;
             }
 
-            foreach ($approved as $v) {
-                $options[$v] = $v;
+            foreach ($approved as $option) {
+                $options[$option->option_value] = $option->option_value;
             }
 
-            foreach ($pending as $v) {
-                $options[$v] = $v . ' (Pending)';
+            foreach ($pending as $option) {
+                $options[$option->option_value] = $option->option_value . ' (Pending)';
             }
 
             $options[$this->otherKey] = 'Other';
@@ -85,9 +83,8 @@ class CustomOptionSelect extends Select
                 array_values($this->predefinedOptions),
                 CustomOption::query()
                     ->where('field_name', $this->fieldName)
-                    ->whereIn('status', ['approved', 'pending'])
-                    ->pluck('option_value')
-                    ->all(),
+                    ->whereIn('status', ['approved', 'pending']) 
+                    ->get()->pluck('option_value')->toArray(),
             )));
 
             if (! in_array($state, $known, true)) {
@@ -96,29 +93,12 @@ class CustomOptionSelect extends Select
             }
         });
 
+        // dehydrateStateUsing: ONLY transform value, no DB writes.
+        // DB writes (pending option creation, usage tracking) happen in saveUsageAndPending().
         $this->dehydrateStateUsing(function ($state, callable $get): ?string {
             if ($state === $this->otherKey) {
                 $otherValue = trim((string) $get($this->otherInputName));
-
-                if (blank($otherValue)) {
-                    return null;
-                }
-
-                CustomOption::query()->firstOrCreate([
-                    'field_name' => $this->fieldName,
-                    'option_value' => $otherValue,
-                ], [
-                    'status' => 'pending',
-                    'added_by' => Auth::id(),
-                    'added_at' => now(),
-                    'usage_count' => 0,
-                ]);
-
-                return $otherValue;
-            }
-
-            if (filled($state)) {
-                CustomOption::recordUsage($this->fieldName, (string) $state);
+                return blank($otherValue) ? null : $otherValue;
             }
 
             return filled($state) ? (string) $state : null;
@@ -130,7 +110,7 @@ class CustomOptionSelect extends Select
      */
     public function customOptions(string $fieldName, array $predefinedOptions = []): static
     {
-        $this->fieldName = $fieldName;
+        $this->fieldName      = $fieldName;
         $this->predefinedOptions = $predefinedOptions;
         $this->otherInputName = $this->getName() . '_other';
 
@@ -152,17 +132,63 @@ class CustomOptionSelect extends Select
     }
 
     /**
-     * Convenience helper to render Select + inline "Other" TextInput.
+     * Convenience helper: renders Select + inline "Other" TextInput.
+     *
+     * Returns a Filament\Schemas\Components\Group (Filament 5).
      *
      * @param  array<string, string>  $predefinedOptions
-     * @param  bool  $required
      */
-    public static function makeWithOther(string $name, string $fieldName, array $predefinedOptions = [], bool $required = false): Group
+    /**
+     * Call this from your resource's afterCreate() / afterSave() to persist
+     * pending custom options and record usage counts.
+     * e.g. CustomOptionSelect::saveUsageAndPending($this->form->getState());
+     *
+     * @param array<string, mixed> $formState
+     */
+    public static function saveUsageAndPending(array $formState, array $fields): void
     {
+        foreach ($fields as $fieldName => $stateName) {
+            $value = $formState[$stateName] ?? null;
+            if (blank($value)) continue;
+
+            // Create pending option if it doesn't already exist
+            $exists = CustomOption::query()
+                ->where('field_name', $fieldName)
+                ->where('option_value', $value)
+                ->exists();
+
+            if (!$exists) {
+                CustomOption::query()->create([
+                    'field_name'   => $fieldName,
+                    'option_value' => $value,
+                    'status'       => 'pending',
+                    'added_by'     => Auth::id(),
+                    'added_at'     => now(),
+                    'usage_count'  => 0,
+                ]);
+            } else {
+                // Find and increment usage count of existing option
+                $option = CustomOption::query()
+                    ->where('field_name', $fieldName)
+                    ->where('option_value', $value)
+                    ->first();
+                if ($option) {
+                    $option->incrementUsage();
+                }
+            }
+        }
+    }
+
+        public static function makeWithOther(
+        string $name,
+        string $fieldName,
+        array  $predefinedOptions = [],
+        bool   $required = false,
+    ): Group {
         $select = static::make($name)
             ->label(Str::of($name)->replace('_', ' ')->title()->toString())
             ->customOptions($fieldName, $predefinedOptions);
-        
+
         if ($required) {
             $select->required();
         }
@@ -173,4 +199,3 @@ class CustomOptionSelect extends Select
         ])->columns(1);
     }
 }
-

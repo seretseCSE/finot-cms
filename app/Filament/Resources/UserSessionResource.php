@@ -9,9 +9,10 @@ use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Actions\DeleteAction;
+use \Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Auth;
 
 class UserSessionResource extends Resource
 {
@@ -22,6 +23,26 @@ class UserSessionResource extends Resource
     public static function getNavigationGroup(): ?string { return 'System'; }
 
     public static function getNavigationSort(): ?int { return 2; }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->hasRole(['admin', 'superadmin']);
+    }
+
+    public static function canCreate(): bool
+    {
+        return false; // User sessions are created automatically
+    }
+
+    public static function canEdit($record): bool
+    {
+        return false; // User sessions cannot be edited
+    }
+
+    public static function canDelete($record): bool
+    {
+        return Auth::user()?->hasRole(['admin', 'superadmin']);
+    }
 
     public static function form(Schema $schema): Schema
     {

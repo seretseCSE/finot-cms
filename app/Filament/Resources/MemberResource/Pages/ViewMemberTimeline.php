@@ -5,19 +5,20 @@ namespace App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Resources\MemberResource;
 use App\Helpers\EthiopianDateHelper;
 use Filament\Forms;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Schema as DbSchema;
 
-class ViewMemberTimeline extends Page implements HasForms
+class ViewMemberTimeline extends Page implements HasSchemas
 {
-    use InteractsWithForms;
+    use InteractsWithSchemas;
 
     protected static string $resource = MemberResource::class;
 
@@ -61,9 +62,9 @@ class ViewMemberTimeline extends Page implements HasForms
         }
     }
 
-    protected function getFormSchema(): array
+    public function form(Schema $schema): Schema
     {
-        return [
+        return $schema->components([
             Forms\Components\TextInput::make('name')
                 ->label('Name')
                 ->placeholder('First name or Father name')
@@ -84,13 +85,10 @@ class ViewMemberTimeline extends Page implements HasForms
             Forms\Components\TextInput::make('parent_name')
                 ->label('Parent / Guardian Name')
                 ->maxLength(200),
-        ];
+        ]);
     }
 
-    protected function getFormColumns(): int
-    {
-        return 3;
-    }
+    // getFormColumns removed - use ->columns(3) on the Schema instead
 
     public function searchTimeline(): void
     {
@@ -240,7 +238,7 @@ class ViewMemberTimeline extends Page implements HasForms
             return $tab === $group && in_array($group, $allowed, true);
         };
 
-        if ($include('groups') && Schema::hasTable('member_group_assignments')) {
+        if ($include('groups') && DbSchema::hasTable('member_group_assignments')) {
             $groupQuery = DB::table('member_group_assignments as mga')
                 ->join('members as m', 'm.id', '=', 'mga.member_id')
                 ->join('member_groups as g', 'g.id', '=', 'mga.group_id')
@@ -277,7 +275,7 @@ class ViewMemberTimeline extends Page implements HasForms
         }
 
         if ($include('education')) {
-            if (Schema::hasTable('student_enrollments')) {
+            if (DbSchema::hasTable('student_enrollments')) {
                 $educationQuery = DB::table('student_enrollments as se')
                     ->join('members as m', 'm.id', '=', 'se.member_id')
                     ->select([
@@ -294,7 +292,7 @@ class ViewMemberTimeline extends Page implements HasForms
                 $queries[] = $this->applyMemberFiltersToQuery($educationQuery, $filters);
             }
 
-            if (Schema::hasTable('enrollments')) {
+            if (DbSchema::hasTable('enrollments')) {
                 $educationQuery = DB::table('enrollments as e')
                     ->join('members as m', 'm.id', '=', 'e.student_id')
                     ->leftJoin('school_classes as sc', 'sc.id', '=', 'e.school_class_id')
@@ -313,7 +311,7 @@ class ViewMemberTimeline extends Page implements HasForms
             }
         }
 
-        if ($include('attendance') && Schema::hasTable('student_attendance') && Schema::hasTable('attendance_sessions')) {
+        if ($include('attendance') && DbSchema::hasTable('student_attendance') && DbSchema::hasTable('attendance_sessions')) {
             $attendanceQuery = DB::table('student_attendance as sa')
                 ->join('members as m', 'm.id', '=', 'sa.student_id')
                 ->join('attendance_sessions as s', 's.id', '=', 'sa.session_id')
@@ -332,7 +330,7 @@ class ViewMemberTimeline extends Page implements HasForms
             $queries[] = $this->applyMemberFiltersToQuery($attendanceQuery, $filters);
         }
 
-        if ($include('contributions') && Schema::hasTable('contributions')) {
+        if ($include('contributions') && DbSchema::hasTable('contributions')) {
             $contributionQuery = DB::table('contributions as c')
                 ->join('members as m', 'm.id', '=', 'c.member_id')
                 ->leftJoin('users as u', 'u.id', '=', 'c.recorded_by')
@@ -350,7 +348,7 @@ class ViewMemberTimeline extends Page implements HasForms
             $queries[] = $this->applyMemberFiltersToQuery($contributionQuery, $filters);
         }
 
-        if ($tab === 'all' && Schema::hasTable('member_parent_guardians')) {
+        if ($tab === 'all' && DbSchema::hasTable('member_parent_guardians')) {
             $guardianQuery = DB::table('member_parent_guardians as mpg')
                 ->join('members as m', 'm.id', '=', 'mpg.member_id')
                 ->select([
@@ -367,7 +365,7 @@ class ViewMemberTimeline extends Page implements HasForms
             $queries[] = $this->applyMemberFiltersToQuery($guardianQuery, $filters);
         }
 
-        if ($tab === 'all' && Schema::hasTable('tour_passengers') && Schema::hasTable('tours')) {
+        if ($tab === 'all' && DbSchema::hasTable('tour_passengers') && DbSchema::hasTable('tours')) {
             $tourQuery = DB::table('tour_passengers as tp')
                 ->join('members as m', 'm.id', '=', 'tp.member_id')
                 ->join('tours as t', 't.id', '=', 'tp.tour_id')
@@ -386,7 +384,7 @@ class ViewMemberTimeline extends Page implements HasForms
             $queries[] = $this->applyMemberFiltersToQuery($tourQuery, $filters);
         }
 
-        if ($tab === 'all' && Schema::hasTable('audit_logs')) {
+        if ($tab === 'all' && DbSchema::hasTable('audit_logs')) {
             $auditQuery = DB::table('audit_logs as al')
                 ->join('members as m', 'm.id', '=', 'al.entity_id')
                 ->leftJoin('users as u', 'u.id', '=', 'al.user_id')
@@ -450,7 +448,7 @@ class ViewMemberTimeline extends Page implements HasForms
             });
         }
 
-        if (filled($filters['group_name'] ?? null) && Schema::hasTable('member_group_assignments')) {
+        if (filled($filters['group_name'] ?? null) && DbSchema::hasTable('member_group_assignments')) {
             $groupName = trim((string) $filters['group_name']);
 
             $query->whereExists(function ($sub) use ($groupName): void {
@@ -462,7 +460,7 @@ class ViewMemberTimeline extends Page implements HasForms
             });
         }
 
-        if (filled($filters['parent_name'] ?? null) && Schema::hasTable('member_parent_guardians')) {
+        if (filled($filters['parent_name'] ?? null) && DbSchema::hasTable('member_parent_guardians')) {
             $parentName = trim((string) $filters['parent_name']);
 
             $query->whereExists(function ($sub) use ($parentName): void {
@@ -534,4 +532,3 @@ class ViewMemberTimeline extends Page implements HasForms
         return 'Member Timeline';
     }
 }
-

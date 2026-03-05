@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -63,8 +63,8 @@ class EditProfile extends Page implements HasForms
 
     public function form(\Filament\Schemas\Schema $form): \Filament\Schemas\Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 // Personal Information Header
                 \Filament\Forms\Components\Placeholder::make('personal_info_header')
                     ->label('Personal Information')

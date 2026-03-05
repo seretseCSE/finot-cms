@@ -25,7 +25,7 @@ class SongResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::check(); // All authenticated users can view songs
+        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
     }
 
     public static function canCreate(): bool

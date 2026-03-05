@@ -11,6 +11,8 @@ class AttendanceRecord extends BaseModel
 {
     use HasFactory, HasAuditLog;
 
+    protected $table = 'attendance_records';
+
     protected $fillable = [
         'member_id',
         'event_type',

@@ -95,8 +95,8 @@ class FilamentPhoneLoginAction extends Action
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 \Filament\Forms\Components\TextInput::make('phone')
                     ->label('Phone Number / ስልክ ቁጥር')
                     ->placeholder('+251XXXXXXXXX')
@@ -122,4 +122,3 @@ class FilamentPhoneLoginAction extends Action
             ->statePath('data');
     }
 }
-

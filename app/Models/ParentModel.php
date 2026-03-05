@@ -72,7 +72,15 @@ class ParentModel extends BaseModel
      */
     public function updateMemberCount()
     {
-        $this->member_count = $this->members()->count();
+        $count = $this->members()->count();
+        \Log::info('updateMemberCount called', [
+            'parent_id' => $this->id,
+            'parent_name' => $this->full_name,
+            'old_count' => $this->member_count,
+            'new_count' => $count
+        ]);
+        
+        $this->member_count = $count;
         $this->saveQuietly();
     }
 

@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\SiteSetting;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Page;
@@ -23,7 +23,7 @@ class GlobalChurchSettings extends Page implements HasForms
 
     protected static ?string $title = 'Global Church Settings';
 
-    protected static ?int $navigationSort = 3;
+    public static function getNavigationSort(): ?int { return 3; }
 
     public ?array $data = [];
 
@@ -64,8 +64,8 @@ class GlobalChurchSettings extends Page implements HasForms
 
     public function form(\Filament\Schemas\Schema $form): \Filament\Schemas\Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 \Filament\Schemas\Components\Section::make('Church Information')
                     ->description('Basic church information and contact details')
                     ->schema([

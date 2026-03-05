@@ -51,7 +51,7 @@ class ManageActiveSessions extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return auth()->user()?->hasRole(['admin', 'superadmin']);
     }
 
     protected function getTableActions(): array

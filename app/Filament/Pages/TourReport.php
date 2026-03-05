@@ -15,6 +15,7 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class TourReport extends Page implements HasTable
 {
@@ -27,6 +28,11 @@ class TourReport extends Page implements HasTable
     public static function getNavigationGroup(): ?string { return 'Reports'; }
 
     public static function getNavigationSort(): ?int { return 1; }
+
+    public static function canView(): bool
+    {
+        return Auth::user()?->hasRole(['tour_head', 'admin', 'superadmin']);
+    }
 
     public ?array $filters = [];
 

@@ -164,7 +164,7 @@ class MemberGroupAssignment extends BaseModel
             'member_id' => $this->member_id,
             'group_id' => $this->group_id,
             'data' => $data,
-            'user_id' => auth()->user()->id(),
+
         ]);
     }
 }

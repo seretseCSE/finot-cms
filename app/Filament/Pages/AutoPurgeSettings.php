@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\SiteSetting;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -15,7 +15,7 @@ class AutoPurgeSettings extends Page
 {
     protected static ?string $title = 'Auto-Purge Settings';
 
-    protected static ?int $navigationSort = 5;
+    public static function getNavigationSort(): ?int { return 5; }
 
     public static function getNavigationIcon(): ?string
     {

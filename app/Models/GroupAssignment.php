@@ -5,27 +5,27 @@ namespace App\Models;
 use App\Models\BaseModel;
 use App\Models\Traits\HasAuditLog;
 use App\Models\Traits\GeneratesAutoId;
-use App\Models\Traits\ScopedByDepartment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class GroupAssignment extends BaseModel
 {
-    use HasFactory, ScopedByDepartment, HasAuditLog, GeneratesAutoId;
+    use HasFactory, HasAuditLog, GeneratesAutoId;
+
+    protected $table = 'member_group_assignments';
 
     protected $fillable = [
         'member_id',
         'group_id',
-        'assigned_date',
+        'effective_from',
+        'effective_to',
         'assigned_by',
-        'role_in_group',
-        'department_id',
-        'is_active',
+        'removed_by',
     ];
 
     protected $casts = [
-        'assigned_date' => 'date',
-        'is_active' => 'boolean',
+        'effective_from' => 'date',
+        'effective_to' => 'date',
     ];
 
     /**
@@ -50,14 +50,6 @@ class GroupAssignment extends BaseModel
     public function assignedBy()
     {
         return $this->belongsTo(User::class, 'assigned_by');
-    }
-
-    /**
-     * Get the department for this assignment.
-     */
-    public function department()
-    {
-        return $this->belongsTo(Department::class);
     }
 
     /**

@@ -2,25 +2,29 @@
 
 namespace App\Filament\Pages;
 
+use App\Exports\AuditLogsExport;
 use App\Models\AuditLog;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Pages\Page;
+use Carbon\Carbon;
 use Filament\Actions\Action;
+use Filament\Forms;
+use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\AuditLogsExport;
 
 class ExportAuditLogs extends Page
 {
+    use InteractsWithForms;
+
     public ?array $data = [];
 
     protected static ?string $title = 'Export Audit Logs';
 
-    protected static ?int $navigationSort = 5;
+    public static function getNavigationSort(): ?int { return 5; }
 
     public static function getNavigationIcon(): ?string
     {
@@ -78,7 +82,7 @@ class ExportAuditLogs extends Page
                             }
                         }),
 
-                    Forms\Components\Grid::make(2)
+                    Grid::make(2)
                         ->schema([
                             Forms\Components\DatePicker::make('start_date')
                                 ->label('Start Date')
@@ -130,28 +134,28 @@ class ExportAuditLogs extends Page
                     Forms\Components\Select::make('action_type')
                         ->label('Filter by Action Type')
                         ->options(function () {
-                            return AuditLog::select('action')
+                            return AuditLog::select('action_type')
                                 ->distinct()
-                                ->pluck('action', 'action')
+                                ->pluck('action_type', 'action_type')
                                 ->mapWithKeys(fn ($action) => [$action => ucfirst($action)])
                                 ->toArray();
                         })
                         ->placeholder('All Actions'),
 
-                    Forms\Components\Select::make('subject_type')
-                        ->label('Filter by Subject Type')
+                    Forms\Components\Select::make('entity_type')
+                        ->label('Filter by Entity Type')
                         ->options(function () {
-                            return AuditLog::select('subject_type')
+                            return AuditLog::select('entity_type')
                                 ->distinct()
-                                ->whereNotNull('subject_type')
-                                ->pluck('subject_type', 'subject_type')
+                                ->whereNotNull('entity_type')
+                                ->pluck('entity_type', 'entity_type')
                                 ->mapWithKeys(function ($type) {
                                     $className = class_basename($type);
                                     return [$type => $className];
                                 })
                                 ->toArray();
                         })
-                        ->placeholder('All Subject Types'),
+                        ->placeholder('All Entity Types'),
 
                     Forms\Components\Select::make('format')
                         ->label('Export Format')
@@ -197,10 +201,10 @@ class ExportAuditLogs extends Page
     {
         try {
             $data = $this->form->getState();
-            
+
             // Get date range
             [$startDate, $endDate] = $this->getDateRange($data);
-            
+
             // Build query
             $query = AuditLog::with(['causer', 'subject'])
                 ->whereBetween('created_at', [$startDate, $endDate]);
@@ -220,7 +224,7 @@ class ExportAuditLogs extends Page
 
             // Count records
             $recordCount = $query->count();
-            
+
             if ($recordCount === 0) {
                 Notification::make()
                     ->title('No Records Found')
@@ -276,10 +280,10 @@ class ExportAuditLogs extends Page
     {
         try {
             $data = $this->form->getState();
-            
+
             // Get date range
             [$startDate, $endDate] = $this->getDateRange($data);
-            
+
             // Build query
             $query = AuditLog::with(['causer', 'subject'])
                 ->whereBetween('created_at', [$startDate, $endDate]);
@@ -317,7 +321,7 @@ class ExportAuditLogs extends Page
     public function resetFilters(): void
     {
         $this->mount();
-        
+
         Notification::make()
             ->title('Filters Reset')
             ->body('All filters have been reset to default values.')
@@ -328,7 +332,7 @@ class ExportAuditLogs extends Page
     private function getDateRange(array $data): array
     {
         $now = now();
-        
+
         switch ($data['date_range']) {
             case 'last_7_days':
                 return [$now->copy()->subDays(7)->startOfDay(), $now->endOfDay()];
@@ -355,13 +359,13 @@ class ExportAuditLogs extends Page
         // For PDF export, you would typically use a library like DomPDF or TCPDF
         // For now, we'll create a simple text-based PDF preview
         $records = $query->limit(1000)->get(); // Limit for performance
-        
+
         $content = '<h1>Audit Logs Export</h1>';
         $content .= '<p>Generated: ' . now()->format('Y-m-d H:i:s') . '</p>';
         $content .= '<p>Total Records: ' . $records->count() . '</p>';
         $content .= '<table border="1">';
         $content .= '<tr><th>Date</th><th>User</th><th>Action</th><th>Subject</th><th>IP Address</th></tr>';
-        
+
         foreach ($records as $record) {
             $content .= '<tr>';
             $content .= '<td>' . $record->created_at->format('Y-m-d H:i:s') . '</td>';
@@ -371,9 +375,9 @@ class ExportAuditLogs extends Page
             $content .= '<td>' . $record->ip_address . '</td>';
             $content .= '</tr>';
         }
-        
+
         $content .= '</table>';
-        
+
         // This is a simplified approach - in production, use a proper PDF library
         return response($content, 200, [
             'Content-Type' => 'application/pdf',
@@ -391,26 +395,26 @@ class ExportAuditLogs extends Page
         ];
 
         // Most active users
-        $stats['top_users'] = AuditLog::with('causer')
-            ->whereNotNull('causer_id')
-            ->selectRaw('causer_id, COUNT(*) as count')
-            ->groupBy('causer_id')
+        $stats['top_users'] = AuditLog::with('user')
+            ->whereNotNull('user_id')
+            ->selectRaw('user_id, COUNT(*) as count')
+            ->groupBy('user_id')
             ->orderByDesc('count')
             ->limit(5)
             ->get()
             ->map(function ($log) {
                 return [
-                    'name' => $log->causer?->name ?? 'Unknown',
+                    'name' => $log->user?->name ?? 'Unknown',
                     'count' => $log->count,
                 ];
             });
 
         // Most common actions
-        $stats['top_actions'] = AuditLog::selectRaw('action, COUNT(*) as count')
-            ->groupBy('action')
+        $stats['top_actions'] = AuditLog::selectRaw('action_type, COUNT(*) as count')
+            ->groupBy('action_type')
             ->orderByDesc('count')
             ->limit(10)
-            ->pluck('count', 'action')
+            ->pluck('count', 'action_type')
             ->toArray();
 
         return $stats;

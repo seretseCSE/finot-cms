@@ -9,9 +9,9 @@ use App\Models\MemberGroup;
 // Filament v5: Action classes live under Filament\Actions, not Filament\Tables\Actions
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\DeleteAction;
+use \Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use \Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -174,7 +174,7 @@ class ContributionAmountResource extends Resource
                         blank: fn (Builder $query) => $query,
                     ),
             ])
-            // Filament v5: Use Filament\Actions\EditAction and DeleteAction for row actions
+            // Filament v5: Use \Filament\Actions\EditAction and DeleteAction for row actions
             ->actions([
                 EditAction::make(),
 

@@ -136,6 +136,14 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Get the audit logs for the user.
+     */
+    public function auditLogs()
+    {
+        return $this->hasMany(AuditLog::class);
+    }
+
+    /**
      * Get the preferred locale.
      */
     public function getPreferredLocale(): string

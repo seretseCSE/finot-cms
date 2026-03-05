@@ -1,0 +1,129 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\ClassroomResource\Pages;
+use App\Filament\Resources\ClassroomResource\RelationManagers;
+use App\Models\Classroom;
+use Filament\Forms;
+use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+
+class ClassroomResource extends Resource
+{
+    protected static ?string $model = Classroom::class; 
+ 
+    public static function getNavigationGroup(): ?string { return 'Education'; }
+
+    protected static ?int $navigationSort = 3;  
+
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-academic-cap'; }
+
+    public static function getNavigationLabel(): string { return 'Classes'; }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('is_active')
+                    ->label('Active')
+                    ->default(true),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('name')->label('Name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('description')->label('Description')->limit(50),
+                Tables\Columns\ToggleColumn::make('is_active')->label('Active'),
+                Tables\Columns\TextColumn::make('created_at')->label('Created')->dateTime()->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Status')
+                    ->placeholder('All')
+                    ->trueLabel('Active')
+                    ->falseLabel('Inactive'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListClassrooms::class,
+            'create' => Pages\CreateClassroom::class,
+            'edit' => Pages\EditClassroom::class,
+        ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScope('softDeletes');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->hasRole(['admin', 'superadmin', 'education_head', 'teacher']);
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()?->hasRole(['admin', 'superadmin', 'education_head']);
+    }
+
+    public static function canEdit($record): bool
+    {
+        return Auth::user()?->hasRole(['admin', 'superadmin', 'education_head']);
+    }
+
+    public static function canDelete($record): bool
+    {
+        return Auth::user()?->hasRole(['admin', 'superadmin']);
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return Auth::user()?->hasRole(['admin', 'superadmin']);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getLabel(): string
+    {
+        return 'Classroom';
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return 'Classrooms';
+    }
+}

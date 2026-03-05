@@ -12,7 +12,10 @@ class ListMembers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            //
+            \Filament\Actions\CreateAction::make()
+                ->label('New Member')
+                ->icon('heroicon-o-plus')
+                ->color('primary'),
         ];
     }
 }

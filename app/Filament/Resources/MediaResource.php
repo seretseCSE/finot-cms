@@ -26,7 +26,7 @@ class MediaResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::check(); // All staff can view media (scoped by visibility)
+        return Auth::user()?->hasRole(['av_head', 'internal_relations_head', 'admin', 'superadmin']);
     }
 
     public static function canCreate(): bool

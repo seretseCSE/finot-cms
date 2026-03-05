@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MemberEducationHistory extends Model
 {
+    protected $table = 'member_education_history';
     protected $fillable = [
         'member_id',
         'school_name',
