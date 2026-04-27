@@ -9,6 +9,8 @@ class ExportLog extends BaseModel
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'resource_type',
         'format',

@@ -114,6 +114,10 @@ class OutstandingContributions extends Page
                 continue;
             }
 
+            $memberExpected = 0;
+            $memberPaid = 0;
+            $outstandingMonths = [];
+
             foreach ($monthsToCalculate as $m) {
                 $monthName = EthiopianDateHelper::getEthiopianMonthName($m);
 
@@ -132,21 +136,32 @@ class OutstandingContributions extends Page
                     ->where('month_name', $monthName)
                     ->sum('amount');
 
-                $totalExpected += $expected;
-                $totalCollected += $paid;
+                $memberExpected += $expected;
+                $memberPaid += $paid;
 
-                $outstanding = $expected - $paid;
-
-                if ($outstanding > 0) {
-                    $this->tableData[] = [
-                        'member' => $member,
-                        'month' => $m,
-                        'month_name' => $monthName,
-                        'expected' => $expected,
-                        'paid' => $paid,
-                        'outstanding' => $outstanding,
-                    ];
+                $monthOutstanding = $expected - $paid;
+                if ($monthOutstanding > 0) {
+                    $outstandingMonths[] = $monthName;
                 }
+            }
+
+            $totalExpected += $memberExpected;
+            $totalCollected += $memberPaid;
+
+            $memberOutstanding = $memberExpected - $memberPaid;
+
+            if ($memberOutstanding > 0) {
+                $this->tableData[] = [
+                    'member' => $member,
+                    'month' => $this->month ? reset($monthsToCalculate) : null,
+                    'month_name' => $this->month
+                        ? EthiopianDateHelper::getEthiopianMonthName(reset($monthsToCalculate))
+                        : implode(', ', $outstandingMonths),
+                    'expected' => $memberExpected,
+                    'paid' => $memberPaid,
+                    'outstanding' => $memberOutstanding,
+                    'is_annual' => is_null($this->month),
+                ];
             }
         }
 

@@ -96,6 +96,9 @@
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-semibold text-gray-900">
                             Outstanding Contributions - {{ $activeYear->name }}
+                            @if(!$this->month)
+                                <span class="text-sm font-normal text-gray-500">(Annual View)</span>
+                            @endif
                         </h3>
                         <span class="text-sm text-gray-500">
                             {{ count($tableData) }} members with outstanding amounts
@@ -124,7 +127,7 @@
                                         Group
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Month
+                                        {{ $this->month ? 'Month' : 'Outstanding Months' }}
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Expected Amount
@@ -150,7 +153,13 @@
                                             {{ $row['member']->memberGroup?->name ?? 'Unassigned' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $row['month'] }}
+                                            @if($this->month)
+                                                {{ $row['month'] }}
+                                            @else
+                                                <span class="text-xs" title="{{ $row['month_name'] }}">
+                                                    {{ Str::limit($row['month_name'], 30) }}
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                                             Birr {{ number_format($row['expected'], 2) }}
