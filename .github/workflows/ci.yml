@@ -18,7 +18,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, bcmath, sqlite, pdo_mysql
+          extensions: mbstring, xml, bcmath, sqlite, pdo_mysql, pcntl
           coverage: none
 
       - name: Get composer cache directory
@@ -65,7 +65,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, bcmath, sqlite, pdo_mysql
+          extensions: mbstring, xml, bcmath, sqlite, pdo_mysql, pcntl
           coverage: xdebug
 
       - name: Copy .env
