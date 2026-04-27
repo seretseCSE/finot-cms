@@ -28,6 +28,11 @@ class CreateMedia extends CreateRecord
             $recordData = $data;
             $recordData['file_path'] = $path;
 
+            // Auto-detect type from file extension
+            $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            $recordData['type'] = in_array($extension, $imageExtensions, true) ? 'Photo' : 'Video';
+
             // Add file size from stored file
             try {
                 $fullPath = storage_path('app/public/' . $path);

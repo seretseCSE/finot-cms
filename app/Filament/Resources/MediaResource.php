@@ -48,16 +48,6 @@ class MediaResource extends BaseResource
                             ->required()
                             ->maxLength(255),
 
-                        Forms\Components\Radio::make('type')
-                            ->label('Type')
-                            ->options([
-                                'Photo' => 'Photo',
-                                'Video' => 'Video',
-                            ])
-                            ->required()
-                            ->inline()
-                            ->live(),
-
                         Forms\Components\Select::make('category_id')
                             ->label('Category')
                             ->relationship('category', 'name')
@@ -126,17 +116,9 @@ class MediaResource extends BaseResource
                                 'video/x-msvideo',
                                 'video/webm',
                             ])
-                            ->maxSize(function (callable $get) {
-                                return $get('type') === 'Photo' ? 20480 : 51200; // 20MB for photos, 37.5MB for videos
-                            })
-                            ->helperText(function (callable $get) {
-                                $type = $get('type');
-                                $typeLabel = $type === 'Photo' ? 'Photos' : 'Videos';
-                                $formats = $type === 'Photo' ? 'JPG, PNG, GIF, WEBP' : 'MP4, MOV, AVI, WEBM';
-                                $size = $type === 'Photo' ? '20MB' : '37.5MB';
-                                return "Current type: {$type}. {$formats} files, max {$size} each. You can upload up to 10 files at once.";
-                            })
-                            ->imageEditor(fn (callable $get) => $get('type') === 'Photo')
+                            ->maxSize(51200) // 50MB max for any media
+                            ->helperText('Supported formats: JPG, PNG, GIF, WEBP, MP4, MOV, AVI, WEBM. Max 50MB each. You can upload up to 10 files at once.')
+                            ->imageEditor()
                             ->imageEditorAspectRatios([
                                 null,
                                 '16:9',
