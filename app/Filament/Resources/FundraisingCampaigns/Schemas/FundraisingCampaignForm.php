@@ -9,7 +9,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Illuminate\Support\HtmlString;
 
 class FundraisingCampaignForm

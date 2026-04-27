@@ -5,7 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\SiteSetting;
 use Filament\Forms;
 use Filament\Pages\Page;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Components\Grid;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
