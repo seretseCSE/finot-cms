@@ -137,24 +137,10 @@ class MediaResource extends BaseResource
                             ->label('Visibility')
                             ->options([
                                 'Public' => 'Public',
-                                'Members Only' => 'Members Only',
-                                'Department Only' => 'Department Only',
+                                'Hidden' => 'Hidden',
                             ])
                             ->required()
-                            ->default('Public')
-                            ->reactive()
-                            ->afterStateUpdated(function (callable $set, $state) {
-                                if ($state === 'Department Only') {
-                                    $set('department_id', Auth::user()->department_id);
-                                }
-                            }),
-
-                        Forms\Components\Select::make('department_id')
-                            ->label('Department')
-                            ->relationship('department', 'name')
-                            ->default(fn () => Auth::user()->department_id)
-                            ->visible(fn (callable $get) => $get('visibility') === 'Department Only')
-                            ->required(fn (callable $get) => $get('visibility') === 'Department Only'),
+                            ->default('Public'),
                     ])
                     ->columns(2),
             ]);
@@ -239,8 +225,7 @@ class MediaResource extends BaseResource
                     ->label('Visibility')
                     ->options([
                         'Public' => 'Public',
-                        'Members Only' => 'Members Only',
-                        'Department Only' => 'Department Only',
+                        'Hidden' => 'Hidden',
                     ]),
 
                 Tables\Filters\Filter::make('date_range')
@@ -277,8 +262,7 @@ class MediaResource extends BaseResource
                                 ->label('Visibility')
                                 ->options([
                                     'Public' => 'Public',
-                                    'Members Only' => 'Members Only',
-                                    'Department Only' => 'Department Only',
+                                    'Hidden' => 'Hidden',
                                 ])
                                 ->required(),
                         ])

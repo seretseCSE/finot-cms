@@ -61,12 +61,12 @@
 </section>
 
 {{-- ═══════════════════════════════════════════════════════
-     3.  MEDIA GRID
+     3.  MEDIA GRID (grouped by album/title)
      ═══════════════════════════════════════════════════════ --}}
 <section style="padding:0 24px 100px;background:var(--dark-900);">
     <div style="max-width:1280px;margin:0 auto;">
         
-        @if($mediaItems->isEmpty())
+        @if($mediaGroups->isEmpty())
             <div class="card sr" style="padding:80px;text-align:center;max-width:600px;margin:0 auto;">
                 <div style="font-size:3rem;margin-bottom:24px;">📷</div>
                 <h3 class="display" style="font-size:1.8rem;margin-bottom:12px;">{{ __('No Media Found') }}</h3>
@@ -74,7 +74,13 @@
             </div>
         @else
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;">
-                @foreach($mediaItems as $item)
+                @foreach($mediaGroups as $group)
+                    @php
+                        $item = $group['main'];
+                        $count = $group['count'];
+                        $hasPhotos = $group['photos'] > 0;
+                        $hasVideos = $group['videos'] > 0;
+                    @endphp
                     <a href="{{ route('media.show', $item) }}" class="card sr" style="padding:0;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;" data-delay="{{ $loop->index * 50 }}">
                         <div style="aspect-ratio:4/3;overflow:hidden;position:relative;background:var(--dark-800);">
                             @if($item->type === 'Photo')
@@ -84,6 +90,14 @@
                                     <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:#fff;">
                                         <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                     </div>
+                                </div>
+                            @endif
+
+                            {{-- Multi-item count badge --}}
+                            @if($count > 1)
+                                <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);color:#fff;padding:4px 12px;border-radius:99px;font-size:.75rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    {{ $count }}
                                 </div>
                             @endif
 
@@ -97,7 +111,15 @@
 
                         <div style="padding:24px;">
                             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                                <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:{{ $item->type === 'Photo' ? 'rgba(74,222,128,.1)' : 'rgba(248,113,113,.1)' }};border:1px solid {{ $item->type === 'Photo' ? 'rgba(74,222,128,.2)' : 'rgba(248,113,113,.2)' }};color:{{ $item->type === 'Photo' ? '#86efac' : '#fca5a5' }};text-transform:uppercase;letter-spacing:.05em;">{{ $item->type }}</span>
+                                @if($hasPhotos && $hasVideos)
+                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text-40);">{{ $group['photos'] }} Photo{{ $group['photos'] > 1 ? 's' : '' }} + {{ $group['videos'] }} Video{{ $group['videos'] > 1 ? 's' : '' }}</span>
+                                @elseif($hasPhotos && $count > 1)
+                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:#86efac;">{{ $count }} Photos</span>
+                                @elseif($hasVideos && $count > 1)
+                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:#fca5a5;">{{ $count }} Videos</span>
+                                @else
+                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:{{ $item->type === 'Photo' ? 'rgba(74,222,128,.1)' : 'rgba(248,113,113,.1)' }};border:1px solid {{ $item->type === 'Photo' ? 'rgba(74,222,128,.2)' : 'rgba(248,113,113,.2)' }};color:{{ $item->type === 'Photo' ? '#86efac' : '#fca5a5' }};text-transform:uppercase;letter-spacing:.05em;">{{ $item->type }}</span>
+                                @endif
                                 @if($item->category)
                                     <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:var(--text-40);">{{ $item->category->name }}</span>
                                 @endif
@@ -112,7 +134,7 @@
             </div>
 
             <div style="margin-top:60px;display:flex;justify-content:center;">
-                {{ $mediaItems->links() }}
+                {{ $mediaGroups->links() }}
             </div>
         @endif
     </div>

@@ -107,8 +107,7 @@ class MediaItem extends BaseModel
     {
         return match ($this->visibility) {
             'Public' => 'green',
-            'Members Only' => 'blue',
-            'Department Only' => 'purple',
+            'Hidden' => 'gray',
             default => 'gray',
         };
     }
@@ -136,8 +135,7 @@ class MediaItem extends BaseModel
 
         return match ($this->visibility) {
             'Public' => true,
-            'Members Only' => true, // All authenticated users are members
-            'Department Only' => $user->department_id === $this->department_id,
+            'Hidden' => false, // Hidden media is not viewable on public pages
             default => false,
         };
     }
@@ -190,13 +188,6 @@ class MediaItem extends BaseModel
             return $query;
         }
 
-        return $query->where(function ($q) use ($user) {
-            $q->where('visibility', 'Public')
-                ->orWhere('visibility', 'Members Only')
-                ->orWhere(function ($subQuery) use ($user) {
-                    $subQuery->where('visibility', 'Department Only')
-                        ->where('department_id', $user->department_id);
-                });
-        });
+        return $query->where('visibility', 'Public');
     }
 }

@@ -2,7 +2,7 @@
     <div class="space-y-6">
         {{-- Media Preview Section --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="p-4 md:p-6 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+            <div class="p-4 md:p-6 bg-gray-50 border-b border-gray-200 flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-gray-900">{{ $record->title }}</h2>
                     @if($record->description)
@@ -19,6 +19,11 @@
                         @endif
                         {{ $record->type }}
                     </span>
+                    @if($relatedMedia->count() > 0)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                            {{ $relatedMedia->count() + 1 }} items
+                        </span>
+                    @endif
                 </div>
             </div>
 
@@ -32,19 +37,47 @@
                     />
                 @else
                     <video
+                        src="{{ $record->file_url }}"
                         controls
-                        class="max-w-full rounded-lg shadow-lg"
-                        style="max-height: 70vh;"
+                        playsinline
                         preload="metadata"
-                    >
-                        <source src="{{ $record->file_url }}" type="video/mp4">
-                        <source src="{{ $record->file_url }}" type="video/webm">
-                        <source src="{{ $record->file_url }}" type="video/quicktime">
-                        Your browser does not support the video tag.
-                    </video>
+                        class="max-w-full rounded-lg shadow-lg"
+                        style="max-height: 70vh;min-height:300px;display:block;background:#000;"
+                    ></video>
                 @endif
             </div>
         </div>
+
+        {{-- Related Media Gallery --}}
+        @if($relatedMedia->count() > 0)
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+                    More from "{{ $groupKey }}"
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    @foreach($relatedMedia as $item)
+                        <a
+                            href="{{ \App\Filament\Resources\MediaResource::getUrl('view', ['record' => $item]) }}"
+                            class="group relative aspect-square rounded-lg overflow-hidden border border-gray-200 hover:border-primary-500 transition-colors bg-gray-100"
+                        >
+                            @if($item->type === 'Photo')
+                                <img
+                                    src="{{ $item->file_url }}"
+                                    alt="{{ $item->title }}"
+                                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    loading="lazy"
+                                />
+                            @else
+                                <div class="w-full h-full flex items-center justify-center bg-gray-800">
+                                    <x-heroicon-o-video-camera class="w-10 h-10 text-gray-400"/>
+                                </div>
+                            @endif
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         {{-- Metadata Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -73,8 +106,7 @@
                         @php
                             $visibilityClasses = match ($record->visibility) {
                                 'Public' => 'bg-green-100 text-green-800',
-                                'Members Only' => 'bg-blue-100 text-blue-800',
-                                'Department Only' => 'bg-purple-100 text-purple-800',
+                                'Hidden' => 'bg-gray-100 text-gray-800',
                                 default => 'bg-gray-100 text-gray-800',
                             };
                         @endphp
@@ -82,12 +114,6 @@
                             {{ $record->visibility }}
                         </span>
                     </div>
-                    @if($record->visibility === 'Department Only')
-                        <div>
-                            <span class="text-xs text-gray-500 block">Department</span>
-                            <span class="text-sm font-medium text-gray-900">{{ $record->department?->name ?? '—' }}</span>
-                        </div>
-                    @endif
                 </div>
 
                 @if(!empty($record->parsed_tags))

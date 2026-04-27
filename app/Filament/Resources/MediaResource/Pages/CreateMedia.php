@@ -33,6 +33,11 @@ class CreateMedia extends CreateRecord
             $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             $recordData['type'] = in_array($extension, $imageExtensions, true) ? 'Photo' : 'Video';
 
+            // All files in a multi-upload share the same title and event_album
+            if (empty($recordData['event_album'])) {
+                $recordData['event_album'] = $recordData['title'];
+            }
+
             // Add file size from stored file
             try {
                 $fullPath = storage_path('app/public/' . $path);
@@ -49,11 +54,6 @@ class CreateMedia extends CreateRecord
                     'error' => $e->getMessage(),
                     'index' => $index,
                 ]);
-            }
-
-            // If it's not the first file, maybe append a number to the title?
-            if ($index > 0) {
-                $recordData['title'] = $data['title'] . ' (' . ($index + 1) . ')';
             }
 
             $record = static::getModel()::create($recordData);

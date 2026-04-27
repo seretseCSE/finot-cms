@@ -30,14 +30,40 @@ class MediaController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('tags', 'like', "%{$search}%");
+                    ->orWhere('tags', 'like', "%{$search}%")
+                    ->orWhere('event_album', 'like', "%{$search}%");
             });
         }
 
-        $mediaItems = $query->paginate(12)->withQueryString();
+        $allItems = $query->get();
+
+        // Group by event_album (or title if no album set)
+        $grouped = $allItems->groupBy(fn ($item) => $item->event_album ?: $item->title);
+
+        $mediaGroups = $grouped->map(function ($items) {
+            return [
+                'main' => $items->first(),
+                'count' => $items->count(),
+                'photos' => $items->where('type', 'Photo')->count(),
+                'videos' => $items->where('type', 'Video')->count(),
+            ];
+        })->values();
+
+        // Paginate the groups
+        $perPage = 12;
+        $page = $request->get('page', 1);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $mediaGroups->forPage($page, $perPage),
+            $mediaGroups->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+        $mediaGroups = $paginator->withQueryString();
+
         $categories = MediaCategory::where('status', 'Active')->orderBy('name')->get();
 
-        return view('public.media', compact('mediaItems', 'categories'));
+        return view('public.media', compact('mediaGroups', 'categories'));
     }
 
     public function show(MediaItem $mediaItem)
@@ -47,6 +73,18 @@ class MediaController extends Controller
             abort(404);
         }
 
-        return view('public.media-show', compact('mediaItem'));
+        $groupKey = $mediaItem->event_album ?: $mediaItem->title;
+
+        $relatedMedia = MediaItem::where('visibility', 'Public')
+            ->where('id', '!=', $mediaItem->id)
+            ->when(
+                $mediaItem->event_album,
+                fn ($q) => $q->where('event_album', $mediaItem->event_album),
+                fn ($q) => $q->where('title', $mediaItem->title)
+            )
+            ->orderBy('created_at')
+            ->get();
+
+        return view('public.media-show', compact('mediaItem', 'relatedMedia', 'groupKey'));
     }
 }
