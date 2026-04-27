@@ -28,20 +28,21 @@ class CreateMedia extends CreateRecord
             $recordData = $data;
             $recordData['file_path'] = $path;
 
-            // Add file size if available
+            // Add file size from stored file
             try {
-                if (isset($file['size'])) {
-                    $recordData['file_size_kb'] = round($file['size'] / 1024); // Convert bytes to KB
+                $fullPath = storage_path('app/public/' . $path);
+                if (file_exists($fullPath)) {
+                    $recordData['file_size_kb'] = round(filesize($fullPath) / 1024); // Convert bytes to KB
                 } else {
-                    $recordData['file_size_kb'] = 0; // Default value
+                    $recordData['file_size_kb'] = 0;
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // Handle metadata retrieval errors gracefully
-                $recordData['file_size_kb'] = 0; // Default value
+                $recordData['file_size_kb'] = 0;
                 \Log::warning('File metadata retrieval failed', [
                     'file' => $path,
                     'error' => $e->getMessage(),
-                    'index' => $index
+                    'index' => $index,
                 ]);
             }
 

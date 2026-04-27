@@ -277,6 +277,12 @@ class MediaResource extends BaseResource
                 Actions\ViewAction::make(),
                 Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
+                Actions\Action::make('view_new_tab')
+                    ->label('Open')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->color('gray')
+                    ->url(fn ($record): string => static::getUrl('view', ['record' => $record]))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
@@ -330,6 +336,7 @@ class MediaResource extends BaseResource
             'index' => Pages\ListMedia::route('/'),
             'create' => Pages\CreateMedia::route('/create'),
             'edit' => Pages\EditMedia::route('/{record}/edit'),
+            'view' => Pages\ViewMedia::route('/{record}'),
         ];
     }
 }
