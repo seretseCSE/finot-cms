@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\TeacherResource\Pages;
 
+use App\Exports\TeacherExport;
 use App\Filament\Resources\TeacherResource;
-use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListTeachers extends ListRecords
 {
@@ -13,11 +16,14 @@ class ListTeachers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ExportAction::make()
-                ->exporter(\App\Filament\Exports\TeacherExporter::class)
+            Action::make('export')
+                ->label('Export')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->icon('heroicon-o-arrow-down-tray'),
-            Actions\CreateAction::make(),
+                ->action(function () {
+                    return Excel::download(new TeacherExport, 'teachers_' . now()->format('Y-m-d_His') . '.xlsx');
+                }),
+            CreateAction::make(),
         ];
     }
 }

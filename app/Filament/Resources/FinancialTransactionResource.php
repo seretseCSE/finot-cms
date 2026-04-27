@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Exports\FinancialTransactionExporter;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\FinancialTransactionResource\Pages;
 use App\Models\BankAccount;
@@ -11,7 +10,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ExportAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -256,11 +254,10 @@ class FinancialTransactionResource extends Resource
                     }),
             ])
             ->headerActions([
-                ExportAction::make()
-                    ->exporter(FinancialTransactionExporter::class)
-                    ->label('Export')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('success'),
+                Actions\CreateAction::make()
+                    ->label('New Member')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn () => static::canCreate()),
             ])
             ->actions([
                 ViewAction::make(),

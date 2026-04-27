@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\BeneficiaryResource\Pages;
 
+use App\Exports\BeneficiaryExport;
 use App\Filament\Resources\BeneficiaryResource;
-use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListBeneficiaries extends ListRecords
 {
@@ -13,11 +16,14 @@ class ListBeneficiaries extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ExportAction::make()
-                ->exporter(\App\Filament\Exports\BeneficiaryExporter::class)
+            Action::make('export')
+                ->label('Export')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->icon('heroicon-o-arrow-down-tray'),
-            Actions\CreateAction::make(),
+                ->action(function () {
+                    return Excel::download(new BeneficiaryExport, 'beneficiaries_' . now()->format('Y-m-d_His') . '.xlsx');
+                }),
+            CreateAction::make(),
         ];
     }
 }

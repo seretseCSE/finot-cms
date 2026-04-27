@@ -2,16 +2,17 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Exports\ContributionExporter;
+use App\Exports\ContributionExport;
 use Filament\Schemas\Schema;
 use App\Models\AcademicYear;
 use App\Models\Contribution;
 use App\Models\MemberGroup;
-use Filament\Actions\ExportAction;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ContributionReport extends Page
 {
@@ -175,11 +176,18 @@ class ContributionReport extends Page
     protected function getHeaderActions(): array
     {
         return [
-            ExportAction::make()
-                ->exporter(ContributionExporter::class)
-                ->modifyQueryUsing(fn (Builder $query) => $this->buildQuery($query))
+            Action::make('export')
+                ->label('Export')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->icon('heroicon-o-arrow-down-tray'),
+                ->action(function () {
+                    $query = Contribution::with(['member', 'academicYear', 'recordedBy'])
+                        ->orderBy('payment_date', 'desc');
+
+                    $query = $this->buildQuery($query);
+
+                    return Excel::download(new ContributionExport($query), 'contributions_' . now()->format('Y-m-d_His') . '.xlsx');
+                }),
         ];
     }
 }

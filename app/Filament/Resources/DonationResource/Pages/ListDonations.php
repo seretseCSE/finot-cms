@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\DonationResource\Pages;
 
+use App\Exports\DonationExport;
 use App\Filament\Resources\DonationResource;
-use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListDonations extends ListRecords
 {
@@ -13,11 +16,14 @@ class ListDonations extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ExportAction::make()
-                ->exporter(\App\Filament\Exports\SimpleDonationExporter::class)
+            Action::make('export')
+                ->label('Export')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->icon('heroicon-o-arrow-down-tray'),
-            Actions\CreateAction::make()
+                ->action(function () {
+                    return Excel::download(new DonationExport, 'donations_' . now()->format('Y-m-d_His') . '.xlsx');
+                }),
+            CreateAction::make()
                 ->visible(fn () => DonationResource::canCreate()),
         ];
     }

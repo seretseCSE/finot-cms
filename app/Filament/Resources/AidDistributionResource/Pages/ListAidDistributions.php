@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\AidDistributionResource\Pages;
 
+use App\Exports\AidDistributionExport;
 use App\Filament\Resources\AidDistributionResource;
-use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListAidDistributions extends ListRecords
 {
@@ -13,11 +16,14 @@ class ListAidDistributions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ExportAction::make()
-                ->exporter(\App\Filament\Exports\AidDistributionExporter::class)
+            Action::make('export')
+                ->label('Export')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->icon('heroicon-o-arrow-down-tray'),
-            Actions\CreateAction::make(),
+                ->action(function () {
+                    return Excel::download(new AidDistributionExport, 'aid_distributions_' . now()->format('Y-m-d_His') . '.xlsx');
+                }),
+            CreateAction::make(),
         ];
     }
 }

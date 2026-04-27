@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\MemberResource\Pages;
 
-use App\Filament\Exports\MemberExporter;
+use App\Exports\MemberExport;
 use App\Filament\Resources\MemberResource;
-use Filament\Actions\Exports\Enums\ExportFormat;
-use Filament\Actions\ExportAction;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListMembers extends ListRecords
 {
@@ -16,14 +16,13 @@ class ListMembers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            ExportAction::make()
-                ->exporter(MemberExporter::class)
-                ->formats([
-                    ExportFormat::Xlsx,
-                    ExportFormat::Csv,
-                ])
+            Action::make('export')
+                ->label('Export')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->icon('heroicon-o-arrow-down-tray'),
+                ->action(function () {
+                    return Excel::download(new MemberExport, 'members_' . now()->format('Y-m-d_His') . '.xlsx');
+                }),
             CreateAction::make()
                 ->label('New Member')
                 ->icon('heroicon-o-plus')
