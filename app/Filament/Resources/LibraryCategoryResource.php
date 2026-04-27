@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LibraryCategoryResource\Pages;
+use App\Filament\Resources\LibraryCategoryResource\RelationManagers;
 use Filament\Schemas\Schema;
 use App\Models\LibraryCategory;
 use Filament\Actions;
@@ -59,78 +60,147 @@ class LibraryCategoryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-                Forms\Components\TextInput::make('name')
-                    ->label('Name')
-                    ->required()
-                    ->maxLength(255),
+            \Filament\Schemas\Components\Section::make('Category Information')
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->label('Category Name')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(100),
 
-                Forms\Components\Textarea::make('description')
-                    ->label('Description')
-                    ->rows(3)
-                    ->maxLength(500),
+                    Forms\Components\Textarea::make('description')
+                        ->label('Description')
+                        ->rows(3)
+                        ->maxLength(500),
 
-                Forms\Components\TextInput::make('display_order')
-                    ->label('Display Order')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
+                    Forms\Components\TextInput::make('display_order')
+                        ->label('Display Order')
+                        ->numeric()
+                        ->default(0),
 
-                Forms\Components\Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'Active' => 'Active',
-                        'Inactive' => 'Inactive',
-                    ])
-                    ->default('Active')
-                    ->required(),
-            ]);
+                    Forms\Components\Select::make('status')
+                        ->label('Status')
+                        ->options([
+                            'Active' => 'Active',
+                            'Inactive' => 'Inactive',
+                        ])
+                        ->required()
+                        ->default('Active'),
+                ])
+                ->columns(2),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('display_order')
+                    ->label('Order')
+                    ->sortable()
+                    ->alignCenter(),
+
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Name')
+                    ->label('Category Name')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('description')
                     ->label('Description')
                     ->limit(50)
-                    ->wrap(),
-
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'Active',
-                        'danger' => 'Inactive',
-                    ]),
-
-                Tables\Columns\TextColumn::make('display_order')
-                    ->label('Order')
-                    ->sortable(),
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('subcategories_count')
                     ->label('Subcategories')
-                    ->state(fn ($record) => $record->subcategories()->count()),
+                    ->counts('subcategories')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('resources_count')
+                    ->label('Resources')
+                    ->counts('resources')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn ($record) => $record->status === 'Active' ? 'success' : 'danger'),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
                     ->options([
                         'Active' => 'Active',
                         'Inactive' => 'Inactive',
                     ]),
             ])
             ->actions([
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
+                Actions\EditAction::make()
+                    ->visible(fn ($record) => static::canEdit($record)),
+
+                Actions\DeleteAction::make()
+                    ->visible(fn ($record) => static::canDelete($record))
+                    ->before(function ($record, Actions\DeleteAction $action) {
+                        if ($record !== null && ! $record->canBeDeleted()) {
+                            $action->halt();
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Cannot Delete')
+                                ->body('Cannot delete category with assigned resources. Use soft delete instead.')
+                                ->danger()
+                                ->send();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                    Actions\BulkAction::make('deactivate')
+                        ->label('Deactivate Selected')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                $record->update(['status' => 'Inactive']);
+                            }
+                        }),
+
+                    Actions\BulkAction::make('activate')
+                        ->label('Activate Selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                $record->update(['status' => 'Active']);
+                            }
+                        }),
                 ]),
             ])
+            ->headerActions([
+                Actions\CreateAction::make()
+                    ->label('New Library Category')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn () => static::canCreate()),
+            ])
+            ->emptyStateActions([
+                Actions\CreateAction::make()
+                    ->visible(fn () => static::canCreate()),
+            ])
+            ->emptyStateHeading('No library categories found')
+            ->emptyStateDescription('Create your first library category to get started.')
+            ->emptyStateIcon('heroicon-o-folder')
             ->defaultSort('display_order', 'asc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\SubcategoriesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

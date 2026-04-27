@@ -45,6 +45,14 @@ class LibrarySubcategory extends BaseModel
     }
 
     /**
+     * Check if subcategory can be deleted
+     */
+    public function canBeDeleted(): bool
+    {
+        return ! $this->resources()->exists();
+    }
+
+    /**
      * Get resource name for permissions
      */
     public static function getResourceName(): string

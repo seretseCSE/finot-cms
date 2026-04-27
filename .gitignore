@@ -48,7 +48,10 @@ ehthumbs.db
 Thumbs.db
 
 # Composer
-/vendor/
+/vendor
+.env
+vendor/
+storage/logs//
 composer.phar
 
 # Node

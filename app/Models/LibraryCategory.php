@@ -49,6 +49,41 @@ class LibraryCategory extends BaseModel
     }
 
     /**
+     * Check if category can be deleted
+     */
+    public function canBeDeleted(): bool
+    {
+        // Check if category has any resources
+        if ($this->resources()->exists()) {
+            return false;
+        }
+
+        // Check if any subcategory has resources
+        foreach ($this->subcategories as $subcategory) {
+            if ($subcategory->resources()->exists()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Soft delete category (set to Inactive) if it has resources
+     */
+    public function softDeleteIfHasResources(): void
+    {
+        if (! $this->canBeDeleted()) {
+            $this->update(['status' => 'Inactive']);
+
+            // Also deactivate all subcategories
+            $this->subcategories()->update(['status' => 'Inactive']);
+        } else {
+            $this->delete();
+        }
+    }
+
+    /**
      * Get resource name for permissions
      */
     public static function getResourceName(): string
