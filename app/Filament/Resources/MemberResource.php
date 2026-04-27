@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Exports\MemberExporter;
+use App\Exports\MemberExport;
 use App\Jobs\BulkAssignToDepartmentJob;
 use App\Jobs\BulkAssignToGroupJob;
 use App\Services\PhoneFormattingService;
@@ -19,7 +19,7 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ExportBulkAction;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
@@ -49,22 +49,22 @@ class MemberResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('resources.navigation.membership_management');
+        return 'Membership Management';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('resources.member.plural_label');
+        return 'Members';
     }
 
     public static function getModelLabel(): string
     {
-        return __('resources.member.label');
+        return 'Member';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('resources.member.plural_label');
+        return 'Members';
     }
 
     public static function form(Schema $schema): Schema
@@ -74,7 +74,7 @@ class MemberResource extends BaseResource
                     ->contained(false)
                     ->tabs([
                         // Tab 1 - Personal Information
-                        Tab::make(__('resources.member.tabs.personal_information'))
+                        Tab::make('Personal Information')
                             ->icon('heroicon-o-user')
                             ->schema([
                                 // Placeholder::make('workflow_guide')
@@ -95,8 +95,8 @@ class MemberResource extends BaseResource
                                 //     ->columnSpanFull()
                                 //     ->visible(fn (callable $get) => $get('member_type')),
 
-                                Section::make(__('resources.member.sections.basic_information'))
-                                    ->description(__('resources.member.sections.basic_information_description'))
+                                Section::make('Basic Information')
+                                    ->description('Enter basic personal details')
                                     ->schema([
                                         CustomOptionSelect::make('title')
                                             ->label('Title')
@@ -183,11 +183,11 @@ class MemberResource extends BaseResource
                             ]),
 
                         // Tab 2 - Address & Contact
-                        Tab::make(__('resources.member.tabs.address_contact'))
+                        Tab::make('Address & Contact')
                             ->icon('heroicon-o-map-pin')
                             ->schema([
-                                Section::make(__('resources.member.sections.residential_address'))
-                                    ->description(__('resources.member.sections.residential_address_description'))
+                                Section::make('Residential Address')
+                                    ->description('Current address details')
                                     ->schema([
                                         TextInput::make('city')
                                             ->label('City')
@@ -218,8 +218,8 @@ class MemberResource extends BaseResource
                                     ])
                                     ->columns(3),
 
-                                Section::make(__('resources.member.sections.contact_information'))
-                                    ->description(__('resources.member.sections.contact_information_description'))
+                                Section::make('Contact Information')
+                                    ->description('Phone and email contact details')
                                     ->schema([
                                         TextInput::make('phone')
                                             ->label('Personal Phone')
@@ -243,11 +243,11 @@ class MemberResource extends BaseResource
                             ]),
 
                         // Tab 3 - Emergency & Spiritual
-                        Tab::make(__('resources.member.tabs.emergency_spiritual'))
+                        Tab::make('Emergency & Spiritual')
                             ->icon('heroicon-o-phone')
                             ->schema([
-                                Section::make(__('resources.member.sections.emergency_contact'))
-                                    ->description(__('resources.member.sections.emergency_contact_description'))
+                                Section::make('Emergency Contact')
+                                    ->description('Contact person for emergencies')
                                     ->schema([
                                         TextInput::make('emergency_contact_name')
                                             ->label('Emergency Contact Name')
@@ -267,8 +267,8 @@ class MemberResource extends BaseResource
                                     ])
                                     ->columns(2),
 
-                                Section::make(__('resources.member.sections.spiritual_information'))
-                                    ->description(__('resources.member.sections.spiritual_information_description'))
+                                Section::make('Spiritual Information')
+                                    ->description('Confession father and spiritual details')
                                     ->schema([
                                         TextInput::make('confession_father_name')
                                             ->label("Confession Father's Name")
@@ -288,7 +288,7 @@ class MemberResource extends BaseResource
                             ]),
 
                         // Tab 4 - Parent/Guardian (Kids + historical)
-                        Tab::make(__('resources.member.tabs.parent_guardian'))
+                        Tab::make('Parent/Guardian')
                             ->icon('heroicon-o-user-group')
                             ->schema([
 
@@ -408,7 +408,7 @@ class MemberResource extends BaseResource
                             ),
 
                         // Tab 5 - Family & Occupation (Youth/Adult only)
-                        Tab::make(__('resources.member.tabs.family_occupation'))
+                        Tab::make('Family & Occupation')
                             ->icon('heroicon-o-briefcase')
                             ->schema([
                                 Section::make('Family Information')
@@ -600,7 +600,7 @@ class MemberResource extends BaseResource
                             ->visible(fn (callable $get) => in_array($get('member_type'), ['Youth', 'Adult'])),
 
                         // Tab 6 - Status & History
-                        Tab::make(__('resources.member.tabs.status_history'))
+                        Tab::make('Status & History')
                             ->icon('heroicon-o-clock')
                             ->schema([
                                 Section::make('Member Status')
@@ -661,12 +661,12 @@ class MemberResource extends BaseResource
             })
             ->columns([
                 Tables\Columns\TextColumn::make('member_code')
-                    ->label(__('resources.member.table.member_id'))
+                    ->label('Member ID')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('full_name')
-                    ->label(__('resources.member.table.full_name'))
+                    ->label('Full Name')
                     ->searchable(['first_name', 'father_name', 'grandfather_name']),
 
                 Tables\Columns\TextColumn::make('member_type')
@@ -698,7 +698,7 @@ class MemberResource extends BaseResource
                     ->color(fn (Member $record): string => $record->currentGroup ? 'primary' : 'gray'),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('resources.member.table.created_at'))
+                    ->label('Created At')
                     ->formatStateUsing(fn ($state) => $state ? app(EthiopianDateHelper::class)->toString($state) : '')
                     ->sortable(),
             ])
@@ -797,9 +797,16 @@ class MemberResource extends BaseResource
                 // Use DeleteBulkAction instead of DeleteAction
                 DeleteBulkAction::make(),
 
-                // Use ExportBulkAction for bulk exporting
-                ExportBulkAction::make()
-                    ->exporter(MemberExporter::class),
+                // Use Laravel Excel for bulk exporting
+                BulkAction::make('export')
+                    ->label('Export')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->action(function (BulkAction $action) {
+                        $ids = $action->getSelectedRecords()->pluck('id')->toArray();
+
+                        return Excel::download(new MemberExport($ids), 'members_' . now()->format('Y-m-d_His') . '.xlsx');
+                    }),
 
                 // Use Tables\Actions\BulkAction for custom bulk operations
                 BulkAction::make('assign_to_group')
@@ -894,7 +901,7 @@ class MemberResource extends BaseResource
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->label(__('resources.member.actions.new_member'))
+                    ->label('New Member')
                     ->icon('heroicon-o-plus')
                     ->visible(fn () => static::canCreate()),
             ])
@@ -902,8 +909,8 @@ class MemberResource extends BaseResource
                 Actions\CreateAction::make()
                     ->visible(fn () => static::canCreate()),
             ])
-            ->emptyStateHeading(__('resources.member.empty_state.heading'))
-            ->emptyStateDescription(__('resources.member.empty_state.description'))
+            ->emptyStateHeading('No members found')
+            ->emptyStateDescription('Get started by creating a new member.')
             ->emptyStateIcon('heroicon-o-users')
             ->defaultSort('created_at', 'desc');
     }

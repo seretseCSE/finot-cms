@@ -13,7 +13,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
-use Filament\Forms\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -52,84 +51,76 @@ class MemberGroupResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-                Group::make()
+                Grid::make(3)
                     ->schema([
-                        Grid::make(3)
+                        Section::make('Group Registry')
+                            ->description('Basic identification for this group.')
+                            ->icon('heroicon-m-identification')
                             ->schema([
-                                Group::make()
-                                    ->schema([
-                                        Section::make('Group Registry')
-                                            ->description('Basic identification for this group.')
-                                            ->icon('heroicon-m-identification')
-                                            ->schema([
-                                                TextInput::make('name')
-                                                    ->label('Group Name')
-                                                    ->placeholder('e.g. Saint Yared Choir')
-                                                    ->required()
-                                                    ->maxLength(200)
-                                                    ->unique(ignoreRecord: true)
-                                                    ->columnSpanFull(),
+                                TextInput::make('name')
+                                    ->label('Group Name')
+                                    ->placeholder('e.g. Saint Yared Choir')
+                                    ->required()
+                                    ->maxLength(200)
+                                    ->unique(ignoreRecord: true)
+                                    ->columnSpanFull(),
 
-                                                Select::make('group_type')
-                                                    ->label('Group Type')
-                                                    ->prefixIcon('heroicon-m-tag')
-                                                    ->options([
-                                                        'Kids' => 'Kids',
-                                                        'Elder Kids' => 'Elder Kids',
-                                                        'Youngsters' => 'Youngsters',
-                                                        'Youth' => 'Youth',
-                                                        'Finot Family' => 'Finot Family',
-                                                    ])
-                                                    ->native(false)
-                                                    ->searchable()
-                                                    ->columnSpanFull(),
-                                            ])
-                                            ->columns(2),
-
-                                        Section::make('Group Purpose')
-                                            ->description('Additional details about the group’s focus and requirements.')
-                                            ->icon('heroicon-m-chat-bubble-bottom-center-text')
-                                            ->schema([
-                                                Textarea::make('description')
-                                                    ->label('Description')
-                                                    ->placeholder('Write a brief summary of what this group does...')
-                                                    ->rows(4)
-                                                    ->maxLength(1000)
-                                                    ->columnSpanFull(),
-                                            ]),
+                                Select::make('group_type')
+                                    ->label('Group Type')
+                                    ->prefixIcon('heroicon-m-tag')
+                                    ->options([
+                                        'Kids' => 'Kids',
+                                        'Elder Kids' => 'Elder Kids',
+                                        'Youngsters' => 'Youngsters',
+                                        'Youth' => 'Youth',
+                                        'Finot Family' => 'Finot Family',
                                     ])
-                                    ->columnSpan(['lg' => 2]),
+                                    ->native(false)
+                                    ->searchable()
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->columnSpan(['lg' => 2]),
 
-                                Group::make()
-                                    ->schema([
-                                        Section::make('Visibility & Status')
-                                            ->schema([
-                                                Toggle::make('is_active')
-                                                    ->label('Active Status')
-                                                    ->helperText('Inactive groups will not be available for new member assignments.')
-                                                    ->default(true)
-                                                    ->onColor('success')
-                                                    ->offColor('danger'),
-                                            ]),
+                        Section::make('Group Purpose')
+                            ->description('Additional details about the group’s focus and requirements.')
+                            ->icon('heroicon-m-chat-bubble-bottom-center-text')
+                            ->schema([
+                                Textarea::make('description')
+                                    ->label('Description')
+                                    ->placeholder('Write a brief summary of what this group does...')
+                                    ->rows(4)
+                                    ->maxLength(1000)
+                                    ->columnSpanFull(),
+                            ])
+                            ->columnSpan(['lg' => 2]),
 
-                                        Section::make('Audit Information')
-                                            ->icon('heroicon-m-clock')
-                                            ->schema([
-                                                Placeholder::make('created_at')
-                                                    ->label('Created On')
-                                                    ->content(fn (?MemberGroup $record): string => $record?->created_at?->toFormattedDateString() ?? 'New Record'),
+                        Section::make('Visibility & Status')
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Active Status')
+                                    ->helperText('Inactive groups will not be available for new member assignments.')
+                                    ->default(true)
+                                    ->onColor('success')
+                                    ->offColor('danger'),
+                            ])
+                            ->columnSpan(['lg' => 1]),
 
-                                                Placeholder::make('updated_at')
-                                                    ->label('Last Updated')
-                                                    ->content(fn (?MemberGroup $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
-                                            ])
-                                            ->collapsible()
-                                            ->collapsed(fn (?MemberGroup $record): bool => $record === null),
-                                    ])
-                                    ->columnSpan(['lg' => 1]),
-                            ]),
-                    ])
-                    ->columnSpanFull(),
+                        Section::make('Audit Information')
+                            ->icon('heroicon-m-clock')
+                            ->schema([
+                                Placeholder::make('created_at')
+                                    ->label('Created On')
+                                    ->content(fn (?MemberGroup $record): string => $record?->created_at?->toFormattedDateString() ?? 'New Record'),
+
+                                Placeholder::make('updated_at')
+                                    ->label('Last Updated')
+                                    ->content(fn (?MemberGroup $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                            ])
+                            ->collapsible()
+                            ->collapsed(fn (?MemberGroup $record): bool => $record === null)
+                            ->columnSpan(['lg' => 1]),
+                    ]),
             ]);
     }
 

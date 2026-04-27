@@ -50,6 +50,15 @@ class StockMovementResource extends Resource
         return $schema->components([
                 Section::make('Movement Details')
                     ->schema([
+                        Forms\Components\Hidden::make('original_quantity')
+                            ->default(fn ($record) => $record?->quantity ?? 0),
+                        Forms\Components\Hidden::make('original_item_id')
+                            ->default(fn ($record) => $record?->item_id ?? null),
+                        Forms\Components\Hidden::make('original_movement_type')
+                            ->default(fn ($record) => $record?->movement_type ?? null),
+                        Forms\Components\Hidden::make('original_sub_type')
+                            ->default(fn ($record) => $record?->sub_type ?? null),
+
                         Forms\Components\Select::make('item_id')
                             ->label('Inventory Item')
                             ->relationship('item', 'name')
@@ -97,7 +106,8 @@ class StockMovementResource extends Resource
                             ->label('Movement Date')
                             ->required()
                             ->default(now())
-                            ->native(false),
+                            ->native(false)
+                            ->maxDate(now()),
 
                         Forms\Components\TextInput::make('recipient_source')
                             ->label('Recipient/Source')

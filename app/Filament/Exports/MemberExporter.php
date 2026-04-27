@@ -4,6 +4,7 @@ namespace App\Filament\Exports;
 
 use App\Models\Member;
 use App\Services\ExportAuditService;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -17,13 +18,25 @@ class MemberExporter extends Exporter
         return 'default';
     }
 
+    public function getFormats(): array
+    {
+        return [
+            ExportFormat::Xlsx,
+            ExportFormat::Csv,
+        ];
+    }
+
     public static function getColumns(): array
     {
         return [
             ExportColumn::make('member_code')
                 ->label('Member ID'),
-            ExportColumn::make('full_name')
-                ->label('Full Name'),
+            ExportColumn::make('first_name')
+                ->label('First Name'),
+            ExportColumn::make('father_name')
+                ->label('Father Name'),
+            ExportColumn::make('grandfather_name')
+                ->label('Grandfather Name'),
             ExportColumn::make('member_type')
                 ->label('Member Type'),
             ExportColumn::make('status')
@@ -32,10 +45,6 @@ class MemberExporter extends Exporter
                 ->label('Phone'),
             ExportColumn::make('email')
                 ->label('Email'),
-            ExportColumn::make('currentGroupAssignment.group.name')
-                ->label('Current Group'),
-            ExportColumn::make('department.name')
-                ->label('Department'),
             ExportColumn::make('created_at')
                 ->label('Created At'),
         ];
@@ -47,7 +56,7 @@ class MemberExporter extends Exporter
             resourceType: 'members',
             format: $export->file_name ? pathinfo($export->file_name, PATHINFO_EXTENSION) : 'xlsx',
             recordCount: $export->successful_rows,
-            filters: $export->options(),
+            filters: $export->getOptions(),
             filePath: 'filament_exports/' . $export->getKey() . '/' . ($export->file_name ?? 'members.xlsx'),
         );
 

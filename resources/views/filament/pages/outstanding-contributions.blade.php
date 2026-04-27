@@ -147,7 +147,7 @@
                                             {{ $row['member']->member_code }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $row['member']->memberGroup->name }}
+                                            {{ $row['member']->memberGroup?->name ?? 'Unassigned' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $row['month'] }}

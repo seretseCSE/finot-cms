@@ -93,6 +93,7 @@ class DonationResource extends Resource
                         EthiopianDatePicker::make('donation_date')
                             ->label('Donation Date')
                             ->default(now())
+                            ->maxDate(now())
                             ->required(),
 
                         Forms\Components\Select::make('donation_type')

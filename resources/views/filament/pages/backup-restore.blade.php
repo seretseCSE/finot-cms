@@ -1,16 +1,7 @@
 <x-filament-panels::page>
     <div class="space-y-6">
         <!-- Available Backups -->
-        <x-filament::section>
-            <x-filament::section.header>
-                <x-filament::section.heading>
-                    Available Backups
-                </x-filament::section.heading>
-                <x-filament::section.description>
-                    Last 30 system backups. Automatic backups are created daily.
-                </x-filament::section.description>
-            </x-filament::section.header>
-
+        <x-filament::section heading="Available Backups" description="Last 30 system backups. Automatic backups are created daily.">
             <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                 <table class="min-w-full divide-y divide-gray-300">
                     <thead class="bg-gray-50">
@@ -95,13 +86,7 @@
         </x-filament::section>
 
         <!-- System Information -->
-        <x-filament::section>
-            <x-filament::section.header>
-                <x-filament::section.heading>
-                    Backup Information
-                </x-filament::section.heading>
-            </x-filament::section.header>
-
+        <x-filament::section heading="Backup Information">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-4 rounded-lg shadow">
                     <h3 class="text-sm font-medium text-gray-500">Backup Retention</h3>

@@ -23,4 +23,15 @@ class EthiopianDatePicker extends TextInput
 
         return $this;
     }
+
+    public function maxDate(string | Carbon | null $date): static
+    {
+        if ($date instanceof Carbon) {
+            $date = $date->format('Y-m-d');
+        }
+
+        $this->extraInputAttributes(['max' => $date]);
+
+        return $this;
+    }
 }

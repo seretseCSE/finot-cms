@@ -151,7 +151,7 @@
                     <div class="space-y-3">
                         @php
                             $groups = $reportData['contributions']->groupBy(function($contribution) {
-                                return $contribution->member->memberGroup->name ?? 'Unknown';
+                                return $contribution->member->memberGroup?->name ?? 'Unknown';
                             });
                         @endphp
                         @foreach($groups->take(5) as $groupName => $contributions)
@@ -248,7 +248,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                            {{ $contribution->member->memberGroup->name ?? 'N/A' }}
+                                            {{ $contribution->member->memberGroup?->name ?? 'N/A' }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -310,7 +310,7 @@
                                     {{ $contributor['member'] ? substr($contributor['member']->full_name, 0, 1) : '?' }}
                                 </div>
                                 <h4 class="font-semibold text-gray-900 dark:text-white text-sm mb-1">{{ $contributor['member'] ? $contributor['member']->full_name : 'Unknown Member' }}</h4>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ $contributor['member']->memberGroup->name ?? '' }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ $contributor['member']->memberGroup?->name ?? '' }}</p>
                                 <div class="w-full bg-white dark:bg-gray-800 rounded-lg p-2 border border-{{ ['blue', 'green', 'purple', 'orange', 'pink'][$index] }}-200 dark:border-{{ ['blue', 'green', 'purple', 'orange', 'pink'][$index] }}-700">
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
                                     <p class="text-lg font-bold text-{{ ['blue', 'green', 'purple', 'orange', 'pink'][$index] }}-600 dark:text-{{ ['blue', 'green', 'purple', 'orange', 'pink'][$index] }}-400">

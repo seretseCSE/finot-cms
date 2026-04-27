@@ -205,7 +205,7 @@ class PWATourManager {
                 { element: '[href="/admin/attendance-sessions"]', popover: { title: 'Attendance', description: 'Track member attendance for services and events.' } },
             ],
             finance_head: [
-                { element: '[href="/admin/contributions"]', popover: { title: 'Contributions', description: 'Track and manage member contributions by month.' } },
+                { element: '[href="/admin/contribution-matrix"]', popover: { title: 'Contribution Matrix', description: 'Track and manage member contributions by month.' } },
                 { element: '[href="/admin/donations"]', popover: { title: 'Donations', description: 'Record and manage donations from visitors and organizations.' } },
                 { element: '[href="/admin/financial-overview-page"]', popover: { title: 'Financial Overview', description: 'View financial summaries and analytics.' } },
                 { element: '[href="/admin/bank-accounts"]', popover: { title: 'Bank Accounts', description: 'Manage church bank accounts and balances.' } },

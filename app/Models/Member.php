@@ -231,6 +231,14 @@ class Member extends BaseModel
     }
 
     /**
+     * Get member group attribute (alias for currentGroup)
+     */
+    public function getMemberGroupAttribute()
+    {
+        return $this->currentGroup;
+    }
+
+    /**
      * Get student enrollments
      */
     public function studentEnrollments()

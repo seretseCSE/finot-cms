@@ -40,10 +40,10 @@
             "icons": [{ "src": "/images/logo.png", "sizes": "96x96" }]
         },
         {
-            "name": "Contributions",
+            "name": "Contribution Matrix",
             "short_name": "Contributions",
             "description": "View contributions",
-            "url": "/admin/contributions",
+            "url": "/admin/contribution-matrix",
             "icons": [{ "src": "/images/logo.png", "sizes": "96x96" }]
         }
     ],

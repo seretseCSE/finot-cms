@@ -1,10 +1,10 @@
 
-const BUILD_INFO = {"timestamp":1777295976619,"hash":"bq2dcteng","assets":["/assets/app-jZeZ-CPS.css","/assets/vendor-C0Zqfgkc.js","/assets/admin-tour-BbrJdXfc.js","/assets/app-BhuTOWE_.js","/assets/admin-7TsvjRt4.js","/assets/app-O-pZlwva.js"]};
-const CACHE_NAME = 'finot-cache-bq2dcteng';
-const API_CACHE_NAME = 'finot-api-cache-bq2dcteng';
+const BUILD_INFO = {"timestamp":1777324288969,"hash":"5qhxysrii","assets":["/assets/app-jZeZ-CPS.css","/assets/vendor-C0Zqfgkc.js","/assets/admin-tour-ZvKes2yH.js","/assets/app-BhuTOWE_.js","/assets/admin-DA6Oz-K-.js","/assets/app-O-pZlwva.js"]};
+const CACHE_NAME = 'finot-cache-5qhxysrii';
+const API_CACHE_NAME = 'finot-api-cache-5qhxysrii';
 
 // Dynamic assets from build
-const DYNAMIC_ASSETS = ["/assets/app-jZeZ-CPS.css","/assets/vendor-C0Zqfgkc.js","/assets/admin-tour-BbrJdXfc.js","/assets/app-BhuTOWE_.js","/assets/admin-7TsvjRt4.js","/assets/app-O-pZlwva.js"];
+const DYNAMIC_ASSETS = ["/assets/app-jZeZ-CPS.css","/assets/vendor-C0Zqfgkc.js","/assets/admin-tour-ZvKes2yH.js","/assets/app-BhuTOWE_.js","/assets/admin-DA6Oz-K-.js","/assets/app-O-pZlwva.js"];
 
 // Static assets that rarely change
 const STATIC_ASSETS = [

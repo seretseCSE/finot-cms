@@ -77,7 +77,8 @@ class LossRecordResource extends Resource
                             ->label('Date of Loss/Damage')
                             ->required()
                             ->default(now())
-                            ->native(false),
+                            ->native(false)
+                            ->maxDate(now()),
 
                         Forms\Components\TextInput::make('reference_number')
                             ->label('Reference Number')

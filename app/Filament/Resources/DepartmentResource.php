@@ -24,12 +24,12 @@ class DepartmentResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('resources.department.plural_label');
+        return 'Departments';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('resources.department.navigation_group');
+        return 'Organization';
     }
 
     public static function getNavigationSort(): ?int

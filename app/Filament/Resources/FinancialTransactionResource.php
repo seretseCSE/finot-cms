@@ -102,7 +102,8 @@ class FinancialTransactionResource extends Resource
                                 Forms\Components\DatePicker::make('transaction_date')
                                     ->label('Transaction Date')
                                     ->required()
-                                    ->default(now()),
+                                    ->default(now())
+                                    ->maxDate(now()),
                             ]),
 
                         Grid::make(2)
@@ -120,6 +121,7 @@ class FinancialTransactionResource extends Resource
                                             'tithes' => 'Tithes',
                                             'offering' => 'Offering',
                                             'donation' => 'Donation',
+                                            'revenue' => 'Revenue',
                                             'other' => 'Other',
                                         ] : [
                                             'salaries' => 'Salaries',

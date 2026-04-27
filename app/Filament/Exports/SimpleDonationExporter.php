@@ -44,7 +44,7 @@ class SimpleDonationExporter extends Exporter
             resourceType: 'donations',
             format: 'xlsx',
             recordCount: $export->successful_rows,
-            filters: $export->options(),
+            filters: $export->getOptions(),
             filePath: 'filament_exports/' . $export->getKey() . '/' . ($export->file_name ?? 'export.xlsx'),
         );
 

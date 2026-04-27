@@ -718,6 +718,21 @@ class ContributionMatrix extends Page
     }
 
     /**
+     * Refresh data from the database
+     */
+    public function refreshData(): void
+    {
+        $this->loadMembersWithFilters();
+        $this->loadGrid();
+
+        Notification::make()
+            ->title('Data Refreshed')
+            ->body('Contribution matrix data has been refreshed.')
+            ->success()
+            ->send();
+    }
+
+    /**
      * Mark all members as paid for a specific month
      */
     public function markAllPaid(int $month): void

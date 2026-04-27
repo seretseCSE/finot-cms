@@ -19,8 +19,7 @@ class CreateDonation extends CreateRecord
     {
         return [
             $this->getCreateFormAction()
-                ->label('Record Donation')
-                ->submit(null),
+                ->label('Record Donation'),
         ];
     }
 

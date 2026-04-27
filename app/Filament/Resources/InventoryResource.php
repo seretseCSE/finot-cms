@@ -111,7 +111,8 @@ class InventoryResource extends Resource
                     ->schema([
                         Forms\Components\DatePicker::make('purchase_date')
                             ->label('Purchase Date')
-                            ->native(false),
+                            ->native(false)
+                            ->maxDate(now()),
 
                         Forms\Components\TextInput::make('purchase_price')
                             ->label('Purchase Price')

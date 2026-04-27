@@ -175,7 +175,7 @@ class FinancialStatementPage extends Page
         $endDate = $this->getEndDate();
 
         // Get contributions for the period
-        $contributions = Contribution::with(['member.memberGroup', 'academicYear', 'recordedBy'])
+        $contributions = Contribution::with(['member.currentGroupAssignment.group', 'academicYear', 'recordedBy'])
             ->whereDate('payment_date', '>=', $startDate)
             ->whereDate('payment_date', '<=', $endDate)
             ->orderBy('payment_date')
@@ -189,7 +189,9 @@ class FinancialStatementPage extends Page
             ->get();
 
         // Calculate contributions by group and month
-        $contributionsByGroup = $contributions->groupBy('member.group_id');
+        $contributionsByGroup = $contributions->groupBy(function ($contribution) {
+            return $contribution->member->currentGroupAssignment?->group_id;
+        });
         $contributionsByMonth = $contributions->groupBy('month_name');
 
         // Calculate outstanding contributions (current academic year only)
@@ -199,15 +201,15 @@ class FinancialStatementPage extends Page
         if ($activeYear) {
             $members = Member::query()
                 ->whereIn('status', ['Active', 'Member'])
-                ->whereHas('memberGroup')
-                ->with(['memberGroup'])
+                ->whereHas('currentGroupAssignment')
+                ->with(['currentGroupAssignment.group'])
                 ->get();
 
             foreach ($members as $member) {
                 $months = EthiopianDateHelper::getContributionMonths();
 
                 foreach ($months as $monthName) {
-                    $expectedAmount = ContributionAmount::where('group_id', $member->group_id)
+                    $expectedAmount = ContributionAmount::where('group_id', $member->currentGroupAssignment?->group_id)
                         ->forMonth($monthName)
                         ->active()
                         ->value('amount') ?? 0;
@@ -241,7 +243,7 @@ class FinancialStatementPage extends Page
         // Group performance summary
         $groupSummary = [];
         foreach ($contributionsByGroup as $groupId => $groupContributions) {
-            $groupName = $groupContributions->first()->member->memberGroup->name ?? 'Unknown';
+            $groupName = $groupContributions->first()->member->memberGroup?->name ?? 'Unknown';
             $groupSummary[] = [
                 'group_name' => $groupName,
                 'total_amount' => $groupContributions->sum('amount'),

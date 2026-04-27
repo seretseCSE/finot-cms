@@ -130,7 +130,7 @@ class ContributionReport extends Page
         }
 
         if ($this->group_id) {
-            $query->whereHas('member', function (Builder $query) {
+            $query->whereHas('member.currentGroupAssignment', function (Builder $query) {
                 $query->where('group_id', $this->group_id);
             });
         }
@@ -148,7 +148,7 @@ class ContributionReport extends Page
 
     protected function loadData(): void
     {
-        $query = Contribution::with(['member.memberGroup', 'recordedBy'])
+        $query = Contribution::with(['member.currentGroupAssignment.group', 'recordedBy'])
             ->orderBy('payment_date', 'desc');
 
         $contributions = $this->buildQuery($query)->get();

@@ -39,7 +39,6 @@ class Timeline extends ViewRecord
             'education'    => 'Education',
             'group'        => 'Group Assignments',
             'guardian'      => 'Parent / Guardian',
-            'tour'         => 'Tours',
         ];
     }
 
@@ -94,7 +93,6 @@ class Timeline extends ViewRecord
             'contributions_count' => $member->contributions()->count(),
             'enrollments_count'  => $member->studentEnrollments()->count(),
             'groups_count'       => $member->groupAssignments()->count(),
-            'tours_count'        => $member->tourPassengers()->count(),
             'education_level'    => $member->educationHistory()->latest()->first()?->education_level ?? 'N/A',
         ];
     }
@@ -260,30 +258,6 @@ class Timeline extends ViewRecord
                 });
         }
 
-        // ──── Tour Participation ────
-        if (!$isFilteringType || $this->eventTypeFilter === 'tour') {
-            $collections[] = $this->record->tourPassengers()
-                ->when($dateCutoff, fn ($q) => $q->where('created_at', '>=', $dateCutoff))
-                ->with('tour')
-                ->orderByDesc('created_at')
-                ->get()
-                ->map(fn ($r) => [
-                    'id'          => $r->id,
-                    'type'        => 'tour',
-                    'title'       => 'Tour Participation',
-                    'description' => 'Registered for ' . ($r->tour?->place ?? 'a tour'),
-                    'date'        => $r->created_at->toDateString(),
-                    'time'        => $r->created_at->toTimeString(),
-                    'status'      => $r->status ?? 'Registered',
-                    'color'       => match ($r->status ?? '') {
-                        'Attended'  => 'success',
-                        'Confirmed' => 'primary',
-                        'Cancelled' => 'danger',
-                        default     => 'warning',
-                    },
-                ]);
-        }
-
         // Merge, sort, return
         return collect($collections)
             ->flatten(1)
@@ -320,7 +294,6 @@ class Timeline extends ViewRecord
             'education'     => 'heroicon-o-book-open',
             'guardian'      => 'heroicon-o-users',
             'group'         => 'heroicon-o-user-group',
-            'tour'          => 'heroicon-o-map',
             'status_change' => 'heroicon-o-cog-6-tooth',
         ];
 
@@ -342,7 +315,6 @@ class Timeline extends ViewRecord
             'education'     => 'info',
             'guardian'      => 'warning',
             'group'         => 'secondary',
-            'tour'          => 'primary',
             'status_change' => 'gray',
         ];
 

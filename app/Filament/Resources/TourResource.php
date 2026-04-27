@@ -30,12 +30,12 @@ class TourResource extends BaseResource
 
     public static function getNavigationLabel(): string
     {
-        return __('resources.tour.plural_label');
+        return 'Tours';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('resources.tour.navigation_group');
+        return 'Tour Management';
     }
 
     public static function getNavigationSort(): ?int
@@ -92,7 +92,9 @@ class TourResource extends BaseResource
                                 'min' => now()->format('Y-m-d'),
                                 ...($get('tour_date') ? ['max' => $get('tour_date')] : []),
                             ])
-                            ->rules(['date', 'after_or_equal:today', 'before:tour_date']),
+                            ->rules(['date'])
+                            ->afterOrEqual('today')
+                            ->before('tour_date'),
 
                         Forms\Components\TextInput::make('max_capacity')
                             ->label('Maximum Capacity')

@@ -18,11 +18,11 @@ class SystemMonitoringService
     {
         return Cache::remember('system_health_metrics', 300, function () {
             return [
-                'uptime' => $this->getServerUptimeString(),
+                'uptime' => $this->getServerUptime(),
                 'storage_usage' => $this->getStorageUsage(),
                 'db_query_time' => $this->getDatabaseQueryTime(),
                 'active_sessions' => $this->getActiveSessionsCount(),
-                'error_rate' => $this->getErrorRateValue(),
+                'error_rate' => $this->getErrorRate(),
                 'failed_logins' => $this->getFailedLoginsCount(),
                 'memory_usage' => $this->getMemoryUsageString(),
                 'cpu_usage' => $this->getCpuUsageString(),

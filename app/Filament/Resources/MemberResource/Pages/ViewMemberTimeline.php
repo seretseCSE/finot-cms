@@ -374,25 +374,6 @@ class ViewMemberTimeline extends Page implements HasForms
             $queries[] = $this->applyMemberFiltersToQuery($guardianQuery, $filters);
         }
 
-        if ($tab === 'all' && DbSchema::hasTable('tour_passengers') && DbSchema::hasTable('tours')) {
-            $tourQuery = DB::table('tour_passengers as tp')
-                ->join('members as m', 'm.id', '=', 'tp.member_id')
-                ->join('tours as t', 't.id', '=', 'tp.tour_id')
-                ->leftJoin('users as u', 'u.id', '=', 'tp.registered_by')
-                ->select([
-                    DB::raw("'groups' as event_group"),
-                    DB::raw("'tour_registered' as event_type"),
-                    'tp.registration_date as event_date',
-                    DB::raw("CONCAT('Tour: ', t.place, ' (', tp.status, ')') as description"),
-                    'u.name as performed_by',
-                    'm.id as member_id',
-                    'm.member_code as member_code',
-                    DB::raw("CONCAT(m.first_name, ' ', m.father_name, ' ', m.grandfather_name) as member_name"),
-                ]);
-
-            $queries[] = $this->applyMemberFiltersToQuery($tourQuery, $filters);
-        }
-
         if ($tab === 'all' && DbSchema::hasTable('audit_logs')) {
             $auditQuery = DB::table('audit_logs as al')
                 ->join('members as m', 'm.id', '=', 'al.entity_id')
