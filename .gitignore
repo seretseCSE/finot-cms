@@ -1,0 +1,86 @@
+node_modules
+
+# Laravel specific
+/.env
+/.env.backup
+/.env.*.php
+.env
+.env.backup
+.env.*.php
+
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+vendor/
+
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+storage/*.key
+.env.backup
+.env.*.php
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Laravel Framework specific files
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Composer
+/vendor/
+composer.phar
+
+# Node
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Build outputs
+/public/build
+/public/hot
+
+# Cache and logs
+/storage/logs/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/bootstrap/cache/
+
+# Testing
+/coverage/
+/phpunit.xml
+.phpunit.result.cache
+
+# Environment files
+.env
+.env.backup
+.env.*.php
+
+# Deployment
+.deploy/
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md

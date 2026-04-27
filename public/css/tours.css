@@ -1,0 +1,111 @@
+.tour-highlight {
+    position: relative;
+    z-index: 9998;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+    border-radius: 4px;
+}
+
+#tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.tour-nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    pointer-events: all;
+    z-index: 10000;
+}
+
+.tour-nav button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tour-nav button:hover {
+    background: #f3f4f6;
+}
+
+.tour-nav button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#tour-close {
+    background: #ef4444 !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+}
+
+#tour-close:hover {
+    background: #dc2626 !important;
+}
+
+#tour-tooltip {
+    position: fixed;
+    background: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-width: 280px;
+    z-index: 10000;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tour-tooltip strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #111827;
+}
+
+.tour-tooltip:not(strong) {
+    color: #6b7280;
+}
+
+.tour-tooltip::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+}
+
+.tour-tooltip-bottom::before {
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-color: white;
+}
+
+.tour-tooltip-right::before {
+    top: 50%;
+    left: -12px;
+    transform: translateY(-50%);
+    border-right-color: white;
+}
+
+.tour-tooltip-left::before {
+    top: 50%;
+    right: -12px;
+    transform: translateY(-50%);
+    border-left-color: white;
+}

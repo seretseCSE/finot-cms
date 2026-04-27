@@ -1,0 +1,107 @@
+<?php
+
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\PasswordChangeController;
+use App\Http\Controllers\ProductTourController;
+use App\Http\Controllers\PwaController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\TourController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Include backup routes
+require __DIR__.'/backup.php';
+
+// PWA routes
+Route::get('/manifest.json', [PwaController::class, 'manifest']);
+Route::get('/service-worker.js', [PwaController::class, 'serviceWorker']);
+Route::get('/build-info.json', [PwaController::class, 'buildInfo']);
+Route::get('/offline', [PwaController::class, 'offline'])->name('offline');
+
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\EditProfileController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\FundraisingController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\SongController;
+
+// Apply rate limiting to all public routes (60 requests per minute)
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/', [HomeController::class, 'index']);
+
+    // Public page routes
+    Route::get('/about', [AboutController::class, 'index'])->name('about');
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/{id}', [AnnouncementController::class, 'show'])->name('announcements.show');
+    Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+    Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+    Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
+    Route::get('/songs/{id}', [SongController::class, 'show'])->name('songs.show');
+    Route::get('/media', [MediaController::class, 'index'])->name('media');
+    Route::get('/events', [EventController::class, 'index'])->name('events');
+    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+    Route::get('/library', [LibraryController::class, 'index'])->name('library');
+    Route::get('/library/download/{resource}', [LibraryController::class, 'download'])->name('library.download');
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+    // Fundraising routes
+    Route::get('/fundraising', [FundraisingController::class, 'index'])->name('fundraising.index');
+    Route::get('/api/fundraising', [FundraisingController::class, 'api'])->name('fundraising.api');
+
+    // Language switch endpoint
+    Route::post('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
+
+    // Edit profile route
+    Route::get('/admin/profile', [EditProfileController::class, '__invoke'])->name('admin.edit-profile');
+
+    // Public tour routes
+    Route::get('/tours', [TourController::class, 'index'])->name('tours.index');
+    Route::get('/tours/{id}/register', [TourController::class, 'showRegister'])->name('tour.register');
+    Route::post('/tours/{id}/register', [TourController::class, 'register'])->name('tour.register.submit');
+
+    // API route for phone lookup
+    Route::get('/api/tour/lookup-phone', [TourController::class, 'lookupPhone'])->name('tour.lookup-phone');
+});
+
+// Password change routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/user/change-password', [PasswordChangeController::class, 'changePassword'])->name('password.change');
+    Route::get('/user/password-requirements', [PasswordChangeController::class, 'getPasswordRequirements'])->name('password.requirements');
+});
+
+// Session management API routes (for PWA background sync and session extension)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/api/session/extend', [SessionController::class, 'extendSession'])->name('session.extend');
+    Route::get('/api/session/status', [SessionController::class, 'getSessionStatus'])->name('session.status');
+});
+
+// Product tour routes
+Route::middleware(['auth', 'web'])->group(function () {
+    Route::post('/api/tour/restart', [ProductTourController::class, 'restart'])->name('tour.restart');
+    Route::post('/api/tour/complete', [ProductTourController::class, 'complete'])->name('tour.complete');
+    Route::get('/api/tour/status', [ProductTourController::class, 'status'])->name('tour.status');
+});
+
+Route::get('/login', function () {
+    return redirect()->route('filament.admin.auth.login');
+})->name('login');
+
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-initial-password', [AuthController::class, 'showChangeInitialPassword'])->name('change-initial-password');
+    Route::post('/change-initial-password', [AuthController::class, 'changeInitialPassword'])->name('change-initial-password.submit');
+});
