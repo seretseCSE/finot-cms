@@ -22,7 +22,10 @@ class ExportAuditService
         string $format,
         int $recordCount,
         array $filters = [],
-        ?string $filePath = null
+        ?string $filePath = null,
+        ?int $exportedBy = null,
+        ?string $ipAddress = null,
+        ?string $userAgent = null,
     ): void {
         ExportLog::create([
             'resource_type' => $resourceType,
@@ -30,9 +33,9 @@ class ExportAuditService
             'filters' => $filters,
             'file_path' => $filePath ?? 'exports/' . $resourceType . '.' . $format,
             'record_count' => $recordCount,
-            'exported_by' => Auth::id(),
-            'ip_address' => Request::ip(),
-            'user_agent' => Request::userAgent(),
+            'exported_by' => $exportedBy ?? Auth::id(),
+            'ip_address' => $ipAddress ?? Request::ip() ?? 'system',
+            'user_agent' => $userAgent ?? Request::userAgent() ?? 'system',
             'created_at' => now(),
         ]);
     }

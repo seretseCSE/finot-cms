@@ -3,48 +3,46 @@
 namespace App\Exports;
 
 use App\Models\Rehearsal;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class RehearsalExport implements FromCollection, WithHeadings, WithMapping
+class RehearsalExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = Rehearsal::with('createdBy')->get();
-
-        ExportAuditService::log(
-            resourceType: 'rehearsals',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/rehearsals.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Date & Time',
-            'Location',
-            'Status',
-            'Recurrence',
-            'Created By',
-            'Created At',
+            'date_time' => 'Date & Time',
+            'location' => 'Location',
+            'status' => 'Status',
+            'recurrence_type' => 'Recurrence',
+            'created_by' => 'Created By',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($rehearsal): array
+    public static function modelClass(): string
     {
-        return [
-            $rehearsal->date_time?->format('M d, Y H:i'),
-            $rehearsal->location,
-            $rehearsal->status,
-            $rehearsal->recurrence_type,
-            $rehearsal->createdBy?->name,
-            $rehearsal->created_at?->format('M d, Y H:i'),
-        ];
+        return Rehearsal::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'rehearsals';
+    }
+
+    public static function relationships(): array
+    {
+        return ['createdBy'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'date_time' => $record->date_time?->format('M d, Y H:i'),
+            'location' => $record->location,
+            'status' => $record->status,
+            'recurrence_type' => $record->recurrence_type,
+            'created_by' => $record->createdBy?->name,
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

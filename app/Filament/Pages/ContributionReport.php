@@ -3,16 +3,19 @@
 namespace App\Filament\Pages;
 
 use App\Exports\ContributionExport;
+use App\Jobs\ProcessExportJob;
 use Filament\Schemas\Schema;
 use App\Models\AcademicYear;
 use App\Models\Contribution;
 use App\Models\MemberGroup;
 use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ContributionReport extends Page
 {
@@ -180,13 +183,38 @@ class ContributionReport extends Page
                 ->label('Export')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->action(function () {
-                    $query = Contribution::with(['member', 'academicYear', 'recordedBy'])
-                        ->orderBy('payment_date', 'desc');
+                ->form([
+                    CheckboxList::make('columns')
+                        ->label('Columns')
+                        ->options(ContributionExport::availableColumns())
+                        ->default(array_keys(ContributionExport::availableColumns()))
+                        ->columns(2)
+                        ->required(),
+                    Radio::make('format')
+                        ->label('Format')
+                        ->options(['xlsx' => 'Excel (.xlsx)', 'csv' => 'CSV (.csv)'])
+                        ->default('xlsx')
+                        ->required(),
+                ])
+                ->action(function (array $data) {
+                    ProcessExportJob::dispatchSync(
+                        exportClass: ContributionExport::class,
+                        columns: $data['columns'],
+                        format: $data['format'],
+                        userId: auth()->id(),
+                        filters: [
+                            'academic_year_id' => $this->academic_year_id,
+                            'group_id' => $this->group_id,
+                            'start_date' => $this->start_date,
+                            'end_date' => $this->end_date,
+                        ],
+                    );
 
-                    $query = $this->buildQuery($query);
-
-                    return Excel::download(new ContributionExport($query), 'contributions_' . now()->format('Y-m-d_His') . '.xlsx');
+                    Notification::make()
+                        ->title('Export queued')
+                        ->body('Your export is being processed. You will be notified when it is ready.')
+                        ->success()
+                        ->send();
                 }),
         ];
     }

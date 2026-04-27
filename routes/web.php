@@ -29,6 +29,7 @@ Route::get('/offline', [PwaController::class, 'offline'])->name('offline');
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EditProfileController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\ExportDownloadController;
 use App\Http\Controllers\FundraisingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LanguageController;
@@ -49,6 +50,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
     Route::get('/songs/{id}', [SongController::class, 'show'])->name('songs.show');
     Route::get('/media', [MediaController::class, 'index'])->name('media');
+    Route::get('/media/{mediaItem}', [MediaController::class, 'show'])->name('media.show');
     Route::get('/events', [EventController::class, 'index'])->name('events');
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
     Route::get('/library', [LibraryController::class, 'index'])->name('library');
@@ -79,6 +81,11 @@ Route::middleware('throttle:60,1')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::post('/user/change-password', [PasswordChangeController::class, 'changePassword'])->name('password.change');
     Route::get('/user/password-requirements', [PasswordChangeController::class, 'getPasswordRequirements'])->name('password.requirements');
+});
+
+// Export download route
+Route::middleware(['auth'])->group(function () {
+    Route::get('/exports/download/{filename}', ExportDownloadController::class)->name('exports.download');
 });
 
 // Session management API routes (for PWA background sync and session extension)

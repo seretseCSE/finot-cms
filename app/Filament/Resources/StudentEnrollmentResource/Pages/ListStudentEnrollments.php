@@ -4,10 +4,13 @@ namespace App\Filament\Resources\StudentEnrollmentResource\Pages;
 
 use App\Exports\StudentEnrollmentExport;
 use App\Filament\Resources\StudentEnrollmentResource;
+use App\Jobs\ProcessExportJob;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Radio;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ListStudentEnrollments extends ListRecords
 {
@@ -20,8 +23,32 @@ class ListStudentEnrollments extends ListRecords
                 ->label('Export')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->action(function () {
-                    return Excel::download(new StudentEnrollmentExport, 'student_enrollments_' . now()->format('Y-m-d_His') . '.xlsx');
+                ->form([
+                    CheckboxList::make('columns')
+                        ->label('Columns')
+                        ->options(StudentEnrollmentExport::availableColumns())
+                        ->default(array_keys(StudentEnrollmentExport::availableColumns()))
+                        ->columns(2)
+                        ->required(),
+                    Radio::make('format')
+                        ->label('Format')
+                        ->options(['xlsx' => 'Excel (.xlsx)', 'csv' => 'CSV (.csv)'])
+                        ->default('xlsx')
+                        ->required(),
+                ])
+                ->action(function (array $data) {
+                    ProcessExportJob::dispatchSync(
+                        exportClass: StudentEnrollmentExport::class,
+                        columns: $data['columns'],
+                        format: $data['format'],
+                        userId: auth()->id(),
+                    );
+
+                    Notification::make()
+                        ->title('Export queued')
+                        ->body('Your export is being processed. You will be notified when it is ready.')
+                        ->success()
+                        ->send();
                 }),
             CreateAction::make(),
         ];

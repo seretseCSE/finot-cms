@@ -3,48 +3,46 @@
 namespace App\Exports;
 
 use App\Models\StudentEnrollment;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class StudentEnrollmentExport implements FromCollection, WithHeadings, WithMapping
+class StudentEnrollmentExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = StudentEnrollment::with(['student', 'class', 'academicYear'])->get();
-
-        ExportAuditService::log(
-            resourceType: 'student_enrollments',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/student_enrollments.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Student',
-            'Class',
-            'Academic Year',
-            'Enrollment Date',
-            'Status',
-            'Created At',
+            'student' => 'Student',
+            'class' => 'Class',
+            'academic_year' => 'Academic Year',
+            'enrollment_date' => 'Enrollment Date',
+            'status' => 'Status',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($enrollment): array
+    public static function modelClass(): string
     {
-        return [
-            $enrollment->student?->full_name,
-            $enrollment->class?->name,
-            $enrollment->academicYear?->name,
-            $enrollment->enrollment_date?->format('M d, Y'),
-            $enrollment->status,
-            $enrollment->created_at?->format('M d, Y H:i'),
-        ];
+        return StudentEnrollment::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'student_enrollments';
+    }
+
+    public static function relationships(): array
+    {
+        return ['student', 'class', 'academicYear'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'student' => $record->student?->full_name,
+            'class' => $record->class?->name,
+            'academic_year' => $record->academicYear?->name,
+            'enrollment_date' => $record->enrollment_date?->format('M d, Y'),
+            'status' => $record->status,
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

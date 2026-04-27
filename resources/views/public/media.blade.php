@@ -75,7 +75,7 @@
         @else
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;">
                 @foreach($mediaItems as $item)
-                    <div class="card sr" style="padding:0;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;" data-delay="{{ $loop->index * 50 }}">
+                    <a href="{{ route('media.show', $item) }}" class="card sr" style="padding:0;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;" data-delay="{{ $loop->index * 50 }}">
                         <div style="aspect-ratio:4/3;overflow:hidden;position:relative;background:var(--dark-800);">
                             @if($item->type === 'Photo')
                                 <img src="{{ $item->file_url }}" alt="{{ $item->title }}" style="width:100%;height:100%;object-fit:cover;transition:transform .5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
@@ -86,7 +86,7 @@
                                     </div>
                                 </div>
                             @endif
-                            
+
                             {{-- Hover Overlay --}}
                             <div style="position:absolute;inset:0;background:var(--overlay-40);opacity:0;transition:opacity .3s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
                                 <div style="width:40px;height:40px;border-radius:50%;background:var(--gold);color:var(--dark-950);display:flex;align-items:center;justify-content:center;">
@@ -107,7 +107,7 @@
                                 <p style="color:var(--text-60);font-size:.78rem;line-height:1.6;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ strip_tags($item->description) }}</p>
                             @endif
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
 

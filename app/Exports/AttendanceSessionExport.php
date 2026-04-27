@@ -3,50 +3,48 @@
 namespace App\Exports;
 
 use App\Models\AttendanceSession;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class AttendanceSessionExport implements FromCollection, WithHeadings, WithMapping
+class AttendanceSessionExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = AttendanceSession::with(['class', 'academicYear', 'createdBy'])->get();
-
-        ExportAuditService::log(
-            resourceType: 'attendance_sessions',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/attendance_sessions.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Class',
-            'Session Date',
-            'Academic Year',
-            'Status',
-            'Locked At',
-            'Created By',
-            'Created At',
+            'class' => 'Class',
+            'session_date' => 'Session Date',
+            'academic_year' => 'Academic Year',
+            'status' => 'Status',
+            'locked_at' => 'Locked At',
+            'created_by' => 'Created By',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($session): array
+    public static function modelClass(): string
     {
-        return [
-            $session->class?->name,
-            $session->session_date?->format('M d, Y'),
-            $session->academicYear?->name,
-            $session->status,
-            $session->locked_at?->format('M d, Y H:i'),
-            $session->createdBy?->name,
-            $session->created_at?->format('M d, Y H:i'),
-        ];
+        return AttendanceSession::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'attendance_sessions';
+    }
+
+    public static function relationships(): array
+    {
+        return ['class', 'academicYear', 'createdBy'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'class' => $record->class?->name,
+            'session_date' => $record->session_date?->format('M d, Y'),
+            'academic_year' => $record->academicYear?->name,
+            'status' => $record->status,
+            'locked_at' => $record->locked_at?->format('M d, Y H:i'),
+            'created_by' => $record->createdBy?->name,
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

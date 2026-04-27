@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Exports\MemberExport;
 use App\Jobs\BulkAssignToDepartmentJob;
 use App\Jobs\BulkAssignToGroupJob;
+use App\Jobs\ProcessExportJob;
 use App\Services\PhoneFormattingService;
 use App\Services\UploadSanitizer;
 use App\Actions\Members\BulkAssignmentValidationAction;
@@ -19,17 +20,17 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Maatwebsite\Excel\Facades\Excel;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Radio;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -797,15 +798,40 @@ class MemberResource extends BaseResource
                 // Use DeleteBulkAction instead of DeleteAction
                 DeleteBulkAction::make(),
 
-                // Use Laravel Excel for bulk exporting
+                // Export selected records in the background
                 BulkAction::make('export')
                     ->label('Export')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
-                    ->action(function (BulkAction $action) {
+                    ->form([
+                        CheckboxList::make('columns')
+                            ->label('Columns')
+                            ->options(MemberExport::availableColumns())
+                            ->default(array_keys(MemberExport::availableColumns()))
+                            ->columns(2)
+                            ->required(),
+                        Radio::make('format')
+                            ->label('Format')
+                            ->options(['xlsx' => 'Excel (.xlsx)', 'csv' => 'CSV (.csv)'])
+                            ->default('xlsx')
+                            ->required(),
+                    ])
+                    ->action(function (array $data, BulkAction $action) {
                         $ids = $action->getSelectedRecords()->pluck('id')->toArray();
 
-                        return Excel::download(new MemberExport($ids), 'members_' . now()->format('Y-m-d_His') . '.xlsx');
+                    ProcessExportJob::dispatchSync(
+                        exportClass: MemberExport::class,
+                        columns: $data['columns'],
+                        format: $data['format'],
+                        userId: auth()->id(),
+                        ids: $ids,
+                    );
+
+                        Notification::make()
+                            ->title('Export queued')
+                            ->body('Your export is being processed. You will be notified when it is ready.')
+                            ->success()
+                            ->send();
                     }),
 
                 // Use Tables\Actions\BulkAction for custom bulk operations

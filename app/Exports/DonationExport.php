@@ -3,56 +3,54 @@
 namespace App\Exports;
 
 use App\Models\Donation;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class DonationExport implements FromCollection, WithHeadings, WithMapping
+class DonationExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = Donation::with(['recordedBy', 'bankAccount'])->get();
-
-        ExportAuditService::log(
-            resourceType: 'donations',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/donations.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'ID',
-            'Donor Name',
-            'Amount (ETB)',
-            'Donation Date',
-            'Donation Type',
-            'Custom Type',
-            'Notes',
-            'Recorded By',
-            'Bank Account',
-            'Created At',
+            'id' => 'ID',
+            'donor_name' => 'Donor Name',
+            'amount' => 'Amount (ETB)',
+            'donation_date' => 'Donation Date',
+            'donation_type' => 'Donation Type',
+            'custom_donation_type' => 'Custom Type',
+            'notes' => 'Notes',
+            'recorded_by' => 'Recorded By',
+            'bank_account' => 'Bank Account',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($donation): array
+    public static function modelClass(): string
     {
-        return [
-            $donation->id,
-            $donation->donor_name,
-            $donation->amount,
-            $donation->donation_date?->format('M d, Y'),
-            $donation->donation_type,
-            $donation->custom_donation_type,
-            $donation->notes,
-            $donation->recordedBy?->name,
-            $donation->bankAccount?->account_name,
-            $donation->created_at?->format('M d, Y H:i'),
-        ];
+        return Donation::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'donations';
+    }
+
+    public static function relationships(): array
+    {
+        return ['recordedBy', 'bankAccount'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'id' => $record->id,
+            'donor_name' => $record->donor_name,
+            'amount' => $record->amount,
+            'donation_date' => $record->donation_date?->format('M d, Y'),
+            'donation_type' => $record->donation_type,
+            'custom_donation_type' => $record->custom_donation_type,
+            'notes' => $record->notes,
+            'recorded_by' => $record->recordedBy?->name,
+            'bank_account' => $record->bankAccount?->account_name,
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

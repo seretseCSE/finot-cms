@@ -3,66 +3,64 @@
 namespace App\Exports;
 
 use App\Models\FinancialTransaction;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class FinancialTransactionExport implements FromCollection, WithHeadings, WithMapping
+class FinancialTransactionExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = FinancialTransaction::with(['bankAccount', 'recordedBy', 'approvedBy'])->get();
-
-        ExportAuditService::log(
-            resourceType: 'financial_transactions',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/financial_transactions.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Transaction ID',
-            'Type',
-            'Title',
-            'Description',
-            'Amount (ETB)',
-            'Currency',
-            'Category',
-            'Source/Payer',
-            'Payment Method',
-            'Bank Account',
-            'Transaction Date',
-            'Recorded By',
-            'Approved By',
-            'Approved At',
-            'Created At',
+            'transaction_id' => 'Transaction ID',
+            'type' => 'Type',
+            'title' => 'Title',
+            'description' => 'Description',
+            'amount' => 'Amount (ETB)',
+            'currency' => 'Currency',
+            'category' => 'Category',
+            'source' => 'Source/Payer',
+            'payment_method' => 'Payment Method',
+            'bank_account' => 'Bank Account',
+            'transaction_date' => 'Transaction Date',
+            'recorded_by' => 'Recorded By',
+            'approved_by' => 'Approved By',
+            'approved_at' => 'Approved At',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($transaction): array
+    public static function modelClass(): string
     {
-        return [
-            $transaction->transaction_id,
-            $transaction->type,
-            $transaction->title,
-            $transaction->description,
-            $transaction->amount,
-            $transaction->currency,
-            $transaction->category,
-            $transaction->source,
-            $transaction->payment_method,
-            $transaction->bankAccount?->account_name,
-            $transaction->transaction_date?->format('M d, Y'),
-            $transaction->recordedBy?->name,
-            $transaction->approvedBy?->name,
-            $transaction->approved_at?->format('M d, Y H:i'),
-            $transaction->created_at?->format('M d, Y H:i'),
-        ];
+        return FinancialTransaction::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'financial_transactions';
+    }
+
+    public static function relationships(): array
+    {
+        return ['bankAccount', 'recordedBy', 'approvedBy'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'transaction_id' => $record->transaction_id,
+            'type' => $record->type,
+            'title' => $record->title,
+            'description' => $record->description,
+            'amount' => $record->amount,
+            'currency' => $record->currency,
+            'category' => $record->category,
+            'source' => $record->source,
+            'payment_method' => $record->payment_method,
+            'bank_account' => $record->bankAccount?->account_name,
+            'transaction_date' => $record->transaction_date?->format('M d, Y'),
+            'recorded_by' => $record->recordedBy?->name,
+            'approved_by' => $record->approvedBy?->name,
+            'approved_at' => $record->approved_at?->format('M d, Y H:i'),
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

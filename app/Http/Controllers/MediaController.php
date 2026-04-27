@@ -39,4 +39,14 @@ class MediaController extends Controller
 
         return view('public.media', compact('mediaItems', 'categories'));
     }
+
+    public function show(MediaItem $mediaItem)
+    {
+        // Ensure only public or accessible media can be viewed
+        if (! $mediaItem->canBeViewedBy(auth()->user())) {
+            abort(404);
+        }
+
+        return view('public.media-show', compact('mediaItem'));
+    }
 }

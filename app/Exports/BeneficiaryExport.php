@@ -3,48 +3,46 @@
 namespace App\Exports;
 
 use App\Models\Beneficiary;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class BeneficiaryExport implements FromCollection, WithHeadings, WithMapping
+class BeneficiaryExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = Beneficiary::all();
-
-        ExportAuditService::log(
-            resourceType: 'beneficiaries',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/beneficiaries.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Name',
-            'Status',
-            'Phone',
-            'Address',
-            'Aid Type',
-            'Created At',
+            'name' => 'Name',
+            'status' => 'Status',
+            'phone' => 'Phone',
+            'address' => 'Address',
+            'aid_type' => 'Aid Type',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($beneficiary): array
+    public static function modelClass(): string
     {
-        return [
-            $beneficiary->name,
-            $beneficiary->status,
-            $beneficiary->phone,
-            $beneficiary->address,
-            $beneficiary->aid_type,
-            $beneficiary->created_at?->format('M d, Y H:i'),
-        ];
+        return Beneficiary::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'beneficiaries';
+    }
+
+    public static function relationships(): array
+    {
+        return [];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'name' => $record->full_name ?? $record->name,
+            'status' => $record->status,
+            'phone' => $record->phone,
+            'address' => $record->address,
+            'aid_type' => $record->aid_type ?? $record->need_category,
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

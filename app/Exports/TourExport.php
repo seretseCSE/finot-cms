@@ -3,54 +3,52 @@
 namespace App\Exports;
 
 use App\Models\Tour;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class TourExport implements FromCollection, WithHeadings, WithMapping
+class TourExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = Tour::with('createdBy')->get();
-
-        ExportAuditService::log(
-            resourceType: 'tours',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/tours.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Destination',
-            'Tour Date',
-            'Start Time',
-            'Cost Per Person',
-            'Registration Deadline',
-            'Max Capacity',
-            'Status',
-            'Created By',
-            'Created At',
+            'place' => 'Destination',
+            'tour_date' => 'Tour Date',
+            'start_time' => 'Start Time',
+            'cost_per_person' => 'Cost Per Person',
+            'registration_deadline' => 'Registration Deadline',
+            'max_capacity' => 'Max Capacity',
+            'status' => 'Status',
+            'created_by' => 'Created By',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($tour): array
+    public static function modelClass(): string
     {
-        return [
-            $tour->place,
-            $tour->tour_date?->format('M d, Y'),
-            $tour->start_time?->format('H:i'),
-            $tour->cost_per_person,
-            $tour->registration_deadline?->format('M d, Y'),
-            $tour->max_capacity,
-            $tour->status,
-            $tour->createdBy?->name,
-            $tour->created_at?->format('M d, Y H:i'),
-        ];
+        return Tour::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'tours';
+    }
+
+    public static function relationships(): array
+    {
+        return ['createdBy'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'place' => $record->place,
+            'tour_date' => $record->tour_date?->format('M d, Y'),
+            'start_time' => $record->start_time?->format('H:i'),
+            'cost_per_person' => $record->cost_per_person,
+            'registration_deadline' => $record->registration_deadline?->format('M d, Y'),
+            'max_capacity' => $record->max_capacity,
+            'status' => $record->status,
+            'created_by' => $record->createdBy?->name,
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

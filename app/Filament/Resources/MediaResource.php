@@ -116,15 +116,16 @@ class MediaResource extends BaseResource
                             ->enableOpen()
                             ->enableDownload()
                             ->maxFiles(10) // Limit to 10 files at once
-                            ->acceptedFileTypes(function (callable $get) {
-                                $type = $get('type');
-                                if ($type === 'Photo') {
-                                    return ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                                } elseif ($type === 'Video') {
-                                    return ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
-                                }
-                                return ['image/jpeg', 'image/png']; // fallback
-                            })
+                            ->acceptedFileTypes([
+                                'image/jpeg',
+                                'image/png',
+                                'image/gif',
+                                'image/webp',
+                                'video/mp4',
+                                'video/quicktime',
+                                'video/x-msvideo',
+                                'video/webm',
+                            ])
                             ->maxSize(function (callable $get) {
                                 return $get('type') === 'Photo' ? 20480 : 51200; // 20MB for photos, 37.5MB for videos
                             })

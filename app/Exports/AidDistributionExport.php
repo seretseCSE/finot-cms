@@ -3,52 +3,50 @@
 namespace App\Exports;
 
 use App\Models\AidDistribution;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class AidDistributionExport implements FromCollection, WithHeadings, WithMapping
+class AidDistributionExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = AidDistribution::with(['beneficiary', 'distributedBy'])->get();
-
-        ExportAuditService::log(
-            resourceType: 'aid_distributions',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/aid_distributions.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Beneficiary',
-            'Distribution Date',
-            'Aid Type',
-            'Amount (ETB)',
-            'Distributed By',
-            'Receipt Number',
-            'Locked',
-            'Created At',
+            'beneficiary' => 'Beneficiary',
+            'distribution_date' => 'Distribution Date',
+            'aid_type' => 'Aid Type',
+            'amount' => 'Amount (ETB)',
+            'distributed_by' => 'Distributed By',
+            'receipt_number' => 'Receipt Number',
+            'is_locked' => 'Locked',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($distribution): array
+    public static function modelClass(): string
     {
-        return [
-            $distribution->beneficiary?->name,
-            $distribution->distribution_date?->format('M d, Y'),
-            $distribution->aid_type,
-            $distribution->amount,
-            $distribution->distributedBy?->name,
-            $distribution->receipt_number,
-            $distribution->is_locked ? 'Yes' : 'No',
-            $distribution->created_at?->format('M d, Y H:i'),
-        ];
+        return AidDistribution::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'aid_distributions';
+    }
+
+    public static function relationships(): array
+    {
+        return ['beneficiary', 'distributedBy'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'beneficiary' => $record->beneficiary?->name ?? $record->beneficiary?->full_name,
+            'distribution_date' => $record->distribution_date?->format('M d, Y'),
+            'aid_type' => $record->aid_type,
+            'amount' => $record->amount,
+            'distributed_by' => $record->distributedBy?->name,
+            'receipt_number' => $record->receipt_number,
+            'is_locked' => $record->is_locked ? 'Yes' : 'No',
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

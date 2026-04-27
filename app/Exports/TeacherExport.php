@@ -3,48 +3,46 @@
 namespace App\Exports;
 
 use App\Models\Teacher;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class TeacherExport implements FromCollection, WithHeadings, WithMapping
+class TeacherExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = Teacher::all();
-
-        ExportAuditService::log(
-            resourceType: 'teachers',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/teachers.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Name',
-            'Phone',
-            'Email',
-            'Specialization',
-            'Active',
-            'Created At',
+            'full_name' => 'Name',
+            'phone' => 'Phone',
+            'email' => 'Email',
+            'specialization' => 'Specialization',
+            'is_active' => 'Active',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($teacher): array
+    public static function modelClass(): string
     {
-        return [
-            $teacher->full_name,
-            $teacher->phone,
-            $teacher->email,
-            $teacher->specialization,
-            $teacher->is_active ? 'Yes' : 'No',
-            $teacher->created_at?->format('M d, Y H:i'),
-        ];
+        return Teacher::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'teachers';
+    }
+
+    public static function relationships(): array
+    {
+        return [];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'full_name' => $record->full_name,
+            'phone' => $record->phone,
+            'email' => $record->email,
+            'specialization' => $record->specialization,
+            'is_active' => $record->is_active ? 'Yes' : 'No',
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }

@@ -3,50 +3,48 @@
 namespace App\Exports;
 
 use App\Models\User;
-use App\Services\ExportAuditService;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 
-class UserExport implements FromCollection, WithHeadings, WithMapping
+class UserExport extends BaseExport
 {
-    public function collection()
-    {
-        $records = User::with('roles')->get();
-
-        ExportAuditService::log(
-            resourceType: 'users',
-            format: 'xlsx',
-            recordCount: $records->count(),
-            filePath: 'exports/users.xlsx',
-        );
-
-        return $records;
-    }
-
-    public function headings(): array
+    public static function availableColumns(): array
     {
         return [
-            'Name',
-            'Email',
-            'Phone',
-            'Roles',
-            'Active',
-            'Last Login',
-            'Created At',
+            'name' => 'Name',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'roles' => 'Roles',
+            'is_active' => 'Active',
+            'last_login_at' => 'Last Login',
+            'created_at' => 'Created At',
         ];
     }
 
-    public function map($user): array
+    public static function modelClass(): string
     {
-        return [
-            $user->name,
-            $user->email,
-            $user->phone,
-            $user->roles->pluck('name')->implode(', '),
-            $user->is_active ? 'Yes' : 'No',
-            $user->last_login_at?->format('M d, Y H:i'),
-            $user->created_at?->format('M d, Y H:i'),
-        ];
+        return User::class;
+    }
+
+    public static function resourceType(): string
+    {
+        return 'users';
+    }
+
+    public static function relationships(): array
+    {
+        return ['roles'];
+    }
+
+    protected function resolveColumn($record, string $column): mixed
+    {
+        return match ($column) {
+            'name' => $record->name,
+            'email' => $record->email,
+            'phone' => $record->phone,
+            'roles' => $record->roles->pluck('name')->implode(', '),
+            'is_active' => $record->is_active ? 'Yes' : 'No',
+            'last_login_at' => $record->last_login_at?->format('M d, Y H:i'),
+            'created_at' => $record->created_at?->format('M d, Y H:i'),
+            default => '',
+        };
     }
 }
