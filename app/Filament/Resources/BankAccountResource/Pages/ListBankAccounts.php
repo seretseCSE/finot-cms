@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BankAccountResource\Pages;
 
 use App\Filament\Resources\BankAccountResource;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListBankAccounts extends ListRecords
@@ -12,7 +13,7 @@ class ListBankAccounts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\CreateAction::make(),
+            Actions\CreateAction::make(),
         ];
     }
 }

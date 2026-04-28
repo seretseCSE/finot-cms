@@ -1,0 +1,43 @@
+{
+  "_vendor-C0Zqfgkc.js": {
+    "file": "assets/vendor-C0Zqfgkc.js",
+    "name": "vendor"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-DDbYwgvs.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/admin.js": {
+    "file": "assets/admin-DA6Oz-K-.js",
+    "name": "admin",
+    "src": "resources/js/admin.js",
+    "isEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_vendor-C0Zqfgkc.js"
+    ],
+    "dynamicImports": [
+      "resources/js/pwa-tour.js"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-O-pZlwva.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-C0Zqfgkc.js"
+    ]
+  },
+  "resources/js/pwa-tour.js": {
+    "file": "assets/admin-tour-ZvKes2yH.js",
+    "name": "admin-tour",
+    "src": "resources/js/pwa-tour.js",
+    "isDynamicEntry": true
+  }
+}

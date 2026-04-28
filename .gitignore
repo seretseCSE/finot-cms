@@ -62,7 +62,6 @@ yarn-error.log*
 lerna-debug.log*
 
 # Build outputs
-/public/build
 /public/hot
 
 # Cache and logs
