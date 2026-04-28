@@ -83,6 +83,7 @@ class MediaController extends Controller
                 fn ($q) => $q->where('title', $mediaItem->title)
             )
             ->orderBy('created_at')
+            ->limit(12)
             ->get();
 
         return view('public.media-show', compact('mediaItem', 'relatedMedia', 'groupKey'));

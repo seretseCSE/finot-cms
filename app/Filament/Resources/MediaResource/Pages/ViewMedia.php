@@ -20,6 +20,7 @@ class ViewMedia extends ViewRecord
         $groupKey = $record->event_album ?: $record->title;
 
         $relatedMedia = \App\Models\MediaItem::query()
+            ->applyVisibilityRestrictions()
             ->when(
                 $record->event_album,
                 fn ($q) => $q->where('event_album', $record->event_album),

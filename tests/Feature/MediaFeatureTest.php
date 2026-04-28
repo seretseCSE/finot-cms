@@ -86,8 +86,8 @@ class MediaFeatureTest extends TestCase
         $response = $this->get('/media');
 
         $response->assertStatus(200);
-        $response->assertViewHas('mediaItems', function ($items) {
-            return $items->count() <= 15;
+        $response->assertViewHas('mediaGroups', function ($groups) {
+            return $groups->count() <= 12;
         });
     }
 }
