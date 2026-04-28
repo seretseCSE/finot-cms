@@ -18,8 +18,7 @@ return new class () extends Migration {
             $table->integer('file_size_kb');
             $table->string('event_album', 255)->nullable();
             $table->text('tags')->nullable();
-            $table->enum('visibility', ['Public', 'Members Only', 'Department Only'])->default('Public');
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
+            $table->enum('visibility', ['Public', 'Hidden'])->default('Public');
             $table->foreignId('uploaded_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
@@ -29,7 +28,6 @@ return new class () extends Migration {
             $table->index('category_id');
             $table->index('subcategory_id');
             $table->index('visibility');
-            $table->index('department_id');
             $table->index('uploaded_by');
             $table->index('created_at');
         });

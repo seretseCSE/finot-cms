@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Department;
 use App\Models\MediaCategory;
 use App\Models\MediaItem;
 use App\Models\MediaSubcategory;
@@ -32,8 +31,7 @@ class MediaItemFactory extends Factory
                 : $this->faker->numberBetween(1000, 50000),
             'event_album' => $this->faker->optional(0.3)->words(2, true),
             'tags' => implode(',', $this->faker->words(3)),
-            'visibility' => $this->faker->randomElement(['Public', 'Members Only', 'Department Only']),
-            'department_id' => Department::factory(),
+            'visibility' => $this->faker->randomElement(['Public', 'Hidden']),
             'uploaded_by' => User::factory(),
         ];
     }
@@ -63,17 +61,10 @@ class MediaItemFactory extends Factory
         ]);
     }
 
-    public function membersOnly(): static
+    public function hidden(): static
     {
         return $this->state(fn (array $attributes) => [
-            'visibility' => 'Members Only',
-        ]);
-    }
-
-    public function departmentOnly(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'visibility' => 'Department Only',
+            'visibility' => 'Hidden',
         ]);
     }
 }

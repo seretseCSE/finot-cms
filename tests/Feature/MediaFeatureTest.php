@@ -16,15 +16,13 @@ class MediaFeatureTest extends TestCase
     public function media_index_shows_public_media_items(): void
     {
         MediaItem::factory()->public()->create(['title' => 'Public Photo']);
-        MediaItem::factory()->membersOnly()->create(['title' => 'Members Only Photo']);
-        MediaItem::factory()->departmentOnly()->create(['title' => 'Department Photo']);
+        MediaItem::factory()->hidden()->create(['title' => 'Hidden Photo']);
 
         $response = $this->get('/media');
 
         $response->assertStatus(200);
         $response->assertSee('Public Photo');
-        $response->assertDontSee('Members Only Photo');
-        $response->assertDontSee('Department Photo');
+        $response->assertDontSee('Hidden Photo');
     }
 
     #[Test]

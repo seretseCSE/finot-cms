@@ -24,7 +24,6 @@ class MediaItem extends BaseModel
         'event_album',
         'tags',
         'visibility',
-        'department_id',
         'uploaded_by',
     ];
 
@@ -54,11 +53,6 @@ class MediaItem extends BaseModel
     public function subcategory(): BelongsTo
     {
         return $this->belongsTo(MediaSubcategory::class);
-    }
-
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class);
     }
 
     public function uploadedBy()
