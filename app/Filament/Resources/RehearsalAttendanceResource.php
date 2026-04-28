@@ -75,7 +75,7 @@ class RehearsalAttendanceResource extends Resource
 
                         Select::make('member_id')
                             ->label('Member')
-                            ->options(Member::query()->whereIn('status', ['Active', 'Member'])->pluck('full_name', 'id'))
+                            ->options(Member::query()->whereIn('status', ['Active', 'Member'])->get()->pluck('full_name', 'id'))
                             ->searchable()
                             ->preload()
                             ->required(),

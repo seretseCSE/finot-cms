@@ -87,9 +87,7 @@ class RegisterTourPassenger
             Storage::disk('public')->makeDirectory($directory);
         }
 
-        $file->storeAs($directory, $filename, 'public');
-
-        return $filename;
+        return $file->storeAs($directory, $filename, 'public');
     }
 
     /**

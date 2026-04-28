@@ -8,6 +8,10 @@
      1.  HERO — Song Header
      ═══════════════════════════════════════════════════════ --}}
 <section style="position:relative;padding:140px 24px 80px;background:var(--dark-950);overflow:hidden;">
+    {{-- Subcategory hero image --}}
+    @if($song->subcategory && $song->subcategory->image_url)
+        <div style="position:absolute;inset:-10% 0;background:url('{{ $song->subcategory->image_url }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
+    @endif
     <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,10,28,.98) 0%,rgba(26,68,247,.1) 50%,rgba(5,10,28,.98) 100%);"></div>
     <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
 
@@ -16,7 +20,7 @@
         <h1 class="display sr" style="font-size:clamp(2rem,4vw,3.2rem);margin-bottom:24px;line-height:1.2;color:var(--text-hero);">
             {{ $song->title }}
         </h1>
-        
+
         <div class="sr" style="display:flex;align-items:center;justify-content:center;gap:20px;font-size:.85rem;color:var(--parchment-40);">
             @if($song->artist)
                 <div style="display:flex;align-items:center;gap:8px;color:var(--gold);">
@@ -28,6 +32,12 @@
                 <div style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.2);"></div>
                 <div style="display:flex;align-items:center;gap:8px;">
                     <span style="color:var(--blue-400);">{{ $song->category->name }}</span>
+                </div>
+            @endif
+            @if($song->subcategory)
+                <div style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.2);"></div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="color:var(--parchment-40);">{{ $song->subcategory->name }}</span>
                 </div>
             @endif
         </div>

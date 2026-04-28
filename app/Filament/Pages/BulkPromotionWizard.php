@@ -133,7 +133,7 @@ class BulkPromotionWizard extends Page implements HasTable
 
                                     return Member::whereHas('educationHistory', function ($query) use ($classId) {
                                         $query->where('class_id', $classId);
-                                    })->pluck('full_name', 'id');
+                                    })->get()->pluck('full_name', 'id');
                                 })
                                 ->columns(3)
                                 ->hidden(fn (callable $get) => $get('promote_all')),
@@ -173,12 +173,12 @@ class BulkPromotionWizard extends Page implements HasTable
                                     if ($promoteAll) {
                                         return Member::whereHas('educationHistory', function ($query) use ($get) {
                                             $query->where('class_id', $get('from_class_id'));
-                                        })->pluck('full_name')->toArray();
+                                        })->get()->pluck('full_name')->toArray();
                                     }
 
                                     $selectedIds = $get('selected_students') ?? [];
 
-                                    return Member::whereIn('id', $selectedIds)->pluck('full_name')->toArray();
+                                    return Member::whereIn('id', $selectedIds)->get()->pluck('full_name')->toArray();
                                 }),
                         ]),
 

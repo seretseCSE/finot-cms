@@ -139,8 +139,7 @@ class TourController extends Controller
                 Storage::disk('public')->makeDirectory($directory);
             }
 
-            $file->storeAs($directory, $filename, 'public');
-            $receiptImage = $filename;
+            $receiptImage = $file->storeAs($directory, $filename, 'public');
         }
 
         // Generate passenger codes

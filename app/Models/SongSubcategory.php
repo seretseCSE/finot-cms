@@ -16,6 +16,7 @@ class SongSubcategory extends BaseModel
         'category_id',
         'name',
         'description',
+        'image',
         'display_order',
         'status',
         'created_by',
@@ -52,6 +53,18 @@ class SongSubcategory extends BaseModel
     public function songs(): HasMany
     {
         return $this->hasMany(Song::class, 'subcategory_id');
+    }
+
+    /**
+     * Get image URL
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image) {
+            return null;
+        }
+
+        return asset('storage/song-subcategories/' . $this->image);
     }
 
     public function activeSongs(): HasMany

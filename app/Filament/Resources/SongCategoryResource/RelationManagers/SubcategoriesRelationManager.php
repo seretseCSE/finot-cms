@@ -5,8 +5,10 @@ namespace App\Filament\Resources\SongCategoryResource\RelationManagers;
 use Filament\Actions;
 use Filament\Schemas\Schema;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 
 class SubcategoriesRelationManager extends RelationManager
@@ -26,6 +28,14 @@ class SubcategoriesRelationManager extends RelationManager
                 Forms\Components\Textarea::make('description')
                     ->label('Description')
                     ->rows(3),
+
+                FileUpload::make('image')
+                    ->label('Image')
+                    ->image()
+                    ->disk('public')
+                    ->directory('song-subcategories')
+                    ->maxSize(2048)
+                    ->nullable(),
 
                 Forms\Components\TextInput::make('display_order')
                     ->label('Display Order')
@@ -53,6 +63,13 @@ class SubcategoriesRelationManager extends RelationManager
                     ->label('Order')
                     ->sortable()
                     ->alignCenter(),
+
+                ImageColumn::make('image')
+                    ->label('Image')
+                    ->disk('public')
+                    ->size(48)
+                    ->circular()
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Subcategory Name')

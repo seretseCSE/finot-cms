@@ -94,8 +94,13 @@ class TourPassenger extends BaseModel
      */
     public function getReceiptUrlAttribute(): ?string
     {
-        if (!$this->receipt_image) {
+        if (! $this->receipt_image) {
             return null;
+        }
+
+        // Handle both old format (just filename) and new format (full path)
+        if (str_starts_with($this->receipt_image, 'receipts/tours/')) {
+            return asset('storage/' . $this->receipt_image);
         }
 
         return asset('storage/receipts/tours/' . $this->tour_id . '/' . $this->receipt_image);

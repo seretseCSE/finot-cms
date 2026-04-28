@@ -84,7 +84,7 @@ class StudentProgressReport extends Page
 
                         return Member::whereHas('educationHistory', function ($query) use ($classId) {
                             $query->where('class_id', $classId);
-                        })->pluck('full_name', 'id');
+                        })->get()->pluck('full_name', 'id');
                     })
                     ->required(),
             ])

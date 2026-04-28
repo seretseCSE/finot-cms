@@ -89,7 +89,7 @@ class TourPassengerResource extends Resource
 
                         Select::make('member_id')
                             ->label('Member')
-                            ->options(Member::query()->whereIn('status', ['Active', 'Member'])->pluck('full_name', 'id'))
+                            ->options(Member::query()->whereIn('status', ['Active', 'Member'])->get()->pluck('full_name', 'id'))
                             ->searchable()
                             ->preload()
                             ->nullable()
@@ -142,6 +142,19 @@ class TourPassengerResource extends Resource
                             ->image()
                             ->disk('public')
                             ->directory(fn (callable $get) => 'receipts/tours/'.$get('tour_id'))
+                            ->formatStateUsing(function ($state, $record) {
+                                if (! $state) {
+                                    return null;
+                                }
+
+                                // If already a full path, return as-is
+                                if (str_starts_with($state, 'receipts/tours/')) {
+                                    return $state;
+                                }
+
+                                // Backward compatibility: old records stored only the filename
+                                return 'receipts/tours/'.($record?->tour_id ?? '0').'/'.$state;
+                            })
                             ->maxSize(5120)
                             ->nullable(),
 

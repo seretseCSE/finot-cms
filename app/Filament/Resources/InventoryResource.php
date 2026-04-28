@@ -261,7 +261,6 @@ class InventoryResource extends Resource
             'index' => Pages\ListInventory::route('/'),
             'create' => Pages\CreateInventory::route('/create'),
             'edit' => Pages\EditInventory::route('/{record}/edit'),
-            'analytics' => Pages\InventoryAnalytics::route('/analytics'),
         ];
     }
 }
