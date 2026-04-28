@@ -211,8 +211,6 @@ return [
         public_path('storage') => storage_path('app/public'),
         public_path('storage/songs-audio') => storage_path('app/songs-audio'),
         public_path('storage/songs-video') => storage_path('app/songs-video'),
-        public_path('storage/media/photos') => storage_path('app/media/photos'),
-        public_path('storage/media/videos') => storage_path('app/media/videos'),
     ],
 
 ];
