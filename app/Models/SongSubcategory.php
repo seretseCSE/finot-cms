@@ -64,7 +64,7 @@ class SongSubcategory extends BaseModel
             return null;
         }
 
-        return asset('storage/song-subcategories/' . $this->image);
+        return asset('storage/' . $this->image);
     }
 
     public function activeSongs(): HasMany

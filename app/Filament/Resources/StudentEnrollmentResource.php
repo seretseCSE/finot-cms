@@ -109,6 +109,7 @@ class StudentEnrollmentResource extends Resource
                 Forms\Components\Select::make('academic_year_id')
                     ->label('Academic Year')
                     ->options(fn () => $activeYear ? [$activeYear->id => $activeYear->name] : [])
+                    ->default(fn () => $activeYear?->id)
                     ->disabled()
                     ->dehydrated()
                     ->required(),
@@ -116,6 +117,7 @@ class StudentEnrollmentResource extends Resource
                 Forms\Components\TextInput::make('enrolled_date')
                     ->label('Enrolled Date')
                     ->type('date')
+                    ->default(now()->toDateString())
                     ->required(),
 
                 Forms\Components\Select::make('status')
@@ -125,7 +127,8 @@ class StudentEnrollmentResource extends Resource
                         'Completed' => 'Completed',
                         'Promoted' => 'Promoted',
                     ])
-                    ->disabled(),
+                    ->default('Enrolled')
+                    ->disabled()
             ]);
     }
 
