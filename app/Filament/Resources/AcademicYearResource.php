@@ -83,7 +83,8 @@ class AcademicYearResource extends Resource
 
                 EthiopianDatePicker::make('end_date')
                     ->label('End Date')
-                    ->required(),
+                    ->required()
+                    ->after('start_date'),
 
                 Select::make('status')
                     ->options([
@@ -91,6 +92,14 @@ class AcademicYearResource extends Resource
                         'Active' => 'Active',
                         'Deactivated' => 'Deactivated',
                     ]),
+
+                Select::make('phase')
+                    ->options([
+                        'upcoming' => 'Upcoming',
+                        'current' => 'Current',
+                        'completed' => 'Completed',
+                    ])
+                    ->helperText('Only one year can be Current and one Upcoming at a time.'),
             ]);
     }
 
@@ -105,6 +114,12 @@ class AcademicYearResource extends Resource
                         'gray' => 'Draft',
                         'success' => 'Active',
                         'danger' => 'Deactivated',
+                    ]),
+                Tables\Columns\BadgeColumn::make('phase')
+                    ->colors([
+                        'warning' => 'upcoming',
+                        'success' => 'current',
+                        'gray' => 'completed',
                     ]),
                 Tables\Columns\TextColumn::make('start_date')
                     ->formatStateUsing(fn ($state) => $state ? app(EthiopianDateHelper::class)->toString($state) : ''),
@@ -136,6 +151,7 @@ class AcademicYearResource extends Resource
                             if ($active) {
                                 $active->update([
                                     'status' => 'Deactivated',
+                                    'phase' => 'completed',
                                     'deactivated_at' => now(),
                                     'deactivated_by' => Auth::id(),
                                 ]);
@@ -150,6 +166,7 @@ class AcademicYearResource extends Resource
 
                             $thisYear->update([
                                 'status' => 'Active',
+                                'phase' => 'current',
                                 'activated_at' => now(),
                                 'activated_by' => Auth::id(),
                             ]);
@@ -178,6 +195,7 @@ class AcademicYearResource extends Resource
                         DB::transaction(function () use ($record): void {
                             $record->update([
                                 'status' => 'Deactivated',
+                                'phase' => 'completed',
                                 'deactivated_at' => now(),
                                 'deactivated_by' => Auth::id(),
                             ]);
@@ -206,7 +224,7 @@ class AcademicYearResource extends Resource
                     ->color('warning')
                     ->visible(fn (AcademicYear $record): bool => $record->status === 'Deactivated' && Auth::user()?->hasRole(['admin', 'superadmin']))
                     ->requiresConfirmation()
-                    ->action(fn (AcademicYear $record) => $record->update(['status' => 'Draft'])),
+                    ->action(fn (AcademicYear $record) => $record->update(['status' => 'Draft', 'phase' => null])),
             ])
             ->defaultSort('start_date', 'desc');
     }

@@ -65,9 +65,9 @@ class GlobalChurchSettings extends Page implements HasForms
         ]);
     }
 
-    public function form(Schema $schema): Schemas\Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->components([
                 \Filament\Schemas\Components\Section::make('Church Information')
                     ->description('Basic church information and contact details')

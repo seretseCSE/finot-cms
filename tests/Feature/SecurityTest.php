@@ -104,16 +104,6 @@ class SecurityTest extends TestCase
     }
 
     #[Test]
-    public function emergency_tools_accessible_to_superadmin(): void
-    {
-        $user = $this->createSuperadminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/emergency-tools');
-        $response->assertStatus(200);
-    }
-
-    #[Test]
     public function password_change_endpoint_exists(): void
     {
         $user = User::factory()->create([

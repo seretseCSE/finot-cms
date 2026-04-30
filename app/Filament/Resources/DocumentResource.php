@@ -338,7 +338,8 @@ class DocumentResource extends Resource
                             ->native(false),
                         Forms\Components\DatePicker::make('to')
                             ->label('To')
-                            ->native(false),
+                            ->native(false)
+                            ->afterOrEqual('from'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

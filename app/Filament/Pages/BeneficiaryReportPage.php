@@ -56,7 +56,7 @@ class BeneficiaryReportPage extends Page
         ]);
     }
 
-    public function form(Schema $schema): Schemas\Form
+    public function form(Schema $schema): Schema
     {
         return $schema->components($this->getFormSchema())
             ->statePath('data');

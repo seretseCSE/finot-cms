@@ -21,6 +21,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\MenuItem;
 use App\Filament\Pages\EditProfile;
 use App\Filament\Pages\ManageActiveSessions;
+use App\Http\Middleware\TrackUserSessions;
+use App\Http\Middleware\SessionTimeoutMiddleware;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -51,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()
-                    ->label('Edit Profile')
+                    ->label('Profile')
                     ->icon('heroicon-o-user-circle')
                     ->url(fn (): string => EditProfile::getUrl()),
                 'sessions' => MenuItem::make()
@@ -75,6 +77,8 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                TrackUserSessions::class,
+                SessionTimeoutMiddleware::class,
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,

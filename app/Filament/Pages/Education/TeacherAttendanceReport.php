@@ -46,7 +46,7 @@ class TeacherAttendanceReport extends Page implements HasTable
         ]);
     }
 
-    public function form(Schema $schema): Schemas\Form
+    public function form(Schema $schema): Schema
     {
         return $schema->components([
                 \Filament\Forms\Components\Select::make('academic_year_id')
@@ -141,9 +141,13 @@ class TeacherAttendanceReport extends Page implements HasTable
 
     protected function getTableQuery(): Builder
     {
-        $filters = $this->form->getState();
+        try {
+            $filters = $this->form->getState();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return Teacher::query()->whereRaw('1 = 0');
+        }
 
-        $activeYear = AcademicYear::where('is_active', true)->first();
+        $activeYear = AcademicYear::where('status', 'Active')->first();
 
         $query = Teacher::query()
             ->where('status', 'Active')

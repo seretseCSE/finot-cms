@@ -113,22 +113,6 @@ class ForceLogoutTest extends TestCase
     }
 
     /**
-     * Test emergency tools page is accessible only for superadmin.
-     */
-    public function test_emergency_tools_page_access(): void
-    {
-        // Test superadmin access
-        $superadmin = $this->createSuperadminUser();
-        $response = $this->actingAs($superadmin)->get('/admin/emergency-tools');
-        $response->assertStatus(200);
-
-        // Test admin denial
-        $admin = $this->createAdminUser();
-        $response = $this->actingAs($admin)->get('/admin/emergency-tools');
-        $response->assertStatus(403);
-    }
-
-    /**
      * Test individual user logout by admin.
      */
     public function test_admin_can_logout_individual_user(): void
@@ -177,30 +161,6 @@ class ForceLogoutTest extends TestCase
 
         // Should trigger logout of all sessions
         $this->assertEquals(0, UserSession::where('user_id', $user->id)->where('is_active', true)->count());
-    }
-
-    /**
-     * Test force logout via EmergencyTools page.
-     */
-    public function test_force_logout_via_emergency_tools(): void
-    {
-        $user = $this->createSuperadminUser();
-
-        // Create sessions
-        $this->createUserSessions(3);
-
-        // Access emergency tools and perform action
-        $response = $this->actingAs($user)
-            ->get('/admin/emergency-tools');
-
-        $response->assertStatus(200);
-        $response->assertSee('Force Logout');
-
-        // Perform the force logout action
-        $response = $this->actingAs($user)
-            ->post('/admin/emergency/force-logout-all');
-
-        $response->assertSessionHas('success');
     }
 
     /**

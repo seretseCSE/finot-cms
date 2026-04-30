@@ -40,8 +40,17 @@ class Announcement extends BaseModel
         parent::boot();
 
         static::creating(function (Announcement $announcement) {
-            if (auth()->check() && !$announcement->created_by) {
+            if (auth()->check() && ! $announcement->created_by) {
                 $announcement->created_by = auth()->id();
+            }
+        });
+
+        static::saving(function (Announcement $announcement) {
+            if ($announcement->start_date && $announcement->end_date && $announcement->end_date < $announcement->start_date) {
+                throw new \Illuminate\Validation\ValidationException(
+                    validator()->make([], []),
+                    new \Illuminate\Support\MessageBag(['end_date' => 'End date must be on or after the start date.'])
+                );
             }
         });
     }

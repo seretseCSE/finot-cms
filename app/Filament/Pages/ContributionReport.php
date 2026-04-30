@@ -96,7 +96,8 @@ class ContributionReport extends Page
                     ->label('Start Date'),
 
                 DatePicker::make('end_date')
-                    ->label('End Date'),
+                    ->label('End Date')
+                    ->afterOrEqual('start_date'),
             ])
             ->columns(4);
     }

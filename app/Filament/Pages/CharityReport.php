@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\AidDistribution;
 use App\Models\Beneficiary;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -84,12 +85,39 @@ class CharityReport extends Page
             'monthly_trend' => AidDistribution::query()
                 ->when($this->date_from, fn ($q) => $q->whereDate('distribution_date', '>=', $this->date_from))
                 ->when($this->date_to, fn ($q) => $q->whereDate('distribution_date', '<=', $this->date_to))
-                ->select(DB::raw('DATE_FORMAT(distribution_date, "%Y-%m") as month'), DB::raw('count(*) as count'), DB::raw('sum(amount) as total'))
+                ->select(DB::raw(match (DB::getDriverName()) {
+                    'sqlite' => "strftime('%Y-%m', distribution_date) as month",
+                    default => "DATE_FORMAT(distribution_date, '%Y-%m') as month",
+                }), DB::raw('count(*) as count'), DB::raw('sum(amount) as total'))
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get()
                 ->mapWithKeys(fn ($item) => [$item->month => ['count' => $item->count, 'total' => $item->total]])
                 ->toArray(),
         ];
+    }
+
+    public function updatedDateTo($value): void
+    {
+        if ($this->date_from && $value && $value < $this->date_from) {
+            $this->date_to = $this->date_from;
+            Notification::make()
+                ->title('Invalid date range')
+                ->body('The end date must be on or after the start date.')
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function updatedDateFrom($value): void
+    {
+        if ($value && $this->date_to && $this->date_to < $value) {
+            $this->date_to = $value;
+            Notification::make()
+                ->title('Invalid date range')
+                ->body('The end date must be on or after the start date.')
+                ->danger()
+                ->send();
+        }
     }
 }

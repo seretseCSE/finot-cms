@@ -36,7 +36,7 @@ class ContributionMatrix extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Contribution Matrix';
+        return 'Contribution';
     }
 
     public static function getSlug(?Panel $panel = null): string

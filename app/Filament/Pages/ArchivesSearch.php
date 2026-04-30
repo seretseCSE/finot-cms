@@ -87,7 +87,8 @@ class ArchivesSearch extends Page implements HasForms
 
                 DatePicker::make('date_to')
                     ->label('To Date')
-                    ->native(false),
+                    ->native(false)
+                    ->afterOrEqual('date_from'),
             ])
             ->columns(4);
     }

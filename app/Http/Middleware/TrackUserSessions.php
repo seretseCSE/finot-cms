@@ -25,6 +25,9 @@ class TrackUserSessions
             $user = Auth::user();
             $sessionToken = session()->getId();
 
+            // Store session token in session for current session identification
+            session(['session_token' => $sessionToken]);
+
             // Get or create user session record
             $userSession = UserSession::where('session_token', $sessionToken)
                 ->where('user_id', $user->id)

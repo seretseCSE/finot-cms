@@ -79,6 +79,19 @@ class BlogPost extends BaseModel
         return $this->belongsTo(User::class, 'author_id');
     }
 
+    public function comments()
+    {
+        return $this->hasMany(BlogComment::class, 'blog_post_id')
+            ->whereNull('parent_id')
+            ->where('is_approved', true)
+            ->orderBy('created_at', 'desc');
+    }
+
+    public function allComments()
+    {
+        return $this->hasMany(BlogComment::class, 'blog_post_id')->orderBy('created_at', 'desc');
+    }
+
     /**
      * Get formatted publish date in Ethiopian
      */

@@ -14,6 +14,7 @@ class AcademicYear extends Model
         'start_date',
         'end_date',
         'status',
+        'phase',
         'activated_at',
         'deactivated_at',
         'reactivated_at',
@@ -108,6 +109,38 @@ class AcademicYear extends Model
     }
 
     /**
+     * Scope to get the current phase academic year.
+     */
+    public function scopeCurrent($query)
+    {
+        return $query->where('phase', 'current');
+    }
+
+    /**
+     * Scope to get the upcoming phase academic year.
+     */
+    public function scopeUpcoming($query)
+    {
+        return $query->where('phase', 'upcoming');
+    }
+
+    /**
+     * Scope to get completed phase academic years.
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->where('phase', 'completed');
+    }
+
+    /**
+     * Get the next (upcoming) academic year.
+     */
+    public static function nextYear(): ?self
+    {
+        return static::upcoming()->first();
+    }
+
+    /**
      * Boot the model and add validation.
      */
     protected static function boot(): void
@@ -121,6 +154,31 @@ class AcademicYear extends Model
                     throw new \Illuminate\Validation\ValidationException(
                         validator()->make([], []),
                         new \Illuminate\Support\MessageBag(['end_date' => 'End date must be after start date.'])
+                    );
+                }
+            }
+
+            // Ensure only one current and one upcoming phase exist
+            if ($academicYear->phase === 'current') {
+                $existing = static::where('id', '!=', $academicYear->id)
+                    ->where('phase', 'current')
+                    ->first();
+                if ($existing) {
+                    throw new \Illuminate\Validation\ValidationException(
+                        validator()->make([], []),
+                        new \Illuminate\Support\MessageBag(['phase' => "Only one academic year can be 'current'. Existing: {$existing->name}"])
+                    );
+                }
+            }
+
+            if ($academicYear->phase === 'upcoming') {
+                $existing = static::where('id', '!=', $academicYear->id)
+                    ->where('phase', 'upcoming')
+                    ->first();
+                if ($existing) {
+                    throw new \Illuminate\Validation\ValidationException(
+                        validator()->make([], []),
+                        new \Illuminate\Support\MessageBag(['phase' => "Only one academic year can be 'upcoming'. Existing: {$existing->name}"])
                     );
                 }
             }

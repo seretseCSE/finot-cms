@@ -20,7 +20,6 @@ class AuthorizationTest extends TestCase
         $this->get('/admin/users')->assertStatus(200);
         $this->get('/admin/contributions')->assertStatus(200);
         $this->get('/admin/tours')->assertStatus(200);
-        $this->get('/admin/super-admin-dashboard')->assertStatus(200);
     }
 
     #[Test]
@@ -32,15 +31,6 @@ class AuthorizationTest extends TestCase
         $this->get('/admin/members')->assertStatus(200);
         $this->get('/admin/users')->assertStatus(200);
         $this->get('/admin/contributions')->assertStatus(200);
-    }
-
-    #[Test]
-    public function admin_cannot_access_superadmin_only_pages(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $this->get('/admin/super-admin-dashboard')->assertStatus(403);
     }
 
     #[Test]

@@ -14,23 +14,31 @@ return new class () extends Migration {
             // SQLite: recreate the table since it doesn't support MODIFY or dropping columns easily
             $this->recreateMediaItemsTableForSqlite();
         } else {
-            // MySQL/PostgreSQL: alter the enum and drop the column
-            // Step 1: Expand the enum to include all old values plus Hidden
-            DB::statement("ALTER TABLE media_items MODIFY visibility ENUM('Public', 'Members Only', 'Department Only', 'Hidden') NOT NULL DEFAULT 'Public'");
+            // MySQL/PostgreSQL: alter the enum and drop the column (if they still exist)
 
-            // Step 2: Migrate existing non-Public visibility values to Hidden
-            DB::table('media_items')
-                ->whereIn('visibility', ['Members Only', 'Department Only'])
-                ->update(['visibility' => 'Hidden']);
+            // Step 1: Expand the enum to include all old values plus Hidden (no-op if already up to date)
+            $currentEnum = DB::selectOne("SHOW COLUMNS FROM media_items WHERE Field = 'visibility'");
+            if ($currentEnum && str_contains($currentEnum->Type, 'Members Only')) {
+                DB::statement("ALTER TABLE media_items MODIFY visibility ENUM('Public', 'Members Only', 'Department Only', 'Hidden') NOT NULL DEFAULT 'Public'");
 
-            // Step 3: Reduce the enum to only Public/Hidden
-            DB::statement("ALTER TABLE media_items MODIFY visibility ENUM('Public', 'Hidden') NOT NULL DEFAULT 'Public'");
+                // Step 2: Migrate existing non-Public visibility values to Hidden
+                DB::table('media_items')
+                    ->whereIn('visibility', ['Members Only', 'Department Only'])
+                    ->update(['visibility' => 'Hidden']);
 
-            // Step 4: Drop the department_id foreign key and column
-            Schema::table('media_items', function (Blueprint $table) {
-                $table->dropForeign(['department_id']);
-                $table->dropColumn('department_id');
-            });
+                // Step 3: Reduce the enum to only Public/Hidden
+                DB::statement("ALTER TABLE media_items MODIFY visibility ENUM('Public', 'Hidden') NOT NULL DEFAULT 'Public'");
+            }
+
+            // Step 4: Drop the department_id foreign key and column (if they still exist)
+            if (Schema::hasColumn('media_items', 'department_id')) {
+                Schema::table('media_items', function (Blueprint $table) {
+                    if (Schema::hasColumn('media_items', 'department_id')) {
+                        $table->dropForeign(['department_id']);
+                        $table->dropColumn('department_id');
+                    }
+                });
+            }
         }
     }
 

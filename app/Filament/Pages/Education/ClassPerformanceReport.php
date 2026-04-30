@@ -31,7 +31,11 @@ class ClassPerformanceReport extends Page
         return 3;
     }
 
-    public ?array $filters = [];
+    public ?int $academic_year_id = null;
+
+    public ?int $class_id = null;
+
+    public ?array $reportData = null;
 
     public static function canAccess(array $parameters = []): bool
     {
@@ -40,10 +44,8 @@ class ClassPerformanceReport extends Page
 
     public function mount(): void
     {
-        $this->form->fill([
-            'academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
-            'class_id' => null,
-        ]);
+        $this->academic_year_id = AcademicYear::where('status', 'Active')->first()?->id;
+        $this->class_id = null;
     }
 
     public function form(Schema $schema): Schema
@@ -51,54 +53,44 @@ class ClassPerformanceReport extends Page
         return $schema->components([
                 Forms\Components\Select::make('academic_year_id')
                     ->label('Academic Year')
-                    ->options(AcademicYear::pluck('name', 'id'))
-                    ->required()
-                    ->reactive()
+                    ->options(fn () => AcademicYear::query()->orderByDesc('start_date')->pluck('name', 'id')->all())
+                    ->live()
                     ->afterStateUpdated(fn ($state, callable $set) => $set('class_id', null)),
 
                 Forms\Components\Select::make('class_id')
                     ->label('Class')
-                    ->options(function (callable $get) {
-                        $yearId = $get('academic_year_id');
-                        if (!$yearId) {
-                            return [];
-                        }
-
-                        return ClassModel::whereHas('attendanceSessions', function ($query) use ($yearId) {
-                            $query->where('academic_year_id', $yearId);
-                        })
-                            ->get()
-                            ->mapWithKeys(fn ($class) => [$class->id => $class->name]);
-                    })
-                    ->required(),
+                    ->options(fn () => ClassModel::query()->orderBy('name')->pluck('name', 'id')->all())
+                    ->live(),
             ])
             ->columns(2);
     }
 
-    public function getClassPerformanceData(): array
+    public function generateClassReport(): void
     {
-        $filters = $this->form->getState();
-
-        if (!$filters['class_id']) {
-            return [];
+        if (! $this->class_id || ! $this->academic_year_id) {
+            $this->reportData = null;
+            return;
         }
 
-        $class = ClassModel::with(['subject', 'academicYear', 'teacher'])
-            ->findOrFail($filters['class_id']);
+        $class = ClassModel::find($this->class_id);
 
-        // Get all students in this class
-        $students = Member::whereHas('educationHistory', function ($query) use ($filters) {
-            $query->where('class_id', $filters['class_id'])
-                  ->where('academic_year_id', $filters['academic_year_id']);
+        if (! $class) {
+            $this->reportData = null;
+            return;
+        }
+
+        $students = Member::whereHas('studentEnrollments', function ($query) {
+            $query->where('class_id', $this->class_id)
+                  ->where('academic_year_id', $this->academic_year_id)
+                  ->where('status', 'Enrolled');
         })->get();
 
-        // Calculate attendance data for each student
         $studentAttendance = [];
         foreach ($students as $student) {
             $attendance = Attendance::where('member_id', $student->id)
-                ->whereHas('session', function ($query) use ($filters) {
-                    $query->where('class_id', $filters['class_id'])
-                          ->where('academic_year_id', $filters['academic_year_id']);
+                ->whereHas('session', function ($query) {
+                    $query->where('class_id', $this->class_id)
+                          ->where('academic_year_id', $this->academic_year_id);
                 })
                 ->get();
 
@@ -115,13 +107,12 @@ class ClassPerformanceReport extends Page
             ];
         }
 
-        // Calculate test performance
         $studentTests = [];
         foreach ($students as $student) {
             $testResults = TestResult::where('member_id', $student->id)
-                ->whereHas('test', function ($query) use ($filters) {
-                    $query->where('class_id', $filters['class_id'])
-                          ->where('academic_year_id', $filters['academic_year_id']);
+                ->whereHas('test', function ($query) {
+                    $query->where('class_id', $this->class_id)
+                          ->where('academic_year_id', $this->academic_year_id);
                 })
                 ->with('test')
                 ->get();
@@ -140,7 +131,6 @@ class ClassPerformanceReport extends Page
             ];
         }
 
-        // Class-level statistics
         $allAttendanceRates = collect($studentAttendance)->pluck('attendance_rate');
         $allTestScores = collect($studentTests)->pluck('average_score');
 
@@ -154,7 +144,6 @@ class ClassPerformanceReport extends Page
             'lowest_test_score' => $allTestScores->min() ?? 0,
         ];
 
-        // Performance distribution
         $attendanceDistribution = [
             'excellent' => collect($studentAttendance)->where('attendance_rate', '>=', 90)->count(),
             'good' => collect($studentAttendance)->where('attendance_rate', '>=', 75)->where('attendance_rate', '<', 90)->count(),
@@ -169,7 +158,7 @@ class ClassPerformanceReport extends Page
             'poor' => collect($studentTests)->where('average_score', '<', 70)->count(),
         ];
 
-        return [
+        $this->reportData = [
             'class' => $class,
             'students' => $students,
             'student_attendance' => $studentAttendance,
@@ -182,9 +171,10 @@ class ClassPerformanceReport extends Page
 
     public function exportClassReport()
     {
-        $data = $this->getClassPerformanceData();
+        if (! $this->reportData) {
+            $this->generateClassReport();
+        }
 
-        // Implementation for Excel export
-        return response()->json($data);
+        return response()->json($this->reportData);
     }
 }

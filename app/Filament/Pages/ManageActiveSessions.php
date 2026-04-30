@@ -100,7 +100,7 @@ class ManageActiveSessions extends Page implements HasTable
                 Actions\Action::make('refresh')
                     ->label('Refresh')
                     ->icon('heroicon-o-arrow-path')
-                    ->action('refreshTable'),
+                    ->action(fn () => $this->resetTable()),
             ])
             ->poll('30s');
     }

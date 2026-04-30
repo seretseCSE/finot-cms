@@ -154,7 +154,8 @@ class AidDistributionResource extends Resource
                         Forms\Components\DatePicker::make('from')
                             ->label('From'),
                         Forms\Components\DatePicker::make('until')
-                            ->label('Until'),
+                            ->label('Until')
+                            ->afterOrEqual('from'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

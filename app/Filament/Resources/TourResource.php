@@ -180,7 +180,8 @@ class TourResource extends BaseResource
                         Forms\Components\DatePicker::make('start_date')
                             ->label('Start Date'),
                         Forms\Components\DatePicker::make('end_date')
-                            ->label('End Date'),
+                            ->label('End Date')
+                            ->afterOrEqual('start_date'),
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         return $data['start_date'] && $data['end_date']

@@ -7,8 +7,10 @@ use Filament\Schemas\Schema;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\AcademicYear;
 use App\Models\ClassModel;
+use App\Models\Member;
 use App\Models\MemberGroup;
 use App\Models\StudentEnrollment;
+use App\Rules\EnrollmentUniquePerYear;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Get;
@@ -88,16 +90,39 @@ class StudentEnrollmentResource extends Resource
                     ->preload()
                     ->options(function (Get $get): array {
                         $groupId = $get('group_id');
+                        $activeYear = AcademicYear::query()->where('status', 'Active')->first();
 
-                        return \App\Models\Member::withoutDepartmentScope()
+                        if (! $activeYear) {
+                            return [];
+                        }
+
+                        $alreadyEnrolled = StudentEnrollment::query()
+                            ->where('academic_year_id', $activeYear->id)
+                            ->where('status', 'Enrolled')
+                            ->pluck('member_id')
+                            ->toArray();
+
+                        return Member::withoutDepartmentScope()
                             ->whereIn('status', ['Active', 'Member'])
                             ->when($groupId, fn ($q) => $q->whereHas('groupAssignments', fn ($g) => $g->where('member_group_assignments.group_id', $groupId)->whereNull('effective_to')))
+                            ->whereNotIn('id', $alreadyEnrolled)
                             ->orderBy('first_name')
                             ->get()
                             ->mapWithKeys(fn ($m) => [$m->id => $m->full_name.' ('.$m->member_code.')'])
                             ->all();
                     })
-                    ->required(),
+                    ->required()
+                    ->rules(function (?StudentEnrollment $record): array {
+                        $activeYear = AcademicYear::query()->where('status', 'Active')->first();
+
+                        if (! $activeYear) {
+                            return [];
+                        }
+
+                        return [
+                            new EnrollmentUniquePerYear($activeYear->id, $record?->id),
+                        ];
+                    }),
 
                 Forms\Components\Select::make('class_id')
                     ->label('Class')
@@ -177,7 +202,8 @@ class StudentEnrollmentResource extends Resource
                         'Withdrawn' => 'Withdrawn',
                         'Completed' => 'Completed',
                         'Promoted' => 'Promoted',
-                    ]),
+                    ])
+                    ->default('Enrolled'),
                 Tables\Filters\SelectFilter::make('class_id')
                     ->label('Class')
                     ->options(fn () => ClassModel::query()->orderBy('name')->pluck('name', 'id')->all()),
@@ -263,23 +289,30 @@ class StudentEnrollmentResource extends Resource
                             ->maxLength(500),
                     ])
                     ->action(function (StudentEnrollment $record, array $data): void {
-                        $activeYear = AcademicYear::query()->where('status', 'Active')->first();
+                        $upcomingYear = AcademicYear::nextYear();
 
-                        if (! $activeYear || $activeYear->status !== 'Active') {
-                            Notification::make()->title('No active academic year')->danger()->send();
-
-                            return;
-                        }
-
-                        if ($record->academic_year_id !== $activeYear->id) {
-                            Notification::make()->title('Cannot promote outside active academic year')->danger()->send();
+                        if (! $upcomingYear) {
+                            Notification::make()->title('No upcoming academic year found')->danger()->body('Please create and set an academic year as Upcoming before promoting students.')->send();
 
                             return;
                         }
 
                         $targetClassId = (int) $data['target_class_id'];
 
-                        DB::transaction(function () use ($record, $targetClassId, $activeYear, $data): void {
+                        // Validate student is not already enrolled in the upcoming year
+                        $alreadyEnrolled = StudentEnrollment::query()
+                            ->where('member_id', $record->member_id)
+                            ->where('academic_year_id', $upcomingYear->id)
+                            ->where('status', 'Enrolled')
+                            ->exists();
+
+                        if ($alreadyEnrolled) {
+                            Notification::make()->title('Already enrolled in upcoming year')->danger()->body('This student already has an active enrollment in the upcoming academic year.')->send();
+
+                            return;
+                        }
+
+                        DB::transaction(function () use ($record, $targetClassId, $upcomingYear, $data): void {
                             $fromClassId = $record->class_id;
 
                             $record->update([
@@ -291,11 +324,13 @@ class StudentEnrollmentResource extends Resource
                             $new = StudentEnrollment::create([
                                 'member_id' => $record->member_id,
                                 'class_id' => $targetClassId,
-                                'academic_year_id' => $activeYear->id,
+                                'academic_year_id' => $upcomingYear->id,
                                 'enrolled_date' => now()->toDateString(),
                                 'status' => 'Enrolled',
                                 'enrolled_by' => Auth::id(),
                             ]);
+
+                            $record->update(['promoted_to_enrollment_id' => $new->getKey()]);
 
                             \Log::channel('audit')->warning('Tier 2 Audit Log', [
                                 'tier' => 2,
@@ -303,7 +338,7 @@ class StudentEnrollmentResource extends Resource
                                 'entity' => 'student_enrollment',
                                 'enrollment_id' => $record->getKey(),
                                 'member_id' => $record->member_id,
-                                'academic_year_id' => $activeYear->id,
+                                'academic_year_id' => $upcomingYear->id,
                                 'old_value' => [
                                     'from_class' => $fromClassId,
                                 ],
@@ -330,7 +365,64 @@ class StudentEnrollmentResource extends Resource
                             ]);
                         });
 
-                        Notification::make()->title('Student promoted')->success()->send();
+                        Notification::make()->title('Student promoted to upcoming year')->success()->send();
+                    }),
+
+                Actions\Action::make('undo_promotion')
+                    ->label('Undo Promotion')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('gray')
+                    ->visible(fn (StudentEnrollment $record): bool => $record->status === 'Promoted' && $record->promoted_to_enrollment_id !== null)
+                    ->requiresConfirmation()
+                    ->action(function (StudentEnrollment $record): void {
+                        DB::transaction(function () use ($record): void {
+                            $newEnrollment = StudentEnrollment::find($record->promoted_to_enrollment_id);
+
+                            if ($newEnrollment) {
+                                $newEnrollment->delete();
+                            }
+
+                            $record->update([
+                                'status' => 'Enrolled',
+                                'completion_date' => null,
+                                'completed_by' => null,
+                                'promoted_to_enrollment_id' => null,
+                            ]);
+
+                            \Log::channel('audit')->warning('Tier 2 Audit Log', [
+                                'tier' => 2,
+                                'action' => 'promotion_undone',
+                                'entity' => 'student_enrollment',
+                                'enrollment_id' => $record->getKey(),
+                                'member_id' => $record->member_id,
+                                'performed_by' => Auth::id(),
+                                'timestamp' => now()->toDateTimeString(),
+                            ]);
+                        });
+
+                        Notification::make()->title('Promotion undone')->success()->send();
+                    }),
+
+                Actions\Action::make('cancel_enrollment')
+                    ->label('Cancel Enrollment')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->visible(fn (StudentEnrollment $record): bool => $record->status === 'Enrolled')
+                    ->requiresConfirmation()
+                    ->action(function (StudentEnrollment $record): void {
+                        $record->delete();
+
+                        \Log::channel('audit')->warning('Tier 2 Audit Log', [
+                            'tier' => 2,
+                            'action' => 'enrollment_cancelled',
+                            'entity' => 'student_enrollment',
+                            'enrollment_id' => $record->getKey(),
+                            'member_id' => $record->member_id,
+                            'performed_by' => Auth::id(),
+                            'timestamp' => now()->toDateTimeString(),
+                        ]);
+
+                        Notification::make()->title('Enrollment cancelled')->success()->send();
                     }),
             ])
             ->bulkActions([
@@ -356,10 +448,10 @@ class StudentEnrollmentResource extends Resource
                                 ->maxLength(500),
                         ])
                         ->action(function ($records, array $data): void {
-                            $activeYear = AcademicYear::query()->where('status', 'Active')->first();
+                            $upcomingYear = AcademicYear::nextYear();
 
-                            if (! $activeYear || $activeYear->status !== 'Active') {
-                                Notification::make()->title('No active academic year')->danger()->send();
+                            if (! $upcomingYear) {
+                                Notification::make()->title('No upcoming academic year found')->danger()->body('Please create and set an academic year as Upcoming before promoting students.')->send();
 
                                 return;
                             }
@@ -367,11 +459,24 @@ class StudentEnrollmentResource extends Resource
                             $targetClassId = (int) $data['target_class_id'];
                             $promotedCount = 0;
                             $skippedCount = 0;
+                            $alreadyEnrolledCount = 0;
 
-                            DB::transaction(function () use ($records, $targetClassId, $activeYear, $data, &$promotedCount, &$skippedCount): void {
+                            DB::transaction(function () use ($records, $targetClassId, $upcomingYear, $data, &$promotedCount, &$skippedCount, &$alreadyEnrolledCount): void {
                                 foreach ($records as $record) {
                                     if ($record->status !== 'Enrolled' || $record->class_id === $targetClassId) {
                                         $skippedCount++;
+
+                                        continue;
+                                    }
+
+                                    $alreadyEnrolled = StudentEnrollment::query()
+                                        ->where('member_id', $record->member_id)
+                                        ->where('academic_year_id', $upcomingYear->id)
+                                        ->where('status', 'Enrolled')
+                                        ->exists();
+
+                                    if ($alreadyEnrolled) {
+                                        $alreadyEnrolledCount++;
 
                                         continue;
                                     }
@@ -384,14 +489,16 @@ class StudentEnrollmentResource extends Resource
                                         'completed_by' => Auth::id(),
                                     ]);
 
-                                    StudentEnrollment::create([
+                                    $new = StudentEnrollment::create([
                                         'member_id' => $record->member_id,
                                         'class_id' => $targetClassId,
-                                        'academic_year_id' => $activeYear->id,
+                                        'academic_year_id' => $upcomingYear->id,
                                         'enrolled_date' => now()->toDateString(),
                                         'status' => 'Enrolled',
                                         'enrolled_by' => Auth::id(),
                                     ]);
+
+                                    $record->update(['promoted_to_enrollment_id' => $new->getKey()]);
 
                                     \Log::channel('audit')->warning('Tier 2 Audit Log', [
                                         'tier' => 2,
@@ -399,7 +506,7 @@ class StudentEnrollmentResource extends Resource
                                         'entity' => 'student_enrollment',
                                         'enrollment_id' => $record->getKey(),
                                         'member_id' => $record->member_id,
-                                        'academic_year_id' => $activeYear->id,
+                                        'academic_year_id' => $upcomingYear->id,
                                         'old_value' => [
                                             'from_class' => $fromClassId,
                                         ],
@@ -415,10 +522,15 @@ class StudentEnrollmentResource extends Resource
                                 }
                             });
 
-                            Notification::make()
-                                ->title("{$promotedCount} students promoted, {$skippedCount} skipped")
-                                ->success()
-                                ->send();
+                            $message = "{$promotedCount} students promoted";
+                            if ($skippedCount > 0) {
+                                $message .= ", {$skippedCount} skipped";
+                            }
+                            if ($alreadyEnrolledCount > 0) {
+                                $message .= ", {$alreadyEnrolledCount} already enrolled in upcoming year";
+                            }
+
+                            Notification::make()->title($message)->success()->send();
                         }),
 
                     Actions\DeleteBulkAction::make(),

@@ -1,37 +1,30 @@
 <x-filament-panels::page>
     <div class="space-y-6">
-        <!-- Filters Form -->
+        <!-- Filters -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold mb-4">Class Selection</h3>
-            <form wire:submit.prevent="generateClassReport">
-                {{ $this->form }}
-                <div class="mt-4">
-                    <x-filament::button type="submit" wire:loading.attr="disabled">
-                        <x-filament::loading-indicator class="mr-2" />
-                        Generate Class Report
-                    </x-filament::button>
-                </div>
-            </form>
+            {{ $this->form }}
+            <div class="mt-4">
+                <x-filament::button wire:click="generateClassReport">
+                    Generate Class Report
+                </x-filament::button>
+            </div>
         </div>
 
-        @if($this->getClassPerformanceData())
+        @if($this->reportData)
             @php
-                $data = $this->getClassPerformanceData();
+                $data = $this->reportData;
             @endphp
 
             <!-- Class Header -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-900">{{ $data['class']->subject->name }} - {{ $data['class']->name }}</h2>
-                        <p class="text-gray-600">{{ $data['class']->academicYear->name }}</p>
-                        @if($data['class']->teacher)
-                            <p class="text-sm text-gray-500">Teacher: {{ $data['class']->teacher->full_name }}</p>
-                        @endif
+                        <h2 class="text-2xl font-bold text-gray-900">{{ $data['class']->name }}</h2>
                     </div>
                     <div class="text-right">
                         <x-filament::button wire:click="exportClassReport">
-                            <x-filament::icon icon="heroicono-document-arrow-down" class="w-4 h-4 mr-2" />
+                            <x-filament::icon icon="heroicon-m-document-arrow-down" class="w-4 h-4 mr-2" />
                             Export Report
                         </x-filament::button>
                     </div>
@@ -67,7 +60,7 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 bg-purple-100 rounded-lg p-3">
-                            <x-filament::icon icon="heroicono-chart-bar" class="w-6 h-6 text-purple-600" />
+                            <x-filament::icon icon="heroicon-o-chart-bar" class="w-6 h-6 text-purple-600" />
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Avg Test Score</p>
@@ -79,7 +72,7 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 bg-yellow-100 rounded-lg p-3">
-                            <x-filament::icon icon="heroicono-trophy" class="w-6 h-6 text-yellow-600" />
+                            <x-filament::icon icon="heroicon-o-trophy" class="w-6 h-6 text-yellow-600" />
                         </div>
                         <div class="ml-4">
                             <p class="text-sm text-gray-600">Highest Score</p>
@@ -196,7 +189,7 @@
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                    <x-filament::icon icon="heroicono-user" class="w-5 h-5 text-gray-500" />
+                                                    <x-filament::icon icon="heroicon-o-user" class="w-5 h-5 text-gray-500" />
                                                 </div>
                                             </div>
                                             <div class="ml-4">

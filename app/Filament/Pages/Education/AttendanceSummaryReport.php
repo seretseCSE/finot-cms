@@ -107,6 +107,7 @@ class AttendanceSummaryReport extends Page
                 Forms\Components\DatePicker::make('end_date')
                     ->label('End Date')
                     ->reactive()
+                    ->afterOrEqual('start_date')
                     ->afterStateUpdated(function () {
                         $this->updateReportData();
                     }),

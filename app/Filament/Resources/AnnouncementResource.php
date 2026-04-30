@@ -120,7 +120,8 @@ class AnnouncementResource extends Resource
                         Forms\Components\DatePicker::make('end_date')
                             ->label('End Date')
                             ->helperText('Leave empty for ongoing announcement')
-                            ->native(false),
+                            ->native(false)
+                            ->afterOrEqual('start_date'),
 
                         Forms\Components\Toggle::make('is_urgent')
                             ->label('Is Urgent')
@@ -207,7 +208,8 @@ class AnnouncementResource extends Resource
                             ->native(false),
                         Forms\Components\DatePicker::make('end_date')
                             ->label('End Date')
-                            ->native(false),
+                            ->native(false)
+                            ->afterOrEqual('start_date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $data['start_date'] && $data['end_date']

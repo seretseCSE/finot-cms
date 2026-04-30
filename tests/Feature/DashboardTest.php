@@ -19,14 +19,6 @@ class DashboardTest extends TestCase
     }
 
     #[Test]
-    public function superadmin_can_access_super_admin_dashboard(): void
-    {
-        $user = $this->createSuperadminUser();
-        $response = $this->actingAs($user)->get('/admin/super-admin-dashboard');
-        $response->assertStatus(200);
-    }
-
-    #[Test]
     public function finance_head_sees_financial_widgets(): void
     {
         $user = $this->createFinanceHeadUser();

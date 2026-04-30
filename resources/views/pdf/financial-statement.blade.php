@@ -5,316 +5,366 @@
     <title>Financial Statement - {{ $data['period_description'] }}</title>
     <style>
         @page {
-            size: A4;
-            orientation: landscape;
-            margin: 20mm 20mm 20mm 20mm;
+            size: A4 portrait;
+            margin: 15mm 15mm 15mm 15mm;
         }
-        
+
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            font-size: 12px;
-            line-height: 1.4;
-            color: #333;
-        }
-        
-        .header {
-            margin-bottom: 30px;
-            border-bottom: 2px solid #4472C4;
-            padding-bottom: 15px;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            width: 80px;
-            height: 80px;
-        }
-        
-        .title-section {
-            text-align: center;
-            flex: 1;
-        }
-        
-        .title-section h1 {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4472C4;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #1a1a2e;
             margin: 0;
+            padding: 0;
         }
-        
-        .title-section h2 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #666;
-            margin: 5px 0;
-        }
-        
-        .church-info {
-            text-align: right;
-            font-size: 11px;
-            color: #666;
-        }
-        
-        .summary-section {
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #4472C4;
-        }
-        
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .summary-item {
-            text-align: center;
-        }
-        
-        .summary-label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        
-        .summary-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .table-section {
-            margin-bottom: 25px;
-        }
-        
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #4472C4;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
-        
-        table {
+
+        /* ── Header ──────────────────────────────────────────────── */
+        .header {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
-        
-        th {
-            background-color: #4472C4;
-            color: white;
-            padding: 8px;
+
+        .header-table { width: 100%; border-collapse: collapse; }
+        .header-table td { padding: 0; vertical-align: middle; border: none; background: none; }
+
+        .logo-cell { width: 70px; }
+        .logo-cell img { width: 60px; height: 60px; object-fit: contain; }
+
+        .title-cell { text-align: center; }
+        .title-cell h1 { font-size: 18px; font-weight: 700; color: #2563eb; margin: 0 0 2px; }
+        .title-cell h2 { font-size: 13px; font-weight: 600; color: #4b5563; margin: 0 0 4px; }
+        .title-cell p  { font-size: 11px; color: #6b7280; margin: 0; }
+
+        .meta-cell { text-align: right; width: 170px; font-size: 10px; color: #6b7280; line-height: 1.6; }
+        .meta-cell strong { color: #374151; }
+
+        /* ── Summary boxes ───────────────────────────────────────── */
+        .summary { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+
+        .summary td {
+            width: 25%;
+            text-align: center;
+            padding: 10px 6px;
+            border: 1px solid #e5e7eb;
+            background: #f8faff;
+            vertical-align: middle;
+        }
+
+        .box-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            margin-bottom: 3px;
+        }
+
+        .box-value        { font-size: 15px; font-weight: 700; color: #1e3a8a; }
+        .box-value.green  { color: #15803d; }
+        .box-value.orange { color: #c2410c; }
+        .box-value.count  { color: #374151; font-size: 17px; }
+
+        /* ── Section titles ──────────────────────────────────────── */
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2563eb;
+            border-bottom: 1px solid #bfdbfe;
+            padding-bottom: 4px;
+            margin: 16px 0 8px;
+        }
+
+        /* ── Data tables ─────────────────────────────────────────── */
+        table.data { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 10px; }
+
+        table.data thead th {
+            background-color: #2563eb;
+            color: #fff;
+            padding: 6px 8px;
             text-align: left;
             font-weight: 600;
-            font-size: 11px;
-        }
-        
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            font-size: 11px;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .amount {
-            text-align: right;
-            font-weight: 600;
-        }
-        
-        .footer {
-            margin-top: 40px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
             font-size: 10px;
-            color: #666;
-            text-align: center;
         }
-        
-        .footer-left {
-            float: left;
+
+        table.data tbody td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151;
         }
-        
-        .footer-right {
-            float: right;
+
+        table.data tbody tr:nth-child(even) td { background-color: #f9fafb; }
+
+        .text-right  { text-align: right; }
+        .text-center { text-align: center; }
+        .fw-600      { font-weight: 600; }
+        .color-red   { color: #dc2626; }
+
+        /* ── Footer ──────────────────────────────────────────────── */
+        .footer {
+            margin-top: 24px;
+            padding-top: 8px;
+            border-top: 1px solid #d1d5db;
         }
-        
-        .ethiopian-date {
-            font-weight: bold;
-            color: #4472C4;
-        }
+
+        .footer-table { width: 100%; border-collapse: collapse; }
+        .footer-table td { border: none; background: none; padding: 0; vertical-align: top; font-size: 9px; color: #9ca3af; }
+        .footer-table strong { color: #6b7280; }
     </style>
 </head>
 <body>
-    <!-- Header with Church Logo and Information -->
+
+@php
+    // ── Safe helpers ──────────────────────────────────────────────────────────
+    // toEthiopian() may return an array ['year','month','day'] or [y,m,d] or a string.
+    // We normalise everything to a display string here, once, so every {{ }} below
+    // is guaranteed to receive a scalar value.
+    $ethDate = \App\Helpers\EthiopianDateHelper::toEthiopian($data['generated_at']);
+    if (is_array($ethDate)) {
+        $y = $ethDate['year']  ?? ($ethDate[0] ?? '');
+        $m = $ethDate['month'] ?? ($ethDate[1] ?? '');
+        $d = $ethDate['day']   ?? ($ethDate[2] ?? '');
+        $ethDateStr = "{$d}/{$m}/{$y}";
+    } else {
+        $ethDateStr = (string) $ethDate;
+    }
+
+    $footerText = $data['church_info']['footer_text'] ?? '';
+    if (is_array($footerText)) { $footerText = implode(' ', $footerText); }
+    $footerText = (string) $footerText;
+@endphp
+
+    {{-- ── Header ─────────────────────────────────────────────────────── --}}
     <div class="header">
-        <div class="header-content">
-            @if($data['church_info']['logo'])
-                <div class="logo">
-                    <img src="{{ asset('storage/' . $data['church_info']['logo']) }}" 
-                         alt="{{ $data['church_info']['name_en'] }}" 
-                         style="width: 100%; height: auto;">
-                </div>
-            @endif
-            
-            <div class="title-section">
-                <h1>{{ $data['church_info']['name_en'] }}</h1>
-                <h2>{{ $data['church_info']['name_am'] }}</h2>
-                <h3>Financial Statement</h3>
-                <p><strong>Period:</strong> {{ $data['period_description'] }}</p>
-                <p><strong>Ethiopian Period:</strong> <span class="ethiopian-date">{{ $data['ethiopian_period'] }}</span></p>
-            </div>
-            
-            <div class="church-info">
-                <p><strong>{{ $data['church_info']['name_en'] }}</strong></p>
-                <p>{{ $data['church_info']['address'] }}</p>
-                <p>{{ $data['church_info']['phone'] }}</p>
-                @if($data['church_info']['email'])
-                    <p>{{ $data['church_info']['email'] }}</p>
+        <table class="header-table">
+            <tr>
+                @if(!empty($data['church_info']['logo']))
+                    <td class="logo-cell">
+                        <img src="{{ public_path('storage/' . $data['church_info']['logo']) }}"
+                             alt="{{ $data['church_info']['name_en'] }}">
+                    </td>
                 @endif
-            </div>
-        </div>
+
+                <td class="title-cell">
+                    <h1>{{ $data['church_info']['name_en'] }}</h1>
+                    <h2>{{ $data['church_info']['name_am'] }}</h2>
+                    <p>
+                        Financial Statement &mdash;
+                        <strong>{{ $data['period_description'] }}</strong>
+                        &nbsp;|&nbsp;
+                        <span style="color:#2563eb;">{{ $data['ethiopian_period'] }}</span>
+                    </p>
+                </td>
+
+                <td class="meta-cell">
+                    @if(!empty($data['church_info']['address']))
+                        <div>{{ $data['church_info']['address'] }}</div>
+                    @endif
+                    @if(!empty($data['church_info']['phone']))
+                        <div><strong>Tel:</strong> {{ $data['church_info']['phone'] }}</div>
+                    @endif
+                    @if(!empty($data['church_info']['email']))
+                        <div>{{ $data['church_info']['email'] }}</div>
+                    @endif
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <!-- Summary Section -->
-    <div class="summary-section">
-        <div class="summary-grid">
-            <div class="summary-item">
-                <div class="summary-label">Total Contributions</div>
-                <div class="summary-value">ETB {{ number_format($data['summary']['total_contributions'], 2) }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Total Donations</div>
-                <div class="summary-value">ETB {{ number_format($data['summary']['total_donations'], 2) }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Grand Total</div>
-                <div class="summary-value">ETB {{ number_format($data['summary']['grand_total'], 2) }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Outstanding</div>
-                <div class="summary-value">ETB {{ number_format($data['summary']['total_outstanding'], 2) }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Contributors</div>
-                <div class="summary-value">{{ $data['summary']['unique_contributors'] }}</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Donors</div>
-                <div class="summary-value">{{ $data['summary']['unique_donors'] }}</div>
-            </div>
-        </div>
-    </div>
+    {{-- ── Summary Boxes ───────────────────────────────────────────────── --}}
+    <table class="summary">
+        <tr>
+            <td>
+                <div class="box-label">Total Contributions</div>
+                <div class="box-value green">ETB {{ number_format($data['summary']['total_contributions'], 2) }}</div>
+            </td>
+            <td>
+                <div class="box-label">Total Donations</div>
+                <div class="box-value green">ETB {{ number_format($data['summary']['total_donations'], 2) }}</div>
+            </td>
+            <td>
+                <div class="box-label">Grand Total</div>
+                <div class="box-value">ETB {{ number_format($data['summary']['grand_total'], 2) }}</div>
+            </td>
+            <td>
+                <div class="box-label">Outstanding</div>
+                <div class="box-value orange">ETB {{ number_format($data['summary']['total_outstanding'], 2) }}</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="box-label">Contributions</div>
+                <div class="box-value count">{{ $data['summary']['contribution_count'] }}</div>
+            </td>
+            <td>
+                <div class="box-label">Donations</div>
+                <div class="box-value count">{{ $data['summary']['donation_count'] }}</div>
+            </td>
+            <td>
+                <div class="box-label">Unique Contributors</div>
+                <div class="box-value count">{{ $data['summary']['unique_contributors'] }}</div>
+            </td>
+            <td>
+                <div class="box-label">Unique Donors</div>
+                <div class="box-value count">{{ $data['summary']['unique_donors'] }}</div>
+            </td>
+        </tr>
+    </table>
 
-    <!-- Monthly/Quarterly Summary -->
-    @if(count($data['contributions_by_month']) > 1)
-    <div class="table-section">
-        <h3 class="section-title">Period Breakdown</h3>
-        <table>
+    {{-- ── Period Breakdown ────────────────────────────────────────────── --}}
+    @if(count($data['contributions_by_month']) > 0)
+        <div class="section-title">Period Breakdown</div>
+        <table class="data">
             <thead>
                 <tr>
                     <th>Period</th>
-                    <th>Contributions</th>
-                    <th>Donations</th>
-                    <th>Total</th>
-                    <th>Contributors</th>
-                    <th>Donors</th>
+                    <th class="text-right">Contributions (ETB)</th>
+                    <th class="text-right">Donations (ETB)</th>
+                    <th class="text-right">Total (ETB)</th>
+                    <th class="text-center"># Contributions</th>
+                    <th class="text-center"># Donations</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($data['contributions_by_month'] as $period)
-                <tr>
-                    <td>{{ $period['period'] }}</td>
-                    <td class="amount">ETB {{ number_format($period['contributions'], 2) }}</td>
-                    <td class="amount">ETB {{ number_format($period['donations'], 2) }}</td>
-                    <td class="amount">ETB {{ number_format($period['total'], 2) }}</td>
-                    <td>{{ $period['contribution_count'] }}</td>
-                    <td>{{ $period['donation_count'] }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ $period['period'] }}</td>
+                        <td class="text-right">{{ number_format($period['contributions'], 2) }}</td>
+                        <td class="text-right">{{ number_format($period['donations'], 2) }}</td>
+                        <td class="text-right fw-600">{{ number_format($period['total'], 2) }}</td>
+                        <td class="text-center">{{ $period['contribution_count'] }}</td>
+                        <td class="text-center">{{ $period['donation_count'] }}</td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
-    </div>
     @endif
 
-    <!-- Group Performance Summary -->
+    {{-- ── Group Performance ───────────────────────────────────────────── --}}
     @if(count($data['contributions_by_group']) > 0)
-    <div class="table-section">
-        <h3 class="section-title">Group Performance Summary</h3>
-        <table>
+        <div class="section-title">Group Performance Summary</div>
+        <table class="data">
             <thead>
                 <tr>
                     <th>Group</th>
-                    <th>Total Amount</th>
-                    <th>Contributions</th>
-                    <th>Average</th>
+                    <th class="text-right">Total Amount (ETB)</th>
+                    <th class="text-center">Contributions</th>
+                    <th class="text-right">Average (ETB)</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($data['contributions_by_group'] as $group)
-                <tr>
-                    <td>{{ $group['group_name'] }}</td>
-                    <td class="amount">ETB {{ number_format($group['total_amount'], 2) }}</td>
-                    <td>{{ $group['contribution_count'] }}</td>
-                    <td class="amount">ETB {{ number_format($group['average_amount'], 2) }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ $group['group_name'] }}</td>
+                        <td class="text-right fw-600">{{ number_format($group['total_amount'], 2) }}</td>
+                        <td class="text-center">{{ $group['contribution_count'] }}</td>
+                        <td class="text-right">{{ number_format($group['average_amount'], 2) }}</td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
-    </div>
     @endif
 
-    <!-- Outstanding Contributions -->
+    {{-- ── Contributions Detail ────────────────────────────────────────── --}}
+    @if($data['contributions']->count() > 0)
+        <div class="section-title">Contributions Detail</div>
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Member</th>
+                    <th>Group</th>
+                    <th>Month</th>
+                    <th>Payment Date</th>
+                    <th class="text-right">Amount (ETB)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data['contributions'] as $i => $contribution)
+                    <tr>
+                        <td class="text-center">{{ $i + 1 }}</td>
+                        <td>{{ $contribution->member->full_name ?? '—' }}</td>
+                        <td>{{ $contribution->member->currentGroupAssignment?->group?->name ?? '—' }}</td>
+                        <td>{{ $contribution->month_name ?? '—' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($contribution->payment_date)->format('d M Y') }}</td>
+                        <td class="text-right fw-600">{{ number_format($contribution->amount, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
+    {{-- ── Donations Detail ───────────────────────────────────────────── --}}
+    @if($data['donations']->count() > 0)
+        <div class="section-title">Donations Detail</div>
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Donor</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                    <th class="text-right">Amount (ETB)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data['donations'] as $i => $donation)
+                    <tr>
+                        <td class="text-center">{{ $i + 1 }}</td>
+                        <td>{{ $donation->donor_name ?? '—' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($donation->donation_date)->format('d M Y') }}</td>
+                        <td>{{ $donation->notes ?? '' }}</td>
+                        <td class="text-right fw-600">{{ number_format($donation->amount, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
+    {{-- ── Outstanding Contributions ──────────────────────────────────── --}}
     @if(count($data['outstanding_contributions']) > 0)
-    <div class="table-section">
-        <h3 class="section-title">Outstanding Contributions</h3>
-        <table>
+        <div class="section-title">Outstanding Contributions</div>
+        <table class="data">
             <thead>
                 <tr>
                     <th>Member</th>
                     <th>Month</th>
-                    <th>Expected</th>
-                    <th>Paid</th>
-                    <th>Outstanding</th>
+                    <th class="text-right">Expected (ETB)</th>
+                    <th class="text-right">Paid (ETB)</th>
+                    <th class="text-right">Outstanding (ETB)</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['outstanding_contributions'] as $outstanding)
-                <tr>
-                    <td>{{ $outstanding['member']->full_name }}</td>
-                    <td>{{ $outstanding['month'] }}</td>
-                    <td class="amount">ETB {{ number_format($outstanding['expected'], 2) }}</td>
-                    <td class="amount">ETB {{ number_format($outstanding['paid'], 2) }}</td>
-                    <td class="amount">ETB {{ number_format($outstanding['outstanding'], 2) }}</td>
-                </tr>
+                @foreach($data['outstanding_contributions'] as $item)
+                    <tr>
+                        <td>{{ $item['member']->full_name ?? '—' }}</td>
+                        <td>{{ $item['month'] }}</td>
+                        <td class="text-right">{{ number_format($item['expected'], 2) }}</td>
+                        <td class="text-right">{{ number_format($item['paid'], 2) }}</td>
+                        <td class="text-right fw-600 color-red">{{ number_format($item['outstanding'], 2) }}</td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
-    </div>
     @endif
 
-    <!-- Footer -->
+    {{-- ── Footer ─────────────────────────────────────────────────────── --}}
     <div class="footer">
-        <div class="footer-left">
-            <p><strong>Generated by:</strong> {{ $data['generated_by'] }}</p>
-            <p><strong>Generated on:</strong> {{ $data['generated_at']->format('Y-m-d H:i:s') }}</p>
-        </div>
-        <div class="footer-right">
-            <p><strong>Ethiopian Date:</strong> {{ \App\Helpers\EthiopianDateHelper::toEthiopian($data['generated_at']) }}</p>
-            <p>{{ $data['church_info']['footer_text'] }}</p>
-        </div>
-        <div style="clear: both;"></div>
+        <table class="footer-table">
+            <tr>
+                <td>
+                    <strong>Generated by:</strong> {{ $data['generated_by'] }}<br>
+                    <strong>Date:</strong> {{ $data['generated_at']->format('d M Y, H:i') }}
+                </td>
+                <td style="text-align:right;">
+                    <strong>Ethiopian Date:</strong> {{ $ethDateStr }}<br>
+                    {{ $footerText }}
+                </td>
+            </tr>
+        </table>
     </div>
+
 </body>
 </html>

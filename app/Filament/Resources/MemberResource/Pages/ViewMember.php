@@ -85,7 +85,8 @@ class ViewMember extends ViewRecord implements HasTable
                 Tables\Filters\Filter::make('date_range')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('from'),
-                        \Filament\Forms\Components\DatePicker::make('to'),
+                        \Filament\Forms\Components\DatePicker::make('to')
+                            ->afterOrEqual('from'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         $from = $data['from'] ?? null;

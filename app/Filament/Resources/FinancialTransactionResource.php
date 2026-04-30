@@ -240,7 +240,8 @@ class FinancialTransactionResource extends Resource
                         Forms\Components\DatePicker::make('from')
                             ->label('From Date'),
                         Forms\Components\DatePicker::make('until')
-                            ->label('Until Date'),
+                            ->label('Until Date')
+                            ->afterOrEqual('from'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

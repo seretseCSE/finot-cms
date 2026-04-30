@@ -33,17 +33,6 @@ class AdvancedAdminTest extends TestCase
     }
 
     #[Test]
-    public function superadmin_can_access_emergency_tools(): void
-    {
-        $user = $this->createSuperadminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/emergency-tools');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
     public function superadmin_can_access_backup_restore(): void
     {
         $user = $this->createSuperadminUser();
@@ -83,27 +72,6 @@ class AdvancedAdminTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->get('/admin/global-church-settings');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
-    public function admin_cannot_access_super_admin_dashboard(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/super-admin-dashboard');
-        $response->assertStatus(403);
-    }
-
-    #[Test]
-    public function superadmin_can_access_super_admin_dashboard(): void
-    {
-        $user = $this->createSuperadminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/super-admin-dashboard');
         $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
         $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
     }

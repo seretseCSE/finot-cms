@@ -5,7 +5,7 @@ namespace App\Filament\Forms\Components;
 use App\Models\CustomOption;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Group;
+use Filament\Schemas\Components\Group;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -137,7 +137,7 @@ class CustomOptionSelect extends Select
     /**
      * Convenience helper: renders Select + inline "Other" TextInput.
      *
-     * Returns a Filament\Forms\Components\Group (Filament 5).
+     * Returns a Filament\Schemas\Components\Group (Filament 5).
      *
      * @param  array<string, string>  $predefinedOptions
      */

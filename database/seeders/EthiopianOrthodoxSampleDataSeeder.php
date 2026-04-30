@@ -18,8 +18,6 @@ class EthiopianOrthodoxSampleDataSeeder extends Seeder
         // Get admin user for created_by
         $adminUser = User::where('email', 'admin@finotetsidik.org')->first();
         $userId = $adminUser ? $adminUser->id : User::first()->id;
-        $departmentId = 1;
-
         // ========== SONG CATEGORIES ==========
         $songCategories = [
             ['name' => 'Orthodox Hymns', 'description' => 'Traditional Ethiopian Orthodox Tewahedo Church hymns and mezmur.'],
@@ -304,7 +302,6 @@ class EthiopianOrthodoxSampleDataSeeder extends Seeder
                 array_merge($item, [
                     'subcategory_id' => null,
                     'file_size_kb' => $item['type'] === 'Photo' ? rand(500, 3000) : rand(5000, 25000),
-                    'department_id' => $departmentId,
                     'uploaded_by' => $userId,
                 ])
             );

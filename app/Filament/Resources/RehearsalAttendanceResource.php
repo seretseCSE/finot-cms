@@ -166,7 +166,8 @@ class RehearsalAttendanceResource extends Resource
                 Tables\Filters\Filter::make('date_range')
                     ->form([
                         Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
+                        Forms\Components\DatePicker::make('until')
+                            ->afterOrEqual('from'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

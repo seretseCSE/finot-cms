@@ -137,6 +137,10 @@ class Tour extends BaseModel
             return false;
         }
 
+        if ($this->is_full) {
+            return false;
+        }
+
         return true;
     }
 

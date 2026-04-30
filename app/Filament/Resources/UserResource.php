@@ -140,6 +140,7 @@ class UserResource extends Resource
                                     $query->where('name', '!=', 'superadmin');
                                 }
                             })
+                            ->saveRelationshipsUsing(fn () => null)
                             ->required()
                             ->preload()
                             ->searchable()
@@ -211,7 +212,6 @@ class UserResource extends Resource
                             ->label('Force Password Change on Next Login')
                             ->default(false)
                             ->helperText('User must change password on next login.')
-                            ->dehydrated(false)
                             ->visible(fn ($record) => $record !== null),
                     ])
                     ->columns(1),
@@ -398,7 +398,7 @@ class UserResource extends Resource
                     ->action(function (User $record): void {
                         $tempPassword = Str::password(12);
                         $record->update([
-                            'password' => Hash::make($tempPassword),
+                            'password' => $tempPassword,
                             'temp_password_changed' => false,
                         ]);
 

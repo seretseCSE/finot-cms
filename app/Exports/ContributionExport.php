@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Contribution;
+use Illuminate\Database\Eloquent\Builder;
 
 class ContributionExport extends BaseExport
 {
@@ -40,7 +41,7 @@ class ContributionExport extends BaseExport
         return ['member', 'academicYear', 'recordedBy'];
     }
 
-    protected function buildQuery()
+    protected function buildQuery(): Builder
     {
         $query = Contribution::with(static::relationships())
             ->orderBy('payment_date', 'desc');

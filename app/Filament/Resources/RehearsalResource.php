@@ -193,7 +193,8 @@ class RehearsalResource extends Resource
                             ->native(false),
                         Forms\Components\DatePicker::make('end_date')
                             ->label('End Date')
-                            ->native(false),
+                            ->native(false)
+                            ->afterOrEqual('start_date'),
                     ])
                     ->query(function ($query, array $data) {
                         return $data['start_date'] && $data['end_date']

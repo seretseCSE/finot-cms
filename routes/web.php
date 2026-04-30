@@ -35,6 +35,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SongController;
 
 // Apply rate limiting to all public routes (60 requests per minute)
@@ -47,6 +48,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/announcements/{id}', [AnnouncementController::class, 'show'])->name('announcements.show');
     Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+    Route::post('/blog/{slug}/comment', [BlogController::class, 'storeComment'])->name('blog.comment.store');
     Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
     Route::get('/songs/{id}', [SongController::class, 'show'])->name('songs.show');
     Route::get('/media', [MediaController::class, 'index'])->name('media');
@@ -67,6 +69,10 @@ Route::middleware('throttle:60,1')->group(function () {
 
     // Edit profile route
     Route::get('/admin/profile', [EditProfileController::class, '__invoke'])->name('admin.edit-profile');
+
+    // Shop routes
+    Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
+    Route::get('/shop/{slug}', [ProductController::class, 'show'])->name('shop.show');
 
     // Public tour routes
     Route::get('/tours', [TourController::class, 'index'])->name('tours.index');

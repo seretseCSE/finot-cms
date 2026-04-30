@@ -178,7 +178,8 @@ class FinancialAuditTrailPage extends Page implements HasForms, HasTable
                         \Filament\Forms\Components\DatePicker::make('start_date')
                             ->label('Start Date'),
                         \Filament\Forms\Components\DatePicker::make('end_date')
-                            ->label('End Date'),
+                            ->label('End Date')
+                            ->afterOrEqual('start_date'),
                     ])
                     ->query(function ($query, array $data) {
                         return $data['start_date'] && $data['end_date']

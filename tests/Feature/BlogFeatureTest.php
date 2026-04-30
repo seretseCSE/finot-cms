@@ -138,4 +138,77 @@ class BlogFeatureTest extends TestCase
 
         $this->assertEquals('timket-celebration-1', $post2->fresh()->slug);
     }
+
+    #[Test]
+    public function blog_show_displays_comments_section(): void
+    {
+        $post = BlogPost::factory()->published()->create([
+            'title' => 'Post With Comments',
+            'slug' => 'post-with-comments',
+        ]);
+
+        $response = $this->get('/blog/post-with-comments');
+
+        $response->assertStatus(200);
+        $response->assertSee('Comments');
+        $response->assertSee('Post Comment');
+    }
+
+    #[Test]
+    public function guest_can_post_comment_on_blog(): void
+    {
+        $post = BlogPost::factory()->published()->create([
+            'title' => 'Commentable Post',
+            'slug' => 'commentable-post',
+        ]);
+
+        $response = $this->post('/blog/commentable-post/comment', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'content' => 'This is a great post!',
+        ]);
+
+        $response->assertRedirect('/blog/commentable-post#comments');
+        $this->assertDatabaseHas('blog_comments', [
+            'blog_post_id' => $post->id,
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'content' => 'This is a great post!',
+            'is_approved' => true,
+        ]);
+    }
+
+    #[Test]
+    public function blog_comment_requires_name_email_and_content(): void
+    {
+        $post = BlogPost::factory()->published()->create([
+            'slug' => 'validation-post',
+        ]);
+
+        $response = $this->post('/blog/validation-post/comment', []);
+
+        $response->assertSessionHasErrors(['name', 'email', 'content']);
+    }
+
+    #[Test]
+    public function blog_show_displays_existing_comments(): void
+    {
+        $post = BlogPost::factory()->published()->create([
+            'title' => 'Post With Existing Comments',
+            'slug' => 'existing-comments',
+        ]);
+
+        $post->comments()->create([
+            'name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+            'content' => 'Amazing article!',
+            'is_approved' => true,
+        ]);
+
+        $response = $this->get('/blog/existing-comments');
+
+        $response->assertStatus(200);
+        $response->assertSee('Jane Doe');
+        $response->assertSee('Amazing article!');
+    }
 }

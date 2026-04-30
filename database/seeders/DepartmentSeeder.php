@@ -23,7 +23,6 @@ class DepartmentSeeder extends Seeder
             [
                 'name_en' => 'Internal Relations',
                 'name_am' => 'ውስጣዊ ግንኙነት',
-                'description' => 'Manages HR, AV, media, blog',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -31,7 +30,6 @@ class DepartmentSeeder extends Seeder
             [
                 'name_en' => 'Nibret ena Hisab',
                 'name_am' => 'ንብረትና ሂሳብ',
-                'description' => 'Finance and Inventory',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -39,7 +37,6 @@ class DepartmentSeeder extends Seeder
             [
                 'name_en' => 'Education',
                 'name_am' => 'ትምህርት',
-                'description' => 'Sunday school, classes, teachers',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -47,7 +44,6 @@ class DepartmentSeeder extends Seeder
             [
                 'name_en' => 'Revenue & Charity',
                 'name_am' => 'ልማትና በጎ አድራጎት',
-                'description' => 'Charity, Tours',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -55,7 +51,6 @@ class DepartmentSeeder extends Seeder
             [
                 'name_en' => 'Mezmur',
                 'name_am' => 'መዝሙር',
-                'description' => 'Worship/Choir',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -63,7 +58,6 @@ class DepartmentSeeder extends Seeder
             [
                 'name_en' => 'Foreign Affairs',
                 'name_am' => 'የውጭ ግንኙነት',
-                'description' => 'Generic department',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -71,7 +65,6 @@ class DepartmentSeeder extends Seeder
             [
                 'name_en' => 'Kinetibeb',
                 'name_am' => 'ኪነጥበብ',
-                'description' => 'Generic department',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),

@@ -82,7 +82,8 @@ class SyncConflictsResource extends Resource
                             ->required(),
                         Forms\Components\DatePicker::make('until')
                             ->label('Until')
-                            ->required(),
+                            ->required()
+                            ->afterOrEqual('from'),
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
                         $from = $data['from'] ?? null;

@@ -21,6 +21,7 @@ class StudentEnrollment extends BaseModel
         'withdrawal_notes',
         'enrolled_by',
         'completed_by',
+        'promoted_to_enrollment_id',
     ];
 
     protected $casts = [
@@ -51,5 +52,15 @@ class StudentEnrollment extends BaseModel
     public function completedBy()
     {
         return $this->belongsTo(User::class, 'completed_by');
+    }
+
+    public function promotedTo()
+    {
+        return $this->belongsTo(self::class, 'promoted_to_enrollment_id');
+    }
+
+    public function promotedFrom()
+    {
+        return $this->hasOne(self::class, 'promoted_to_enrollment_id');
     }
 }

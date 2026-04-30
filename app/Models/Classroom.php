@@ -37,7 +37,14 @@ class Classroom extends BaseModel
 
     public function members()
     {
-        return $this->hasMany(Member::class, 'class_id');
+        return $this->hasManyThrough(
+            Member::class,
+            StudentEnrollment::class,
+            'class_id',
+            'id',
+            'id',
+            'member_id'
+        )->where('student_enrollments.status', 'Enrolled');
     }
 
     public function attendanceSessions()

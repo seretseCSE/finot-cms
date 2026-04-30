@@ -37,6 +37,12 @@ class EditUser extends EditRecord
         $this->roles = $data['roles'] ?? [];
         unset($data['roles']);
 
+        // Map force password change to the database column
+        if (! empty($data['force_password_change'])) {
+            $data['temp_password_changed'] = false;
+        }
+        unset($data['force_password_change']);
+
         // If password is empty, remove it so it doesn't overwrite the existing password
         if (empty($data['password'])) {
             unset($data['password']);

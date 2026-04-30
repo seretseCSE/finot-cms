@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrackUserVisits::class,
             \App\Http\Middleware\ErrorLoggingMiddleware::class,
             \App\Http\Middleware\TrackUserSessions::class,
+            \App\Http\Middleware\SessionTimeoutMiddleware::class,
         ]);
 
         $middleware->alias([

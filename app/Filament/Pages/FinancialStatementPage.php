@@ -11,10 +11,7 @@ use App\Models\Member;
 use App\Models\SiteSetting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
-use Filament\Forms;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -47,155 +44,107 @@ class FinancialStatementPage extends Page
         return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
     }
 
-    public $periodType = 'monthly';
-
-    public $selectedYear = null;
-
-    public $selectedMonth = null;
-
-    public $selectedQuarter = null;
+    public string $periodType = 'monthly';
+    public int $selectedYear;
+    public int $selectedMonth;
+    public int $selectedQuarter;
 
     public function mount(): void
     {
-        $this->selectedYear = now()->year;
-        $this->selectedMonth = now()->month;
+        $activeYear = AcademicYear::where('status', 'Active')->first();
 
-        // Determine current quarter
-        $this->selectedQuarter = ceil(now()->month / 3);
+        $this->selectedYear    = $activeYear?->start_date?->year ?? now()->year;
+        $this->selectedMonth   = now()->month;
+        $this->selectedQuarter = (int) ceil(now()->month / 3);
     }
 
-    protected function getFormSchema(): array
+    // -------------------------------------------------------------------------
+    // Form actions
+    // -------------------------------------------------------------------------
+
+    public function resetForm(): void
     {
-        return [
-            Section::make('Statement Period')
-                ->schema([
-                    Grid::make(3)
-                        ->schema([
-                            Forms\Components\Select::make('periodType')
-                                ->label('Period Type')
-                                ->options([
-                                    'monthly' => 'Monthly',
-                                    'quarterly' => 'Quarterly',
-                                    'annual' => 'Annual',
-                                ])
-                                ->default('monthly')
-                                ->reactive()
-                                ->afterStateUpdated(fn ($state) => $this->updatePeriodFields($state)),
+        $activeYear = AcademicYear::where('status', 'Active')->first();
 
-                            Forms\Components\Select::make('selectedYear')
-                                ->label('Year')
-                                ->options(function () {
-                                    $years = [];
-                                    for ($year = now()->year - 5; $year <= now()->year + 1; $year++) {
-                                        $years[$year] = $year;
-                                    }
-
-                                    return $years;
-                                })
-                                ->default(now()->year)
-                                ->reactive(),
-
-                            Forms\Components\Placeholder::make('periodSelector')
-                                ->label('Period')
-                                ->content(function ($get) {
-                                    $periodType = $get('periodType');
-
-                                    if ($periodType === 'monthly') {
-                                        return Forms\Components\Select::make('selectedMonth')
-                                            ->label('Month')
-                                            ->options(EthiopianDateHelper::getMonthsForContribution())
-                                            ->default(now()->month);
-                                    } elseif ($periodType === 'quarterly') {
-                                        return Forms\Components\Select::make('selectedQuarter')
-                                            ->label('Quarter')
-                                            ->options([
-                                                1 => 'Q1 (Jan-Mar)', 2 => 'Q2 (Apr-Jun)',
-                                                3 => 'Q3 (Jul-Sep)', 4 => 'Q4 (Oct-Dec)',
-                                            ])
-                                            ->default(ceil(now()->month / 3));
-                                    }
-
-                                    return null;
-                                }),
-                        ]),
-                ]),
-        ];
-    }
-
-    public function updatePeriodFields($periodType): void
-    {
-        // This will trigger Livewire reactivity
-        // The actual field updates are handled in the placeholder content
+        $this->periodType      = 'monthly';
+        $this->selectedYear    = $activeYear?->start_date?->year ?? now()->year;
+        $this->selectedMonth   = now()->month;
+        $this->selectedQuarter = (int) ceil(now()->month / 3);
+        $this->resetErrorBag();
     }
 
     public function generateStatement(): void
     {
         $this->validate([
-            'periodType' => 'required|in:monthly,quarterly,annual',
-            'selectedYear' => 'required|integer|min:2020|max:'.(now()->year + 1),
-            'selectedMonth' => 'required_if:periodType,monthly|integer|min:1|max:12',
+            'periodType'      => 'required|in:monthly,quarterly,annual',
+            'selectedYear'    => 'required|integer|min:2020|max:' . (now()->year + 1),
+            'selectedMonth'   => 'required_if:periodType,monthly|integer|min:1|max:12',
             'selectedQuarter' => 'required_if:periodType,quarterly|integer|min:1|max:4',
         ]);
 
         try {
             $statementData = $this->generateStatementData();
-            $pdf = $this->generatePDF($statementData);
+            $pdf           = $this->generatePDF($statementData);
 
-            // Log to Tier-2 audit trail
             Log::channel('audit')->warning('Tier 2 Audit Log', [
-                'tier' => 2,
-                'action' => 'financial_statement_generated',
-                'period_type' => $this->periodType,
-                'period' => $this->getPeriodDescription(),
+                'tier'         => 2,
+                'action'       => 'financial_statement_generated',
+                'period_type'  => $this->periodType,
+                'period'       => $this->getPeriodDescription(),
                 'generated_by' => Auth::id(),
                 'record_count' => count($statementData['contributions']) + count($statementData['donations']),
-                'timestamp' => now()->toDateTimeString(),
+                'timestamp'    => now()->toDateTimeString(),
             ]);
 
-            // Download the PDF
-            response()->streamDownload(
-                $pdf->output(),
-                'financial-statement-'.$this->getPeriodDescription().'.pdf'
-            )->send();
+            $filename = 'financial-statement-' . $this->getPeriodDescription() . '.pdf';
+
+            session()->flash('message', 'Financial statement generated successfully.');
+
+            $this->dispatch('download-pdf', [
+                'content'  => base64_encode($pdf->output()),
+                'filename' => $filename,
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Financial statement generation failed', [
-                'error' => $e->getMessage(),
+                'error'       => $e->getMessage(),
                 'period_type' => $this->periodType,
-                'period' => $this->getPeriodDescription(),
+                'period'      => $this->getPeriodDescription(),
             ]);
 
-            $this->addError('generation_error', 'Failed to generate statement: '.$e->getMessage());
+            $this->addError('generation_error', 'Failed to generate statement: ' . $e->getMessage());
         }
     }
+
+    // -------------------------------------------------------------------------
+    // Data building
+    // -------------------------------------------------------------------------
 
     protected function generateStatementData(): array
     {
         $startDate = $this->getStartDate();
-        $endDate = $this->getEndDate();
+        $endDate   = $this->getEndDate();
 
-        // Get contributions for the period
         $contributions = Contribution::with(['member.currentGroupAssignment.group', 'academicYear', 'recordedBy'])
             ->whereDate('payment_date', '>=', $startDate)
             ->whereDate('payment_date', '<=', $endDate)
             ->orderBy('payment_date')
             ->get();
 
-        // Get donations for the period
         $donations = Donation::with(['recordedBy'])
             ->whereDate('donation_date', '>=', $startDate)
             ->whereDate('donation_date', '<=', $endDate)
             ->orderBy('donation_date')
             ->get();
 
-        // Calculate contributions by group and month
         $contributionsByGroup = $contributions->groupBy(function ($contribution) {
             return $contribution->member->currentGroupAssignment?->group_id;
         });
-        $contributionsByMonth = $contributions->groupBy('month_name');
 
-        // Calculate outstanding contributions (current academic year only)
-        $activeYear = AcademicYear::where('is_active', true)->first();
+        // --- Fix: use status column; fall back to latest if none active ----------
+        $activeYear = AcademicYear::where('status', 'active')->first()
+            ?? AcademicYear::latest('start_date')->first();
+
         $outstandingContributions = [];
 
         if ($activeYear) {
@@ -222,10 +171,10 @@ class FinancialStatementPage extends Page
 
                         if ($paidAmount < $expectedAmount) {
                             $outstandingContributions[] = [
-                                'member' => $member,
-                                'month' => $monthName,
-                                'expected' => $expectedAmount,
-                                'paid' => $paidAmount,
+                                'member'      => $member,
+                                'month'       => $monthName,
+                                'expected'    => $expectedAmount,
+                                'paid'        => $paidAmount,
                                 'outstanding' => $expectedAmount - $paidAmount,
                             ];
                         }
@@ -234,172 +183,149 @@ class FinancialStatementPage extends Page
             }
         }
 
-        // Calculate summary statistics
         $totalContributions = $contributions->sum('amount');
-        $totalDonations = $donations->sum('amount');
-        $totalOutstanding = collect($outstandingContributions)->sum('outstanding');
-        $grandTotal = $totalContributions + $totalDonations;
+        $totalDonations     = $donations->sum('amount');
+        $totalOutstanding   = collect($outstandingContributions)->sum('outstanding');
+        $grandTotal         = $totalContributions + $totalDonations;
 
-        // Group performance summary
         $groupSummary = [];
-        foreach ($contributionsByGroup as $groupId => $groupContributions) {
-            $groupName = $groupContributions->first()->member->memberGroup?->name ?? 'Unknown';
+        foreach ($contributionsByGroup as $groupContributions) {
+            $groupName      = $groupContributions->first()->member->memberGroup?->name ?? 'Unknown';
             $groupSummary[] = [
-                'group_name' => $groupName,
-                'total_amount' => $groupContributions->sum('amount'),
+                'group_name'         => $groupName,
+                'total_amount'       => $groupContributions->sum('amount'),
                 'contribution_count' => $groupContributions->count(),
-                'average_amount' => $groupContributions->count() > 0 ? $groupContributions->sum('amount') / $groupContributions->count() : 0,
+                'average_amount'     => $groupContributions->count() > 0
+                    ? $groupContributions->sum('amount') / $groupContributions->count()
+                    : 0,
             ];
         }
 
-        // Monthly/Quarterly summary
         $periodSummary = [];
         if ($this->periodType === 'monthly') {
             $periodSummary[] = [
-                'period' => EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth).' '.EthiopianDateHelper::getEthiopianYear($this->selectedYear),
-                'contributions' => $totalContributions,
-                'donations' => $totalDonations,
-                'total' => $grandTotal,
+                'period'             => EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth) . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear),
+                'contributions'      => $totalContributions,
+                'donations'          => $totalDonations,
+                'total'              => $grandTotal,
                 'contribution_count' => $contributions->count(),
-                'donation_count' => $donations->count(),
+                'donation_count'     => $donations->count(),
             ];
         } elseif ($this->periodType === 'quarterly') {
-            $quarterMonths = $this->getQuarterMonths($this->selectedQuarter);
-            foreach ($quarterMonths as $month) {
-                $monthContributions = $contributions->where('month_name', EthiopianDateHelper::getEthiopianMonthName($month));
-                $monthDonations = $donations->whereMonth('donation_date', $month);
-
+            foreach ($this->getQuarterMonths($this->selectedQuarter) as $month) {
+                $mc              = $contributions->where('month_name', EthiopianDateHelper::getEthiopianMonthName($month));
+                $md              = $donations->filter(fn ($d) => (int) date('m', strtotime($d->donation_date)) === $month);
                 $periodSummary[] = [
-                    'period' => EthiopianDateHelper::getEthiopianMonthName($month).' '.EthiopianDateHelper::getEthiopianYear($this->selectedYear),
-                    'contributions' => $monthContributions->sum('amount'),
-                    'donations' => $monthDonations->sum('amount'),
-                    'total' => $monthContributions->sum('amount') + $monthDonations->sum('amount'),
-                    'contribution_count' => $monthContributions->count(),
-                    'donation_count' => $monthDonations->count(),
+                    'period'             => EthiopianDateHelper::getEthiopianMonthName($month) . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear),
+                    'contributions'      => $mc->sum('amount'),
+                    'donations'          => $md->sum('amount'),
+                    'total'              => $mc->sum('amount') + $md->sum('amount'),
+                    'contribution_count' => $mc->count(),
+                    'donation_count'     => $md->count(),
                 ];
             }
         }
 
         return [
-            'period_type' => $this->periodType,
-            'period_description' => $this->getPeriodDescription(),
-            'ethiopian_period' => $this->getEthiopianPeriodDescription(),
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'generated_at' => now(),
-            'generated_by' => Auth::user()->name,
-            'church_info' => $this->getChurchInfo(),
-            'contributions' => $contributions,
-            'donations' => $donations,
-            'contributions_by_group' => $groupSummary,
-            'contributions_by_month' => $periodSummary,
+            'period_type'              => $this->periodType,
+            'period_description'       => $this->getPeriodDescription(),
+            'ethiopian_period'         => $this->getEthiopianPeriodDescription(),
+            'start_date'               => $startDate,
+            'end_date'                 => $endDate,
+            'generated_at'             => now(),
+            'generated_by'             => Auth::user()->name,
+            'church_info'              => $this->getChurchInfo(),
+            'contributions'            => $contributions,
+            'donations'                => $donations,
+            'contributions_by_group'   => $groupSummary,
+            'contributions_by_month'   => $periodSummary,
             'outstanding_contributions' => $outstandingContributions,
-            'summary' => [
+            'summary'                  => [
                 'total_contributions' => $totalContributions,
-                'total_donations' => $totalDonations,
-                'total_outstanding' => $totalOutstanding,
-                'grand_total' => $grandTotal,
-                'contribution_count' => $contributions->count(),
-                'donation_count' => $donations->count(),
+                'total_donations'     => $totalDonations,
+                'total_outstanding'   => $totalOutstanding,
+                'grand_total'         => $grandTotal,
+                'contribution_count'  => $contributions->count(),
+                'donation_count'      => $donations->count(),
                 'unique_contributors' => $contributions->groupBy('member_id')->count(),
-                'unique_donors' => $donations->groupBy('donor_name')->count(),
+                'unique_donors'       => $donations->groupBy('donor_name')->count(),
             ],
         ];
     }
 
-    /**
-     * Get church information for the statement
-     */
     protected function getChurchInfo(): array
     {
         return [
-            'name_en' => SiteSetting::get('church_name_en', 'FINOTE TSIDIK'),
-            'name_am' => SiteSetting::get('church_name_am', 'Finote Tsidik'),
-            'address' => SiteSetting::get('church_address', ''),
-            'phone' => SiteSetting::get('church_phone', ''),
-            'email' => SiteSetting::get('church_email', ''),
-            'logo' => SiteSetting::get('logo'),
+            'name_en'     => SiteSetting::get('church_name_en', 'FINOTE TSIDIK'),
+            'name_am'     => SiteSetting::get('church_name_am', 'Finote Tsidik'),
+            'address'     => SiteSetting::get('church_address', ''),
+            'phone'       => SiteSetting::get('church_phone', ''),
+            'email'       => SiteSetting::get('church_email', ''),
+            'footer_text' => SiteSetting::get('church_footer_text', ''),
+            'logo'        => SiteSetting::get('logo'),
         ];
     }
 
-    /**
-     * Get Ethiopian date period description
-     */
     protected function getEthiopianPeriodDescription(): string
     {
         if ($this->periodType === 'monthly') {
-            return EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth).' '.EthiopianDateHelper::getEthiopianYear($this->selectedYear);
+            return EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth) . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear);
         } elseif ($this->periodType === 'quarterly') {
-            $ethiopianYear = EthiopianDateHelper::getEthiopianYear($this->selectedYear);
-
-            return "Q{$this->selectedQuarter} {$ethiopianYear}";
-        } else {
-            return EthiopianDateHelper::getEthiopianYear($this->selectedYear);
+            return 'Q' . $this->selectedQuarter . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear);
         }
+
+        return EthiopianDateHelper::getEthiopianYear($this->selectedYear);
     }
 
-    /**
-     * Get months for a given quarter
-     */
     protected function getQuarterMonths(int $quarter): array
     {
-        $quarters = [
-            1 => [1, 2, 3],
-            2 => [4, 5, 6],
-            3 => [7, 8, 9],
-            4 => [10, 11, 12],
-        ];
-
-        return $quarters[$quarter] ?? [1, 2, 3];
+        return [1 => [1,2,3], 2 => [4,5,6], 3 => [7,8,9], 4 => [10,11,12]][$quarter] ?? [1,2,3];
     }
 
     protected function getStartDate(): string
     {
         if ($this->periodType === 'monthly') {
-            return "{$this->selectedYear}-{$this->selectedMonth}-01";
+            return sprintf('%04d-%02d-01', $this->selectedYear, $this->selectedMonth);
         } elseif ($this->periodType === 'quarterly') {
-            $quarterMonths = $this->getQuarterMonths($this->selectedQuarter);
-            $firstMonth = min($quarterMonths);
-
-            return "{$this->selectedYear}-{$firstMonth}-01";
-        } else {
-            return "{$this->selectedYear}-01-01";
+            $first = min($this->getQuarterMonths($this->selectedQuarter));
+            return sprintf('%04d-%02d-01', $this->selectedYear, $first);
         }
+
+        return "{$this->selectedYear}-01-01";
     }
 
     protected function getEndDate(): string
     {
         if ($this->periodType === 'monthly') {
-            return "{$this->selectedYear}-{$this->selectedMonth}-31";
+            $days = cal_days_in_month(CAL_GREGORIAN, $this->selectedMonth, $this->selectedYear);
+            return sprintf('%04d-%02d-%02d', $this->selectedYear, $this->selectedMonth, $days);
         } elseif ($this->periodType === 'quarterly') {
-            $quarterMonths = $this->getQuarterMonths($this->selectedQuarter);
-            $lastMonth = max($quarterMonths);
-            $daysInMonth = now()->setYear($this->selectedYear)->setMonth($lastMonth)->daysInMonth;
-
-            return "{$this->selectedYear}-{$lastMonth}-{$daysInMonth}";
-        } else {
-            return "{$this->selectedYear}-12-31";
+            $last = max($this->getQuarterMonths($this->selectedQuarter));
+            $days = cal_days_in_month(CAL_GREGORIAN, $last, $this->selectedYear);
+            return sprintf('%04d-%02d-%02d', $this->selectedYear, $last, $days);
         }
+
+        return "{$this->selectedYear}-12-31";
     }
 
     protected function getPeriodDescription(): string
     {
         if ($this->periodType === 'monthly') {
-            $monthName = date('F', mktime(0, 0, 0, $this->selectedMonth, 1));
-
-            return "{$monthName} {$this->selectedYear}";
+            return date('F', mktime(0, 0, 0, $this->selectedMonth, 1)) . ' ' . $this->selectedYear;
         } elseif ($this->periodType === 'quarterly') {
             return "Q{$this->selectedQuarter} {$this->selectedYear}";
-        } else {
-            return "Year {$this->selectedYear}";
         }
+
+        return "Year {$this->selectedYear}";
     }
+
+    // -------------------------------------------------------------------------
+    // PDF — KEY FIX: wrap in ['data' => $data] so $data is defined in the blade
+    // -------------------------------------------------------------------------
 
     protected function generatePDF(array $data)
     {
-        $pdf = Pdf::loadView('pdf.financial-statement', $data);
-
-        // Set paper size to A4
+        $pdf = Pdf::loadView('pdf.financial-statement', ['data' => $data]);
         $pdf->setPaper('a4', 'portrait');
 
         return $pdf;
@@ -412,10 +338,7 @@ class FinancialStatementPage extends Page
                 ->label('Generate Statement')
                 ->icon('heroicon-o-document-arrow-down')
                 ->action('generateStatement')
-                ->color('primary')
-                ->requiresConfirmation()
-                ->modalHeading('Generate Financial Statement')
-                ->modalDescription('This will generate a PDF financial statement for the selected period.'),
+                ->color('primary'),
         ];
     }
 }

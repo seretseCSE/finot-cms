@@ -12,6 +12,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -96,7 +97,8 @@ class ExportAuditLogs extends Page
                                 ->label('End Date')
                                 ->required(fn (callable $get) => $get('date_range') === 'custom')
                                 ->visible(fn (callable $get) => $get('date_range') === 'custom')
-                                ->native(false),
+                                ->native(false)
+                                ->afterOrEqual('start_date'),
                         ]),
 
                     Forms\Components\Select::make('user_id')

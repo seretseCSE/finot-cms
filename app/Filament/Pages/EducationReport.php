@@ -6,6 +6,7 @@ use App\Models\StudentAttendance;
 use App\Models\StudentEnrollment;
 use App\Models\Teacher;
 use App\Models\TeacherAttendance;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,7 @@ class EducationReport extends Page
             'withdrawn' => (clone $query)->where('status', 'Withdrawn')->count(),
             'completed' => (clone $query)->where('status', 'Completed')->count(),
             'by_class' => (clone $query)
+                ->where('status', 'Enrolled')
                 ->select('class_id', DB::raw('count(*) as count'))
                 ->with('class')
                 ->groupBy('class_id')
@@ -135,5 +137,29 @@ class EducationReport extends Page
             'student_attendance' => $this->getStudentAttendanceData(),
             default => [],
         };
+    }
+
+    public function updatedDateTo($value): void
+    {
+        if ($this->date_from && $value && $value < $this->date_from) {
+            $this->date_to = $this->date_from;
+            Notification::make()
+                ->title('Invalid date range')
+                ->body('The end date must be on or after the start date.')
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function updatedDateFrom($value): void
+    {
+        if ($value && $this->date_to && $this->date_to < $value) {
+            $this->date_to = $value;
+            Notification::make()
+                ->title('Invalid date range')
+                ->body('The end date must be on or after the start date.')
+                ->danger()
+                ->send();
+        }
     }
 }

@@ -203,7 +203,8 @@ class BlogPostResource extends Resource
                             ->native(false),
                         Forms\Components\DatePicker::make('end_date')
                             ->label('End Date')
-                            ->native(false),
+                            ->native(false)
+                            ->afterOrEqual('start_date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $data['start_date'] && $data['end_date']

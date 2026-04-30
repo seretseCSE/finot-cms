@@ -6,6 +6,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
 class EditProfile extends Page
@@ -29,7 +30,7 @@ class EditProfile extends Page
 
     public function form(Schema $form): Schema
     {
-        return $schema->components([
+        return $form->components([
                 // Personal Information Section
                 Section::make('Personal Information')
                     ->schema([
@@ -151,7 +152,7 @@ class EditProfile extends Page
         return null; // Show in main navigation, not in a group
     }
 
-    public static function getNavigationVisibility(): bool
+    public static function shouldRegisterNavigation(): bool
     {
         return false; // Completely hide from navigation
     }

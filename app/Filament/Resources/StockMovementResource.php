@@ -199,7 +199,8 @@ class StockMovementResource extends Resource
                     ->label('Date Range')
                     ->form([
                         Forms\Components\DatePicker::make('from'),
-                        Forms\Components\DatePicker::make('until'),
+                        Forms\Components\DatePicker::make('until')
+                            ->afterOrEqual('from'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

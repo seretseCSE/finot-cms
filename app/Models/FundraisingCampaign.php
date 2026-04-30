@@ -32,6 +32,15 @@ class FundraisingCampaign extends Model
                 $model->updated_by = Auth::id();
             }
         });
+
+        static::saving(function ($model) {
+            if ($model->start_date && $model->end_date && $model->end_date < $model->start_date) {
+                throw new \Illuminate\Validation\ValidationException(
+                    validator()->make([], []),
+                    new \Illuminate\Support\MessageBag(['end_date' => 'End date must be on or after the start date.'])
+                );
+            }
+        });
     }
 
     /**
