@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Tour;
 use App\Models\TourPassenger;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -11,10 +12,12 @@ use Illuminate\Support\Str;
 class TourController extends Controller
 {
     /**
-     * Display public tours listing page
+     * Display public tours listing page (with Shop tab)
      */
-    public function index()
+    public function index(Request $request)
     {
+        $activeTab = $request->query('tab', 'tours');
+
         $tours = Tour::with(['confirmedPassengers'])
             ->whereNotIn('status', ['Draft', 'Cancelled'])
             ->orderBy('tour_date', 'asc')
@@ -45,7 +48,43 @@ class TourController extends Controller
                 ];
             });
 
-        return view('public.tours', compact('tours'));
+        $productQuery = Product::active()->orderBy('name');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $productQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $productQuery->where('category', $request->input('category'));
+        }
+
+        $products = $productQuery->paginate(12, ['*'], 'products_page')->withQueryString();
+
+        $categories = Product::active()
+            ->whereNotNull('category')
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->values();
+
+        $totalProducts = Product::active()->count();
+        $inStockProducts = Product::active()->where('stock_quantity', '>', 0)->count();
+
+        $currentPage = 'tours';
+
+        return view('public.tours', compact(
+            'tours',
+            'activeTab',
+            'products',
+            'categories',
+            'totalProducts',
+            'inStockProducts',
+            'currentPage'
+        ));
     }
 
     /**

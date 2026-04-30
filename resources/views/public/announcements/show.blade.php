@@ -7,7 +7,7 @@
     <div style="position:absolute;inset:0;background:url('{{ asset('images/hero-bg.jpg') }}') center/cover no-repeat;filter:brightness(.15) blur(5px);opacity:.5;"></div>
     
     <div style="max-width:800px;margin:0 auto;position:relative;z-index:2;width:100%;">
-        <a href="{{ route('announcements.index') }}" style="display:inline-flex;align-items:center;gap:8px;color:var(--blue-400);text-decoration:none;font-size:.85rem;font-weight:600;margin-bottom:32px;transition:color .2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--blue-400)'">
+        <a href="{{ route('news') }}" style="display:inline-flex;align-items:center;gap:8px;color:var(--blue-400);text-decoration:none;font-size:.85rem;font-weight:600;margin-bottom:32px;transition:color .2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--blue-400)'">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             {{ __('Back to Announcements') }}
         </a>
@@ -54,7 +54,7 @@
         </div>
 
         <div style="margin-top:64px;padding-top:40px;border-top:1px solid var(--border-subtle);display:flex;justify-content:center;">
-            <a href="{{ route('announcements.index') }}" class="btn btn-primary">
+            <a href="{{ route('news') }}" class="btn btn-primary">
                 {{ __('View All Announcements') }}
             </a>
         </div>

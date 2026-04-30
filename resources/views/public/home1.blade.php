@@ -143,7 +143,7 @@
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-lg font-semibold text-gray-900">{{ __('Upcoming Events') }}</h2>
-                            <a href="{{ route('events') }}" class="text-sm text-blue-600 hover:text-blue-700">{{ __('Calendar') }}</a>
+                            <a href="{{ route('news') }}" class="text-sm text-blue-600 hover:text-blue-700">{{ __('Calendar') }}</a>
                         </div>
                         <div class="space-y-4 text-sm">
                             <div class="flex gap-3">

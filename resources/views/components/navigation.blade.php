@@ -1,5 +1,17 @@
 @props(['currentPage' => ''])
 
+@php
+    $resolvedPage = $currentPage;
+    if (Request::is('announcements/*')) $resolvedPage = 'news';
+    if (Request::is('events/*')) $resolvedPage = 'news';
+    if (Request::is('songs*')) $resolvedPage = 'resources';
+    if (Request::is('library*')) $resolvedPage = 'resources';
+    if (Request::is('media*')) $resolvedPage = 'resources';
+    if (Request::is('blog*')) $resolvedPage = 'resources';
+    if (Request::is('shop*')) $resolvedPage = 'tours';
+    if (Request::is('tours*')) $resolvedPage = 'tours';
+@endphp
+
 <nav id="main-nav" style="
     position:fixed;top:0;left:0;right:0;z-index:900;
     padding:0 24px;
@@ -22,26 +34,65 @@
         {{-- Desktop Links (hidden/shown via JS) --}}
         <div id="nav-links" style="display:flex;align-items:center;gap:4px;">
             @foreach([
-                ['href' => '/',                          'label' => __('Home'),        'page' => 'home'],
-                ['href' => route('about'),               'label' => __('About'),       'page' => 'about'],
-                                ['href' => route('events'),              'label' => __('Events'),      'page' => 'events'],
-                ['href' => route('announcements.index'), 'label' => __('News'),        'page' => 'announcements'],
-                ['href' => route('songs.index'),         'label' => __('Songs'),       'page' => 'songs'],
-                ['href' => route('library'),             'label' => __('Library'),     'page' => 'library'],
-                ['href' => route('shop.index'),          'label' => __('Shop'),        'page' => 'shop'],
-                ['href' => route('tours.index'),         'label' => __('Tours'),       'page' => 'tours'],
-                ['href' => route('blog.index'),          'label' => __('Blog'),        'page' => 'blog'],
-                ['href' => route('media'),               'label' => __('Media'),       'page' => 'media'],
-                ['href' => route('fundraising.index'),   'label' => __('Fundraising'), 'page' => 'fundraising'],
-                ['href' => route('contact'),             'label' => __('Contact'),     'page' => 'contact'],
+                ['href' => '/',                          'label' => __('Home'),          'page' => 'home'],
+                ['href' => route('about'),               'label' => __('About'),         'page' => 'about'],
+                ['href' => route('news'),                'label' => __('News & Events'), 'page' => 'news'],
             ] as $link)
                 <a href="{{ $link['href'] }}"
-                   class="nav-link {{ $currentPage === $link['page'] ? 'nav-active' : '' }}"
+                   class="nav-link {{ $resolvedPage === $link['page'] ? 'nav-active' : '' }}"
                    style="
                        padding:8px 12px;border-radius:6px;font-size:.82rem;font-weight:500;
-                       color:{{ $currentPage === $link['page'] ? 'var(--text-display)' : 'var(--text-40)' }};
+                       color:{{ $resolvedPage === $link['page'] ? 'var(--text-display)' : 'var(--text-40)' }};
                        text-decoration:none;transition:color .2s,background .2s;position:relative;
-                       {{ $currentPage === $link['page'] ? 'background:rgba(26,68,247,.1);' : '' }}
+                       {{ $resolvedPage === $link['page'] ? 'background:rgba(26,68,247,.1);' : '' }}
+                   "
+                >{{ $link['label'] }}</a>
+            @endforeach
+
+            {{-- Resources Dropdown --}}
+            <div class="nav-dropdown" style="position:relative;" id="resources-dropdown">
+                <a href="#" class="nav-link {{ $resolvedPage === 'resources' ? 'nav-active' : '' }}" style="
+                    padding:8px 12px;border-radius:6px;font-size:.82rem;font-weight:500;
+                    color:{{ $resolvedPage === 'resources' ? 'var(--text-display)' : 'var(--text-40)' }};
+                    text-decoration:none;transition:color .2s,background .2s;position:relative;display:flex;align-items:center;gap:4px;
+                    {{ $resolvedPage === 'resources' ? 'background:rgba(26,68,247,.1);' : '' }}
+                " onclick="event.preventDefault()">
+                    {{ __('Resources') }}
+                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="dropdown-arrow" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </a>
+                <div class="dropdown-menu" id="dropdown-menu" style="
+                    position:absolute;top:100%;left:0;min-width:180px;padding:8px 0;
+                    background:var(--overlay-98);border:1px solid var(--border-subtle);
+                    border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.35);
+                    opacity:0;visibility:hidden;transform:translateY(8px);
+                    transition:opacity .2s,transform .2s,visibility .2s;z-index:100;
+                ">
+                    @foreach([
+                        ['href' => route('songs.index'),   'label' => __('Songs')],
+                        ['href' => route('library'),       'label' => __('Library')],
+                        ['href' => route('media'),         'label' => __('Media')],
+                        ['href' => route('blog.index'),    'label' => __('Blog')],
+                    ] as $item)
+                        <a href="{{ $item['href'] }}" class="dropdown-item" style="
+                            display:block;padding:10px 20px;font-size:.82rem;color:var(--text-40);
+                            text-decoration:none;transition:background .15s,color .15s;
+                        ">{{ $item['label'] }}</a>
+                    @endforeach
+                </div>
+            </div>
+
+            @foreach([
+                ['href' => route('tours.index'),         'label' => __('Tours & Shop'),  'page' => 'tours'],
+                ['href' => route('fundraising.index'),   'label' => __('Fundraising'),   'page' => 'fundraising'],
+                ['href' => route('contact'),             'label' => __('Contact'),       'page' => 'contact'],
+            ] as $link)
+                <a href="{{ $link['href'] }}"
+                   class="nav-link {{ $resolvedPage === $link['page'] ? 'nav-active' : '' }}"
+                   style="
+                       padding:8px 12px;border-radius:6px;font-size:.82rem;font-weight:500;
+                       color:{{ $resolvedPage === $link['page'] ? 'var(--text-display)' : 'var(--text-40)' }};
+                       text-decoration:none;transition:color .2s,background .2s;position:relative;
+                       {{ $resolvedPage === $link['page'] ? 'background:rgba(26,68,247,.1);' : '' }}
                    "
                 >{{ $link['label'] }}</a>
             @endforeach
@@ -156,26 +207,50 @@
     ">
         <div style="padding:12px 8px 20px;display:flex;flex-direction:column;gap:2px;">
             @foreach([
-                ['href' => '/',                          'label' => __('Home'),        'page' => 'home'],
-                ['href' => route('about'),               'label' => __('About'),       'page' => 'about'],
-                                ['href' => route('events'),              'label' => __('Events'),      'page' => 'events'],
-                ['href' => route('announcements.index'),   'label' => __('News'),        'page' => 'announcements'],
-                ['href' => route('songs.index'),         'label' => __('Songs'),       'page' => 'songs'],
-                ['href' => route('library'),             'label' => __('Library'),     'page' => 'library'],
-                ['href' => route('shop.index'),          'label' => __('Shop'),        'page' => 'shop'],
-                ['href' => route('tours.index'),         'label' => __('Tours'),       'page' => 'tours'],
-                ['href' => route('blog.index'),          'label' => __('Blog'),        'page' => 'blog'],
-                ['href' => route('media'),               'label' => __('Media'),       'page' => 'media'],
-                ['href' => route('fundraising.index'),   'label' => __('Fundraising'), 'page' => 'fundraising'],
-                ['href' => route('contact'),             'label' => __('Contact'),     'page' => 'contact'],
+                ['href' => '/',                          'label' => __('Home'),          'page' => 'home'],
+                ['href' => route('about'),               'label' => __('About'),         'page' => 'about'],
+                ['href' => route('news'),                'label' => __('News & Events'), 'page' => 'news'],
+                ['href' => '#',                          'label' => __('Resources'),     'page' => 'resources', 'sub' => [
+                    ['href' => route('songs.index'),   'label' => __('Songs')],
+                    ['href' => route('library'),       'label' => __('Library')],
+                    ['href' => route('media'),         'label' => __('Media')],
+                    ['href' => route('blog.index'),    'label' => __('Blog')],
+                ]],
+                ['href' => route('tours.index'),         'label' => __('Tours & Shop'),  'page' => 'tours'],
+                ['href' => route('fundraising.index'),   'label' => __('Fundraising'),   'page' => 'fundraising'],
+                ['href' => route('contact'),             'label' => __('Contact'),       'page' => 'contact'],
             ] as $link)
-                <a href="{{ $link['href'] }}" class="mobile-nav-link" style="
-                    display:block;padding:12px 14px;border-radius:10px;
-                    color:{{ $currentPage === $link['page'] ? 'var(--text-display)' : 'var(--text-60)' }};
-                    text-decoration:none;font-size:.95rem;font-weight:500;
-                    transition:background .2s,color .2s;
-                    {{ $currentPage === $link['page'] ? 'background:rgba(26,68,247,.12);' : '' }}
-                ">{{ $link['label'] }}</a>
+                @if(isset($link['sub']))
+                    <div>
+                        <button class="mobile-nav-link mobile-sub-toggle" style="
+                            display:block;width:100%;text-align:left;padding:12px 14px;border-radius:10px;
+                            border:none;background:{{ $resolvedPage === $link['page'] ? 'rgba(26,68,247,.12)' : 'transparent' }};
+                            color:{{ $resolvedPage === $link['page'] ? 'var(--text-display)' : 'var(--text-60)' }};
+                            font-size:.95rem;font-weight:500;cursor:pointer;font-family:inherit;
+                            transition:background .2s,color .2s;display:flex;justify-content:space-between;align-items:center;
+                        ">
+                            {{ $link['label'] }}
+                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="mobile-sub-links" style="max-height:0;overflow:hidden;transition:max-height .3s ease;">
+                            @foreach($link['sub'] as $sub)
+                                <a href="{{ $sub['href'] }}" class="mobile-nav-link" style="
+                                    display:block;padding:10px 14px 10px 32px;border-radius:10px;
+                                    color:var(--text-40);text-decoration:none;font-size:.88rem;font-weight:400;
+                                    transition:background .2s,color .2s;
+                                ">{{ $sub['label'] }}</a>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ $link['href'] }}" class="mobile-nav-link" style="
+                        display:block;padding:12px 14px;border-radius:10px;
+                        color:{{ $resolvedPage === $link['page'] ? 'var(--text-display)' : 'var(--text-60)' }};
+                        text-decoration:none;font-size:.95rem;font-weight:500;
+                        transition:background .2s,color .2s;
+                        {{ $resolvedPage === $link['page'] ? 'background:rgba(26,68,247,.12);' : '' }}
+                    ">{{ $link['label'] }}</a>
+                @endif
             @endforeach
 
             <div style="margin-top:10px;padding-top:12px;border-top:1px solid var(--border-subtle);">
@@ -217,7 +292,16 @@
         transition:transform .2s,box-shadow .2s; white-space:nowrap;
     }
     .nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(26,68,247,.45); }
+
+    /* Dropdown */
+    .dropdown-menu { opacity:0; visibility:hidden; transform:translateY(8px); pointer-events:none; }
+    .nav-dropdown:hover .dropdown-menu { opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto; }
+    .nav-dropdown:hover > a svg { transform:rotate(180deg); }
+    .dropdown-item:hover { background:var(--glass-hover); color:var(--text-display) !important; }
+
+    /* Mobile */
     .mobile-nav-link:hover { background:rgba(255,255,255,.07) !important; color:var(--text-display) !important; }
+    .mobile-sub-toggle.open svg { transform:rotate(180deg); }
 
     @media (max-width: 480px) {
         #main-nav { padding: 0 12px !important; }
@@ -285,6 +369,23 @@
     // Close on link tap
     mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
 
+    // ── Mobile sub-toggle (Resources dropdown) ───────────────────────────
+    document.querySelectorAll('.mobile-sub-toggle').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const subLinks = this.nextElementSibling;
+            const isOpen = this.classList.contains('open');
+            if (isOpen) {
+                this.classList.remove('open');
+                subLinks.style.maxHeight = '0';
+            } else {
+                this.classList.add('open');
+                subLinks.style.maxHeight = subLinks.scrollHeight + 'px';
+            }
+        });
+    });
+
     // Close on outside click
     document.addEventListener('click', e => {
         if (menuOpen && !nav.contains(e.target)) closeMenu();
@@ -312,6 +413,27 @@
     applyTheme(localStorage.getItem('theme') || document.documentElement.getAttribute('data-theme') || 'dark');
     themeBtnD.addEventListener('click', toggleTheme);
     themeBtnM.addEventListener('click', toggleTheme);
+
+    // ── Resources Dropdown (hover) ──────────────────────────────────────────
+    var dd = document.getElementById('resources-dropdown');
+    var ddMenu = document.getElementById('dropdown-menu');
+    if (dd && ddMenu) {
+        var ddArrow = dd.querySelector('.dropdown-arrow');
+        dd.addEventListener('mouseenter', function() {
+            ddMenu.style.opacity = '1';
+            ddMenu.style.visibility = 'visible';
+            ddMenu.style.transform = 'translateY(0)';
+            ddMenu.style.pointerEvents = 'auto';
+            if (ddArrow) ddArrow.style.transform = 'rotate(180deg)';
+        });
+        dd.addEventListener('mouseleave', function() {
+            ddMenu.style.opacity = '0';
+            ddMenu.style.visibility = 'hidden';
+            ddMenu.style.transform = 'translateY(8px)';
+            ddMenu.style.pointerEvents = 'none';
+            if (ddArrow) ddArrow.style.transform = 'rotate(0deg)';
+        });
+    }
 })();
 </script>
 @endpush

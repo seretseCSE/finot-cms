@@ -257,6 +257,13 @@
             .btn { padding: 8px 16px !important; font-size: .75rem !important; }
             .display { font-size: clamp(1.6rem, 7vw, 2rem) !important; }
         }
+
+        /* ── Nav dropdown ── */
+        .nav-dropdown .dropdown-menu { opacity:0; visibility:hidden; transform:translateY(8px); pointer-events:none; }
+        .nav-dropdown:hover .dropdown-menu { opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto; }
+        .nav-dropdown:hover > a svg { transform:rotate(180deg); }
+        .dropdown-item:hover { background:var(--glass-hover); color:var(--text-display) !important; }
+        .mobile-sub-toggle.open svg { transform:rotate(180deg); }
     </style>
 
     @stack('styles')

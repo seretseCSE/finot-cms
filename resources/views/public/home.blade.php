@@ -88,7 +88,7 @@
                         {{ __('New Announcement') }}
                     </a>
                 @endif
-                <a href="{{ route('announcements.index') }}" class="btn btn-ghost sr">{{ __('View All') }}</a>
+                <a href="{{ route('news') }}" class="btn btn-ghost sr">{{ __('View All') }}</a>
             </div>
         </div>
 
@@ -408,7 +408,7 @@
                 <div class="sec-label sr">{{ __('Calendar') }}</div>
                 <h2 class="display sr" style="font-size:clamp(1.8rem,3vw,2.8rem);">{{ __('Upcoming Events') }}</h2>
             </div>
-            <a href="{{ route('events') }}" class="btn btn-ghost sr">{{ __('View All Events') }}</a>
+            <a href="{{ route('news', ['tab' => 'events']) }}" class="btn btn-ghost sr">{{ __('View All Events') }}</a>
         </div>
 
         @if($upcomingEvents && $upcomingEvents->count() > 0)

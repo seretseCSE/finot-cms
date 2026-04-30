@@ -114,7 +114,7 @@
 
                 {{-- Action Buttons --}}
                 <div style="text-align:center;">
-                    <a href="{{ route('events') }}" class="btn btn-ghost" style="margin-right:16px;">
+                    <a href="{{ route('news', ['tab' => 'events']) }}" class="btn btn-ghost" style="margin-right:16px;">
                         ← {{ __('Back to Events') }}
                     </a>
                     @if($event->registration_required)

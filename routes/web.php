@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PasswordChangeController;
 use App\Http\Controllers\ProductTourController;
 use App\Http\Controllers\PwaController;
@@ -44,8 +45,28 @@ Route::middleware('throttle:60,1')->group(function () {
 
     // Public page routes
     Route::get('/about', [AboutController::class, 'index'])->name('about');
-    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+
+    // Combined News & Events page
+    Route::get('/news', [NewsController::class, 'index'])->name('news');
+
+    // Redirect old index pages to combined pages (keep names for backward compat)
+    Route::get('/announcements', fn () => redirect('/news', 301))->name('announcements.index');
+    Route::get('/events', function () {
+        $params = request()->query();
+        $params['tab'] = 'events';
+        return redirect()->route('news', $params, 301);
+    })->name('events');
+    Route::get('/shop', function () {
+        $params = request()->query();
+        $params['tab'] = 'shop';
+        return redirect('/tours?' . http_build_query($params), 301);
+    })->name('shop.index');
+
+    // Detail routes
     Route::get('/announcements/{id}', [AnnouncementController::class, 'show'])->name('announcements.show');
+    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+    Route::get('/shop/{slug}', [ProductController::class, 'show'])->name('shop.show');
+
     Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
     Route::post('/blog/{slug}/comment', [BlogController::class, 'storeComment'])->name('blog.comment.store');
@@ -53,8 +74,6 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/songs/{id}', [SongController::class, 'show'])->name('songs.show');
     Route::get('/media', [MediaController::class, 'index'])->name('media');
     Route::get('/media/{mediaItem}', [MediaController::class, 'show'])->name('media.show');
-    Route::get('/events', [EventController::class, 'index'])->name('events');
-    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
     Route::get('/library', [LibraryController::class, 'index'])->name('library');
     Route::get('/library/download/{resource}', [LibraryController::class, 'download'])->name('library.download');
     Route::get('/contact', [ContactController::class, 'index'])->name('contact');
@@ -69,10 +88,6 @@ Route::middleware('throttle:60,1')->group(function () {
 
     // Edit profile route
     Route::get('/admin/profile', [EditProfileController::class, '__invoke'])->name('admin.edit-profile');
-
-    // Shop routes
-    Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
-    Route::get('/shop/{slug}', [ProductController::class, 'show'])->name('shop.show');
 
     // Public tour routes
     Route::get('/tours', [TourController::class, 'index'])->name('tours.index');

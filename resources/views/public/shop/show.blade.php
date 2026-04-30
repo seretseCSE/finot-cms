@@ -73,7 +73,7 @@
         </div>
 
         <div class="sr" style="margin-top:40px;display:flex;justify-content:center;">
-            <a href="{{ route('shop.index') }}" class="btn btn-ghost">
+            <a href="{{ route('tours.index', ['tab' => 'shop']) }}" class="btn btn-ghost">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 {{ __('Back to Shop') }}
             </a>
