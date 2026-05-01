@@ -133,28 +133,21 @@ class MemberGroupResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('group_type')
+                Tables\Columns\TextColumn::make('group_type')
                     ->label('Type')
-                    ->colors([
-                        'info' => 'Kids',
-                        'warning' => 'Youth',
-                        'success' => 'Adult',
-                        'primary' => 'Ministry',
-                        'secondary' => 'Other',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Kids' => 'info',
+                        'Youth' => 'warning',
+                        'Adult' => 'success',
+                        'Ministry' => 'primary',
+                        'Other' => 'secondary',
+                    }),
 
-                Tables\Columns\TextColumn::make('active_member_count')
-                    ->label('Active Members')
-                    ->sortable()
-                    ->formatStateUsing(fn ($state) => $state . ' members')
-                    ->counts('activeAssignments'),
-
-                Tables\Columns\BadgeColumn::make('is_active')
+                Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
-                    ->colors([
-                        'success' => true,
-                        'danger' => false,
-                    ])
+                    ->badge()
+                    ->color(fn($state) => $state ? 'success' : 'danger')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
 
                 Tables\Columns\TextColumn::make('created_at')

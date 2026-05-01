@@ -69,18 +69,31 @@ class CharityReport extends Page
             ->when($this->date_to, fn ($q) => $q->whereDate('distribution_date', '<=', $this->date_to))
             ->when($this->aid_type, fn ($q) => $q->where('aid_type', $this->aid_type));
 
+        $monetaryQuery = (clone $query)->whereNotNull('amount');
+
         return [
             'total_distributions' => $query->count(),
-            'total_amount' => $query->sum('amount'),
-            'average_amount' => $query->avg('amount'),
+            'monetary_distributions' => $monetaryQuery->count(),
+            'non_monetary_distributions' => (clone $query)->whereNull('amount')->count(),
+            'total_amount' => $monetaryQuery->sum('amount'),
+            'average_amount' => $monetaryQuery->avg('amount'),
             'locked_count' => (clone $query)->where('is_locked', true)->count(),
             'by_type' => AidDistribution::query()
                 ->when($this->date_from, fn ($q) => $q->whereDate('distribution_date', '>=', $this->date_from))
                 ->when($this->date_to, fn ($q) => $q->whereDate('distribution_date', '<=', $this->date_to))
-                ->select('aid_type', DB::raw('count(*) as count'), DB::raw('sum(amount) as total'))
+                ->select('aid_type',
+                    DB::raw('count(*) as count'),
+                    DB::raw('sum(amount) as total'),
+                    DB::raw('count(amount) as monetary_count')
+                )
                 ->groupBy('aid_type')
                 ->get()
-                ->mapWithKeys(fn ($item) => [$item->aid_type => ['count' => $item->count, 'total' => $item->total]])
+                ->mapWithKeys(fn ($item) => [$item->aid_type => [
+                    'count' => $item->count,
+                    'total' => $item->total,
+                    'monetary_count' => $item->monetary_count,
+                    'non_monetary_count' => $item->count - $item->monetary_count,
+                ]])
                 ->toArray(),
             'monthly_trend' => AidDistribution::query()
                 ->when($this->date_from, fn ($q) => $q->whereDate('distribution_date', '>=', $this->date_from))
@@ -88,11 +101,16 @@ class CharityReport extends Page
                 ->select(DB::raw(match (DB::getDriverName()) {
                     'sqlite' => "strftime('%Y-%m', distribution_date) as month",
                     default => "DATE_FORMAT(distribution_date, '%Y-%m') as month",
-                }), DB::raw('count(*) as count'), DB::raw('sum(amount) as total'))
+                }), DB::raw('count(*) as count'), DB::raw('sum(amount) as total'), DB::raw('count(amount) as monetary_count'))
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get()
-                ->mapWithKeys(fn ($item) => [$item->month => ['count' => $item->count, 'total' => $item->total]])
+                ->mapWithKeys(fn ($item) => [$item->month => [
+                    'count' => $item->count,
+                    'total' => $item->total,
+                    'monetary_count' => $item->monetary_count,
+                    'non_monetary_count' => $item->count - $item->monetary_count,
+                ]])
                 ->toArray(),
         ];
     }

@@ -14,7 +14,10 @@ return new class () extends Migration {
             $table->id();
             $table->string('name_en');
             $table->string('name_am');
+            $table->text('description')->nullable();
+            $table->foreignId('head_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->boolean('is_active')->default(true);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

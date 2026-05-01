@@ -11,7 +11,10 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('member_id')->constrained('members')->onDelete('cascade');
             $table->foreignId('academic_year_id')->constrained('academic_years')->onDelete('cascade');
+            $table->unsignedTinyInteger('month')->nullable();
+            $table->boolean('is_paid')->default(false);
             $table->decimal('amount', 10, 2);
+            $table->enum('status', ['Paid', 'Not Paid'])->default('Not Paid');
             $table->string('month_name', 50);
             $table->date('payment_date');
             $table->enum('payment_method', ['Cash', 'Check', 'Mobile Money', 'Bank Transfer', 'Other'])->default('Cash');
@@ -23,6 +26,7 @@ return new class () extends Migration {
             $table->timestamps();
 
             // Indexes for performance
+            $table->unique(['member_id', 'academic_year_id', 'month'], 'contributions_member_year_month_unique');
             $table->index(['member_id', 'academic_year_id']);
             $table->index(['academic_year_id', 'is_archived']);
             $table->index('payment_date');

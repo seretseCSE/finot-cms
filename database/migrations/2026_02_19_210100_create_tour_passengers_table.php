@@ -12,7 +12,7 @@ return new class () extends Migration {
             $table->string('passenger_code', 20)->unique(); // TP-000001 format
             $table->foreignId('tour_id')->constrained('tours')->onDelete('cascade');
             $table->string('full_name', 255);
-            $table->string('phone', 20);
+            $table->string('phone', 20)->nullable();
             $table->integer('passenger_count')->default(1);
             $table->string('receipt_image', 500)->nullable();
             $table->foreignId('member_id')->nullable()->constrained('members')->onDelete('set null');

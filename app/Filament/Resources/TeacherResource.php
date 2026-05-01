@@ -21,6 +21,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TeacherResource extends Resource
 {
@@ -159,28 +160,36 @@ class TeacherResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Teacher::query())
+            ->query(Teacher::query()->withCount(['assignments as assigned_classes_count' => function ($query) {
+                $query->select(DB::raw('count(distinct class_id)'))
+                    ->where('assignment_status', 'Active')
+                    ->where(function ($q) {
+                        $q->whereNull('effective_to')
+                            ->orWhere('effective_to', '>=', now());
+                    });
+            }]))
             ->columns([
                 Tables\Columns\TextColumn::make('teacher_code')->label('Teacher Code')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('full_name')->label('Full Name')->sortable()->searchable(),
-                Tables\Columns\BadgeColumn::make('type')
+                Tables\Columns\TextColumn::make('type')
                     ->label('Type')
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Member' => 'primary',
                         'External' => 'gray',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('phone')->label('Phone')->searchable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'Active',
-                        'gray' => 'Inactive',
-                        'warning' => 'On Leave',
-                        'danger' => 'Former',
-                    ]),
+
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Active' => 'success',
+                        'Inactive' => 'gray',
+                        'On Leave' => 'warning',
+                        'Former' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('assigned_classes_count')
-                    ->label('Assigned Classes')
-                    ->state(fn () => 0),
+                    ->label('Assigned Classes'),
 
                 Tables\Columns\TextColumn::make('attendance_rate')
                     ->label('Attendance Rate')

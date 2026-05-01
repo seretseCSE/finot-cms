@@ -27,6 +27,7 @@ return new class () extends Migration {
 
             $table->foreignId('enrolled_by')->constrained('users');
             $table->foreignId('completed_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('promoted_to_enrollment_id')->nullable()->constrained('student_enrollments')->nullOnDelete();
 
             $table->timestamps();
 

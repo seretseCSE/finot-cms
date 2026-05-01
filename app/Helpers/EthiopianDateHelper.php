@@ -207,4 +207,19 @@ class EthiopianDateHelper
 
         return $ethDate->getYear();
     }
+
+    /**
+     * Get all Ethiopian month names (1-13) with Amharic.
+     */
+    public static function getAllEthiopianMonthNames(): array
+    {
+        $instance = new self();
+        $options = [];
+
+        foreach ($instance->ethiopianMonths as $key => $month) {
+            $options[$key] = $month['en'] . ' (' . $month['am'] . ')';
+        }
+
+        return $options;
+    }
 }

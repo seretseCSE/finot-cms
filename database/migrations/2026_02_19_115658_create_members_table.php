@@ -18,9 +18,11 @@ return new class () extends Migration {
             // Member classification
             $table->enum('member_type', ['Kids', 'Youth', 'Adult'])->comment('Type of member: Kids, Youth, or Adult');
             $table->enum('status', ['Draft', 'Member', 'Active', 'Former'])->default('Draft')->comment('Current status of the member');
+            $table->date('member_since')->nullable()->comment('Date when member formally became a member');
+            $table->text('hr_notes')->nullable()->comment('HR notes and observations');
 
             // Personal information
-            $table->string('title', 50)->comment('Title: Mr/Mrs/Dr/Dn/etc.');
+            $table->string('title', 50)->nullable()->comment('Title: Mr/Mrs/Dr/Dn/etc.');
             $table->string('first_name', 100)->comment('First name of the member');
             $table->string('father_name', 100)->comment('Father\'s name');
             $table->string('grandfather_name', 100)->comment('Grandfather\'s name');
@@ -81,6 +83,7 @@ return new class () extends Migration {
 
             // Foreign keys
             $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete()->comment('Department that manages this member');
+            $table->decimal('monthly_contribution_amount', 10, 2)->default(0.00)->comment('Monthly contribution amount for this member');
 
             // Soft deletes and timestamps
             $table->softDeletes();

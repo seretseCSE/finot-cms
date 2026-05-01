@@ -255,11 +255,11 @@
 
             <div style="margin-top:10px;padding-top:12px;border-top:1px solid var(--border-subtle);">
                 @auth
-                    <a href="{{ url('/admin') }}" style="display:flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:10px;background:linear-gradient(135deg,var(--blue-primary),#3D5EFF);color:#fff;text-decoration:none;font-weight:600;font-size:.95rem;">
+                    <a href="{{ url('/admin') }}" style="display:flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:10px;background:#1A44F7;color:#fff;text-decoration:none;font-weight:600;font-size:.95rem;">
                         {{ __('Dashboard') }}
                     </a>
                 @else
-                    <a href="{{ route('login') }}" style="display:flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:10px;background:linear-gradient(135deg,var(--blue-primary),#3D5EFF);color:#fff;text-decoration:none;font-weight:600;font-size:.95rem;">
+                    <a href="{{ route('login') }}" style="display:flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:10px;background:#1A44F7;color:#fff;text-decoration:none;font-weight:600;font-size:.95rem;">
                         {{ __('Login') }}
                     </a>
                 @endauth
@@ -286,12 +286,12 @@
     .nav-cta {
         display:inline-flex; align-items:center; gap:6px;
         padding:9px 18px; border-radius:8px; font-size:.82rem; font-weight:600;
-        background:linear-gradient(135deg,var(--blue-primary),#3D5EFF);
+        background:#1A44F7;
         color:#fff; text-decoration:none; margin-left:8px;
         box-shadow:0 4px 18px rgba(26,68,247,.35);
         transition:transform .2s,box-shadow .2s; white-space:nowrap;
     }
-    .nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(26,68,247,.45); }
+    .nav-cta:hover { background:#2952FF; transform:translateY(-2px); box-shadow:0 8px 28px rgba(26,68,247,.45); }
 
     /* Dropdown */
     .dropdown-menu { opacity:0; visibility:hidden; transform:translateY(8px); pointer-events:none; }

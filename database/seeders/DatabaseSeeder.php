@@ -26,12 +26,13 @@ class DatabaseSeeder extends Seeder
             MemberSeeder::class,
             TeacherSeeder::class,
             SubjectSeeder::class,
+            ClassSeeder::class,
             TeacherSubjectAssignmentSeeder::class,
 
             // Content Management
             PageSeeder::class,
-            // BlogSeeder::class,
-            // MediaSeeder::class,
+            BlogSeeder::class,
+            MediaSeeder::class,
             DocumentSeeder::class,
             TourSeeder::class,
 

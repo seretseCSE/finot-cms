@@ -103,11 +103,12 @@ class LibrarySubcategoryResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'Active',
-                        'danger' => 'Inactive',
-                    ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Active' => 'success',
+                        'Inactive' => 'danger',
+                    }),
 
                 Tables\Columns\TextColumn::make('display_order')
                     ->label('Order')

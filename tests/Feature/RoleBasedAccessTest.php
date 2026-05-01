@@ -53,9 +53,6 @@ class RoleBasedAccessTest extends TestCase
         $response = $this->actingAs($educationHead)->get('/admin/classes');
         $response->assertStatus(200);
 
-        $response = $this->actingAs($educationHead)->get('/admin/education-reports');
-        $response->assertStatus(200);
-
         // Should not have access to finance resources
         $response = $this->actingAs($educationHead)->get('/admin/contributions');
         $response->assertStatus(403);

@@ -189,13 +189,14 @@ class PredefinedReportResource extends BaseResource
                 Tables\Columns\TextColumn::make('resource_type')
                     ->badge(),
 
-                Tables\Columns\BadgeColumn::make('format')
-                    ->colors([
-                        'primary' => 'screen',
-                        'success' => 'excel',
-                        'danger' => 'pdf',
-                        'warning' => 'csv',
-                    ]),
+                Tables\Columns\TextColumn::make('format')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'screen' => 'primary',
+                        'excel' => 'success',
+                        'pdf' => 'danger',
+                        'csv' => 'warning',
+                    }),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),

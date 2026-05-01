@@ -29,7 +29,8 @@ class AidDistributionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Amount')
                     ->money('ETB')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('N/A'),
                 Tables\Columns\TextColumn::make('receipt_number')
                     ->label('Receipt Number'),
                 Tables\Columns\TextColumn::make('distributed_by.name')

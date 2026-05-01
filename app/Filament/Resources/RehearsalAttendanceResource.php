@@ -116,15 +116,16 @@ class RehearsalAttendanceResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'success' => 'Present',
-                        'danger' => 'Absent',
-                        'warning' => 'Excused',
-                        'info' => 'Late',
-                        'primary' => 'Permission',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Present' => 'success',
+                        'Absent' => 'danger',
+                        'Excused' => 'warning',
+                        'Late' => 'info',
+                        'Permission' => 'primary',
+                    }),
 
                 Tables\Columns\TextColumn::make('markedBy.name')
                     ->label('Marked By')

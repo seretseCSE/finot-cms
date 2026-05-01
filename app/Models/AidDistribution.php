@@ -25,7 +25,7 @@ class AidDistribution extends BaseModel
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount' => 'decimal:2|null',
         'distribution_date' => 'date',
         'is_locked' => 'boolean',
         'locked_at' => 'datetime',

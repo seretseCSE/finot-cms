@@ -124,12 +124,13 @@ class TourAttendanceResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'success' => 'Present',
-                        'danger' => 'Not Present',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Present' => 'success',
+                        'Not Present' => 'danger',
+                    }),
 
                 Tables\Columns\TextColumn::make('markedBy.name')
                     ->label('Marked By')

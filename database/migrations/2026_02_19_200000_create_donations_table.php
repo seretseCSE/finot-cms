@@ -15,11 +15,9 @@ return new class () extends Migration {
             $table->string('donation_type', 100);
             $table->string('custom_donation_type', 100)->nullable();
             $table->text('notes')->nullable();
+            $table->unsignedBigInteger('bank_account_id')->nullable();
             $table->foreignId('recorded_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
-
-            // Check constraint for minimum amount
-            // $table->check('amount >= 0.01', 'check_donation_amount_minimum');
 
             // Indexes for performance
             $table->index('donation_date');

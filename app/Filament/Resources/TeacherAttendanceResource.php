@@ -138,22 +138,24 @@ class TeacherAttendanceResource extends Resource
                     ->date('M j, Y')
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('attendance_status')
+                Tables\Columns\TextColumn::make('attendance_status')
                     ->label('Status')
-                    ->colors([
-                        'success' => 'Present',
-                        'danger' => 'Absent',
-                        'warning' => 'Late',
-                        'info' => 'Permission',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Present' => 'success',
+                        'Absent' => 'danger',
+                        'Late' => 'warning',
+                        'Permission' => 'info',
+                    }),
 
-                Tables\Columns\BadgeColumn::make('session_outcome')
+                Tables\Columns\TextColumn::make('session_outcome')
                     ->label('Outcome')
-                    ->colors([
-                        'success' => 'Normal',
-                        'danger' => 'Cancelled',
-                        'warning' => 'Substitute_Assigned',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Normal' => 'success',
+                        'Cancelled' => 'danger',
+                        'Substitute_Assigned' => 'warning',
+                    }),
 
                 Tables\Columns\TextColumn::make('substitute_teacher_name')
                     ->label('Substitute')

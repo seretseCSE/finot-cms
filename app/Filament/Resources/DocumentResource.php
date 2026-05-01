@@ -75,13 +75,15 @@ class DocumentResource extends Resource
             return false;
         }
 
-        $query = Department::query()->where('secretary_user_id', $user->id);
-
-        if ($record?->department_id) {
-            $query->where('id', $record->department_id);
+        if (! $user->hasRole('department_secretary')) {
+            return false;
         }
 
-        return $query->exists();
+        if ($record?->department_id) {
+            return $user->department_id === $record->department_id;
+        }
+
+        return true;
     }
 
     public static function canViewAny(): bool

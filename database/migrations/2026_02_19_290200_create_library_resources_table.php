@@ -11,6 +11,7 @@ return new class () extends Migration {
             $table->id();
             $table->string('title', 255);
             $table->string('file_path', 500);
+            $table->string('file_type', 20)->default('pdf');
             $table->foreignId('category_id')->constrained('library_categories')->onDelete('cascade');
             $table->foreignId('subcategory_id')->nullable()->constrained('library_subcategories')->onDelete('set null');
             $table->text('description')->nullable();

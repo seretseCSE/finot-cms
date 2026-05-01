@@ -16,12 +16,17 @@ return new class () extends Migration {
             $table->string('phone', 20)->unique(); // Phone as unique identifier
             $table->string('email')->nullable(); // Email optional
             $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('last_login_at')->nullable();
             $table->string('password');
+            $table->json('password_history')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_locked')->default(false);
             $table->boolean('temp_password_changed')->default(false);
             $table->integer('failed_login_attempts')->default(0);
             $table->timestamp('locked_until')->nullable();
+            $table->string('lock_reason')->nullable();
+            $table->foreignId('locked_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('locked_at')->nullable();
             $table->unsignedBigInteger('department_id')->nullable();
             $table->enum('language_preference', ['am', 'en'])->default('am');
             $table->rememberToken();

@@ -37,7 +37,7 @@ class ClassModel extends BaseModel
 
     public function attendanceSessions()
     {
-        return $this->hasMany(AttendanceSession::class, 'class_id');
+        return $this->belongsToMany(AttendanceSession::class, 'session_classes', 'class_id', 'session_id');
     }
 
     public function scopeActive($query)

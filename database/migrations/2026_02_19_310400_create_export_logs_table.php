@@ -10,11 +10,14 @@ return new class () extends Migration {
         Schema::create('export_logs', function (Blueprint $table) {
             $table->id();
             $table->string('resource_type', 100);
+            $table->json('filters')->nullable();
             $table->string('format', 20);
             $table->string('file_path', 500);
             $table->integer('record_count');
             $table->string('exported_by');
-            $table->timestamp('created_at');
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->timestamp('created_at')->useCurrent();
 
             // Indexes
             $table->index('resource_type');

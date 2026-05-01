@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasAuditLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AttendanceSession extends BaseModel
@@ -35,6 +36,21 @@ class AttendanceSession extends BaseModel
     public function class()
     {
         return $this->belongsTo(ClassModel::class, 'class_id');
+    }
+
+    public function classes(): BelongsToMany
+    {
+        return $this->belongsToMany(ClassModel::class, 'session_classes', 'session_id', 'class_id');
+    }
+
+    public function teacherAssignmentsPivot(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TeacherAssignment::class,
+            'session_teacher_assigns',
+            'session_id',
+            'teacher_assignment_id'
+        );
     }
 
     public function academicYear()

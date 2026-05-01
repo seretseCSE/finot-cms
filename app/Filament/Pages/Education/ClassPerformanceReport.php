@@ -6,8 +6,7 @@ use App\Models\ClassModel;
 use Filament\Schemas\Schema;
 use App\Models\AcademicYear;
 use App\Models\Member;
-use App\Models\Attendance;
-use App\Models\TestResult;
+use App\Models\StudentAttendance;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Illuminate\Support\Facades\Auth;
@@ -87,9 +86,9 @@ class ClassPerformanceReport extends Page
 
         $studentAttendance = [];
         foreach ($students as $student) {
-            $attendance = Attendance::where('member_id', $student->id)
+            $attendance = StudentAttendance::where('student_id', $student->id)
                 ->whereHas('session', function ($query) {
-                    $query->where('class_id', $this->class_id)
+                    $query->whereHas('classes', fn ($q) => $q->where('class_id', $this->class_id))
                           ->where('academic_year_id', $this->academic_year_id);
                 })
                 ->get();
@@ -99,35 +98,20 @@ class ClassPerformanceReport extends Page
             $attendanceRate = $totalSessions > 0 ? round(($presentCount / $totalSessions) * 100, 2) : 0;
 
             $studentAttendance[$student->id] = [
-                'student' => $student,
                 'total_sessions' => $totalSessions,
                 'present' => $presentCount,
                 'attendance_rate' => $attendanceRate,
-                'attendance_details' => $attendance->groupBy('status'),
             ];
         }
 
         $studentTests = [];
         foreach ($students as $student) {
-            $testResults = TestResult::where('member_id', $student->id)
-                ->whereHas('test', function ($query) {
-                    $query->where('class_id', $this->class_id)
-                          ->where('academic_year_id', $this->academic_year_id);
-                })
-                ->with('test')
-                ->get();
-
-            $scores = $testResults->pluck('score');
-            $averageScore = $scores->count() > 0 ? round($scores->avg(), 2) : 0;
-            $highestScore = $scores->max() ?? 0;
-            $lowestScore = $scores->min() ?? 0;
-
             $studentTests[$student->id] = [
-                'total_tests' => $testResults->count(),
-                'average_score' => $averageScore,
-                'highest_score' => $highestScore,
-                'lowest_score' => $lowestScore,
-                'test_results' => $testResults,
+                'total_tests' => 0,
+                'average_score' => 0,
+                'highest_score' => 0,
+                'lowest_score' => 0,
+                'test_results' => [],
             ];
         }
 
@@ -159,8 +143,12 @@ class ClassPerformanceReport extends Page
         ];
 
         $this->reportData = [
-            'class' => $class,
-            'students' => $students,
+            'class' => $class->only(['id', 'name']),
+            'students' => $students->map(fn ($student) => [
+                'id' => $student->id,
+                'full_name' => $student->full_name,
+                'phone' => $student->phone,
+            ])->toArray(),
             'student_attendance' => $studentAttendance,
             'student_tests' => $studentTests,
             'class_stats' => $classStats,

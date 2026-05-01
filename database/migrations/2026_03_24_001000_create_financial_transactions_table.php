@@ -23,15 +23,11 @@ return new class () extends Migration {
             $table->string('payment_method')->nullable(); // Cash, Bank Transfer, etc.
 
             // Bank account
-            $table->foreignId('bank_account_id')->nullable();
+            $table->unsignedBigInteger('bank_account_id')->nullable();
 
             // File attachments
             $table->string('attachment_path')->nullable();
             $table->string('attachment_type')->nullable(); // receipt, invoice, etc.
-
-            // Status and approval
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->text('notes')->nullable();
 
             // Audit fields
             $table->foreignId('recorded_by')->constrained('users')->onDelete('restrict');
@@ -42,7 +38,6 @@ return new class () extends Migration {
             $table->softDeletes();
 
             $table->index(['type', 'transaction_date']);
-            $table->index(['status', 'transaction_date']);
             $table->index('bank_account_id');
         });
     }

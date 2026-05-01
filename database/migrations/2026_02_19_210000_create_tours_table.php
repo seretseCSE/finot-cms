@@ -11,6 +11,7 @@ return new class () extends Migration {
             $table->id();
             $table->string('place', 255);
             $table->text('description');
+            $table->string('image', 500)->nullable();
             $table->date('tour_date');
             $table->time('start_time');
             $table->decimal('cost_per_person', 10, 2)->nullable();

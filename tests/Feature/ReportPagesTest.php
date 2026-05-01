@@ -92,15 +92,6 @@ class ReportPagesTest extends TestCase
     }
 
     #[Test]
-    public function education_report_page_accessible(): void
-    {
-        $user = $this->createEducationHeadUser();
-        $response = $this->actingAs($user)->get('/admin/education-report');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
     public function predefined_reports_accessible(): void
     {
         $user = $this->createAdminUser();

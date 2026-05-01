@@ -17,6 +17,7 @@ class CreateAttendanceSession extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = Auth::user()->id;
+
         return $data;
     }
 
@@ -25,34 +26,32 @@ class CreateAttendanceSession extends CreateRecord
         $activeYear = AcademicYear::query()->where('status', 'Active')->first();
 
         if (! $activeYear) {
-            abort(redirect()->back()->with('error', 'No active academic year'));
+            throw new \RuntimeException('No active academic year');
         }
 
         $classIds = $data['class_ids'] ?? [];
         $sessionDate = $data['session_date'];
 
         if (empty($classIds) || ! $sessionDate) {
-            abort(redirect()->back()->with('error', 'Please select classes and date'));
+            throw new \RuntimeException('Please select classes and date');
         }
 
-        $firstSession = null;
-        foreach ($classIds as $classId) {
-            $session = AttendanceSession::create([
-                'class_id' => $classId,
-                'session_date' => $sessionDate,
-                'academic_year_id' => $activeYear->id,
-                'status' => 'Open',
-                'created_by' => $data['created_by'],
-            ]);
+        $session = AttendanceSession::create([
+            'session_date' => $sessionDate,
+            'academic_year_id' => $activeYear->id,
+            'status' => 'Open',
+            'created_by' => $data['created_by'],
+        ]);
 
-            if (! $firstSession) {
-                $firstSession = $session;
-            }
-        }
+        $session->classes()->sync($classIds);
 
         $count = count($classIds);
-        Notification::make()->title("{$count} attendance sessions created")->success()->send();
+        Notification::make()
+            ->title("Attendance session created")
+            ->body("Session for {$sessionDate} with {$count} class(es).")
+            ->success()
+            ->send();
 
-        return $firstSession;
+        return $session;
     }
 }

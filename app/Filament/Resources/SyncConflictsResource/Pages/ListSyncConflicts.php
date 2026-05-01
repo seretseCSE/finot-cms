@@ -22,7 +22,7 @@ class ListSyncConflicts extends ListRecords
                     $csv = $records->map(function ($record) {
                         return [
                             'Student' => $record->student->full_name,
-                            'Class' => $record->session->class->name,
+                            'Class' => $record->session->classes->pluck('name')->join(', ') ?: 'N/A',
                             'Date' => $record->session->session_date,
                             'First Value' => $record->first_value,
                             'Second Value (Winner)' => $record->second_value,

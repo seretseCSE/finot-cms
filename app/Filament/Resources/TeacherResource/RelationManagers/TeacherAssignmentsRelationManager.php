@@ -75,13 +75,14 @@ class TeacherAssignmentsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('class.name')->label('Class')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('subject.name')->label('Subject')->sortable()->searchable(),
-                Tables\Columns\BadgeColumn::make('assignment_status')
+                Tables\Columns\TextColumn::make('assignment_status')
                     ->label('Status')
-                    ->colors([
-                        'success' => 'Active',
-                        'danger' => 'Inactive',
-                        'warning' => 'On Leave',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Active' => 'success',
+                        'Inactive' => 'danger',
+                        'On Leave' => 'warning',
+                    }),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('class_id')

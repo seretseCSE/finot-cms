@@ -6,11 +6,14 @@ use App\Models\Member;
 use Filament\Schemas\Schema;
 use App\Models\ClassModel;
 use App\Models\AcademicYear;
-use App\Models\Attendance;
-use App\Models\TestResult;
+use App\Models\Contribution;
+use App\Models\StudentAttendance;
 use Filament\Pages\Page;
 use Filament\Forms;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 
 class StudentProgressReport extends Page
 {
@@ -31,7 +34,13 @@ class StudentProgressReport extends Page
         return 2;
     }
 
-    public ?array $filters = [];
+    // FIX: removed unused $filters property; Filament stores form state in $data automatically.
+    // Declaring it explicitly avoids "property not found" warnings.
+    public ?array $data = [];
+
+    // FIX: replaces calling getProgressData() twice per render — store result here after
+    // the button is clicked so the blade reads a single cached value.
+    public ?array $reportData = null;
 
     public static function canAccess(array $parameters = []): bool
     {
@@ -42,145 +51,200 @@ class StudentProgressReport extends Page
     {
         $this->form->fill([
             'academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
-            'class_id' => null,
-            'member_id' => null,
+            'class_id'         => null,
+            'member_id'        => null,
         ]);
     }
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema
+            ->components([
                 Forms\Components\Select::make('academic_year_id')
                     ->label('Academic Year')
                     ->options(AcademicYear::pluck('name', 'id'))
                     ->required()
-                    ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('class_id', null)),
+                    ->live()   // FIX: ->reactive() is removed in Filament v5, use ->live()
+                    ->afterStateUpdated(function (Set $set) {
+                        // FIX: v5 afterStateUpdated uses typed Set/Get, not ($state, callable $set)
+                        $set('class_id',  null);
+                        $set('member_id', null);
+                        $this->reportData = null; // clear stale results on filter change
+                    }),
 
                 Forms\Components\Select::make('class_id')
                     ->label('Class')
-                    ->options(function (callable $get) {
+                    ->options(function (Get $get) {
                         $yearId = $get('academic_year_id');
-                        if (!$yearId) {
+                        if (! $yearId) {
                             return [];
                         }
 
-                        return ClassModel::whereHas('attendanceSessions', function ($query) use ($yearId) {
-                            $query->where('academic_year_id', $yearId);
-                        })
+                        return ClassModel::active()
+                            ->orderBy('name')
                             ->get()
-                            ->mapWithKeys(fn ($class) => [$class->id => $class->name]);
+                            ->pluck('name', 'id');
                     })
-                    ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('member_id', null)),
+                    ->live()   // FIX: ->reactive() → ->live()
+                    ->afterStateUpdated(function (Set $set) {
+                        $set('member_id', null);
+                        $this->reportData = null;
+                    })
+                    ->placeholder('Select a class'),
 
                 Forms\Components\Select::make('member_id')
                     ->label('Student')
-                    ->options(function (callable $get) {
+                    ->options(function (Get $get) {
                         $classId = $get('class_id');
-                        if (!$classId) {
+                        $yearId  = $get('academic_year_id');
+                        if (! $classId || ! $yearId) {
                             return [];
                         }
 
-                        return Member::whereHas('educationHistory', function ($query) use ($classId) {
-                            $query->where('class_id', $classId);
-                        })->get()->pluck('full_name', 'id');
+                        return Member::whereHas('studentEnrollments', function ($query) use ($classId, $yearId) {
+                                $query->where('class_id', $classId)
+                                      ->where('academic_year_id', $yearId);
+                            })
+                            ->get()
+                            ->pluck('full_name', 'id');
                     })
-                    ->required(),
+                    ->required()
+                    ->searchable()
+                    ->placeholder('Select a student'),
             ])
+            ->statePath('data')  // FIX: explicit statePath so $this->data is always the source of truth
             ->columns(3);
     }
 
-    public function getProgressData(): array
+    // FIX: now builds and caches into $this->reportData instead of being a computed getter.
+    // The blade reads $this->reportData (a plain property), not a method called twice.
+    public function generateProgressReport(): void
     {
-        $filters = $this->data ?? [];
+        $this->form->validate();
+
+        $filters = $this->data;
 
         if (empty($filters['member_id'])) {
-            return [];
+            Notification::make()
+                ->title('Please select a student first.')
+                ->warning()
+                ->send();
+            return;
         }
 
-        $member = Member::with(['educationHistory.class.subject', 'educationHistory.academicYear'])
+        $member = Member::with(['studentEnrollments.class'])
             ->findOrFail($filters['member_id']);
 
-        // Get current education record
-        $currentEducation = $member->educationHistory()
+        $currentEnrollment = $member->studentEnrollments()
             ->where('academic_year_id', $filters['academic_year_id'])
-            ->with(['class.subject'])
+            ->when(! empty($filters['class_id']), fn ($q) => $q->where('class_id', $filters['class_id']))
+            ->with('class')
             ->first();
 
-        if (!$currentEducation) {
-            return [];
+        if (! $currentEnrollment) {
+            Notification::make()
+                ->title('No enrollment found for the selected filters.')
+                ->warning()
+                ->send();
+            return;
         }
 
-        // Attendance data
-        $attendanceData = Attendance::where('member_id', $member->id)
+        $attendanceData = StudentAttendance::where('student_id', $member->id)
             ->whereHas('session', function ($query) use ($filters) {
                 $query->where('academic_year_id', $filters['academic_year_id']);
-                if (!empty($filters['class_id'])) {
+                if (! empty($filters['class_id'])) {
                     $query->where('class_id', $filters['class_id']);
                 }
             })
             ->with('session')
             ->get();
 
-        // Test results data
-        $testResults = TestResult::where('member_id', $member->id)
-            ->whereHas('test', function ($query) use ($filters) {
-                $query->where('academic_year_id', $filters['academic_year_id']);
-                if (!empty($filters['class_id'])) {
-                    $query->where('class_id', $filters['class_id']);
-                }
-            })
-            ->with('test')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // TODO: replace with your real test result query when the tests module is ready
+        $testResults = collect();
 
-        // Calculate statistics
-        $totalSessions = $attendanceData->count();
-        $presentCount = $attendanceData->where('status', 'Present')->count();
-        $attendanceRate = $totalSessions > 0 ? round(($presentCount / $totalSessions) * 100, 2) : 0;
+        $totalSessions  = $attendanceData->count();
+        $presentCount   = $attendanceData->where('status', 'Present')->count();
+        $attendanceRate = $totalSessions > 0
+            ? round(($presentCount / $totalSessions) * 100, 2)
+            : 0;
 
-        $testScores = $testResults->pluck('score');
+        $testScores   = $testResults->pluck('score');
         $averageScore = $testScores->count() > 0 ? round($testScores->avg(), 2) : 0;
         $highestScore = $testScores->max() ?? 0;
-        $lowestScore = $testScores->min() ?? 0;
+        $lowestScore  = $testScores->min() ?? 0;
 
-        // Progress trend
-        $monthlyProgress = $testResults->groupBy(function ($result) {
-            return \Carbon\Carbon::parse($result->created_at)->format('Y-m');
-        })->map(function ($monthResults) {
-            return [
-                'month' => \Carbon\Carbon::parse($monthResults->first()->created_at)->format('M Y'),
-                'average_score' => round($monthResults->pluck('score')->avg(), 2),
-                'test_count' => $monthResults->count(),
-            ];
-        })->sortBy('month');
+        // Monthly trend — populate once tests are wired up
+        $monthlyProgress = collect();
 
-        return [
-            'student' => $member,
-            'current_education' => $currentEducation,
-            'attendance' => [
+        // Contributions
+        $contributions = Contribution::where('member_id', $member->id)
+            ->where('academic_year_id', $filters['academic_year_id'])
+            ->orderBy('month')
+            ->get();
+
+        $totalContributions = $contributions->count();
+        $paidCount = $contributions->where('status', 'Paid')->count();
+        $unpaidCount = $totalContributions - $paidCount;
+        $totalAmount = $contributions->where('status', 'Paid')->sum('amount');
+        $expectedAmount = $contributions->sum('amount');
+        $paymentRate = $totalContributions > 0 ? round(($paidCount / $totalContributions) * 100, 2) : 0;
+
+        $monthlyDetail = $contributions->map(fn ($c) => [
+            'month_name' => $c->month_name,
+            'month' => $c->month,
+            'amount' => $c->amount,
+            'is_paid' => $c->is_paid,
+            'status' => $c->status,
+            'payment_date' => $c->payment_date,
+            'payment_method' => $c->payment_method,
+        ])->values()->toArray();
+
+        $this->reportData = [
+            'student'            => $member,
+            'current_enrollment' => $currentEnrollment,
+            'attendance'         => [
                 'total_sessions' => $totalSessions,
-                'present' => $presentCount,
-                'rate' => $attendanceRate,
-                'details' => $attendanceData->groupBy('status'),
+                'present'        => $presentCount,
+                'rate'           => $attendanceRate,
+                'details'        => $attendanceData->groupBy('status'),
             ],
             'tests' => [
-                'total_tests' => $testResults->count(),
+                'total_tests'   => $testResults->count(),
                 'average_score' => $averageScore,
                 'highest_score' => $highestScore,
-                'lowest_score' => $lowestScore,
-                'results' => $testResults,
+                'lowest_score'  => $lowestScore,
+                'results'       => $testResults,
             ],
             'progress_trend' => $monthlyProgress,
+            'contributions' => [
+                'total_months' => $totalContributions,
+                'paid_count' => $paidCount,
+                'unpaid_count' => $unpaidCount,
+                'total_paid' => $totalAmount,
+                'expected_total' => $expectedAmount,
+                'payment_rate' => $paymentRate,
+                'monthly' => $monthlyDetail,
+            ],
         ];
     }
 
-    public function generateReportCard()
+    // FIX: Livewire component methods cannot return an HTTP Response.
+    // Raise a notification for now; swap for a PDF stream / redirect when ready.
+    public function generateReportCard(): void
     {
-        $data = $this->getProgressData();
+        if (! $this->reportData) {
+            Notification::make()
+                ->title('Generate a progress report first.')
+                ->warning()
+                ->send();
+            return;
+        }
 
-        // Implementation for PDF report card generation
-        return response()->json($data);
+        // TODO: implement PDF export, e.g.:
+        // return response()->streamDownload(fn () => print($pdf->output()), 'report-card.pdf');
+        Notification::make()
+            ->title('Report card export coming soon.')
+            ->info()
+            ->send();
     }
 }

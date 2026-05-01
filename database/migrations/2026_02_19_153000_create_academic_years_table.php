@@ -17,20 +17,22 @@ return new class () extends Migration {
             $table->date('start_date');
             $table->date('end_date');
 
-            $table->boolean('is_active')->default(false);
             $table->enum('status', ['Draft', 'Active', 'Deactivated'])->default('Draft');
+            $table->enum('phase', ['upcoming', 'current', 'completed'])->nullable();
 
             $table->timestamp('activated_at')->nullable();
             $table->timestamp('deactivated_at')->nullable();
+            $table->timestamp('reactivated_at')->nullable();
 
             $table->foreignId('activated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deactivated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('reactivated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('created_by')->constrained('users');
 
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index(['status']);
-            $table->index(['is_active']);
         });
 
         // start_date must be before end_date
@@ -40,10 +42,9 @@ return new class () extends Migration {
             // Ignore if DB doesn't support check constraints.
         }
 
-        // Enforce only one active row (partial unique index equivalent)
-        // MySQL 8 supports functional indexes; for other DBs this may be ignored.
+        // Enforce only one active row
         try {
-            DB::statement('CREATE UNIQUE INDEX academic_years_one_active ON academic_years ((CASE WHEN is_active = 1 THEN 1 ELSE NULL END))');
+            DB::statement("CREATE UNIQUE INDEX academic_years_one_active ON academic_years ((CASE WHEN status = 'Active' THEN 1 ELSE NULL END))");
         } catch (\Throwable $e) {
             // Fallback to application-level enforcement.
         }

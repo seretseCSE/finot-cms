@@ -31,13 +31,13 @@ class AttendanceSessionExport extends BaseExport
 
     public static function relationships(): array
     {
-        return ['class', 'academicYear', 'createdBy'];
+        return ['classes', 'academicYear', 'createdBy'];
     }
 
     protected function resolveColumn($record, string $column): mixed
     {
         return match ($column) {
-            'class' => $record->class?->name,
+            'class' => $record->classes->pluck('name')->join(', ') ?: 'N/A',
             'session_date' => $record->session_date?->format('M d, Y'),
             'academic_year' => $record->academicYear?->name,
             'status' => $record->status,

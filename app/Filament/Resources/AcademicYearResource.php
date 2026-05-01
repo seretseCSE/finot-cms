@@ -109,18 +109,20 @@ class AcademicYearResource extends Resource
             ->query(AcademicYear::query()->withCount('enrollments'))
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'gray' => 'Draft',
-                        'success' => 'Active',
-                        'danger' => 'Deactivated',
-                    ]),
-                Tables\Columns\BadgeColumn::make('phase')
-                    ->colors([
-                        'warning' => 'upcoming',
-                        'success' => 'current',
-                        'gray' => 'completed',
-                    ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Draft' => 'gray',
+                        'Active' => 'success',
+                        'Deactivated' => 'danger',
+                    }),
+                Tables\Columns\TextColumn::make('phase')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'upcoming' => 'warning',
+                        'current' => 'success',
+                        'completed' => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('start_date')
                     ->formatStateUsing(fn ($state) => $state ? app(EthiopianDateHelper::class)->toString($state) : ''),
                 Tables\Columns\TextColumn::make('end_date')

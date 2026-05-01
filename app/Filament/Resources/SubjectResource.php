@@ -73,13 +73,11 @@ class SubjectResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\BadgeColumn::make('is_active')
+                Tables\Columns\TextColumn::make('is_active')
                     ->label('Active')
-                    ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
-                    ->colors([
-                        'success' => true,
-                        'gray' => false,
-                    ]),
+                    ->badge()
+                    ->color(fn($state) => $state ? 'success' : 'gray')
+                    ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->toggleable(),
             ])
             ->actions([

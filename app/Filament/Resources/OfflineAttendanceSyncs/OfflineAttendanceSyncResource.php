@@ -92,21 +92,23 @@ class OfflineAttendanceSyncResource extends BaseResource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'Present',
-                        'danger' => 'Absent',
-                        'warning' => 'Late',
-                        'info' => 'Excused',
-                        'gray' => 'Permission',
-                    ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Present' => 'success',
+                        'Absent' => 'danger',
+                        'Late' => 'warning',
+                        'Excused' => 'info',
+                        'Permission' => 'gray',
+                    }),
 
-                Tables\Columns\BadgeColumn::make('sync_status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'synced',
-                        'danger' => 'conflict',
-                    ]),
+                Tables\Columns\TextColumn::make('sync_status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'pending' => 'warning',
+                        'synced' => 'success',
+                        'conflict' => 'danger',
+                    }),
 
                 Tables\Columns\TextColumn::make('marked_at')
                     ->dateTime()

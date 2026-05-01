@@ -76,9 +76,9 @@ class AidDistributionResource extends Resource
                             ->label('Amount')
                             ->numeric()
                             ->step(0.01)
-                            ->minValue(0.01)
-                            ->required()
-                            ->prefix('ETB'),
+                            ->minValue(0)
+                            ->prefix('ETB')
+                            ->helperText('Leave empty for non-monetary aid'),
 
                         Forms\Components\Select::make('distributed_by')
                             ->label('Distributed By')
@@ -121,7 +121,8 @@ class AidDistributionResource extends Resource
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Amount')
                     ->money('ETB')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('N/A'),
 
                 Tables\Columns\TextColumn::make('receipt_number')
                     ->label('Receipt Number')

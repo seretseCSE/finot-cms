@@ -32,12 +32,14 @@ class SessionLockReminder extends Notification
         $helper = app(EthiopianDateHelper::class);
         $sessionDate = $helper->toString($this->session->session_date);
 
+        $classNames = $this->session->classes->pluck('name')->join(', ') ?: 'N/A';
+
         return [
             'title' => 'Session Lock Reminder / ክፍለ ጊዜ ይዘጋል',
-            'message' => "Attendance session for {$this->session->class->name} on {$sessionDate} will auto-lock in 3 days",
+            'message' => "Attendance session for {$classNames} on {$sessionDate} will auto-lock in 3 days",
             'action_url' => route('filament.admin.resources.attendance-sessions.index'),
             'session_id' => $this->session->getKey(),
-            'class_name' => $this->session->class->name,
+            'class_names' => $classNames,
             'session_date' => $this->session->session_date,
         ];
     }

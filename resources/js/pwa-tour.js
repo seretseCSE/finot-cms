@@ -223,7 +223,7 @@ class PWATourManager {
                 { element: '[href="/admin/academic-years"]', popover: { title: 'Academic Years', description: 'Manage academic years, terms, and schedules.' } },
                 { element: '[href="/admin/school-classes"]', popover: { title: 'Classes', description: 'Manage educational classes and curricula.' } },
                 { element: '[href="/admin/student-enrollments"]', popover: { title: 'Enrollments', description: 'Manage student enrollments and registrations.' } },
-                { element: '[href="/admin/education-report"]', popover: { title: 'Education Reports', description: 'View attendance and performance reports.' } },
+
             ],
             education_monitor: [
                 { element: '[href="/admin/attendance-sessions"]', popover: { title: 'Attendance Tracking', description: 'Mark and review student attendance.' } },

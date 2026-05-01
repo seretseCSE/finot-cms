@@ -4,12 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ParentResource\Pages;
 use Filament\Schemas\Schema;
+use App\Exports\ParentExport;
+use App\Jobs\ProcessExportJob;
 use App\Models\ParentModel;
-use Filament\Forms;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Radio;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
-use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,41 +51,41 @@ class ParentResource extends Resource
         return 'Parents';
     }
 
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->components([
-                Section::make()
-                    ->schema([
-                        Forms\Components\TextInput::make('full_name')
-                            ->label('Full Name')
-                            ->required()
-                            ->maxLength(200),
+    // public static function form(Schema $schema): Schema
+    // {
+    //     return $schema->components([
+    //             Section::make()
+    //                 ->schema([
+    //                     Forms\Components\TextInput::make('full_name')
+    //                         ->label('Full Name')
+    //                         ->required()
+    //                         ->maxLength(200),
 
-                        Forms\Components\TextInput::make('phone')
-                            ->label('Phone')
-                            ->required()
-                            ->prefix(config('finot.phone_prefix', '+251'))
-                            ->regex('/^[0-9]{9}$/')
-                            ->placeholder('912345678')
-                            ->helperText('Enter 9 digits after '.config('finot.phone_prefix', '+251'))
-                            ->maxLength(9)
-                            ->unique(ignoreRecord: true)
-                            ->live(debounce: 500)
-                            ->formatStateUsing(function ($state) {
-                                $prefix = config('finot.phone_prefix', '+251');
+    //                     Forms\Components\TextInput::make('phone')
+    //                         ->label('Phone')
+    //                         ->required()
+    //                         ->prefix(config('finot.phone_prefix', '+251'))
+    //                         ->regex('/^[0-9]{9}$/')
+    //                         ->placeholder('912345678')
+    //                         ->helperText('Enter 9 digits after '.config('finot.phone_prefix', '+251'))
+    //                         ->maxLength(9)
+    //                         ->unique(ignoreRecord: true)
+    //                         ->live(debounce: 500)
+    //                         ->formatStateUsing(function ($state) {
+    //                             $prefix = config('finot.phone_prefix', '+251');
 
-                                return $state ? preg_replace('/^(' . preg_quote($prefix, '/') . '|0)/', '', $state) : null;
-                            })
-                            ->dehydrateStateUsing(fn ($state) => $state ? config('finot.phone_prefix', '+251').$state : null),
+    //                             return $state ? preg_replace('/^(' . preg_quote($prefix, '/') . '|0)/', '', $state) : null;
+    //                         })
+    //                         ->dehydrateStateUsing(fn ($state) => $state ? config('finot.phone_prefix', '+251').$state : null),
 
-                        Forms\Components\Textarea::make('notes')
-                            ->label('Notes')
-                            ->rows(3)
-                            ->maxLength(1000),
-                    ])
-                    ->columns(2),
-            ]);
-    }
+    //                     Forms\Components\Textarea::make('notes')
+    //                         ->label('Notes')
+    //                         ->rows(3)
+    //                         ->maxLength(1000),
+    //                 ])
+    //                 ->columns(2),
+    //         ]);
+    // }
 
     public static function table(Table $table): Table
     {
@@ -97,12 +106,10 @@ class ParentResource extends Resource
                     ->sortable()
                     ->formatStateUsing(fn ($state) => $state.' children'),
 
-                Tables\Columns\BadgeColumn::make('is_active')
+                Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
-                    ->colors([
-                        'success' => true,
-                        'danger' => false,
-                    ])
+                    ->badge()
+                    ->color(fn($state) => $state ? 'success' : 'danger')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -134,12 +141,44 @@ class ParentResource extends Resource
                     ]))
                     ->openUrlInNewTab(),
             ])
-            // ->bulkActions([
-            //     BulkActionGroup::make([
-            //         DeleteBulkAction::make(),
-            //         RestoreBulkAction::make(),
-            //     ]),
-            // ])
+            ->bulkActions([
+                DeleteBulkAction::make(),
+
+                BulkAction::make('export')
+                    ->label('Export')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->form([
+                        CheckboxList::make('columns')
+                            ->label('Columns')
+                            ->options(ParentExport::availableColumns())
+                            ->default(array_keys(ParentExport::availableColumns()))
+                            ->columns(2)
+                            ->required(),
+                        Radio::make('format')
+                            ->label('Format')
+                            ->options(['xlsx' => 'Excel (.xlsx)', 'csv' => 'CSV (.csv)'])
+                            ->default('xlsx')
+                            ->required(),
+                    ])
+                    ->action(function (array $data, BulkAction $action) {
+                        $ids = $action->getSelectedRecords()->pluck('id')->toArray();
+
+                        ProcessExportJob::dispatchSync(
+                            exportClass: ParentExport::class,
+                            columns: $data['columns'],
+                            format: $data['format'],
+                            userId: auth()->id(),
+                            ids: $ids,
+                        );
+
+                        Notification::make()
+                            ->title('Export queued')
+                            ->body('Your export is being processed. You will be notified when it is ready.')
+                            ->success()
+                            ->send();
+                    }),
+            ])
             ->defaultSort('created_at', 'desc');
     }
 

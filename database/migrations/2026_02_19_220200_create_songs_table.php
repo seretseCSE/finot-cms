@@ -13,7 +13,7 @@ return new class () extends Migration {
             $table->string('title', 255);
             $table->longText('lyrics')->nullable();
             $table->foreignId('category_id')->constrained('song_categories')->onDelete('restrict');
-            $table->foreignId('subcategory_id')->constrained('song_subcategories')->onDelete('restrict');
+            $table->foreignId('subcategory_id')->nullable()->constrained('song_subcategories')->onDelete('restrict');
             $table->string('audio_file', 500)->nullable();
             $table->string('video_file', 500)->nullable();
             $table->string('artist', 255)->nullable();

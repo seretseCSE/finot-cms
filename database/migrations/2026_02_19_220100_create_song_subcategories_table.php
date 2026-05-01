@@ -12,6 +12,7 @@ return new class () extends Migration {
             $table->foreignId('category_id')->constrained('song_categories')->onDelete('cascade');
             $table->string('name', 100);
             $table->text('description')->nullable();
+            $table->string('image', 500)->nullable();
             $table->integer('display_order')->default(0);
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');

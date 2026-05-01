@@ -75,26 +75,30 @@ class AttendanceSessionResource extends Resource
                 EthiopianDatePicker::make('session_date')
                     ->label('Session Date')
                     ->required()
-                    ->helperText('Date for the attendance session. Multiple sessions will be created for selected classes.'),
+                    ->helperText('One session per day. Multiple classes can be included in a single session.'),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->query(AttendanceSession::query()->with(['class', 'academicYear']))
+            ->query(AttendanceSession::query()->with(['classes', 'academicYear']))
             ->columns([
-                Tables\Columns\TextColumn::make('class.name')->label('Class')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('session_date')
                     ->label('Session Date')
                     ->formatStateUsing(fn ($state) => $state ? app(EthiopianDateHelper::class)->toString($state) : '')
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'Open',
-                        'warning' => 'Completed',
-                        'danger' => 'Locked',
-                    ]),
+                Tables\Columns\TextColumn::make('classes_names')
+                    ->label('Classes')
+                    ->state(fn (AttendanceSession $record): string => $record->classes->pluck('name')->join(', ') ?: '—')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Open' => 'success',
+                        'Completed' => 'warning',
+                        'Locked' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('student_attendance_summary')
                     ->label('Student Attendance')
                     ->state(function (AttendanceSession $record): string {
@@ -117,9 +121,10 @@ class AttendanceSessionResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('class_id')
+                Tables\Filters\SelectFilter::make('classes')
                     ->label('Class')
-                    ->options(fn () => ClassModel::query()->orderBy('name')->pluck('name', 'id')->all()),
+                    ->relationship('classes', 'name')
+                    ->preload(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'Open' => 'Open',

@@ -15,17 +15,19 @@ class AttendanceSessionObserver
     public function updated(AttendanceSession $session): void
     {
         if ($session->wasChanged('status') && $session->status === 'Locked') {
+            $classNames = $session->classes->pluck('name')->join(', ') ?: 'N/A';
             $this->notifyRelevantUsers(
                 'Attendance Session Locked',
-                "Attendance for {$session->class?->name} on {$session->session_date->toDateString()} has been locked.",
+                "Attendance for {$classNames} on {$session->session_date->toDateString()} has been locked.",
                 route('filament.admin.resources.attendance-sessions.edit', $session)
             );
         }
 
         if ($session->wasChanged('status') && $session->status === 'Open') {
+            $classNames = $session->classes->pluck('name')->join(', ') ?: 'N/A';
             $this->notifyRelevantUsers(
                 'Attendance Session Opened',
-                "Attendance for {$session->class?->name} on {$session->session_date->toDateString()} is now open.",
+                "Attendance for {$classNames} on {$session->session_date->toDateString()} is now open.",
                 route('filament.admin.resources.attendance-sessions.edit', $session)
             );
         }

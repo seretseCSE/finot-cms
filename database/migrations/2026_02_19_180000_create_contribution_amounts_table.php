@@ -14,11 +14,12 @@ return new class () extends Migration {
             $table->decimal('amount', 10, 2);
             $table->date('effective_from');
             $table->date('effective_to')->nullable();
+            $table->foreignId('academic_year_id')->nullable()->constrained('academic_years')->onDelete('cascade');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
 
             // Constraints
-            $table->unique(['group_id', 'month_name', 'effective_from'], 'unique_group_month_effective');
+            $table->unique(['group_id', 'month_name', 'academic_year_id'], 'unique_group_month_academic_year');
             // $table->check('amount >= 0.01', 'check_amount_minimum'); // Blueprint::check does not exist
 
             // Indexes for performance

@@ -12,7 +12,7 @@ return new class () extends Migration {
             $table->foreignId('beneficiary_id')->constrained('beneficiaries')->onDelete('cascade');
             $table->date('distribution_date');
             $table->string('aid_type', 100);
-            $table->decimal('amount', 10, 2);
+            $table->decimal('amount', 10, 2)->nullable();
             $table->foreignId('distributed_by')->constrained('users')->onDelete('cascade');
             $table->string('receipt_number', 100)->nullable();
             $table->text('notes')->nullable();

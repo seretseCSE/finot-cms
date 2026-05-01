@@ -12,6 +12,17 @@ class Beneficiary extends BaseModel
     use HasAuditLog;
     use HasFactory;
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($beneficiary) {
+            if (auth()->check() && ! $beneficiary->created_by) {
+                $beneficiary->created_by = auth()->id();
+            }
+        });
+    }
+
     protected $fillable = [
         'beneficiary_code',
         'full_name',

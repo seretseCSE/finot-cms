@@ -18,6 +18,7 @@ return new class () extends Migration {
             $table->date('effective_to')->nullable()->comment('Date assignment ends (null = still active)');
             $table->foreignId('assigned_by')->constrained('users')->comment('User who assigned member');
             $table->foreignId('removed_by')->nullable()->constrained('users')->comment('User who removed member');
+            $table->foreignId('created_by')->nullable()->constrained('users')->comment('User who created the assignment');
             $table->timestamps();
 
             // Index for fast active group lookup

@@ -70,13 +70,14 @@ class ManageCustomOptions extends Page implements HasTable
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'approved',
-                        'danger' => 'rejected',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'pending' => 'warning',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                    }),
 
                 TextColumn::make('addedBy.name')
                     ->label('Added By')

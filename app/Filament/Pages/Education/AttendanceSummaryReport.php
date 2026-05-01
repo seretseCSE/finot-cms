@@ -142,13 +142,13 @@ class AttendanceSummaryReport extends Page
     {
         $filters = $this->form->getState();
 
-        $query = Attendance::with(['member', 'session.class', 'session.academicYear'])
+        $query = Attendance::with(['member', 'session.classes', 'session.academicYear'])
             ->whereHas('session', function (Builder $query) use ($filters) {
                 if ($filters['academic_year_id']) {
                     $query->where('academic_year_id', $filters['academic_year_id']);
                 }
                 if ($filters['class_id']) {
-                    $query->where('class_id', $filters['class_id']);
+                    $query->whereHas('classes', fn ($q) => $q->where('class_id', $filters['class_id']));
                 }
             });
 

@@ -196,20 +196,22 @@ class TourPassengerResource extends Resource
                     ->label('Count')
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('registration_type')
+                Tables\Columns\TextColumn::make('registration_type')
                     ->label('Type')
-                    ->colors([
-                        'primary' => 'Public',
-                        'success' => 'Internal',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Public' => 'primary',
+                        'Internal' => 'success',
+                    }),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'warning' => 'Pending',
-                        'success' => 'Confirmed',
-                        'danger' => 'Cancelled',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Pending' => 'warning',
+                        'Confirmed' => 'success',
+                        'Cancelled' => 'danger',
+                    }),
 
                 Tables\Columns\TextColumn::make('registration_date')
                     ->label('Registered')

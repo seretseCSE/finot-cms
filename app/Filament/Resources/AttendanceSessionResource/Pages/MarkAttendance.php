@@ -54,13 +54,17 @@ class MarkAttendance extends Page
 
     protected function loadTeacherAttendance(): void
     {
-        $activeYear = $this->record->academicYear;
-        $classId = $this->record->class_id;
+        $sessionAssignmentIds = $this->record->teacherAssignmentsPivot()
+            ->pluck('teacher_assignments.id')
+            ->toArray();
+
+        if (empty($sessionAssignmentIds)) {
+            return;
+        }
 
         $assignments = TeacherAssignment::query()
             ->with(['teacher', 'subject'])
-            ->where('class_id', $classId)
-            ->where('academic_year_id', $activeYear->id)
+            ->whereIn('id', $sessionAssignmentIds)
             ->active()
             ->get();
 
@@ -79,9 +83,15 @@ class MarkAttendance extends Page
 
     protected function loadStudentAttendance(): void
     {
+        $classIds = $this->record->classes()->pluck('class_id')->toArray();
+
+        if (empty($classIds)) {
+            return;
+        }
+
         $enrollments = StudentEnrollment::query()
             ->with(['member'])
-            ->where('class_id', $this->record->class_id)
+            ->whereIn('class_id', $classIds)
             ->where('academic_year_id', $this->record->academic_year_id)
             ->where('status', 'Enrolled')
             ->get();
@@ -194,6 +204,9 @@ class MarkAttendance extends Page
 
     public function getTitle(): string
     {
-        return "Mark Attendance - {$this->record->class->name} - " . app(\App\Helpers\EthiopianDateHelper::class)->toString($this->record->session_date);
+        $classNames = $this->record->classes->pluck('name')->join(', ');
+        $date = app(\App\Helpers\EthiopianDateHelper::class)->toString($this->record->session_date);
+
+        return "Mark Attendance — {$classNames} — {$date}";
     }
 }

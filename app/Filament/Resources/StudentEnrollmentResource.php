@@ -183,13 +183,14 @@ class StudentEnrollmentResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('class.name')->label('Class')->sortable(),
                 Tables\Columns\TextColumn::make('academicYear.name')->label('Academic Year')->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'Enrolled',
-                        'danger' => 'Withdrawn',
-                        'gray' => 'Completed',
-                        'warning' => 'Promoted',
-                    ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Enrolled' => 'success',
+                        'Withdrawn' => 'danger',
+                        'Completed' => 'gray',
+                        'Promoted' => 'warning',
+                    }),
                 Tables\Columns\TextColumn::make('enrolled_date')
                     ->formatStateUsing(fn ($state) => $state ? app(EthiopianDateHelper::class)->toString($state) : ''),
                 Tables\Columns\TextColumn::make('completion_date')

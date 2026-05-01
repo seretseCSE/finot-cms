@@ -16,6 +16,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class TeacherAssignmentResource extends Resource
@@ -87,13 +89,6 @@ class TeacherAssignmentResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-
-                        Select::make('academic_year_id')
-                            ->label('Academic Year')
-                            ->options(AcademicYear::query()->orderBy('start_date', 'desc')->pluck('name', 'id'))
-                            ->searchable()
-                            ->preload()
-                            ->required(),
                     ])
                     ->columns(2),
 
@@ -120,6 +115,7 @@ class TeacherAssignmentResource extends Resource
                                 'Active' => 'Active',
                                 'Inactive' => 'Inactive',
                                 'On Leave' => 'On Leave',
+                                'Completed' => 'Completed',
                             ])
                             ->required()
                             ->default('Active'),
@@ -130,7 +126,17 @@ class TeacherAssignmentResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $activeAcademicYearId = AcademicYear::where('status', 'Active')
+            ->where('phase', 'current')
+            ->value('id')
+            ?? AcademicYear::where('status', 'Active')->orderBy('start_date', 'desc')->value('id');
+
         return $table
+            ->modifyQueryUsing(function (Builder $query) use ($activeAcademicYearId): void {
+                if ($activeAcademicYearId) {
+                    $query->where('academic_year_id', $activeAcademicYearId);
+                }
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('teacher.full_name')
                     ->label('Teacher')
@@ -147,10 +153,6 @@ class TeacherAssignmentResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('academicYear.name')
-                    ->label('Academic Year')
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('assigned_date')
                     ->label('Assigned')
                     ->date('M j, Y')
@@ -164,18 +166,19 @@ class TeacherAssignmentResource extends Resource
 
                 Tables\Columns\TextColumn::make('effective_to')
                     ->label('To')
-                    ->date('M j, Y')
+                    ->formatStateUsing(fn ($state) => $state ? \Carbon\Carbon::parse($state)->format('M j, Y') : 'Ongoing')
                     ->sortable()
-                    ->toggleable()
-                    ->default('Ongoing'),
+                    ->toggleable(),
 
-                Tables\Columns\BadgeColumn::make('assignment_status')
+                Tables\Columns\TextColumn::make('assignment_status')
                     ->label('Status')
-                    ->colors([
-                        'success' => 'Active',
-                        'warning' => 'On Leave',
-                        'danger' => 'Inactive',
-                    ]),
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'Active' => 'success',
+                        'On Leave' => 'warning',
+                        'Inactive' => 'danger',
+                        'Completed' => 'gray',
+                    }),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('teacher')
@@ -193,17 +196,15 @@ class TeacherAssignmentResource extends Resource
                     ->searchable()
                     ->preload(),
 
-                Tables\Filters\SelectFilter::make('academic_year')
-                    ->relationship('academicYear', 'name')
-                    ->searchable()
-                    ->preload(),
-
                 Tables\Filters\SelectFilter::make('assignment_status')
+                    ->label('Status')
                     ->options([
                         'Active' => 'Active',
                         'Inactive' => 'Inactive',
                         'On Leave' => 'On Leave',
-                    ]),
+                        'Completed' => 'Completed',
+                    ])
+                    ->default('Active'),
             ])
             ->actions([
                 Actions\EditAction::make(),
@@ -212,9 +213,36 @@ class TeacherAssignmentResource extends Resource
             ->bulkActions([
                 Actions\BulkActionGroup::make([
                     Actions\DeleteBulkAction::make(),
+                    Actions\BulkAction::make('end_assignment')
+                        ->label('End Assignment')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('gray')
+                        ->action(function (Collection $records): void {
+                            $records->each(function (TeacherAssignment $record): void {
+                                $record->update([
+                                    'assignment_status' => 'Completed',
+                                    'effective_to' => $record->effective_to ?? now(),
+                                ]);
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->requiresConfirmation()
+                        ->modalHeading('End Assignments')
+                        ->modalDescription('Are you sure you want to mark the selected assignments as completed?')
+                        ->modalSubmitActionLabel('Yes, end assignments'),
                 ]),
             ])
             ->defaultSort('assigned_date', 'desc');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        TeacherAssignment::whereNotNull('effective_to')
+            ->where('effective_to', '<', now())
+            ->where('assignment_status', '!=', 'Completed')
+            ->update(['assignment_status' => 'Completed']);
+
+        return parent::getEloquentQuery();
     }
 
     public static function getPages(): array

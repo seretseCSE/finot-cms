@@ -159,12 +159,13 @@ class DuplicateRecordResource extends BaseResource
                     ->formatStateUsing(fn (?array $state): string => $state ? json_encode($state) : '-')
                     ->limit(40),
 
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'merged',
-                        'danger' => 'ignored',
-                    ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match($state) {
+                        'pending' => 'warning',
+                        'merged' => 'success',
+                        'ignored' => 'danger',
+                    }),
 
                 Tables\Columns\TextColumn::make('mergedBy.name')
                     ->label('Merged By')

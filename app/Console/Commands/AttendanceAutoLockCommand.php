@@ -38,7 +38,7 @@ class AttendanceAutoLockCommand extends Command
                 'entity' => 'attendance_session',
                 'session_id' => $session->getKey(),
                 'academic_year_id' => $session->academic_year_id,
-                'class_id' => $session->class_id,
+                'class_ids' => $session->classes()->pluck('class_id')->toArray(),
                 'session_date' => $session->session_date,
                 'performed_by' => 'system',
                 'timestamp' => now()->toDateTimeString(),

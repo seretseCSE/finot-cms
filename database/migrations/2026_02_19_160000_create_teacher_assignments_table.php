@@ -21,7 +21,7 @@ return new class () extends Migration {
             $table->date('effective_from');
             $table->date('effective_to')->nullable();
 
-            $table->enum('assignment_status', ['Active', 'Inactive', 'On Leave'])->default('Active');
+            $table->enum('assignment_status', ['Active', 'Inactive', 'On Leave', 'Completed'])->default('Active');
             $table->foreignId('created_by')->constrained('users');
 
             $table->timestamps();
