@@ -3,11 +3,12 @@
 namespace App\Filament\Resources\AttendanceSessionResource\Pages;
 
 use App\Filament\Resources\AttendanceSessionResource;
+use App\Helpers\EthiopianDateHelper;
 use App\Models\AttendanceSession;
 use App\Models\StudentAttendance;
+use App\Models\StudentEnrollment;
 use App\Models\TeacherAttendance;
 use App\Models\TeacherAssignment;
-use App\Models\StudentEnrollment;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Auth;
@@ -26,12 +27,20 @@ class MarkAttendance extends Page
     public AttendanceSession $record;
 
     #[Locked]
+    public string $activeTab = 'students';
+
     public array $teacherAttendance = [];
 
     public array $studentAttendance = [];
 
+    public array $selectedStudents = [];
+
+    public array $selectedTeachers = [];
+
     #[Locked]
     public bool $sessionCancelled = false;
+
+    public ?int $selectedClassId = null;
 
     public function mount(AttendanceSession $record): void
     {
@@ -45,6 +54,7 @@ class MarkAttendance extends Page
                 ->send();
 
             $this->redirect(AttendanceSessionResource::getUrl('index'));
+
             return;
         }
 
@@ -62,21 +72,29 @@ class MarkAttendance extends Page
             return;
         }
 
+        $existing = TeacherAttendance::query()
+            ->where('session_id', $this->record->getKey())
+            ->get()
+            ->keyBy('teacher_assignment_id')
+            ->toArray();
+
         $assignments = TeacherAssignment::query()
-            ->with(['teacher', 'subject'])
+            ->with(['teacher', 'subject', 'class'])
             ->whereIn('id', $sessionAssignmentIds)
             ->active()
             ->get();
 
         foreach ($assignments as $assignment) {
-            $this->teacherAttendance[$assignment->teacher_id] = [
+            $existingData = $existing[$assignment->id] ?? null;
+
+            $this->teacherAttendance[$assignment->id] = [
+                'assignment_id' => $assignment->id,
                 'teacher_id' => $assignment->teacher_id,
                 'teacher_name' => $assignment->teacher->full_name,
+                'class_name' => $assignment->class->name ?? '',
                 'subject_name' => $assignment->subject->name ?? '',
-                'attendance_status' => null,
-                'session_outcome' => 'Normal',
-                'substitute_teacher_name' => null,
-                'notes' => null,
+                'attendance_status' => $existingData['attendance_status'] ?? null,
+                'notes' => $existingData['notes'] ?? null,
             ];
         }
     }
@@ -89,6 +107,12 @@ class MarkAttendance extends Page
             return;
         }
 
+        $existing = StudentAttendance::query()
+            ->where('session_id', $this->record->getKey())
+            ->get()
+            ->keyBy('student_id')
+            ->toArray();
+
         $enrollments = StudentEnrollment::query()
             ->with(['member'])
             ->whereIn('class_id', $classIds)
@@ -100,13 +124,27 @@ class MarkAttendance extends Page
             if (! $enrollment->member) {
                 continue;
             }
+
+            $existingData = $existing[$enrollment->member_id] ?? null;
+
             $this->studentAttendance[$enrollment->member_id] = [
                 'student_id' => $enrollment->member_id,
                 'student_name' => $enrollment->member->full_name,
                 'member_code' => $enrollment->member->member_code,
-                'status' => null,
+                'class_id' => $enrollment->class_id,
+                'class_name' => $enrollment->class->name ?? '',
+                'status' => $existingData['status'] ?? null,
             ];
         }
+    }
+
+    public function setTab(string $tab): void
+    {
+        if (! in_array($tab, ['students', 'teachers'])) {
+            return;
+        }
+
+        $this->activeTab = $tab;
     }
 
     public function saveTeacherAttendance(): void
@@ -116,18 +154,17 @@ class MarkAttendance extends Page
                 ->title('Access denied')
                 ->danger()
                 ->send();
+
             return;
         }
 
         DB::transaction(function (): void {
-            foreach ($this->teacherAttendance as $teacherId => $data) {
+            foreach ($this->teacherAttendance as $assignmentId => $data) {
                 TeacherAttendance::updateOrCreate(
-                    ['teacher_id' => $teacherId, 'session_id' => $this->record->getKey()],
+                    ['teacher_assignment_id' => $assignmentId, 'session_id' => $this->record->getKey()],
                     [
                         'attendance_status' => $data['attendance_status'],
-                        'session_outcome' => $data['session_outcome'],
-                        'substitute_teacher_name' => $data['substitute_teacher_name'],
-                        'notes' => $data['notes'],
+                        'notes' => $data['notes'] ?? null,
                         'marked_by' => Auth::id(),
                         'marked_at' => now(),
                     ]
@@ -145,6 +182,7 @@ class MarkAttendance extends Page
                 ->title('Access denied')
                 ->danger()
                 ->send();
+
             return;
         }
 
@@ -164,24 +202,87 @@ class MarkAttendance extends Page
         Notification::make()->title('Student attendance saved')->success()->send();
     }
 
-    public function markAllPresent(): void
+    public function applyBulkStatus(string $status): void
     {
-        foreach ($this->studentAttendance as $studentId => &$data) {
-            $data['status'] = 'Present';
+        if ($this->activeTab === 'students') {
+            if (empty($this->selectedStudents)) {
+                foreach ($this->studentAttendance as $studentId => $data) {
+                    $this->studentAttendance[$studentId]['status'] = $status;
+                }
+            } else {
+                foreach ($this->selectedStudents as $studentId) {
+                    if (array_key_exists($studentId, $this->studentAttendance)) {
+                        $this->studentAttendance[$studentId]['status'] = $status;
+                    }
+                }
+            }
+        } elseif ($this->activeTab === 'teachers') {
+            if (empty($this->selectedTeachers)) {
+                foreach ($this->teacherAttendance as $assignmentId => $data) {
+                    $this->teacherAttendance[$assignmentId]['attendance_status'] = $status;
+                }
+            } else {
+                foreach ($this->selectedTeachers as $assignmentId) {
+                    if (array_key_exists($assignmentId, $this->teacherAttendance)) {
+                        $this->teacherAttendance[$assignmentId]['attendance_status'] = $status;
+                    }
+                }
+            }
         }
     }
 
-    public function markAllAbsent(): void
+    public function toggleSelectAll(): void
     {
-        foreach ($this->studentAttendance as $studentId => &$data) {
-            $data['status'] = 'Absent';
+        if ($this->activeTab === 'students') {
+            $ids = array_keys($this->filteredStudentAttendance);
+
+            if (empty($ids)) {
+                return;
+            }
+
+            if (count(array_intersect($this->selectedStudents, $ids)) === count($ids)) {
+                $this->selectedStudents = array_values(array_diff($this->selectedStudents, $ids));
+            } else {
+                $this->selectedStudents = array_values(array_unique(array_merge($this->selectedStudents, $ids)));
+            }
+        } elseif ($this->activeTab === 'teachers') {
+            $ids = array_keys($this->teacherAttendance);
+
+            if (empty($ids)) {
+                return;
+            }
+
+            if (count(array_intersect($this->selectedTeachers, $ids)) === count($ids)) {
+                $this->selectedTeachers = array_values(array_diff($this->selectedTeachers, $ids));
+            } else {
+                $this->selectedTeachers = array_values(array_unique(array_merge($this->selectedTeachers, $ids)));
+            }
         }
+    }
+
+    #[Computed]
+    public function availableClasses(): array
+    {
+        return $this->record->classes()->pluck('classes.name', 'classes.id')->toArray();
+    }
+
+    #[Computed]
+    public function filteredStudentAttendance(): array
+    {
+        if (! $this->selectedClassId) {
+            return $this->studentAttendance;
+        }
+
+        return array_filter(
+            $this->studentAttendance,
+            fn ($student) => ($student['class_id'] ?? null) == $this->selectedClassId
+        );
     }
 
     #[Computed]
     public function attendanceSummary(): string
     {
-        $counts = array_count_values(array_column($this->studentAttendance, 'status'));
+        $counts = array_count_values(array_filter(array_column($this->filteredStudentAttendance, 'status')));
         $present = $counts['Present'] ?? 0;
         $absent = $counts['Absent'] ?? 0;
         $excused = $counts['Excused'] ?? 0;
@@ -192,21 +293,27 @@ class MarkAttendance extends Page
     }
 
     #[Computed]
+    public function teacherAttendanceSummary(): string
+    {
+        $counts = array_count_values(array_filter(array_column($this->teacherAttendance, 'attendance_status')));
+        $present = $counts['Present'] ?? 0;
+        $absent = $counts['Absent'] ?? 0;
+        $late = $counts['Late'] ?? 0;
+        $permission = $counts['Permission'] ?? 0;
+
+        return "{$present} Present / {$absent} Absent / {$late} Late / {$permission} Permission";
+    }
+
+    #[Computed]
     public function isSessionCancelled(): bool
     {
-        foreach ($this->teacherAttendance as $data) {
-            if (($data['attendance_status'] ?? null) === 'Absent' && ($data['session_outcome'] ?? 'Normal') === 'Cancelled') {
-                return true;
-            }
-        }
         return false;
     }
 
     public function getTitle(): string
     {
-        $classNames = $this->record->classes->pluck('name')->join(', ');
-        $date = app(\App\Helpers\EthiopianDateHelper::class)->toString($this->record->session_date);
+        $date = app(EthiopianDateHelper::class)->toString($this->record->session_date);
 
-        return "Mark Attendance — {$classNames} — {$date}";
+        return "Mark Attendance — {$date}";
     }
 }

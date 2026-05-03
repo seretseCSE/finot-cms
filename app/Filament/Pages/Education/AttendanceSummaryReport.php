@@ -2,7 +2,8 @@
 
 namespace App\Filament\Pages\Education;
 
-use App\Models\Attendance;
+use App\Models\StudentAttendance;
+use App\Models\TeacherAttendance;
 use Filament\Schemas\Schema;
 use App\Models\ClassModel;
 use App\Models\AcademicYear;
@@ -142,7 +143,7 @@ class AttendanceSummaryReport extends Page
     {
         $filters = $this->form->getState();
 
-        $query = Attendance::with(['member', 'session.classes', 'session.academicYear'])
+        $studentQuery = StudentAttendance::with(['student', 'session.classes', 'session.academicYear'])
             ->whereHas('session', function (Builder $query) use ($filters) {
                 if ($filters['academic_year_id']) {
                     $query->where('academic_year_id', $filters['academic_year_id']);
@@ -153,33 +154,70 @@ class AttendanceSummaryReport extends Page
             });
 
         // Apply date range filter
-        $query->whereHas('session', function (Builder $query) use ($filters) {
-            $query->whereBetween('date', [$filters['start_date'], $filters['end_date']]);
+        $studentQuery->whereHas('session', function (Builder $query) use ($filters) {
+            $query->whereBetween('session_date', [$filters['start_date'], $filters['end_date']]);
         });
 
-        $attendances = $query->get();
+        $attendances = $studentQuery->get();
 
         // Calculate statistics
         $totalSessions = $attendances->pluck('session_id')->unique()->count();
-        $totalStudents = $attendances->pluck('member_id')->unique()->count();
+        $totalStudents = $attendances->pluck('student_id')->unique()->count();
         $presentCount = $attendances->where('status', 'Present')->count();
         $absentCount = $attendances->where('status', 'Absent')->count();
         $lateCount = $attendances->where('status', 'Late')->count();
         $excusedCount = $attendances->where('status', 'Excused')->count();
 
         // Calculate attendance rate by student
-        $attendanceByStudent = $attendances->groupBy('member_id')->map(function ($studentAttendances) {
+        $attendanceByStudent = $attendances->groupBy('student_id')->map(function ($studentAttendances) {
             $total = $studentAttendances->count();
             $present = $studentAttendances->where('status', 'Present')->count();
             $rate = $total > 0 ? ($present / $total) * 100 : 0;
 
             return [
-                'member' => $studentAttendances->first()->member,
+                'student' => $studentAttendances->first()->student,
                 'total_sessions' => $total,
                 'present' => $present,
                 'rate' => round($rate, 2),
             ];
         })->sortByDesc('rate');
+
+        // Teacher attendance by subject
+        $teacherQuery = TeacherAttendance::with(['teacherAssignment.teacher', 'teacherAssignment.subject', 'session'])
+            ->whereHas('session', function (Builder $query) use ($filters) {
+                if ($filters['academic_year_id']) {
+                    $query->where('academic_year_id', $filters['academic_year_id']);
+                }
+                if ($filters['class_id']) {
+                    $query->whereHas('classes', fn ($q) => $q->where('class_id', $filters['class_id']));
+                }
+                $query->whereBetween('session_date', [$filters['start_date'], $filters['end_date']]);
+            });
+
+        $teacherAttendances = $teacherQuery->get();
+
+        $byTeacherSubject = $teacherAttendances
+            ->groupBy(fn ($ta) => $ta->teacherAssignment?->subject?->name ?? 'Unknown')
+            ->map(function ($subjectAttendances) {
+                return $subjectAttendances
+                    ->groupBy(fn ($ta) => $ta->teacherAssignment?->teacher?->id ?? 0)
+                    ->map(function ($teacherAttendances) {
+                        $total = $teacherAttendances->count();
+                        $present = $teacherAttendances->where('attendance_status', 'Present')->count();
+                        $rate = $total > 0 ? ($present / $total) * 100 : 0;
+
+                        return [
+                            'teacher_name' => $teacherAttendances->first()->teacherAssignment?->teacher?->full_name ?? 'N/A',
+                            'total_sessions' => $total,
+                            'present' => $present,
+                            'rate' => round($rate, 2),
+                        ];
+                    })
+                    ->sortByDesc('rate')
+                    ->values()
+                    ->toArray();
+            })
+            ->toArray();
 
         return [
             'summary' => [
@@ -193,18 +231,19 @@ class AttendanceSummaryReport extends Page
             ],
             'by_student' => $attendanceByStudent,
             'by_date' => $attendances->groupBy(function ($attendance) {
-                return $attendance->session->date;
+                return $attendance->session->session_date;
             })->map(function ($dateAttendances) {
                 $total = $dateAttendances->count();
                 $present = $dateAttendances->where('status', 'Present')->count();
 
                 return [
-                    'date' => $dateAttendances->first()->session->date,
+                    'date' => $dateAttendances->first()->session->session_date,
                     'total' => $total,
                     'present' => $present,
                     'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
                 ];
             })->sortBy('date'),
+            'by_teacher_subject' => $byTeacherSubject,
         ];
     }
 

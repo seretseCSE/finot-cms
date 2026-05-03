@@ -164,34 +164,38 @@ class TeacherAttendanceReport extends Page implements HasTable
             $query->where('teachers.id', $filters['teacher_id']);
         }
 
+        $dateThreshold = match ($filters['date_range'] ?? 'month') {
+            'week' => now()->subWeek()->toDateString(),
+            'month' => now()->subMonth()->toDateString(),
+            'quarter' => now()->subQuarter()->toDateString(),
+            'year' => now()->subYear()->toDateString(),
+            default => now()->subMonth()->toDateString(),
+        };
+
         return $query->selectRaw("
             teachers.*,
             (
-                SELECT COUNT(*)
+                SELECT COUNT(DISTINCT s.id)
                 FROM teacher_attendance ta
                 JOIN attendance_sessions s ON s.id = ta.session_id
                 WHERE ta.teacher_id = teachers.id
                 AND s.academic_year_id = ?
-                AND s.date >= ?
+                AND s.session_date >= ?
             ) as total_sessions,
             (
-                SELECT COUNT(*)
+                SELECT COUNT(DISTINCT s.id)
                 FROM teacher_attendance ta
                 JOIN attendance_sessions s ON s.id = ta.session_id
                 WHERE ta.teacher_id = teachers.id
                 AND s.academic_year_id = ?
-                AND s.date >= ?
+                AND s.session_date >= ?
                 AND ta.attendance_status = 'Present'
             ) as present_sessions
         ", [
             $activeYear?->id ?? 1,
-            match ($filters['date_range'] ?? 'month') {
-                'week' => now()->subWeek()->toDateString(),
-                'month' => now()->subMonth()->toDateString(),
-                'quarter' => now()->subQuarter()->toDateString(),
-                'year' => now()->subYear()->toDateString(),
-                default => now()->subMonth()->toDateString(),
-            },
+            $dateThreshold,
+            $activeYear?->id ?? 1,
+            $dateThreshold,
         ])
             ->selectRaw("
                 CASE 

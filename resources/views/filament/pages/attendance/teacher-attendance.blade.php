@@ -122,10 +122,12 @@
         }
         .dark .at-status-btn { background: #1f2937; border-color: #374151; color: #6b7280; }
         .at-status-btn .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
         .at-status-btn.active-present { background: #dcfce7; border-color: #86efac; color: #15803d; }
         .at-status-btn.active-absent  { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
         .at-status-btn.active-late    { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
         .at-status-btn.active-perm    { background: #fef9c3; border-color: #fde047; color: #a16207; }
+
         .at-status-btn:not([class*="active-"]):hover { border-color: #d1d5db; color: #374151; background: #f9fafb; }
 
         .at-alert { border-radius: 12px; padding: 1.5rem; text-align: center; border: 0.5px solid; }
@@ -157,7 +159,7 @@
                     </div>
                 </div>
 
-                @if($sessionId && !empty($teachers))
+                @if($sessionId && !empty($assignments))
                     <button type="button" wire:click="saveAttendance" class="at-btn-save">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -168,13 +170,13 @@
             </div>
         </div>
 
-        @if($sessionId && !empty($teachers))
+        @if($sessionId && !empty($assignments))
 
             {{-- ── Summary ── --}}
             <div class="at-card">
                 <div class="at-summary">
                     <span class="at-summary-text">{!! $this->attendanceSummary !!}</span>
-                    <span class="at-summary-count">{{ count($teachers) }} teachers</span>
+                    <span class="at-summary-count">{{ count($assignments) }} assignments</span>
                 </div>
             </div>
 
@@ -183,23 +185,14 @@
                 <div class="at-bulk-row">
                     <span class="at-bulk-label">Bulk mark</span>
 
-                    {{--
-                        FIX: Same bulk-mark bug as the student page. Changed from
-                        `$set('bulkStatus', ...)` to `applyBulkStatus('...')`.
-                        Add a public `applyBulkStatus(string $status)` method in your
-                        Livewire component that does:
-                            foreach ($this->selectedTeachers as $id) {
-                                $this->attendance[$id] = $status;
-                            }
-                    --}}
                     <button type="button" wire:click="applyBulkStatus('Present')" class="at-bulk-btn present">Present</button>
                     <button type="button" wire:click="applyBulkStatus('Absent')"  class="at-bulk-btn absent">Absent</button>
                     <button type="button" wire:click="applyBulkStatus('Late')"    class="at-bulk-btn late">Late</button>
                     <button type="button" wire:click="applyBulkStatus('Permission')" class="at-bulk-btn perm">Permission</button>
 
-                    @if(count($selectedTeachers) > 0)
-                        <span class="at-sel-info">{{ count($selectedTeachers) }} selected</span>
-                        <button type="button" wire:click="$set('selectedTeachers', [])" class="at-clear-btn">
+                    @if(count($selectedAssignments) > 0)
+                        <span class="at-sel-info">{{ count($selectedAssignments) }} selected</span>
+                        <button type="button" wire:click="$set('selectedAssignments', [])" class="at-clear-btn">
                             Clear
                         </button>
                     @endif
@@ -213,41 +206,45 @@
                         <tr>
                             <th style="width:44px; text-align:center;">
                                 <input type="checkbox" wire:click="toggleSelectAll"
-                                    @if(count($selectedTeachers) === count($teachers)) checked @endif>
+                                    @if(count($selectedAssignments) === count($assignments)) checked @endif>
                             </th>
                             <th>Teacher name</th>
+                            <th>Subject</th>
                             <th style="width:260px; text-align:center;">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($teachers as $teacherId => $teacher)
-                            @php $currentStatus = $attendance[$teacherId] ?? null; @endphp
-                            <tr class="{{ in_array($teacherId, $selectedTeachers) ? 'at-selected' : '' }}">
+                        @foreach($assignments as $assignmentId => $assignment)
+                            @php $currentStatus = $attendance[$assignmentId] ?? null; @endphp
+                            <tr class="{{ in_array($assignmentId, $selectedAssignments) ? 'at-selected' : '' }}">
                                 <td style="text-align:center;">
-                                    <input type="checkbox" wire:model.live="selectedTeachers" value="{{ $teacherId }}">
+                                    <input type="checkbox" wire:model.live="selectedAssignments" value="{{ $assignmentId }}">
                                 </td>
                                 <td>
-                                    <span class="at-name">{{ $teacher['name'] }}</span>
+                                    <span class="at-name">{{ $assignment['teacher_name'] }}</span>
+                                </td>
+                                <td>
+                                    <span class="at-name">{{ $assignment['subject_name'] }}</span>
                                 </td>
                                 <td>
                                     <div class="at-status-group">
                                         <button type="button"
-                                            wire:click="$set('attendance.{{ $teacherId }}', 'Present')"
+                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Present')"
                                             class="at-status-btn {{ $currentStatus === 'Present' ? 'active-present' : '' }}">
                                             <span class="dot" style="background:#22c55e;"></span> P
                                         </button>
                                         <button type="button"
-                                            wire:click="$set('attendance.{{ $teacherId }}', 'Absent')"
+                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Absent')"
                                             class="at-status-btn {{ $currentStatus === 'Absent' ? 'active-absent' : '' }}">
                                             <span class="dot" style="background:#ef4444;"></span> A
                                         </button>
                                         <button type="button"
-                                            wire:click="$set('attendance.{{ $teacherId }}', 'Late')"
+                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Late')"
                                             class="at-status-btn {{ $currentStatus === 'Late' ? 'active-late' : '' }}">
                                             <span class="dot" style="background:#3b82f6;"></span> L
                                         </button>
                                         <button type="button"
-                                            wire:click="$set('attendance.{{ $teacherId }}', 'Permission')"
+                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Permission')"
                                             class="at-status-btn {{ $currentStatus === 'Permission' ? 'active-perm' : '' }}">
                                             <span class="dot" style="background:#eab308;"></span> X
                                         </button>

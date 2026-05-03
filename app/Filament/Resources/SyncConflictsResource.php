@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SyncConflictsResource\Pages;
-use Filament\Schemas\Schema;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\AttendanceSyncConflict;
 use Filament\Forms;
@@ -31,12 +30,17 @@ class SyncConflictsResource extends Resource
         return 'Sync Conflicts';
     }
 
+    public static function getNavigationSort(): ?int
+    {
+        return 6;
+    }
+
     public static function canViewAny(): bool
     {
         return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
         return $schema->components([]);
     }
@@ -53,9 +57,9 @@ class SyncConflictsResource extends Resource
                 Tables\Columns\TextColumn::make('session.class.name')
                     ->label('Class')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('session_date')
+                Tables\Columns\TextColumn::make('session.session_date')
                     ->label('Date')
-                    ->formatStateUsing(fn ($state) => $state ? app(EthiopianDateHelper::class)->toString($state) : '')
+                    ->state(fn ($record) => $record->session?->session_date ? app(EthiopianDateHelper::class)->toString($record->session->session_date) : '—')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('first_value')
                     ->label('First Value')
@@ -92,6 +96,49 @@ class SyncConflictsResource extends Resource
                             $query->whereHas('session', fn ($q) => $q->whereBetween('session_date', [$from, $until]));
                         }
                         return $query;
+                    }),
+            ])
+            ->actions([
+                Tables\Actions\Action::make('resolve')
+                    ->label('Resolve')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => is_null($record->winner_value) && Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']))
+                    ->form([
+                        Forms\Components\Radio::make('chosen_value')
+                            ->label('Choose winning value')
+                            ->options(fn ($record) => [
+                                $record->first_value => "First: {$record->first_value}",
+                                $record->second_value => "Second: {$record->second_value}",
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data): void {
+                        $chosen = $data['chosen_value'];
+
+                        $record->update(['winner_value' => $chosen]);
+
+                        if ($record->studentAttendance) {
+                            $record->studentAttendance->update([
+                                'status' => $chosen,
+                                'marked_by' => Auth::id(),
+                                'marked_at' => now(),
+                            ]);
+                        }
+
+                        \Log::channel('audit')->warning('Tier 2 Audit Log', [
+                            'tier' => 2,
+                            'action' => 'conflict_resolved',
+                            'entity' => 'attendance_sync_conflict',
+                            'conflict_id' => $record->getKey(),
+                            'session_id' => $record->session_id,
+                            'student_id' => $record->student_id,
+                            'winner_value' => $chosen,
+                            'performed_by' => Auth::id(),
+                            'timestamp' => now()->toDateTimeString(),
+                        ]);
+
+                        \Filament\Notifications\Notification::make()->title('Conflict resolved')->success()->send();
                     }),
             ]);
     }

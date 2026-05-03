@@ -68,9 +68,12 @@ class Teacher extends BaseModel
             ? DB::table('teacher_assignments')->where('teacher_id', $this->getKey())->exists()
             : false;
 
-        // Teacher attendance records are in `teacher_attendance`, not `attendance_sessions`
         $hasAttendance = Schema::hasTable('teacher_attendance')
-            ? DB::table('teacher_attendance')->where('teacher_id', $this->getKey())->exists()
+            ? DB::table('teacher_attendance')
+                ->whereIn('teacher_assignment_id', function ($query) {
+                    $query->select('id')->from('teacher_assignments')->where('teacher_id', $this->getKey());
+                })
+                ->exists()
             : false;
 
         return ! $hasAssignments && ! $hasAttendance;

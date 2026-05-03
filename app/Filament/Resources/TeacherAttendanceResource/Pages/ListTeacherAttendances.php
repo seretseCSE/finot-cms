@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\TeacherAttendanceResource\Pages;
 
 use App\Filament\Resources\TeacherAttendanceResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListTeacherAttendances extends ListRecords
@@ -12,8 +11,6 @@ class ListTeacherAttendances extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\CreateAction::make(),
-        ];
+        return [];
     }
 }

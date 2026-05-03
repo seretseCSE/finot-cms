@@ -3,18 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TeacherAttendanceResource\Pages;
-use Filament\Schemas\Schema;
 use App\Models\AttendanceSession;
 use App\Models\Teacher;
 use App\Models\TeacherAttendance;
-use Filament\Actions;
 use Filament\Forms;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
@@ -48,90 +41,24 @@ class TeacherAttendanceResource extends Resource
         return Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
     }
 
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
-    }
-
     public static function canDelete($record): bool
     {
         return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->components([
-                Section::make('Attendance Details')
-                    ->schema([
-                        Select::make('teacher_id')
-                            ->label('Teacher')
-                            ->options(Teacher::query()->where('status', 'Active')->pluck('full_name', 'id'))
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-
-                        Select::make('session_id')
-                            ->label('Session')
-                            ->options(AttendanceSession::query()->orderBy('session_date', 'desc')->pluck('session_date', 'id'))
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-
-                        Select::make('attendance_status')
-                            ->label('Status')
-                            ->options([
-                                'Present' => 'Present',
-                                'Absent' => 'Absent',
-                                'Late' => 'Late',
-                                'Permission' => 'Permission',
-                            ])
-                            ->required()
-                            ->default('Present'),
-
-                        Select::make('session_outcome')
-                            ->label('Session Outcome')
-                            ->options([
-                                'Normal' => 'Normal',
-                                'Cancelled' => 'Cancelled',
-                                'Substitute_Assigned' => 'Substitute Assigned',
-                            ])
-                            ->required()
-                            ->default('Normal'),
-
-                        TextInput::make('substitute_teacher_name')
-                            ->label('Substitute Teacher')
-                            ->maxLength(255)
-                            ->nullable()
-                            ->visible(fn (callable $get) => $get('session_outcome') === 'Substitute_Assigned'),
-
-                        DateTimePicker::make('marked_at')
-                            ->label('Marked At')
-                            ->required()
-                            ->default(now())
-                            ->native(false),
-
-                        Textarea::make('notes')
-                            ->label('Notes')
-                            ->rows(3)
-                            ->nullable(),
-                    ])
-                    ->columns(2),
-            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('teacher.full_name')
+                Tables\Columns\TextColumn::make('teacherAssignment.teacher.full_name')
                     ->label('Teacher')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('teacherAssignment.subject.name')
+                    ->label('Subject')
+                    ->sortable()
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('session.session_date')
                     ->label('Session Date')
@@ -154,14 +81,7 @@ class TeacherAttendanceResource extends Resource
                     ->color(fn(string $state): string => match($state) {
                         'Normal' => 'success',
                         'Cancelled' => 'danger',
-                        'Substitute_Assigned' => 'warning',
                     }),
-
-                Tables\Columns\TextColumn::make('substitute_teacher_name')
-                    ->label('Substitute')
-                    ->searchable()
-                    ->toggleable()
-                    ->default('-'),
 
                 Tables\Columns\TextColumn::make('markedBy.name')
                     ->label('Marked By')
@@ -182,7 +102,7 @@ class TeacherAttendanceResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('teacher')
-                    ->relationship('teacher', 'full_name')
+                    ->relationship('teacherAssignment.teacher', 'full_name')
                     ->searchable()
                     ->preload(),
 
@@ -198,7 +118,6 @@ class TeacherAttendanceResource extends Resource
                     ->options([
                         'Normal' => 'Normal',
                         'Cancelled' => 'Cancelled',
-                        'Substitute_Assigned' => 'Substitute Assigned',
                     ]),
 
                 Tables\Filters\Filter::make('date_range')
@@ -213,15 +132,6 @@ class TeacherAttendanceResource extends Resource
                             ->when($data['until'], fn ($q) => $q->whereHas('session', fn ($sq) => $sq->whereDate('session_date', '<=', $data['until'])));
                     }),
             ])
-            ->actions([
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
-            ])
             ->defaultSort('marked_at', 'desc');
     }
 
@@ -229,8 +139,6 @@ class TeacherAttendanceResource extends Resource
     {
         return [
             'index' => Pages\ListTeacherAttendances::route('/'),
-            'create' => Pages\CreateTeacherAttendance::route('/create'),
-            'edit' => Pages\EditTeacherAttendance::route('/{record}/edit'),
         ];
     }
 }

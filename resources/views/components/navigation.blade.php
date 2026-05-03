@@ -134,14 +134,20 @@
             </button>
 
             @auth
-                <a href="{{ url('/admin') }}" class="nav-cta">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    {{ __('Dashboard') }}
+                <a href="{{ url('/admin') }}" class="nav-cta" id="nav-cta-btn">
+                    <span class="nav-cta-inner">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        {{ __('Dashboard') }}
+                        <svg class="nav-cta-arrow" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </span>
                 </a>
             @else
-                <a href="{{ route('login') }}" class="nav-cta">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                    {{ __('Login') }}
+                <a href="{{ route('login') }}" class="nav-cta" id="nav-cta-btn">
+                    <span class="nav-cta-inner">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3-3l3-3m0 0l-3-3m3 3H9"/></svg>
+                        {{ __('Login') }}
+                        <svg class="nav-cta-arrow" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </span>
                 </a>
             @endauth
         </div>
@@ -255,12 +261,16 @@
 
             <div style="margin-top:10px;padding-top:12px;border-top:1px solid var(--border-subtle);">
                 @auth
-                    <a href="{{ url('/admin') }}" style="display:flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:10px;background:#1A44F7;color:#fff;text-decoration:none;font-weight:600;font-size:.95rem;">
+                    <a href="{{ url('/admin') }}" class="mobile-cta-btn">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         {{ __('Dashboard') }}
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left:auto;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                     </a>
                 @else
-                    <a href="{{ route('login') }}" style="display:flex;align-items:center;justify-content:center;padding:13px 20px;border-radius:10px;background:#1A44F7;color:#fff;text-decoration:none;font-weight:600;font-size:.95rem;">
+                    <a href="{{ route('login') }}" class="mobile-cta-btn">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3-3l3-3m0 0l-3-3m3 3H9"/></svg>
                         {{ __('Login') }}
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left:auto;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                     </a>
                 @endauth
             </div>
@@ -272,34 +282,90 @@
 
 @push('styles')
 <style>
+    /* ── Scrolled state ── */
     .nav-scrolled {
-        background: rgba(5,10,28,0.97) !important;
-        box-shadow: 0 4px 30px rgba(0,0,0,.25) !important;
+        background: var(--overlay-98) !important;
+        box-shadow: 0 1px 0 var(--border-subtle), 0 8px 32px rgba(0,0,0,.2) !important;
     }
-    .nav-link:hover { color: var(--text-display) !important; background: var(--glass-hover) !important; }
+
+    /* ── Nav links — animated underline on hover ── */
+    .nav-link {
+        position: relative;
+    }
+    .nav-link::after {
+        content: ''; position: absolute; bottom: 2px; left: 50%; width: 0; height: 2px;
+        border-radius: 2px; background: linear-gradient(90deg, var(--blue-primary), var(--gold));
+        transform: translateX(-50%); transition: width .25s cubic-bezier(.22,1,.36,1);
+    }
+    .nav-link:hover { color: var(--text-display) !important; background: transparent !important; }
+    .nav-link:hover::after { width: 20px; }
     .nav-active { color: var(--text-display) !important; }
-    .nav-active::after {
-        content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
-        width:16px; height:2px; border-radius:2px;
-        background:linear-gradient(90deg, var(--blue-primary), var(--gold));
+    .nav-active::after { width: 20px; }
+
+    /* ── CTA Button — gradient border + glow ── */
+    @keyframes cta-shimmer {
+        0%   { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
     }
     .nav-cta {
-        display:inline-flex; align-items:center; gap:6px;
-        padding:9px 18px; border-radius:8px; font-size:.82rem; font-weight:600;
-        background:#1A44F7;
-        color:#fff; text-decoration:none; margin-left:8px;
-        box-shadow:0 4px 18px rgba(26,68,247,.35);
-        transition:transform .2s,box-shadow .2s; white-space:nowrap;
+        position: relative; display: inline-flex; align-items: center;
+        padding: 1.5px; border-radius: 50px; margin-left: 10px;
+        background: linear-gradient(135deg, var(--blue-primary), var(--gold), var(--blue-500), var(--gold-light));
+        background-size: 200% 200%;
+        text-decoration: none; white-space: nowrap;
+        transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s;
+        box-shadow: 0 0 16px rgba(26,68,247,.2), 0 0 6px rgba(243,186,21,.1);
+        animation: cta-shimmer 4s linear infinite;
     }
-    .nav-cta:hover { background:#2952FF; transform:translateY(-2px); box-shadow:0 8px 28px rgba(26,68,247,.45); }
+    .nav-cta-inner {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 8px 20px; border-radius: 50px;
+        background: var(--bg-900);
+        color: var(--text-display); font-size: .8rem; font-weight: 600;
+        transition: background .25s, color .25s;
+    }
+    .nav-cta-arrow {
+        opacity: 0; transform: translateX(-4px);
+        transition: opacity .2s, transform .2s;
+        flex-shrink: 0;
+    }
+    .nav-cta:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 0 28px rgba(26,68,247,.35), 0 0 12px rgba(243,186,21,.18);
+    }
+    .nav-cta:hover .nav-cta-inner {
+        background: linear-gradient(135deg, var(--blue-primary), #2952FF);
+        color: #fff;
+    }
+    .nav-cta:hover .nav-cta-arrow {
+        opacity: 1; transform: translateX(0);
+    }
 
-    /* Dropdown */
+    /* ── Mobile CTA ── */
+    .mobile-cta-btn {
+        display: flex; align-items: center; gap: 10px;
+        padding: 14px 22px; border-radius: 14px;
+        background: linear-gradient(135deg, var(--blue-primary) 0%, #2952FF 100%);
+        color: #fff; text-decoration: none; font-weight: 600; font-size: .95rem;
+        box-shadow: 0 4px 24px rgba(26,68,247,.3);
+        transition: transform .2s, box-shadow .2s;
+        position: relative; overflow: hidden;
+    }
+    .mobile-cta-btn::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(135deg, transparent 40%, rgba(243,186,21,.15) 100%);
+        opacity: 0; transition: opacity .3s;
+    }
+    .mobile-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(26,68,247,.4); }
+    .mobile-cta-btn:hover::before { opacity: 1; }
+
+    /* ── Dropdown ── */
     .dropdown-menu { opacity:0; visibility:hidden; transform:translateY(8px); pointer-events:none; }
     .nav-dropdown:hover .dropdown-menu { opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto; }
-    .nav-dropdown:hover > a svg { transform:rotate(180deg); }
+    .nav-dropdown:hover > a svg.dropdown-arrow { transform:rotate(180deg); }
     .dropdown-item:hover { background:var(--glass-hover); color:var(--text-display) !important; }
 
-    /* Mobile */
+    /* ── Mobile ── */
     .mobile-nav-link:hover { background:rgba(255,255,255,.07) !important; color:var(--text-display) !important; }
     .mobile-sub-toggle.open svg { transform:rotate(180deg); }
 

@@ -36,6 +36,11 @@ class AttendanceSessionResource extends Resource
         return 'Attendance Sessions';
     }
 
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
+
     public static function canViewAny(): bool
     {
         return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
@@ -48,7 +53,12 @@ class AttendanceSessionResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(['admin', 'superadmin']);
+    }
+
+    public static function canDelete($record): bool
+    {
+        return (bool) Auth::user()?->hasRole(['admin', 'superadmin']);
     }
 
     public static function canMarkAttendance($record): bool
@@ -115,10 +125,6 @@ class AttendanceSessionResource extends Resource
 
                         return $total > 0 ? "{$present}/{$total}" : '-';
                     }),
-                Tables\Columns\TextColumn::make('substituteTeacher.full_name')
-                    ->label('Substitute Teacher')
-                    ->default('-')
-                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('classes')
@@ -139,27 +145,38 @@ class AttendanceSessionResource extends Resource
                     ->url(fn (AttendanceSession $record): string => static::getUrl('mark', ['record' => $record->getKey()]))
                     ->visible(fn (AttendanceSession $record): bool => static::canMarkAttendance($record)),
 
-                Actions\Action::make('lock')
-                    ->label('Lock')
+                Actions\EditAction::make(),
+
+                Actions\DeleteAction::make()
+                    ->visible(fn (AttendanceSession $record): bool => static::canDelete($record)),
+            ])
+            ->bulkActions([
+                Actions\BulkAction::make('lock')
+                    ->label('Lock Selected')
                     ->icon('heroicon-o-lock-closed')
                     ->color('warning')
-                    ->visible(fn (AttendanceSession $record): bool => in_array($record->status, ['Open', 'Completed']))
                     ->requiresConfirmation()
-                    ->action(function (AttendanceSession $record): void {
-                        $record->update([
-                            'status' => 'Locked',
-                            'locked_at' => now(),
-                            'locked_by' => Auth::id(),
-                        ]);
+                    ->modalHeading('Lock Selected Sessions')
+                    ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                        foreach ($records as $record) {
+                            if (! in_array($record->status, ['Open', 'Completed'])) {
+                                continue;
+                            }
+                            $record->update([
+                                'status' => 'Locked',
+                                'locked_at' => now(),
+                                'locked_by' => Auth::id(),
+                            ]);
+                        }
 
-                        Notification::make()->title('Session locked')->success()->send();
-                    }),
+                        Notification::make()->title('Sessions locked')->success()->send();
+                    })
+                    ->visible(fn (): bool => Auth::user()?->hasRole(['education_monitor', 'admin', 'superadmin']) ?? false),
 
-                Actions\Action::make('unlock')
-                    ->label('Unlock')
+                Actions\BulkAction::make('unlock')
+                    ->label('Unlock Selected')
                     ->icon('heroicon-o-lock-open')
                     ->color('danger')
-                    ->visible(fn (AttendanceSession $record): bool => $record->isLocked() && Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']))
                     ->form([
                         Forms\Components\Textarea::make('justification')
                             ->label('Justification')
@@ -167,77 +184,39 @@ class AttendanceSessionResource extends Resource
                             ->minLength(20)
                             ->rows(3),
                     ])
-                    ->action(function (AttendanceSession $record, array $data): void {
-                        $record->update([
-                            'status' => 'Open',
-                            'unlock_justification' => $data['justification'],
-                            'unlocked_at' => now(),
-                            'unlocked_by' => Auth::id(),
-                        ]);
-
-                        \Log::channel('audit')->warning('Tier 2 Audit Log', [
-                            'tier' => 2,
-                            'action' => 'session_unlocked',
-                            'entity' => 'attendance_session',
-                            'session_id' => $record->getKey(),
-                            'new_value' => [
-                                'justification' => $data['justification'],
+                    ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
+                        foreach ($records as $record) {
+                            if (! $record->isLocked()) {
+                                continue;
+                            }
+                            $record->update([
+                                'status' => 'Open',
+                                'unlock_justification' => $data['justification'],
+                                'unlocked_at' => now(),
                                 'unlocked_by' => Auth::id(),
-                                'unlocked_at' => now()->toDateTimeString(),
-                            ],
-                            'performed_by' => Auth::id(),
-                            'timestamp' => now()->toDateTimeString(),
-                        ]);
+                            ]);
 
-                        Notification::make()->title('Session unlocked')->success()->send();
-                    }),
+                            \Log::channel('audit')->warning('Tier 2 Audit Log', [
+                                'tier' => 2,
+                                'action' => 'session_unlocked',
+                                'entity' => 'attendance_session',
+                                'session_id' => $record->getKey(),
+                                'new_value' => [
+                                    'justification' => $data['justification'],
+                                    'unlocked_by' => Auth::id(),
+                                    'unlocked_at' => now()->toDateTimeString(),
+                                ],
+                                'performed_by' => Auth::id(),
+                                'timestamp' => now()->toDateTimeString(),
+                            ]);
+                        }
 
-                Actions\Action::make('assign_substitute')
-                    ->label('Assign Substitute')
-                    ->icon('heroicon-o-user-plus')
-                    ->color('warning')
-                    ->visible(fn (AttendanceSession $record): bool => in_array($record->status, ['Open', 'Completed']) && Auth::user()?->hasRole(['education_monitor', 'admin', 'superadmin']))
-                    ->form([
-                        Forms\Components\Select::make('substitute_teacher_id')
-                            ->label('Substitute Teacher')
-                            ->options(function () {
-                                return \App\Models\Teacher::query()
-                                    ->where('status', 'Active')
-                                    ->orderBy('full_name')
-                                    ->pluck('full_name', 'id')
-                                    ->all();
-                            })
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Forms\Components\Textarea::make('substitute_notes')
-                            ->label('Notes')
-                            ->rows(3)
-                            ->maxLength(500),
-                    ])
-                    ->action(function (AttendanceSession $record, array $data): void {
-                        $record->update([
-                            'substitute_teacher_id' => $data['substitute_teacher_id'],
-                            'substitute_notes' => $data['substitute_notes'] ?? null,
-                        ]);
+                        Notification::make()->title('Sessions unlocked')->success()->send();
+                    })
+                    ->visible(fn (): bool => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']) ?? false),
 
-                        \Log::channel('audit')->warning('Tier 2 Audit Log', [
-                            'tier' => 2,
-                            'action' => 'substitute_teacher_assigned',
-                            'entity' => 'attendance_session',
-                            'session_id' => $record->getKey(),
-                            'new_value' => [
-                                'substitute_teacher_id' => $data['substitute_teacher_id'],
-                                'substitute_notes' => $data['substitute_notes'] ?? null,
-                                'assigned_by' => Auth::id(),
-                                'assigned_at' => now()->toDateTimeString(),
-                            ],
-                            'performed_by' => Auth::id(),
-                            'timestamp' => now()->toDateTimeString(),
-                        ]);
-
-                        Notification::make()->title('Substitute teacher assigned')->success()->send();
-                    }),
+                Actions\DeleteBulkAction::make()
+                    ->visible(fn (): bool => Auth::user()?->hasRole(['admin', 'superadmin']) ?? false),
             ]);
     }
 

@@ -72,18 +72,16 @@ class BulkAttendanceService
 
         try {
             DB::transaction(function () use ($sessionId, $attendanceData, &$results) {
-                foreach ($attendanceData as $teacherId => $data) {
+                foreach ($attendanceData as $assignmentId => $data) {
                     if (empty($data['attendance_status'])) {
                         continue; // Skip if no status is set
                     }
 
                     try {
                         $attendance = TeacherAttendance::updateOrCreate(
-                            ['teacher_id' => $teacherId, 'session_id' => $sessionId],
+                            ['teacher_assignment_id' => $assignmentId, 'session_id' => $sessionId],
                             [
                                 'attendance_status' => $data['attendance_status'],
-                                'session_outcome' => $data['session_outcome'] ?? 'Normal',
-                                'substitute_teacher_name' => $data['substitute_teacher_name'] ?? null,
                                 'notes' => $data['notes'] ?? null,
                                 'marked_by' => Auth::id(),
                                 'marked_at' => now(),
@@ -96,7 +94,7 @@ class BulkAttendanceService
                             $results['updated']++;
                         }
                     } catch (\Exception $e) {
-                        $results['errors'][] = "Teacher ID {$teacherId}: " . $e->getMessage();
+                        $results['errors'][] = "Assignment ID {$assignmentId}: " . $e->getMessage();
                     }
                 }
             });

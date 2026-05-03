@@ -41,11 +41,11 @@ class TeacherAttendancePage extends Page
 
     public array $sessions = [];
 
-    public array $teachers = [];
+    public array $assignments = [];
 
     public array $attendance = [];
 
-    public array $selectedTeachers = [];
+    public array $selectedAssignments = [];
 
     public static function canAccess(): bool
     {
@@ -59,7 +59,7 @@ class TeacherAttendancePage extends Page
 
     public function updatedSessionId(): void
     {
-        $this->reset(['teachers', 'attendance', 'selectedTeachers']);
+        $this->reset(['assignments', 'attendance', 'selectedAssignments']);
         $this->loadTeacherAttendance();
     }
 
@@ -87,52 +87,43 @@ class TeacherAttendancePage extends Page
             return;
         }
 
-        $session = AttendanceSession::with('teacherAssignmentsPivot.teacher')->find($this->sessionId);
+        $session = AttendanceSession::with('teacherAssignmentsPivot.teacher', 'teacherAssignmentsPivot.subject')->find($this->sessionId);
 
         if (! $session) {
             return;
         }
 
-        $assignmentTeacherIds = $session->teacherAssignmentsPivot
-            ->pluck('teacher_id')
-            ->unique()
-            ->toArray();
-
-        $teachers = Teacher::query()
-            ->whereIn('id', $assignmentTeacherIds)
-            ->orderBy('full_name')
-            ->get();
-
         $existing = TeacherAttendance::query()
             ->where('session_id', $session->id)
-            ->pluck('attendance_status', 'teacher_id')
+            ->pluck('attendance_status', 'teacher_assignment_id')
             ->toArray();
 
-        $this->teachers = [];
+        $this->assignments = [];
         $this->attendance = [];
 
-        foreach ($teachers as $teacher) {
-            $teacherId = $teacher->id;
+        foreach ($session->teacherAssignmentsPivot as $assignment) {
+            $assignmentId = $assignment->id;
 
-            $this->teachers[$teacherId] = [
-                'id' => $teacherId,
-                'name' => $teacher->full_name,
+            $this->assignments[$assignmentId] = [
+                'id' => $assignmentId,
+                'teacher_name' => $assignment->teacher?->full_name ?? 'N/A',
+                'subject_name' => $assignment->subject?->name ?? 'N/A',
             ];
 
-            $this->attendance[$teacherId] = $existing[$teacherId] ?? null;
+            $this->attendance[$assignmentId] = $existing[$assignmentId] ?? null;
         }
     }
 
     public function applyBulkStatus(string $status): void
     {
-        if (empty($this->selectedTeachers)) {
-            foreach ($this->attendance as $teacherId => $x) {
-                $this->attendance[$teacherId] = $status;
+        if (empty($this->selectedAssignments)) {
+            foreach ($this->attendance as $assignmentId => $x) {
+                $this->attendance[$assignmentId] = $status;
             }
         } else {
-            foreach ($this->selectedTeachers as $teacherId) {
-                if (array_key_exists($teacherId, $this->attendance)) {
-                    $this->attendance[$teacherId] = $status;
+            foreach ($this->selectedAssignments as $assignmentId) {
+                if (array_key_exists($assignmentId, $this->attendance)) {
+                    $this->attendance[$assignmentId] = $status;
                 }
             }
         }
@@ -140,10 +131,16 @@ class TeacherAttendancePage extends Page
 
     public function toggleSelectAll(): void
     {
-        if (count($this->selectedTeachers) === count($this->teachers)) {
-            $this->selectedTeachers = [];
+        $ids = array_keys($this->assignments);
+
+        if (empty($ids)) {
+            return;
+        }
+
+        if (count(array_intersect($this->selectedAssignments, $ids)) === count($ids)) {
+            $this->selectedAssignments = array_values(array_diff($this->selectedAssignments, $ids));
         } else {
-            $this->selectedTeachers = array_keys($this->teachers);
+            $this->selectedAssignments = array_values(array_unique(array_merge($this->selectedAssignments, $ids)));
         }
     }
 
@@ -160,13 +157,13 @@ class TeacherAttendancePage extends Page
         }
 
         DB::transaction(function (): void {
-            foreach ($this->attendance as $teacherId => $status) {
+            foreach ($this->attendance as $assignmentId => $status) {
                 if ($status === null) {
                     continue;
                 }
 
                 TeacherAttendance::updateOrCreate(
-                    ['teacher_id' => $teacherId, 'session_id' => $this->sessionId],
+                    ['teacher_assignment_id' => $assignmentId, 'session_id' => $this->sessionId],
                     [
                         'attendance_status' => $status,
                         'marked_by' => Auth::id(),

@@ -22,8 +22,6 @@ class AttendanceSession extends BaseModel
         'unlock_justification',
         'unlocked_at',
         'unlocked_by',
-        'substitute_teacher_id',
-        'substitute_notes',
         'created_by',
     ];
 
@@ -81,11 +79,6 @@ class AttendanceSession extends BaseModel
     public function teacherAttendance(): HasMany
     {
         return $this->hasMany(TeacherAttendance::class, 'session_id');
-    }
-
-    public function substituteTeacher()
-    {
-        return $this->belongsTo(Teacher::class, 'substitute_teacher_id');
     }
 
     public function scopeActive($query)

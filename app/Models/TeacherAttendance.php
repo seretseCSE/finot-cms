@@ -13,13 +13,12 @@ class TeacherAttendance extends BaseModel
     protected $table = 'teacher_attendance';
 
     protected $fillable = [
-        'teacher_id',
+        'teacher_assignment_id',
         'session_id',
         'attendance_status',
         'marked_by',
         'marked_at',
         'session_outcome',
-        'substitute_teacher_name',
         'notes',
     ];
 
@@ -27,9 +26,9 @@ class TeacherAttendance extends BaseModel
         'marked_at' => 'datetime',
     ];
 
-    public function teacher()
+    public function teacherAssignment()
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(TeacherAssignment::class);
     }
 
     public function session()
