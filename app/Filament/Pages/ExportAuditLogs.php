@@ -11,6 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
@@ -60,11 +61,11 @@ class ExportAuditLogs extends Page
         ]);
     }
 
-    protected function getFormSchema(): array
+    protected function form(Schema $form): Schema
     {
-        return [
+        return $form->schema([
             Section::make('Export Filters')
-                ->description('Configure the audit log export parameters')
+                ->description('Configure audit log export parameters')
                 ->schema([
                     Forms\Components\Select::make('date_range')
                         ->label('Date Range')
@@ -174,7 +175,7 @@ class ExportAuditLogs extends Page
                         ->required(),
                 ])
                 ->columns(2),
-        ];
+        ]);
     }
 
     protected function getFormActions(): array
