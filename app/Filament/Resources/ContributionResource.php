@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\ContributionNotificationAction;
 use App\Filament\Forms\Components\EthiopianDatePicker;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ContributionResource\Pages;
@@ -12,7 +13,6 @@ use App\Models\ContributionAmount;
 use App\Models\Member;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -38,6 +38,11 @@ class ContributionResource extends Resource
         return 'Financial Management';
     }
 
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
+
     public static function getModelLabel(): string
     {
         return 'Contribution';
@@ -52,23 +57,50 @@ class ContributionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can view everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getModel(), 'getPermissionName')) {
+            $permission = static::getModel()::getPermissionName('view');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can create everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getModel(), 'getPermissionName')) {
+            $permission = static::getModel()::getPermissionName('create');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return parent::canEdit($record);
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin'])
-            && ! ($record?->is_archived ?? false);
+        return parent::canDelete($record) && !($record?->is_archived ?? false);
     }
 
     public static function form(Schema $schema): Schema
@@ -362,19 +394,11 @@ class ContributionResource extends Resource
 
     public static function afterCreate($record, array $data): void
     {
-        Notification::make()
-            ->title('Contribution Recorded')
-            ->body("Successfully recorded contribution of {$record->amount} from {$record->member->first_name}")
-            ->success()
-            ->send();
+        ContributionNotificationAction::sendCreatedNotification($record);
     }
 
     public static function afterUpdate($record, array $data): void
     {
-        Notification::make()
-            ->title('Contribution Updated')
-            ->body('Contribution information has been updated successfully')
-            ->success()
-            ->send();
+        ContributionNotificationAction::sendUpdatedNotification();
     }
 }

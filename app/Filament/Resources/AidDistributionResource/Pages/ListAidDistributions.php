@@ -37,7 +37,7 @@ class ListAidDistributions extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatchSync(
+                    ProcessExportJob::dispatch(
                         exportClass: AidDistributionExport::class,
                         columns: $data['columns'],
                         format: $data['format'],

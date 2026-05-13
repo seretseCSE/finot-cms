@@ -44,19 +44,8 @@ class TrackUserSessions
                         'last_activity' => now(),
                     ]);
                 } else {
-                    // Enforce maximum 3 active sessions
-                    if ($user->hasMaxSessions()) {
-                        Auth::logout();
-                        $request->session()->invalidate();
-                        $request->session()->regenerateToken();
-
-                        return redirect()->route('filament.admin.auth.login')
-                            ->withErrors([
-                                'max_sessions' => 'Maximum 3 active devices reached. Please revoke an existing session from your profile before logging in on a new device.',
-                            ]);
-                    }
-
                     // Create new session record
+                    // Session limiting is handled by RecordUserSession listener
                     UserSession::create([
                         'user_id' => $user->id,
                         'session_token' => $sessionToken,

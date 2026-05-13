@@ -5,7 +5,6 @@ namespace App\Filament\Pages;
 use App\Models\Tour;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class TourReport extends Page
 {

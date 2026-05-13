@@ -3,14 +3,13 @@
 namespace App\Jobs;
 
 use App\Models\SystemBackup;
-use App\Services\BackupService;
+use App\Services\BackupCreationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class CreateBackupJob implements ShouldQueue
@@ -29,23 +28,13 @@ class CreateBackupJob implements ShouldQueue
     ) {
     }
 
-    public function handle(BackupService $backupService): void
+    public function handle(BackupCreationService $backupService): void
     {
         $backup = SystemBackup::findOrFail($this->backupId);
 
         try {
-            $backup->update(['status' => 'in_progress']);
-
-            $backupService->performBackup($backup);
-
-            $size = Storage::disk('backups')->size($backup->filename);
-
-            $backup->update([
-                'size' => $size,
-                'status' => 'completed',
-                'completed_at' => now(),
-                'log_message' => 'Backup completed successfully',
-            ]);
+            // The createBackup method handles status updates internally
+            $backupService->createBackup($backup->created_by);
 
             Log::info('Backup job completed successfully', ['backup_id' => $backup->id]);
         } catch (Throwable $e) {

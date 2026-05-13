@@ -7,7 +7,7 @@
 {{-- ═══════════════════════════════════════════════════════
      1.  HERO — About Page Header
      ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:100px 20px 60px;background:var(--dark-950);overflow:hidden;">
+<section style="position:relative;padding:120px 24px 80px;background:var(--dark-950);overflow:hidden;">
     {{-- Parallax background image --}}
     <div class="hero-parallax" style="position:absolute;inset:-10% 0;background:url('{{ asset('images/features-bg.jpg') }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
     
@@ -17,8 +17,8 @@
 
     <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
         <div class="sec-label sr" style="justify-content:center;">{{ __('Our Identity') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2.2rem,5vw,4rem);margin-bottom:20px;color:var(--text-hero);">
-            {{ $page?->titl8e ?? __('About') }}
+        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;color:var(--text-hero);">
+            {{ $page?->title ?? __('About') }}
             <span style="color:var(--gold);">{{ __('Us') }}</span>
         </h1>
         <p class="sr" style="color:var(--text-60);max-width:600px;margin:0 auto;font-size:clamp(0.95rem, 2vw, 1.1rem);line-height:1.7;">

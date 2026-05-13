@@ -21,6 +21,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 use Illuminate\Support\Facades\DB;
 
 class TeacherResource extends Resource
@@ -30,6 +31,11 @@ class TeacherResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return 'Education Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
     }
 
     public static function getNavigationIcon(): ?string
@@ -44,22 +50,22 @@ class TeacherResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canDelete($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']) && $record->canDelete();
+        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS) && $record->canDelete();
     }
 
     public static function form(Schema $schema): Schema
@@ -182,7 +188,7 @@ class TeacherResource extends Resource
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Active' => 'success',
                         'Inactive' => 'gray',
                         'On Leave' => 'warning',
@@ -194,7 +200,7 @@ class TeacherResource extends Resource
                 Tables\Columns\TextColumn::make('attendance_rate')
                     ->label('Attendance Rate')
                     ->state(function (Teacher $record): string {
-                        if (! Auth::user()?->hasRole(['education_head', 'admin', 'superadmin'])) {
+                        if (! Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS)) {
                             return '-';
                         }
 

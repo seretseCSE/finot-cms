@@ -29,12 +29,17 @@ class LibrarySubcategoryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 12;
+        return 10;
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
     }
 
     public static function canViewAny(): bool
@@ -105,7 +110,7 @@ class LibrarySubcategoryResource extends Resource
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Active' => 'success',
                         'Inactive' => 'danger',
                     }),

@@ -75,11 +75,10 @@ staff@finot.org - General Staff
 - 2.5 Update My Profile - User profile edit functionality
 - 2.6 Manage Active Sessions - Session management UI
 
-### **PRIORITY 3: Financial System (8 features)**
+### **PRIORITY 3: Financial System (7 features)**
 - 5.1 Define Contribution Amount - Filament Resource
-- 5.2 Record Individual Contribution - Filament Resource
-- 5.3 Record Donation - Filament Resource
-- 5.4-5.8 Financial Reports & Exports - Reports, Analytics
+- 5.2 Record Donation - Filament Resource
+- 5.3-5.7 Financial Reports & Exports - Reports, Analytics
 
 ### **PRIORITY 4: Tours Admin (10 features)**
 - 6.1-6.6 Tour Management - CRUD operations
@@ -363,31 +362,23 @@ php artisan icons:cache
  Set amount per group per month (12 Ethiopian months, no Pagume).  
  *Actors: Finance Head*
 
-**5.2 Record Individual Contribution**  
- Record payment for member \+ month \+ active academic year.  
- *Actors: Charity Head*
-
-**5.3 Record Donation**  
- Record one-time donation (no academic year link, never archived).  
- *Actors: Finance Head*
-
-**5.4 View Contribution Reports**  
+**5.2 View Contribution Reports**  
  Filter by academic year, group, class, date range.  
  *Actors: Finance Head, Nibret ena Hisab Department Head, Admin*
 
-**5.5 View Donation Reports**  
+**5.3 View Donation Reports**  
  View all-time donation history (never archived).  
  *Actors: Finance Head, Nibret ena Hisab Department Head, Admin*
 
-**5.6 Track Outstanding Contributions**  
+**5.4 Track Outstanding Contributions**  
  View members with unpaid amounts (current year only).  
  *Actors: Finance Head, Charity Head, Admin*
 
-**5.7 Generate Financial Statement**  
+**5.5 Generate Financial Statement**  
  Monthly/quarterly statements with summaries.  
  *Actors: Finance Head, Nibret ena Hisab Department Head, Admin*
 
-**5.8 Export Financial Data**  
+**5.6 Export Financial Data**  
  Export contributions/donations for audit.  
  *Actors: Finance Head, Nibret ena Hisab Department Head, Superadmin*
 

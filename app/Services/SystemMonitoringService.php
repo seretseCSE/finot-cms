@@ -127,7 +127,12 @@ class SystemMonitoringService
                 return [$cpu_percent, $cpu_percent, $cpu_percent];
             }
         } catch (\Exception $e) {
-            // Fallback if command fails
+            Log::warning('CPU monitoring command failed', [
+                'command' => 'wmic cpu get loadpercentage',
+                'error' => $e->getMessage(),
+                'context' => 'system_monitoring',
+                'user_id' => auth()->id(),
+            ]);
         }
 
         // Final fallback - return zeros

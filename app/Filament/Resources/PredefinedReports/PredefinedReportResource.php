@@ -191,7 +191,7 @@ class PredefinedReportResource extends BaseResource
 
                 Tables\Columns\TextColumn::make('format')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'screen' => 'primary',
                         'excel' => 'success',
                         'pdf' => 'danger',

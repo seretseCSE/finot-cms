@@ -55,7 +55,7 @@ class OfflineAttendanceSyncResource extends BaseResource
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Present' => 'success',
                         'Absent' => 'danger',
                         'Late' => 'warning',
@@ -65,7 +65,7 @@ class OfflineAttendanceSyncResource extends BaseResource
 
                 Tables\Columns\TextColumn::make('sync_status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'pending' => 'warning',
                         'synced' => 'success',
                         'conflict' => 'danger',

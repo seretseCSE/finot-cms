@@ -7,10 +7,11 @@ use App\Models\AttendanceSession;
 use App\Models\AttendanceSyncConflict;
 use App\Models\OfflineAttendanceSync;
 use App\Models\StudentAttendance;
+use App\Services\Contracts\OfflineSyncServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class OfflineSyncService
+class OfflineSyncService implements OfflineSyncServiceInterface
 {
     /**
      * Queue offline attendance records for sync.
@@ -43,23 +44,24 @@ class OfflineSyncService
      */
     public function processPendingSyncs(): array
     {
-        $pending = OfflineAttendanceSync::pending()->get();
         $results = ['synced' => 0, 'conflicts' => 0];
 
-        foreach ($pending as $sync) {
-            try {
-                $this->processSync($sync);
-                $results['synced']++;
-            } catch (\Exception $e) {
-                $sync->markAsConflict($e->getMessage());
-                $results['conflicts']++;
+        OfflineAttendanceSync::pending()
+            ->lazy()
+            ->each(function ($sync) use (&$results) {
+                try {
+                    $this->processSync($sync);
+                    $results['synced']++;
+                } catch (\Exception $e) {
+                    $sync->markAsConflict($e->getMessage());
+                    $results['conflicts']++;
 
-                Log::error('Offline attendance sync conflict', [
-                    'sync_id' => $sync->id,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-        }
+                    Log::error('Offline attendance sync conflict', [
+                        'sync_id' => $sync->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            });
 
         return $results;
     }

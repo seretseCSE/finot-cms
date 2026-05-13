@@ -41,7 +41,7 @@ class TeacherAssignmentResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 3;
+        return 5;
     }
 
     public static function canViewAny(): bool
@@ -173,7 +173,7 @@ class TeacherAssignmentResource extends Resource
                 Tables\Columns\TextColumn::make('assignment_status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Active' => 'success',
                         'On Leave' => 'warning',
                         'Inactive' => 'danger',

@@ -273,16 +273,16 @@ class BulkAttendanceService
     {
         switch ($type) {
             case 'student':
-                $attendances = StudentAttendance::where('session_id', $recordId)->get();
+                $attendances = StudentAttendance::where('session_id', $recordId)->lazy();
                 break;
             case 'teacher':
-                $attendances = TeacherAttendance::where('session_id', $recordId)->get();
+                $attendances = TeacherAttendance::where('session_id', $recordId)->lazy();
                 break;
             case 'rehearsal':
-                $attendances = RehearsalAttendance::where('rehearsal_id', $recordId)->get();
+                $attendances = RehearsalAttendance::where('rehearsal_id', $recordId)->lazy();
                 break;
             case 'tour':
-                $attendances = TourAttendance::where('session_id', $recordId)->get();
+                $attendances = TourAttendance::where('session_id', $recordId)->lazy();
                 break;
             default:
                 return [];

@@ -162,6 +162,15 @@ class FundraisingCampaignForm
                         ->default(0)
                         ->minValue(0),
 
+                    TextInput::make('manual_total_raised')
+                        ->label('Manual Override')
+                        ->helperText('Set total raised directly (bypasses additive)')
+                        ->numeric()
+                        ->prefix('ETB')
+                        ->step(0.01)
+                        ->minValue(0)
+                        ->nullable(),
+
                 ]),
 
                 Placeholder::make('progress_percentage')

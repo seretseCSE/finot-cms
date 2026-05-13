@@ -53,7 +53,16 @@ class CreateMedia extends CreateRecord
                     'file' => $path,
                     'error' => $e->getMessage(),
                     'index' => $index,
+                    'context' => 'media_creation',
+                    'user_id' => auth()->id(),
                 ]);
+
+                // Show notification to user about metadata issue
+                \Filament\Notifications\Notification::make()
+                    ->title('File Metadata Warning')
+                    ->body('Unable to retrieve metadata for file: ' . basename($path) . ' - continuing without size information')
+                    ->warning()
+                    ->send();
             }
 
             $record = static::getModel()::create($recordData);

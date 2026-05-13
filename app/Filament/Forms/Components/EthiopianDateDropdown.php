@@ -45,7 +45,7 @@ class EthiopianDateDropdown extends Field
                 return null;
             }
 
-            return (new EthiopianDateHelper)->toGregorian(
+            return (new EthiopianDateHelper())->toGregorian(
                 (int) $state['day'],
                 (int) $state['month'],
                 (int) $state['year']

@@ -3,7 +3,9 @@
 namespace Tests\Unit\Services;
 
 use App\Models\SystemBackup;
-use App\Services\BackupService;
+use App\Services\BackupCreationService;
+use App\Services\BackupRestorationService;
+use App\Services\BackupCleanupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
@@ -41,17 +43,17 @@ class BackupServiceTest extends TestCase
     }
 
     /**
-     * Create a testable subclass of BackupService that overrides the
+     * Create a testable subclass of BackupCreationService that overrides the
      * external-interaction methods so no real mysqldump or filesystem
      * scanning is performed.  Each overridden method writes a known
      * marker entry into the ZIP so we can assert on structure later.
      */
-    private function createTestableService(): BackupService
+    private function createTestableCreationService(): BackupCreationService
     {
-        return new class () extends BackupService {
+        return new class () extends BackupCreationService {
             public function testPerformBackup(SystemBackup $backup): void
             {
-                parent::performBackup($backup);
+                $this->performBackup($backup);
             }
 
             protected function addDatabaseDump(ZipArchive $zip): void
@@ -78,9 +80,9 @@ class BackupServiceTest extends TestCase
      * Create a service that writes a minimal valid ZIP during createBackup
      * so the size() call and status transitions work without mysqldump.
      */
-    private function createTestableServiceForCreateBackup(): BackupService
+    private function createTestableServiceForCreateBackup(): BackupCreationService
     {
-        return new class () extends BackupService {
+        return new class () extends BackupCreationService {
             protected function performBackup(SystemBackup $backup): void
             {
                 $zipPath = Storage::disk('backups')->path($backup->filename);
@@ -97,9 +99,9 @@ class BackupServiceTest extends TestCase
     /**
      * Create a service that no-ops the destructive restore steps.
      */
-    private function createTestableServiceForRestore(): BackupService
+    private function createTestableServiceForRestore(): BackupRestorationService
     {
-        return new class () extends BackupService {
+        return new class () extends BackupRestorationService {
             protected function restoreDatabase(string $sqlFile): void
             {
                 // no-op for testing
@@ -120,7 +122,7 @@ class BackupServiceTest extends TestCase
     #[Test]
     public function perform_backup_creates_zip_with_database_storage_and_config_entries(): void
     {
-        $service = $this->createTestableService();
+        $service = $this->createTestableCreationService();
         $backup = SystemBackup::factory()->create([
             'filename' => 'test_backup.zip',
             'path' => 'backups/',
@@ -152,7 +154,7 @@ class BackupServiceTest extends TestCase
     #[Test]
     public function perform_backup_throws_when_zip_cannot_be_opened(): void
     {
-        $service = $this->createTestableService();
+        $service = $this->createTestableCreationService();
         $backup = SystemBackup::factory()->create([
             'filename' => '/nonexistent/path/backup.zip',
             'path' => 'backups/',
@@ -167,10 +169,10 @@ class BackupServiceTest extends TestCase
     #[Test]
     public function perform_backup_closes_zip_even_when_add_method_throws(): void
     {
-        $service = new class () extends BackupService {
+        $service = new class () extends BackupCreationService {
             public function testPerformBackup(SystemBackup $backup): void
             {
-                parent::performBackup($backup);
+                $this->performBackup($backup);
             }
 
             protected function addDatabaseDump(ZipArchive $zip): void
@@ -227,7 +229,7 @@ class BackupServiceTest extends TestCase
     #[Test]
     public function create_backup_marks_failed_when_perform_backup_throws(): void
     {
-        $service = new class () extends BackupService {
+        $service = new class () extends BackupCreationService {
             protected function performBackup(\App\Models\SystemBackup $backup): void
             {
                 throw new \RuntimeException('Simulated failure');
@@ -253,7 +255,7 @@ class BackupServiceTest extends TestCase
     #[Test]
     public function restore_backup_throws_for_non_completable_backup(): void
     {
-        $service = new BackupService();
+        $service = new BackupRestorationService();
         $backup = SystemBackup::factory()->create([
             'status' => 'failed',
         ]);

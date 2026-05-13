@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 use Illuminate\Support\Facades\DB;
 
 class AcademicYearResource extends Resource
@@ -25,7 +26,12 @@ class AcademicYearResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
     }
 
     public static function getNavigationIcon(): ?string
@@ -40,28 +46,28 @@ class AcademicYearResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
         $user = Auth::user();
 
-        return (bool) $user?->hasRole(['education_head', 'admin', 'superadmin']);
+        return (bool) $user?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
         $user = Auth::user();
 
-        return (bool) $user?->hasRole(['education_head', 'admin', 'superadmin']);
+        return (bool) $user?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canDelete($record): bool
     {
         $user = Auth::user();
 
-        if (! $user?->hasRole(['admin', 'superadmin'])) {
+        if (! $user?->hasRole(Roles::ADMINISTRATORS)) {
             return false;
         }
 
@@ -111,14 +117,14 @@ class AcademicYearResource extends Resource
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Draft' => 'gray',
                         'Active' => 'success',
                         'Deactivated' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('phase')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'upcoming' => 'warning',
                         'current' => 'success',
                         'completed' => 'gray',
@@ -224,7 +230,7 @@ class AcademicYearResource extends Resource
                     ->label('Reactivate')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
-                    ->visible(fn (AcademicYear $record): bool => $record->status === 'Deactivated' && Auth::user()?->hasRole(['admin', 'superadmin']))
+                    ->visible(fn (AcademicYear $record): bool => $record->status === 'Deactivated' && Auth::user()?->hasRole(Roles::ADMINISTRATORS))
                     ->requiresConfirmation()
                     ->action(fn (AcademicYear $record) => $record->update(['status' => 'Draft', 'phase' => null])),
             ])

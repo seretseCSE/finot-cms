@@ -340,4 +340,18 @@ return [
     */
 
     'package_assets' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Livewire Temporary File Upload
+    |--------------------------------------------------------------------------
+    |
+    | This value controls the validation rules for Livewire's temporary file
+    | uploads. By default, Livewire limits uploads to 12MB (12288 KB).
+    |
+    */
+
+    'temporary_file_upload' => [
+        'rules' => ['required', 'file', 'max:51200'],
+    ],
 ];

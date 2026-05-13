@@ -39,7 +39,12 @@ class ContributionAmountResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Finance';
+        return 'Financial Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
     }
 
     public static function getModelLabel(): string
@@ -54,23 +59,50 @@ class ContributionAmountResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can view everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getModel(), 'getPermissionName')) {
+            $permission = static::getModel()::getPermissionName('view');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can create everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getModel(), 'getPermissionName')) {
+            $permission = static::getModel()::getPermissionName('create');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return parent::canEdit($record);
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin'])
-               && $record->canBeDeleted();
+        return parent::canDelete($record) && $record->canBeDeleted();
     }
 
     public static function form(Schema $schema): Schema

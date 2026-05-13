@@ -71,7 +71,12 @@ class EditDocument extends EditRecord
                 ];
             }
         } catch (\Exception $e) {
-            Log::warning('Could not calculate file info: '.$e->getMessage());
+            Log::warning('Could not calculate file info', [
+                'file_path' => $filePath,
+                'error' => $e->getMessage(),
+                'context' => 'document_edit',
+                'user_id' => auth()->id(),
+            ]);
         }
 
         return ['size' => 0, 'type' => null];

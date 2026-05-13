@@ -28,6 +28,49 @@ class Tour extends BaseModel
         'created_by',
     ];
 
+    /**
+     * Validation rules for tour creation and updates.
+     */
+    public static function rules(): array
+    {
+        return [
+            'max_capacity' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:1000',
+            ],
+            'cost_per_person' => [
+                'required',
+                'numeric',
+                'min:0',
+                'max:999999.99',
+            ],
+            'tour_date' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+                'before_or_equal:today',
+            ],
+            'registration_deadline' => [
+                'required',
+                'date',
+                'after_or_equal:tour_date',
+                'before_or_equal:tour_date',
+            ],
+            'tour_date' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+            ],
+            'registration_deadline' => [
+                'required',
+                'date',
+                'after_or_equal:tour_date',
+            ],
+        ];
+    }
+
     protected $casts = [
         'tour_date' => 'date',
         'start_time' => 'datetime:H:i',
@@ -63,6 +106,54 @@ class Tour extends BaseModel
         return $this->hasMany(TourPassenger::class)->where('status', 'Confirmed');
     }
 
+    /**
+     * Check if tour has reached capacity
+     */
+    public function isAtCapacity(): bool
+    {
+        return $this->confirmedPassengers()->count() >= $this->max_capacity;
+    }
+
+    /**
+     * Get remaining capacity
+     */
+    public function getRemainingCapacity(): int
+    {
+        return max(0, $this->max_capacity - $this->confirmedPassengers()->count());
+    }
+
+    /**
+     * Check if registration is still open
+     */
+    public function isRegistrationOpen(): bool
+    {
+        return !$this->isAtCapacity() &&
+               $this->registration_deadline &&
+               $this->registration_deadline->isFuture();
+    }
+
+    /**
+     * Validate tour booking capacity
+     */
+    public function validateBookingCapacity(): array
+    {
+        if ($this->isAtCapacity()) {
+            return [
+                'capacity' => 'This tour has reached maximum capacity.',
+                'remaining_capacity' => 0
+            ];
+        }
+
+        if ($this->registration_deadline && $this->registration_deadline->isPast()) {
+            return [
+                'deadline' => 'Registration deadline has passed.',
+                'deadline_date' => $this->registration_deadline->format('M d, Y')
+            ];
+        }
+
+        return [];
+    }
+
     public function attendanceSessions(): HasMany
     {
         return $this->hasMany(TourAttendanceSession::class);
@@ -84,6 +175,38 @@ class Tour extends BaseModel
                 ->toEthiopian($this->tour_date)['day'].', '.
             app(\App\Helpers\EthiopianDateHelper::class)
                 ->toEthiopian($this->tour_date)['year'];
+    }
+
+    /**
+     * Get formatted registration deadline in Ethiopian
+     */
+    public function getEthiopianRegistrationDeadlineAttribute(): ?string
+    {
+        if (! $this->registration_deadline) {
+            return null;
+        }
+
+        return app(\App\Helpers\EthiopianDateHelper::class)
+            ->toEthiopian($this->registration_deadline)['month_name_am'].' '.
+            app(\App\Helpers\EthiopianDateHelper::class)
+                ->toEthiopian($this->registration_deadline)['day'].', '.
+            app(\App\Helpers\EthiopianDateHelper::class)
+                ->toEthiopian($this->registration_deadline)['year'];
+    }
+
+    /**
+     * Get days left until tour date
+     */
+    public function getDaysLeftAttribute(): ?int
+    {
+        if (! $this->tour_date) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $tourDate = $this->tour_date->startOfDay();
+
+        return $today->diffInDays($tourDate, false); // false = negative for past dates
     }
 
     /**

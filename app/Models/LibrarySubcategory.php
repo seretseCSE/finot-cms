@@ -36,12 +36,12 @@ class LibrarySubcategory extends BaseModel
 
     public function resources(): HasMany
     {
-        return $this->hasMany(LibraryResource::class);
+        return $this->hasMany(LibraryResource::class, 'subcategory_id');
     }
 
     public function activeResources(): HasMany
     {
-        return $this->hasMany(LibraryResource::class)->where('is_active', true);
+        return $this->hasMany(LibraryResource::class, 'subcategory_id')->where('is_active', true);
     }
 
     /**

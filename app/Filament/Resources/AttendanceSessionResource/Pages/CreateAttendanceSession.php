@@ -9,7 +9,6 @@ use App\Models\ClassModel;
 use App\Models\TeacherAssignment;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

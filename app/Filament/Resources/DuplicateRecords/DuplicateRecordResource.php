@@ -161,7 +161,7 @@ class DuplicateRecordResource extends BaseResource
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'pending' => 'warning',
                         'merged' => 'success',
                         'ignored' => 'danger',

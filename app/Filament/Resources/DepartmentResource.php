@@ -29,12 +29,12 @@ class DepartmentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Organization';
+        return 'System';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 1;
+        return 3;
     }
 
     public static function canViewAny(): bool

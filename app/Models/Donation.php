@@ -13,21 +13,54 @@ class Donation extends BaseModel
     protected static function booted(): void
     {
         static::created(function ($donation) {
-            if ($donation->bank_account_id) {
-                $donation->bankAccount->updateBalance();
-            }
+            \DB::transaction(function () use ($donation) {
+                \Log::info('Donation created', [
+                    'id' => $donation->id,
+                    'amount' => $donation->amount,
+                    'campaign_id' => $donation->fundraising_campaign_id
+                ]);
+
+                if ($donation->bank_account_id) {
+                    $donation->bankAccount->updateBalance();
+                }
+
+                // Update fundraising campaign total
+                if ($donation->fundraising_campaign_id) {
+                    $campaign = $donation->fundraisingCampaign;
+                    if ($campaign) {
+                        $campaign->updateTotalRaised();
+                        \Log::info('Campaign total updated', ['campaign_id' => $campaign->id, 'new_total' => $campaign->total_raised]);
+                    } else {
+                        \Log::warning('Campaign not found for donation', ['donation_id' => $donation->id]);
+                    }
+                }
+            });
         });
 
         static::updated(function ($donation) {
-            if ($donation->bank_account_id) {
-                $donation->bankAccount->updateBalance();
-            }
+            \DB::transaction(function () use ($donation) {
+                if ($donation->bank_account_id) {
+                    $donation->bankAccount->updateBalance();
+                }
+
+                // Update fundraising campaign total if amount changed
+                if ($donation->fundraising_campaign_id && $donation->wasChanged('amount')) {
+                    $donation->fundraisingCampaign->updateTotalRaised();
+                }
+            });
         });
 
         static::deleted(function ($donation) {
-            if ($donation->bank_account_id) {
-                $donation->bankAccount->updateBalance();
-            }
+            \DB::transaction(function () use ($donation) {
+                if ($donation->bank_account_id) {
+                    $donation->bankAccount->updateBalance();
+                }
+
+                // Update fundraising campaign total
+                if ($donation->fundraising_campaign_id) {
+                    $donation->fundraisingCampaign->updateTotalRaised();
+                }
+            });
         });
     }
 
@@ -40,7 +73,39 @@ class Donation extends BaseModel
         'notes',
         'recorded_by',
         'bank_account_id',
+        'fundraising_campaign_id',
     ];
+
+    /**
+     * Validation rules for donation creation and updates.
+     */
+    public static function rules(): array
+    {
+        return [
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                'max:999999.99',
+            ],
+            'donation_date' => [
+                'required',
+                'date',
+                'before_or_equal:today',
+                'before_or_equal:today',
+            ],
+            'donation_type' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'donor_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+        ];
+    }
 
     protected $casts = [
         'amount' => 'decimal:2',
@@ -59,6 +124,11 @@ class Donation extends BaseModel
     public function bankAccount()
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
+    }
+
+    public function fundraisingCampaign()
+    {
+        return $this->belongsTo(FundraisingCampaign::class, 'fundraising_campaign_id');
     }
 
     /**
@@ -162,6 +232,56 @@ class Donation extends BaseModel
         // Donations can only be deleted by superadmin
         // and must be logged to Tier-2 audit trail
         return true; // Permission check handled in resource
+    }
+
+    /**
+     * Validate donation amount bounds
+     */
+    public function validateAmountBounds(): array
+    {
+        $errors = [];
+
+        if ($this->amount < 0.01) {
+            $errors[] = [
+                'field' => 'amount',
+                'message' => 'Donation amount must be at least 0.01 Birr.',
+                'code' => 'min_amount'
+            ];
+        }
+
+        if ($this->amount > 999999.99) {
+            $errors[] = [
+                'field' => 'amount',
+                'message' => 'Donation amount cannot exceed 999,999.99 Birr.',
+                'code' => 'max_amount'
+            ];
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Check if donation amount is within acceptable range
+     */
+    public function isAmountValid(): bool
+    {
+        return $this->amount >= 0.01 && $this->amount <= 999999.99;
+    }
+
+    /**
+     * Get donation amount validation rules for forms
+     */
+    public static function getAmountValidationRules(): array
+    {
+        return [
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                'max:999999.99',
+                'regex:/^\d+(\.\d{1,2})?$/' // Ensure proper decimal format
+            ],
+        ];
     }
 
     /**

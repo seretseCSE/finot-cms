@@ -21,7 +21,12 @@ class AuditLogResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Security';
+        return 'System';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
     }
 
     public static function table(Table $table): Table

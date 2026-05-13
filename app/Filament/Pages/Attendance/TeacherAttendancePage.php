@@ -3,9 +3,7 @@
 namespace App\Filament\Pages\Attendance;
 
 use App\Models\AttendanceSession;
-use App\Models\Teacher;
 use App\Models\TeacherAttendance;
-use App\Models\TeacherAssignment;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;

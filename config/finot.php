@@ -24,6 +24,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Maximum Active Sessions Per User
+    |--------------------------------------------------------------------------
+    |
+    | Maximum number of concurrent active sessions allowed per user.
+    | When a user logs in and exceeds this limit, the oldest session will
+    | be automatically invalidated to make room for the new session.
+    | Set to null to disable session limiting.
+    |
+    */
+    'max_active_sessions' => 3,
+
+    /*
+    |--------------------------------------------------------------------------
     | Failed Login Lockout Threshold
     |--------------------------------------------------------------------------
     |

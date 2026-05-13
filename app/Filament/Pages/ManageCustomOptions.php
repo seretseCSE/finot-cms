@@ -73,7 +73,7 @@ class ManageCustomOptions extends Page implements HasTable
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'pending' => 'warning',
                         'approved' => 'success',
                         'rejected' => 'danger',

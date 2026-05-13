@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\FinancialTransactionResource\Pages;
 use App\Models\BankAccount;
 use App\Models\FinancialTransaction;
+use App\Services\FinancialTransactionService;
 use Filament\Actions;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -23,6 +24,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 
 class FinancialTransactionResource extends Resource
 {
@@ -45,7 +47,7 @@ class FinancialTransactionResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 1;
+        return 4;
     }
 
     public static function form(Schema $schema): Schema
@@ -164,6 +166,7 @@ class FinancialTransactionResource extends Resource
                             ->helperText('Upload receipt, invoice, or other proof document')
                             ->acceptedFileTypes(['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'])
                             ->directory('financial-attachments')
+                            ->maxSize(5120) // 5MB for financial attachments
                             ->nullable(),
 
                         Forms\Components\Select::make('attachment_type')
@@ -291,41 +294,31 @@ class FinancialTransactionResource extends Resource
 
     public static function beforeSave(array $data): array
     {
-        // Auto-approve transactions for users with appropriate permissions
-        $user = auth()->user();
-        if ($user && ($user->hasRole(['admin', 'superadmin', 'finance_head', 'nibret_hisab_head']))) {
-            $data['approved_by'] = $user->id;
-            $data['approved_at'] = now();
-        }
-
-        // Set recorded by
-        $data['recorded_by'] = $user?->id;
-
-        return $data;
+        return app(FinancialTransactionService::class)->processBeforeSave($data);
     }
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::FINANCE_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::FINANCE_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::FINANCE_MANAGERS);
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
     }
 
     public static function canDeleteAny(): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
     }
 }

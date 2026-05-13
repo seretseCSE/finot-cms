@@ -27,6 +27,55 @@ class TourPassenger extends BaseModel
         'cancellation_reason',
     ];
 
+    /**
+     * Validation rules for tour passenger booking.
+     */
+    public static function rules(array $context = []): array
+    {
+        $rules = [
+            'passenger_count' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:500',
+            ],
+            'tour_id' => [
+                'required',
+                'exists:tours,id',
+            ],
+            'full_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+            ],
+        ];
+
+        // Add capacity validation when tour_id is provided
+        if (isset($context['tour_id'])) {
+            $tour = Tour::find($context['tour_id']);
+            if ($tour && $tour->max_capacity) {
+                $rules['passenger_count'][] = function ($attribute, $value, $fail) use ($tour) {
+                    $currentConfirmed = $tour->confirmedPassengers->sum('passenger_count');
+                    $requestedTotal = $currentConfirmed + $value;
+
+                    if ($requestedTotal > $tour->max_capacity) {
+                        $remaining = $tour->max_capacity - $currentConfirmed;
+                        return $fail("Cannot book {$value} passengers. Only {$remaining} spots remaining out of {$tour->max_capacity} total capacity.");
+                    }
+
+                    return true;
+                };
+            }
+        }
+
+        return $rules;
+    }
+
     protected $casts = [
         'passenger_count' => 'integer',
         'registration_date' => 'date',

@@ -53,7 +53,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'en',
                 'department_id' => null, // No department for superadmin
@@ -68,7 +68,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'en',
                 'department_id' => null, // No department for admin
@@ -83,7 +83,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 1, // Internal Relations
@@ -98,7 +98,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 2, // Nibret ena Hisab
@@ -113,7 +113,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 2, // Nibret ena Hisab
@@ -128,7 +128,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 2, // Nibret ena Hisab
@@ -143,7 +143,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 3, // Education
@@ -158,7 +158,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 3, // Education
@@ -173,7 +173,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 5, // Mezmur
@@ -188,7 +188,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 5, // Mezmur
@@ -203,7 +203,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 1, // Internal Relations
@@ -218,7 +218,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 4, // Revenue & Charity
@@ -233,7 +233,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 4, // Revenue & Charity
@@ -248,7 +248,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 1, // Internal Relations
@@ -263,7 +263,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 3, // Education (example as specified)
@@ -278,7 +278,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'is_locked' => false,
                 'failed_login_attempts' => 0,
-                'temp_password_changed' => true,
+                'temp_password_changed' => false,
                 'password_history' => [],
                 'language_preference' => 'am',
                 'department_id' => 3, // Education (example as specified)
@@ -323,6 +323,7 @@ class UserSeeder extends Seeder
         }
 
         $this->command->info('Created 16 test users successfully.');
-        $this->command->info('All users have temp_password_changed = false and password "Admin1234"');
+        $this->command->info('All users have temp_password_changed = false and will be required to change password on first login.');
+        $this->command->info('Default password is "Admin1234"');
     }
 }

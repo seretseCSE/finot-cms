@@ -13,7 +13,7 @@
 
     <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
         <div class="sec-label sr" style="justify-content:center;">{{ __('News & Insights') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2.5rem,5vw,4rem);margin-bottom:20px;">
+        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;">
             {{ __('The') }}
             <span style="color:var(--gold);">{{ __('Blog') }}</span>
         </h1>

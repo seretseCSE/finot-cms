@@ -18,6 +18,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 
 class TourResource extends BaseResource
 {
@@ -259,7 +260,7 @@ class TourResource extends BaseResource
                     ->label('Update All Tour Statuses')
                     ->icon('heroicon-o-arrow-path')
                     ->color('info')
-                    ->visible(fn () => Auth::user()?->hasRole(['tour_head', 'tour_manager', 'admin', 'superadmin']) ?? false)
+                    ->visible(fn () => Auth::user()?->hasRole(Roles::TOUR_MANAGERS) ?? false)
                     ->action(function () {
                         $tours = Tour::whereNotIn('status', ['Cancelled', 'Completed'])->get();
                         $updatedCount = 0;
@@ -306,5 +307,25 @@ class TourResource extends BaseResource
             'create' => Pages\CreateTour::route('/create'),
             'edit' => Pages\EditTour::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->place;
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Date' => $record->tour_date->format('M d, Y'),
+            'Cost' => 'Birr ' . number_format($record->cost_per_person, 2),
+            'Capacity' => $record->max_capacity . ' attendees',
+            'Status' => $record->status,
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['place', 'description', 'tour_date', 'status'];
     }
 }

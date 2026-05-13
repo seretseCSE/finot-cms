@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\SystemBackup;
-use App\Services\BackupService;
+use App\Services\BackupRestorationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,14 +28,14 @@ class RestoreBackupJob implements ShouldQueue
     ) {
     }
 
-    public function handle(BackupService $backupService): void
+    public function handle(BackupRestorationService $backupService): void
     {
         $backup = SystemBackup::findOrFail($this->backupId);
 
         try {
             Log::info('Restore job started', ['backup_id' => $backup->id]);
 
-            $backupService->performRestore($backup);
+            $backupService->restoreBackup($backup);
 
             Log::info('Restore job completed successfully', ['backup_id' => $backup->id]);
         } catch (Throwable $e) {

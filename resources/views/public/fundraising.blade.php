@@ -110,6 +110,32 @@
                                 </div>
                             </div>
 
+                            {{-- Donor Stats --}}
+                            @if($campaign->donations && $campaign->donations->count() > 0)
+                                <div style="padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;">
+                                    <div style="font-size:.7rem;text-transform:uppercase;color:var(--parchment-40);margin-bottom:6px;font-weight:700;">{{ __('Donors') }}: {{ $campaign->donations->count() }}</div>
+                                    @php
+                                        $topDonors = $campaign->donations()
+                                            ->where('donor_name', '!=', 'Campaign Update')
+                                            ->whereNotNull('donor_name')
+                                            ->groupBy('donor_name')
+                                            ->selectRaw('donor_name, SUM(amount) as total')
+                                            ->orderByDesc('total')
+                                            ->limit(3)
+                                            ->get();
+                                    @endphp
+                                    @if($topDonors->count() > 0)
+                                        <div style="font-size:.75rem;color:var(--text-60);margin-bottom:8px;">{{ __('Top Contributors') }}:</div>
+                                        @foreach($topDonors as $donor)
+                                            <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--parchment-60);margin-bottom:2px;">
+                                                <span>{{ $donor->donor_name }}</span>
+                                                <span style="color:var(--gold);font-weight:600;">ETB {{ number_format($donor->total, 0) }}</span>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            @endif
+
                             @if($campaign->bank_account_info)
                                 <div style="padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;">
                                     <div style="font-size:.7rem;text-transform:uppercase;color:var(--parchment-40);margin-bottom:6px;font-weight:700;">{{ __('Donation Info') }}</div>

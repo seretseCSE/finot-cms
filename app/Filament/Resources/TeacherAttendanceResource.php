@@ -3,8 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TeacherAttendanceResource\Pages;
-use App\Models\AttendanceSession;
-use App\Models\Teacher;
 use App\Models\TeacherAttendance;
 use Filament\Forms;
 use Filament\Resources\Resource;
@@ -68,7 +66,7 @@ class TeacherAttendanceResource extends Resource
                 Tables\Columns\TextColumn::make('attendance_status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Present' => 'success',
                         'Absent' => 'danger',
                         'Late' => 'warning',
@@ -78,7 +76,7 @@ class TeacherAttendanceResource extends Resource
                 Tables\Columns\TextColumn::make('session_outcome')
                     ->label('Outcome')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Normal' => 'success',
                         'Cancelled' => 'danger',
                     }),

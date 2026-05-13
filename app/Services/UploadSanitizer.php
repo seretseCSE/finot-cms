@@ -34,6 +34,11 @@ class UploadSanitizer
      * Sanitize an uploaded file by quarantining it, verifying MIME magic bytes,
      * stripping EXIF from images, and moving it to the destination disk.
      *
+     * @param TemporaryUploadedFile $file The uploaded file
+     * @param string $directory The target directory
+     * @param string $disk The storage disk
+     * @param array $allowedMimeTypes Allowed MIME types
+     * @return string The file path
      * @throws \RuntimeException
      */
     public function sanitize(
@@ -79,6 +84,9 @@ class UploadSanitizer
 
     /**
      * Get the real MIME type from file contents using magic bytes.
+     *
+     * @param string $path The file path
+     * @return string The MIME type
      */
     public function getRealMimeType(string $path): string
     {
@@ -98,6 +106,11 @@ class UploadSanitizer
 
     /**
      * Create a save callback for Filament's FileUpload component.
+     *
+     * @param string $directory The target directory
+     * @param string $disk The storage disk
+     * @param array $allowedMimeTypes Allowed MIME types
+     * @return Closure The save callback
      */
     public static function saveCallback(string $directory, string $disk, array $allowedMimeTypes = []): Closure
     {

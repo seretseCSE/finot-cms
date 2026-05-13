@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 
 class SongResource extends Resource
 {
@@ -34,27 +35,27 @@ class SongResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 2;
+        return 3;
     }
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function form(Schema $schema): Schema
@@ -193,7 +194,7 @@ class SongResource extends Resource
 
                 Tables\Columns\ToggleColumn::make('is_active')
                     ->label('Active')
-                    ->visible(fn () => Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin'])),
+                    ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS)),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
@@ -253,7 +254,7 @@ class SongResource extends Resource
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn () => Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']))
+                        ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS))
                         ->action(function ($records) {
                             foreach ($records as $record) {
                                 $record->update(['is_active' => true]);
@@ -264,7 +265,7 @@ class SongResource extends Resource
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn () => Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']))
+                        ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS))
                         ->action(function ($records) {
                             foreach ($records as $record) {
                                 $record->update(['is_active' => false]);
@@ -272,7 +273,7 @@ class SongResource extends Resource
                         }),
 
                     Actions\DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin'])),
+                        ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS)),
                 ]),
             ])
             ->headerActions([

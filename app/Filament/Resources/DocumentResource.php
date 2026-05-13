@@ -17,6 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentResource extends Resource
@@ -35,12 +36,12 @@ class DocumentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Archives';
+        return 'Content Management';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 1;
+        return 8;
     }
 
     /**
@@ -99,7 +100,7 @@ class DocumentResource extends Resource
             return false;
         }
 
-        return $user->hasRole(['admin', 'superadmin'])
+        return $user->hasRole(Roles::ADMINISTRATORS)
             || $user->hasPermissionTo('documents.upload')
             || static::isDepartmentHead()
             || static::isDepartmentSecretary();
@@ -114,7 +115,7 @@ class DocumentResource extends Resource
         }
 
         // Superadmin and admin can edit everything
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(Roles::ADMINISTRATORS)) {
             return true;
         }
 
@@ -140,7 +141,7 @@ class DocumentResource extends Resource
         }
 
         // Superadmin and admin can delete everything
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(Roles::ADMINISTRATORS)) {
             return true;
         }
 
@@ -183,7 +184,7 @@ class DocumentResource extends Resource
     public static function form(Schema $schema): Schema
     {
         $user = Auth::user();
-        $isAdmin = $user?->hasRole(['admin', 'superadmin']);
+        $isAdmin = $user?->hasRole(Roles::ADMINISTRATORS);
 
         return $schema->components([
                 Section::make('Document Information')
@@ -249,6 +250,7 @@ class DocumentResource extends Resource
                             ->directory('')
                             ->downloadable()
                             ->openable()
+                            ->maxSize(51240) // 50MB for documents
                             ->saveUploadedFileUsing(UploadSanitizer::saveCallback('', 'documents', [
                                 'application/pdf',
                                 'application/msword',

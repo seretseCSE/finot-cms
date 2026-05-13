@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,6 +32,7 @@ class FinancialTransaction extends Model
     ];
 
     protected $casts = [
+        'type' => TransactionType::class,
         'amount' => 'decimal:2',
         'transaction_date' => 'date',
         'approved_at' => 'datetime',
@@ -45,47 +47,53 @@ class FinancialTransaction extends Model
         });
 
         static::saved(function (self $transaction): void {
-            $newAccountId = $transaction->bank_account_id;
-            $newEffect = self::getSignedEffect($transaction->type, (float) $transaction->amount);
+            \DB::transaction(function () use ($transaction) {
+                $newAccountId = $transaction->bank_account_id;
+                $newEffect = self::getSignedEffect($transaction->type, (float) $transaction->amount);
 
-            if ($transaction->wasRecentlyCreated) {
+                if ($transaction->wasRecentlyCreated) {
+                    self::applyEffectToAccount($newAccountId, $newEffect);
+
+                    return;
+                }
+
+                if (! $transaction->wasChanged(['type', 'amount', 'bank_account_id'])) {
+                    return;
+                }
+
+                $oldAccountId = $transaction->getOriginal('bank_account_id');
+                $oldEffect = self::getSignedEffect(
+                    (string) $transaction->getOriginal('type'),
+                    (float) $transaction->getOriginal('amount')
+                );
+
+                if ($oldAccountId === $newAccountId) {
+                    self::applyEffectToAccount($newAccountId, $newEffect - $oldEffect);
+
+                    return;
+                }
+
+                self::applyEffectToAccount($oldAccountId, -$oldEffect);
                 self::applyEffectToAccount($newAccountId, $newEffect);
-
-                return;
-            }
-
-            if (! $transaction->wasChanged(['type', 'amount', 'bank_account_id'])) {
-                return;
-            }
-
-            $oldAccountId = $transaction->getOriginal('bank_account_id');
-            $oldEffect = self::getSignedEffect(
-                (string) $transaction->getOriginal('type'),
-                (float) $transaction->getOriginal('amount')
-            );
-
-            if ($oldAccountId === $newAccountId) {
-                self::applyEffectToAccount($newAccountId, $newEffect - $oldEffect);
-
-                return;
-            }
-
-            self::applyEffectToAccount($oldAccountId, -$oldEffect);
-            self::applyEffectToAccount($newAccountId, $newEffect);
+            });
         });
 
         static::deleted(function (self $transaction): void {
-            self::applyEffectToAccount(
-                $transaction->bank_account_id,
-                -self::getSignedEffect($transaction->type, (float) $transaction->amount)
-            );
+            \DB::transaction(function () use ($transaction) {
+                self::applyEffectToAccount(
+                    $transaction->bank_account_id,
+                    -self::getSignedEffect($transaction->type, (float) $transaction->amount)
+                );
+            });
         });
 
         static::restored(function (self $transaction): void {
-            self::applyEffectToAccount(
-                $transaction->bank_account_id,
-                self::getSignedEffect($transaction->type, (float) $transaction->amount)
-            );
+            \DB::transaction(function () use ($transaction) {
+                self::applyEffectToAccount(
+                    $transaction->bank_account_id,
+                    self::getSignedEffect($transaction->type, (float) $transaction->amount)
+                );
+            });
         });
     }
 

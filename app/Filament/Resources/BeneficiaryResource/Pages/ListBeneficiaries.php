@@ -37,7 +37,7 @@ class ListBeneficiaries extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatchSync(
+                    ProcessExportJob::dispatch(
                         exportClass: BeneficiaryExport::class,
                         columns: $data['columns'],
                         format: $data['format'],

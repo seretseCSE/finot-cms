@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EventStatus;
 use App\Models\Traits\HasAuditLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,6 +41,7 @@ class Event extends BaseModel
     ];
 
     protected $casts = [
+        'status' => EventStatus::class,
         'date_time' => 'datetime',
         'registration_required' => 'boolean',
         'max_capacity' => 'integer',

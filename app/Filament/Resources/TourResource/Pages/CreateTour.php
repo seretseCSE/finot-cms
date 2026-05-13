@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TourResource\Pages;
 
 use App\Filament\Resources\TourResource;
+use App\Services\TourService;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTour extends CreateRecord
@@ -24,20 +25,6 @@ class CreateTour extends CreateRecord
 
     protected function afterCreate(): void
     {
-        // Log to audit trail
-        \Log::channel('audit')->info('Tier 1 Audit Log', [
-            'tier' => 1,
-            'action' => 'tour_created',
-            'entity_id' => $this->record->id,
-            'entity_type' => 'tour',
-            'old_value' => null,
-            'new_value' => json_encode([
-                'place' => $this->record->place,
-                'tour_date' => $this->record->tour_date,
-                'start_time' => $this->record->start_time,
-            ]),
-            'user_id' => auth()->id(),
-            'timestamp' => now()->toDateTimeString(),
-        ]);
+        app(TourService::class)->logTourCreation($this->record);
     }
 }

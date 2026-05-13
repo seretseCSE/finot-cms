@@ -35,19 +35,27 @@ class RecordUserSession
         }
 
         // Check user's active sessions count
-        $activeSessions = UserSession::forUser($user->id)
-            ->active()
-            ->count();
+        $maxSessions = config('finot.max_active_sessions');
 
-        // If user has 3 or more active sessions, delete the oldest one
-        if ($activeSessions >= 3) {
-            $oldestSession = UserSession::forUser($user->id)
+        if ($maxSessions !== null) {
+            $activeSessions = UserSession::forUser($user->id)
                 ->active()
-                ->orderBy('last_activity', 'asc')
-                ->first();
+                ->count();
 
-            if ($oldestSession) {
-                $oldestSession->delete();
+            // If user has reached max sessions, delete the oldest one
+            if ($activeSessions >= $maxSessions) {
+                $oldestSession = UserSession::forUser($user->id)
+                    ->active()
+                    ->orderBy('last_activity', 'asc')
+                    ->first();
+
+                if ($oldestSession) {
+                    // Invalidate the session in Laravel's session storage
+                    $oldestSession->delete();
+
+                    // Optionally, you could also invalidate the Laravel session
+                    // by calling session()->forget() if you have the session ID stored
+                }
             }
         }
 

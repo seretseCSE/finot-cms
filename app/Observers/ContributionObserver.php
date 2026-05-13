@@ -47,7 +47,7 @@ class ContributionObserver
             ->whereHas('roles', function ($query): void {
                 $query->whereIn('name', ['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
             })
-            ->get();
+            ->lazy();
 
         foreach ($users as $user) {
             $notification = Notification::make()
@@ -68,7 +68,13 @@ class ContributionObserver
         try {
             $pushService = app(PushNotificationService::class);
             $pushService->sendToUsers(
-                $users->pluck('id')->toArray(),
+                User::query()
+                    ->where('is_active', true)
+                    ->whereHas('roles', function ($query): void {
+                        $query->whereIn('name', ['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+                    })
+                    ->pluck('id')
+                    ->toArray(),
                 $title,
                 $body,
                 ['type' => 'contribution', 'url' => $url]

@@ -168,7 +168,7 @@ class ContributionAmount extends BaseModel
             $query->where('id', '!=', $excludeId);
         }
 
-        $existingAmounts = $query->get();
+        $existingAmounts = $query->lazy();
 
         foreach ($existingAmounts as $existing) {
             $newStart = $effectiveFrom;

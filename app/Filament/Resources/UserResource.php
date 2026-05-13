@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Forms\Components\Traits\HasPhoneFormatting;
 use Filament\Schemas\Schema;
 use App\Models\User;
 use Filament\Actions;
@@ -16,13 +17,14 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
+    use HasPhoneFormatting;
     protected static ?string $model = User::class;
 
     public static function getNavigationIcon(): ?string
@@ -33,6 +35,11 @@ class UserResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return 'System';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
     }
 
     public static function getNavigationLabel(): string
@@ -52,19 +59,19 @@ class UserResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['superadmin', 'admin']);
+        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['superadmin', 'admin']);
+        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
     }
 
     public static function canEdit($record): bool
     {
         $user = Auth::user();
 
-        if (! $user?->hasRole(['superadmin', 'admin'])) {
+        if (! $user?->hasRole(Roles::ADMINISTRATORS)) {
             return false;
         }
 
@@ -108,22 +115,7 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(255),
 
-                        TextInput::make('phone')
-                            ->label('Phone Number')
-                            ->tel()
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->prefix(config('finot.phone_prefix', '+251'))
-                            ->regex('/^[0-9]{9}$/')
-                            ->placeholder('912345678')
-                            ->helperText('Enter 9 digits after '.config('finot.phone_prefix', '+251'))
-                            ->maxLength(9)
-                            ->formatStateUsing(function ($state) {
-                                $prefix = config('finot.phone_prefix', '+251');
-
-                                return $state ? preg_replace('/^(' . preg_quote($prefix, '/') . '|0)/', '', $state) : null;
-                            })
-                            ->dehydrateStateUsing(fn ($state) => $state ? config('finot.phone_prefix', '+251').$state : null),
+                        HasPhoneFormatting::uniquePhoneInput('phone', 'Phone Number', true),
 
                         TextInput::make('email')
                             ->label('Email Address')
@@ -328,7 +320,7 @@ class UserResource extends Resource
                     ->visible(function (User $record): bool {
                         $currentUser = Auth::user();
 
-                        return $currentUser?->hasRole(['superadmin', 'admin'])
+                        return $currentUser?->hasRole(Roles::ADMINISTRATORS)
                             && $record->id !== $currentUser->id
                             && ! $record->isCurrentlyLocked();
                     })
@@ -366,7 +358,7 @@ class UserResource extends Resource
                     ->visible(function (User $record): bool {
                         $currentUser = Auth::user();
 
-                        return $currentUser?->hasRole(['superadmin', 'admin'])
+                        return $currentUser?->hasRole(Roles::ADMINISTRATORS)
                             && $record->isCurrentlyLocked();
                     })
                     ->requiresConfirmation()
@@ -388,7 +380,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-key')
                     ->color('warning')
                     ->visible(function (User $record): bool {
-                        return Auth::user()?->hasRole(['superadmin', 'admin'])
+                        return Auth::user()?->hasRole(Roles::ADMINISTRATORS)
                             && $record->id !== Auth::id();
                     })
                     ->requiresConfirmation()
@@ -420,7 +412,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->color('danger')
                     ->visible(function (User $record): bool {
-                        return Auth::user()?->hasRole(['superadmin', 'admin'])
+                        return Auth::user()?->hasRole(Roles::ADMINISTRATORS)
                             && $record->id !== Auth::id();
                     })
                     ->requiresConfirmation()
@@ -464,7 +456,7 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(['superadmin', 'admin']) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
 
                 Actions\BulkAction::make('unlock')
                     ->label('Unlock Selected')
@@ -484,10 +476,10 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(['superadmin', 'admin']) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
 
                 Actions\DeleteBulkAction::make()
-                    ->visible(fn (): bool => Auth::user()?->hasRole(['superadmin', 'admin']) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
             ])
             ->defaultSort('created_at', 'desc')
             ->emptyStateHeading('No users found')

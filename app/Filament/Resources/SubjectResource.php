@@ -18,7 +18,12 @@ class SubjectResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
     }
 
     public static function getNavigationIcon(): ?string
@@ -76,7 +81,7 @@ class SubjectResource extends Resource
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Active')
                     ->badge()
-                    ->color(fn($state) => $state ? 'success' : 'gray')
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->toggleable(),
             ])

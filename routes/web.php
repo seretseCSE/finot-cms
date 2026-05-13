@@ -39,8 +39,8 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SongController;
 
-// Apply rate limiting to all public routes (60 requests per minute)
-Route::middleware('throttle:60,1')->group(function () {
+// Apply rate limiting to all public routes (10 requests per minute)
+Route::middleware('throttle:10,1')->group(function () {
     Route::get('/', [HomeController::class, 'index']);
 
     // Public page routes
@@ -75,6 +75,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/media', [MediaController::class, 'index'])->name('media');
     Route::get('/media/{mediaItem}', [MediaController::class, 'show'])->name('media.show');
     Route::get('/library', [LibraryController::class, 'index'])->name('library');
+    Route::get('/library/subcategories', [LibraryController::class, 'subcategories'])->name('library.subcategories');
     Route::get('/library/download/{resource}', [LibraryController::class, 'download'])->name('library.download');
     Route::get('/contact', [ContactController::class, 'index'])->name('contact');
     Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
@@ -99,7 +100,7 @@ Route::middleware('throttle:60,1')->group(function () {
 });
 
 // Password change routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:5,1'])->group(function () {
     Route::post('/user/change-password', [PasswordChangeController::class, 'changePassword'])->name('password.change');
     Route::get('/user/password-requirements', [PasswordChangeController::class, 'getPasswordRequirements'])->name('password.requirements');
 });
@@ -110,13 +111,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Session management API routes (for PWA background sync and session extension)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:10,1'])->group(function () {
     Route::post('/api/session/extend', [SessionController::class, 'extendSession'])->name('session.extend');
     Route::get('/api/session/status', [SessionController::class, 'getSessionStatus'])->name('session.status');
 });
 
 // Product tour routes
-Route::middleware(['auth', 'web'])->group(function () {
+Route::middleware(['auth', 'web', 'throttle:10,1'])->group(function () {
     Route::post('/api/tour/restart', [ProductTourController::class, 'restart'])->name('tour.restart');
     Route::post('/api/tour/complete', [ProductTourController::class, 'complete'])->name('tour.complete');
     Route::get('/api/tour/status', [ProductTourController::class, 'status'])->name('tour.status');
@@ -126,10 +127,13 @@ Route::get('/login', function () {
     return redirect()->route('filament.admin.auth.login');
 })->name('login');
 
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Apply stricter rate limiting to authentication routes (5 requests per minute)
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:5,1'])->group(function () {
     Route::get('/change-initial-password', [AuthController::class, 'showChangeInitialPassword'])->name('change-initial-password');
     Route::post('/change-initial-password', [AuthController::class, 'changeInitialPassword'])->name('change-initial-password.submit');
 });

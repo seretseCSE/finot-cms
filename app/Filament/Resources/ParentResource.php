@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ParentResource\Pages;
-use Filament\Schemas\Schema;
 use App\Exports\ParentExport;
 use App\Jobs\ProcessExportJob;
 use App\Models\ParentModel;
@@ -13,7 +12,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\RestoreAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
@@ -51,42 +49,6 @@ class ParentResource extends Resource
         return 'Parents';
     }
 
-    // public static function form(Schema $schema): Schema
-    // {
-    //     return $schema->components([
-    //             Section::make()
-    //                 ->schema([
-    //                     Forms\Components\TextInput::make('full_name')
-    //                         ->label('Full Name')
-    //                         ->required()
-    //                         ->maxLength(200),
-
-    //                     Forms\Components\TextInput::make('phone')
-    //                         ->label('Phone')
-    //                         ->required()
-    //                         ->prefix(config('finot.phone_prefix', '+251'))
-    //                         ->regex('/^[0-9]{9}$/')
-    //                         ->placeholder('912345678')
-    //                         ->helperText('Enter 9 digits after '.config('finot.phone_prefix', '+251'))
-    //                         ->maxLength(9)
-    //                         ->unique(ignoreRecord: true)
-    //                         ->live(debounce: 500)
-    //                         ->formatStateUsing(function ($state) {
-    //                             $prefix = config('finot.phone_prefix', '+251');
-
-    //                             return $state ? preg_replace('/^(' . preg_quote($prefix, '/') . '|0)/', '', $state) : null;
-    //                         })
-    //                         ->dehydrateStateUsing(fn ($state) => $state ? config('finot.phone_prefix', '+251').$state : null),
-
-    //                     Forms\Components\Textarea::make('notes')
-    //                         ->label('Notes')
-    //                         ->rows(3)
-    //                         ->maxLength(1000),
-    //                 ])
-    //                 ->columns(2),
-    //         ]);
-    // }
-
     public static function table(Table $table): Table
     {
         return $table
@@ -109,7 +71,7 @@ class ParentResource extends Resource
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->color(fn($state) => $state ? 'success' : 'danger')
+                    ->color(fn ($state) => $state ? 'success' : 'danger')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -164,7 +126,7 @@ class ParentResource extends Resource
                     ->action(function (array $data, BulkAction $action) {
                         $ids = $action->getSelectedRecords()->pluck('id')->toArray();
 
-                        ProcessExportJob::dispatchSync(
+                        ProcessExportJob::dispatch(
                             exportClass: ParentExport::class,
                             columns: $data['columns'],
                             format: $data['format'],

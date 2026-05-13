@@ -81,7 +81,8 @@ class CharityReport extends Page
             'by_type' => AidDistribution::query()
                 ->when($this->date_from, fn ($q) => $q->whereDate('distribution_date', '>=', $this->date_from))
                 ->when($this->date_to, fn ($q) => $q->whereDate('distribution_date', '<=', $this->date_to))
-                ->select('aid_type',
+                ->select(
+                    'aid_type',
                     DB::raw('count(*) as count'),
                     DB::raw('sum(amount) as total'),
                     DB::raw('count(amount) as monetary_count')

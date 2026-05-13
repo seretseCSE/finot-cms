@@ -36,7 +36,7 @@ class BlogPostResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 4;
+        return 6;
     }
 
     public static function canViewAny(): bool

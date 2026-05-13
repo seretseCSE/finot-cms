@@ -12,7 +12,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class MediaResource extends BaseResource
 {
@@ -35,7 +34,7 @@ class MediaResource extends BaseResource
 
     public static function getNavigationSort(): ?int
     {
-        return 3;
+        return 1;
     }
 
     public static function form(Schema $schema): Schema

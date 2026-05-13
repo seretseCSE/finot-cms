@@ -50,6 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('storage/logo.png'))
             ->pages([
                 Dashboard::class,
+                \App\Filament\Pages\Auth\ChangeInitialPassword::class,
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()

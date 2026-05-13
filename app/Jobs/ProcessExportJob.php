@@ -14,7 +14,10 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ProcessExportJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public function __construct(
         protected string $exportClass,
@@ -23,7 +26,8 @@ class ProcessExportJob implements ShouldQueue
         protected int $userId,
         protected ?array $ids = null,
         protected ?array $filters = null,
-    ) {}
+    ) {
+    }
 
     public function handle(): void
     {

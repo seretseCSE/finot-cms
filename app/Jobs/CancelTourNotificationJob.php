@@ -35,20 +35,7 @@ class CancelTourNotificationJob implements ShouldQueue
                 ->get();
 
             foreach ($confirmedPassengers as $passenger) {
-                // Create in-app notification for the linked member
-                // This would depend on your notification system
-                // $passenger->member->notifications()->create([
-                //     'title' => 'Tour Cancelled',
-                //     'message' => "The tour to {$this->tour->place} on {$this->tour->ethiopian_date} has been cancelled. Reason: {$this->cancellationReason}",
-                //     'type' => 'tour_cancellation',
-                //     'data' => [
-                //         'tour_id' => $this->tour->id,
-                //         'tour_place' => $this->tour->place,
-                //         'cancellation_reason' => $this->cancellationReason,
-                //     ],
-                // ]);
-
-                // For now, just log the notification
+                // Log the notification
                 Log::info('Tour cancellation notification created', [
                     'member_id' => $passenger->member_id,
                     'member_name' => $passenger->member->full_name,

@@ -19,7 +19,7 @@ class FundraisingCampaignResource extends BaseResource
 {
     protected static ?string $model = FundraisingCampaign::class;
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
@@ -44,7 +44,7 @@ class FundraisingCampaignResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DonationsRelationManager::class,
         ];
     }
 

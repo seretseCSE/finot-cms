@@ -24,6 +24,7 @@ class ForcePasswordChange
             if (!$user->temp_password_changed) {
                 // Allow access to password change page and logout
                 $allowedRoutes = [
+                    'filament.admin.auth.change-password',
                     'filament.admin.pages.change-password',
                     'filament.admin.logout',
                     'filament.admin.auth.logout',
@@ -38,7 +39,7 @@ class ForcePasswordChange
                     session(['url.intended' => $request->fullUrl()]);
 
                     // Redirect to password change page
-                    return redirect()->route('filament.admin.pages.change-password');
+                    return redirect()->route('filament.admin.auth.change-password');
                 }
             }
         }

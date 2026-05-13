@@ -3,7 +3,7 @@
 @section('title', __('Announcements'))
 
 @section('content')
-<section style="padding:120px 24px 80px;background:var(--dark-950);position:relative;overflow:hidden;min-height:40vh;display:flex;align-items:center;">
+<section style="position:relative;padding:120px 24px 80px;background:var(--dark-950);overflow:hidden;">
     <div style="position:absolute;inset:0;background:url('{{ asset('images/hero-bg.jpg') }}') center/cover no-repeat;filter:brightness(.2);"></div>
     <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--overlay-90),rgba(26,68,247,.2));"></div>
     
@@ -11,10 +11,10 @@
         <div class="sec-label sr" style="justify-content:center;margin-bottom:20px;">
             <span class="am">መግለጫዎች እና ማስታወቂያዎች</span>
         </div>
-        <h1 class="display sr" style="font-size:clamp(2.5rem,6vw,4rem);margin-bottom:24px;">
+        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;">
             {{ __('Announcements') }}
         </h1>
-        <p class="sr" style="font-size:1.1rem;color:var(--text-60);max-width:600px;margin:0 auto;line-height:1.7;">
+        <p class="sr" style="color:var(--text-60);max-width:600px;margin:0 auto;font-size:1.1rem;line-height:1.7;">
             {{ __('Stay informed with the latest news, updates, and urgent messages from our Sunday school.') }}
         </p>
     </div>

@@ -81,8 +81,8 @@ class ChangeInitialPassword extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        // Only show in navigation if user needs to change password
-        return Auth::check() && !Auth::user()->temp_password_changed;
+        // Never show in navigation - this is a forced flow page
+        return false;
     }
 
     public function getBreadcrumbs(): array
@@ -97,11 +97,11 @@ class ChangeInitialPassword extends Page
 
     public function getHeading(): string
     {
-        return 'You must change your temporary password to continue';
+        return 'Welcome! Please Change Your Password';
     }
 
     public function getSubheading(): string
     {
-        return 'Please choose a strong password that you haven\'t used in the last 3 passwords';
+        return 'For your security, you must change your temporary password before continuing to the admin panel.';
     }
 }

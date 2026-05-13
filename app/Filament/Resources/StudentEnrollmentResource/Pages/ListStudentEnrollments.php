@@ -165,7 +165,7 @@ class ListStudentEnrollments extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatchSync(
+                    ProcessExportJob::dispatch(
                         exportClass: StudentEnrollmentExport::class,
                         columns: $data['columns'],
                         format: $data['format'],

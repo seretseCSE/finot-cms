@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\SystemBackup;
-use App\Services\BackupService;
+use App\Services\BackupRestorationService;
 use Illuminate\Console\Command;
 
 class RestoreBackupCommand extends Command
@@ -27,7 +27,7 @@ class RestoreBackupCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(BackupService $backupService): int
+    public function handle(BackupRestorationService $backupService): int
     {
         $backupId = $this->argument('backup');
         $force = $this->option('force');
@@ -50,7 +50,7 @@ class RestoreBackupCommand extends Command
             $this->warn('Running restore synchronously...');
 
             try {
-                $backupService->restoreBackup($backup, true);
+                $backupService->restoreBackup($backup);
                 $this->info('Backup restored successfully.');
 
                 return self::SUCCESS;
@@ -61,7 +61,7 @@ class RestoreBackupCommand extends Command
             }
         }
 
-        $backupService->restoreBackup($backup, false);
+        $backupService->restoreBackup($backup);
         $this->info('Restore job dispatched to the queue.');
 
         return self::SUCCESS;

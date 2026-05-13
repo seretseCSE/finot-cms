@@ -50,7 +50,12 @@ class EditLibraryResource extends EditRecord
                 return round(Storage::disk('library')->size($filePath) / 1024);
             }
         } catch (\Exception $e) {
-            Log::warning('Could not calculate file size: '.$e->getMessage());
+            Log::warning('Could not calculate file size', [
+                'file_path' => $filePath,
+                'error' => $e->getMessage(),
+                'context' => 'library_edit',
+                'user_id' => auth()->id(),
+            ]);
         }
 
         return 0;

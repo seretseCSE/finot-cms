@@ -5,6 +5,7 @@ namespace App\Actions\Members;
 use Filament\Actions\BulkAction;
 use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Cancel;
+use App\Exceptions\InsufficientFundsException;
 
 class BulkAssignmentValidationAction
 {
@@ -26,7 +27,7 @@ class BulkAssignmentValidationAction
                 ->warning()
                 ->send();
 
-            throw new Cancel();
+            throw new InsufficientFundsException("You can assign a maximum of {self::MAX_SELECTION_COUNT} members at a time.");
         }
     }
 

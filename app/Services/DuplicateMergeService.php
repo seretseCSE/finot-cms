@@ -28,7 +28,7 @@ class DuplicateMergeService
             $members = Member::query()
                 ->where('phone', $dup->phone)
                 ->orderBy('created_at')
-                ->get();
+                ->lazy();
 
             $primary = $members->first();
             foreach ($members->skip(1) as $duplicate) {
@@ -59,7 +59,7 @@ class DuplicateMergeService
                 ->where('father_name', $dup->father_name)
                 ->where('grandfather_name', $dup->grandfather_name)
                 ->orderBy('created_at')
-                ->get();
+                ->lazy();
 
             $primary = $members->first();
             foreach ($members->skip(1) as $duplicate) {

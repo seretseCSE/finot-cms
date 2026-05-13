@@ -5,78 +5,73 @@
             <h2 class="text-2xl font-bold text-gray-900">
                 Auto-Purge Settings
             </h2>
-            {{ $this->getHeaderActions() }}
+            <div class="flex space-x-2">
+                @foreach($this->getHeaderActions() as $action)
+                    {{ $action }}
+                @endforeach
+            </div>
         </div>
 
-        <!-- Form -->
-        <form wire:submit="saveSettings">
-            <div class="space-y-6">
-                
-                <!-- Data Retention Settings -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Retention Settings</h3>
-                    <p class="text-sm text-gray-600 mb-6">
-                        Configure how long to keep different types of data before automatic deletion
-                    </p>
-                    
-                    <!-- Auto-Purge Toggle -->
-                    <div class="mb-6">
-                        {{ $this->getFormComponent('auto_purge_enabled') }}
+        <!-- Current Settings Display -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Data Retention Settings -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Retention Settings</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Error Logs Retention</span>
+                        <span class="font-medium">{{ \App\Models\SiteSetting::get('error_logs_retention_days', 60) }} days</span>
                     </div>
-                    
-                    <!-- Purge Schedule -->
-                    <div class="mb-6">
-                        {{ $this->getFormComponent('purge_schedule') }}
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Security Audit Logs Retention</span>
+                        <span class="font-medium">{{ \App\Models\SiteSetting::get('security_audit_retention_days', 30) }} days</span>
                     </div>
-                    
-                    <!-- Retention Periods Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Error Logs & Security Audit -->
-                        <div class="space-y-4">
-                            {{ $this->getFormComponent('error_logs_retention_days') }}
-                            {{ $this->getFormComponent('security_audit_retention_days') }}
-                        </div>
-                        
-                        <!-- Session Logs & Read Notifications -->
-                        <div class="space-y-4">
-                            {{ $this->getFormComponent('session_logs_retention_days') }}
-                            {{ $this->getFormComponent('read_notifications_retention_days') }}
-                        </div>
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Session Logs Retention</span>
+                        <span class="font-medium">{{ \App\Models\SiteSetting::get('session_logs_retention_days', 90) }} days</span>
                     </div>
-                </div>
-
-                <!-- Media & Files Settings -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Media & Files Settings</h3>
-                    <p class="text-sm text-gray-600 mb-6">
-                        Configure retention for uploaded files and media
-                    </p>
-                    
-                    {{ $this->getFormComponent('media_files_retention_years') }}
-                </div>
-
-                <!-- Purge Notifications -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Purge Notifications</h3>
-                    <p class="text-sm text-gray-600 mb-6">
-                        Configure warnings before automatic deletion
-                    </p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {{ $this->getFormComponent('notify_before_purge') }}
-                        <div wire:ignore>
-                            {{ $this->getFormComponent('purge_notification_days') }}
-                        </div>
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Read Notifications Retention</span>
+                        <span class="font-medium">{{ \App\Models\SiteSetting::get('read_notifications_retention_days', 90) }} days</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-gray-600">Media Files Retention</span>
+                        <span class="font-medium">{{ \App\Models\SiteSetting::get('media_files_retention_years', 5) }} years</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-4 mt-8">
-                {{ $this->getFormActions() }}
+            <!-- Schedule Settings -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Schedule Settings</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Auto-Purge Status</span>
+                        <span class="font-medium {{ \App\Models\SiteSetting::get('auto_purge_enabled', true) ? 'text-green-600' : 'text-red-600' }}">
+                            {{ \App\Models\SiteSetting::get('auto_purge_enabled', true) ? 'Enabled' : 'Disabled' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Purge Schedule</span>
+                        <span class="font-medium">
+                            {{ \App\Models\SiteSetting::get('purge_schedule', 'daily') == 'daily' ? 'Daily (2:00 AM)' :
+                               (\App\Models\SiteSetting::get('purge_schedule', 'daily') == 'weekly' ? 'Weekly (Sunday 2:00 AM)' :
+                               'Monthly (1st day 2:00 AM)') }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span class="text-gray-600">Notify Before Purge</span>
+                        <span class="font-medium {{ \App\Models\SiteSetting::get('notify_before_purge', true) ? 'text-green-600' : 'text-gray-500' }}">
+                            {{ \App\Models\SiteSetting::get('notify_before_purge', true) ? 'Enabled' : 'Disabled' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-gray-600">Warning Days</span>
+                        <span class="font-medium">{{ \App\Models\SiteSetting::get('purge_notification_days', 7) }} days</span>
+                    </div>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
 
     <!-- Information Panel -->
     <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">

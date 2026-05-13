@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\Traits\HasUserSessions;
+use App\Presenters\UserPresenter;
+use App\Services\AccountLockService;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -156,7 +158,15 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Override the canAccessPanel method.
+     * Get presenter instance for UI operations
+     */
+    public function present(): UserPresenter
+    {
+        return new UserPresenter($this);
+    }
+
+    /**
+     * Check if the user is active.
      */
     public function canAccessPanel(\Filament\Panel $panel): bool
     {
@@ -196,97 +206,11 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Check if user account is locked (either manual or automatic)
-     */
-    public function isAccountLocked(): bool
-    {
-        return $this->is_locked || ($this->locked_until && $this->locked_until->isFuture());
-    }
-
-    /**
-     * Check if user is manually locked (admin action)
-     */
-    public function isManuallyLocked(): bool
-    {
-        return $this->is_locked;
-    }
-
-    /**
-     * Check if user is automatically locked (failed attempts)
-     */
-    public function isAutomaticallyLocked(): bool
-    {
-        return ! $this->is_locked && $this->locked_until && $this->locked_until->isFuture();
-    }
-
-    /**
-     * Get lock status message
-     */
-    public function getLockStatusMessage(): string
-    {
-        if ($this->isManuallyLocked()) {
-            return 'Account disabled. Please contact administrator.';
-        }
-
-        if ($this->isAutomaticallyLocked()) {
-            return $this->getLockoutMessage();
-        }
-
-        return '';
-    }
-
-    /**
-     * Manually lock user account
-     */
-    public function manuallyLock(?string $reason = null, ?int $adminId = null): void
-    {
-        $this->update(['is_locked' => true]);
-
-        // Log manual lock action
-        $this->logFailedLogin('account_manually_locked', [
-            'reason' => $reason ?? 'Manual lock by administrator',
-            'admin_id' => $adminId,
-            'lock_type' => 'manual',
-        ]);
-    }
-
-    /**
-     * Manually unlock user account
-     */
-    public function manuallyUnlock(?string $reason = null, ?int $adminId = null): void
-    {
-        $this->update([
-            'is_locked' => false,
-            'locked_until' => null, // Clear automatic lockout as well
-            'failed_login_attempts' => 0, // Reset failed attempts
-        ]);
-
-        // Log manual unlock action
-        $this->logFailedLogin('account_manually_unlocked', [
-            'reason' => $reason ?? 'Manual unlock by administrator',
-            'admin_id' => $adminId,
-            'lock_type' => 'manual',
-        ]);
-    }
-
-    /**
-     * Check if user needs to change temporary password.
-     */
-    public function needsPasswordChange(): bool
-    {
-        return ! $this->temp_password_changed;
-    }
-
-    /**
      * Reset failed login attempts.
      */
     public function resetFailedAttempts(): void
     {
-        $this->update([
-            'failed_login_attempts' => 0,
-            'is_locked' => false,
-            'locked_until' => null,
-        ]);
+        AccountLockService::resetFailedAttempts($this);
     }
 
     /**
@@ -294,27 +218,7 @@ class User extends Authenticatable implements FilamentUser
      */
     public function incrementFailedAttempts(): void
     {
-        $this->increment('failed_login_attempts');
-
-        // Progressive locking: 1 minute for first group, 5 minutes for subsequent groups
-        $failedAttempts = $this->failed_login_attempts;
-
-        $lockoutThreshold = config('finot.failed_login_lockout_threshold', 5);
-
-        if ($failedAttempts >= $lockoutThreshold) {
-            $lockDuration = ($failedAttempts === $lockoutThreshold) ? 1 : 5; // 1 minute for first group, 5 for subsequent
-            $this->update([
-                'is_locked' => true,
-                'locked_until' => now()->addMinutes($lockDuration),
-            ]);
-
-            // Log the lockout event
-            $this->logFailedLogin('account_locked', [
-                'failed_attempts' => $failedAttempts,
-                'lock_duration_minutes' => $lockDuration,
-                'locked_until' => $this->locked_until->toDateTimeString(),
-            ]);
-        }
+        AccountLockService::incrementFailedAttempts($this);
     }
 
     /**
@@ -381,140 +285,27 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Log failed login attempt to audit log
-     */
-    public function logFailedLogin(string $event, array $context = []): void
-    {
-        $logData = [
-            'event' => $event,
-            'user_id' => $this->id,
-            'phone' => $this->phone,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'timestamp' => now()->toDateTimeString(),
-            'failed_attempts' => $this->failed_login_attempts,
-            'is_locked' => $this->is_locked,
-            'locked_until' => $this->locked_until?->toDateTimeString(),
-        ];
-
-        // Merge additional context
-        $logData = array_merge($logData, $context);
-
-        // Write to audit log
-        logger()->channel('audit')->warning('Failed login attempt', $logData);
-    }
-
-    /**
-     * Get remaining lockout time in minutes
-     */
-    public function getRemainingLockoutMinutes(): int
-    {
-        if (! $this->is_locked || ! $this->locked_until) {
-            return 0;
-        }
-
-        if ($this->locked_until->isPast()) {
-            return 0;
-        }
-
-        return now()->diffInMinutes($this->locked_until);
-    }
-
-    /**
-     * Get formatted lockout message
-     */
-    public function getLockoutMessage(): string
-    {
-        $remainingMinutes = $this->getRemainingLockoutMinutes();
-
-        if ($remainingMinutes <= 0) {
-            return 'Account is locked. Please try again later.';
-        }
-
-        if ($remainingMinutes === 1) {
-            return 'Account is locked. Please try again in 1 minute.';
-        }
-
-        return "Account is locked. Please try again in {$remainingMinutes} minutes.";
-    }
-
-    /**
-     * Lock the user account.
+     * Lock user account.
      */
     public function lockAccount(string $reason, string $duration, ?int $lockedBy = null): bool
     {
-        $lockedUntil = match ($duration) {
-            '1h' => now()->addHour(),
-            '24h' => now()->addDay(),
-            '7d' => now()->addWeek(),
-            'permanent' => null,
-            default => now()->addHour(),
-        };
-
-        $this->update([
-            'is_locked' => true,
-            'locked_until' => $lockedUntil,
-            'lock_reason' => $reason,
-            'locked_by' => $lockedBy,
-            'locked_at' => now(),
-        ]);
-
-        // Log the lock action
-        activity()
-            ->causedBy($lockedBy ? User::find($lockedBy) : null)
-            ->performedOn($this)
-            ->withProperties([
-                'reason' => $reason,
-                'duration' => $duration,
-                'locked_until' => $lockedUntil,
-            ])
-            ->log('account_locked');
-
-        return true;
+        return AccountLockService::lockAccount($this, $reason, $duration, $lockedBy);
     }
 
     /**
-     * Unlock the user account.
+     * Unlock user account.
      */
     public function unlockAccount(?int $unlockedBy = null): bool
     {
-        $this->update([
-            'is_locked' => false,
-            'locked_until' => null,
-            'lock_reason' => null,
-            'locked_by' => null,
-            'locked_at' => null,
-        ]);
-
-        // Log the unlock action
-        activity()
-            ->causedBy($unlockedBy ? User::find($unlockedBy) : null)
-            ->performedOn($this)
-            ->withProperties([
-                'unlocked_at' => now(),
-            ])
-            ->log('account_unlocked');
-
-        return true;
+        return AccountLockService::unlockAccount($this, $unlockedBy);
     }
 
     /**
-     * Check if the account is currently locked.
+     * Check if account is currently locked.
      */
     public function isCurrentlyLocked(): bool
     {
-        if (! $this->is_locked) {
-            return false;
-        }
-
-        if ($this->locked_until && $this->locked_until->isPast()) {
-            // Auto-unlock if lock time has passed
-            $this->unlockAccount();
-
-            return false;
-        }
-
-        return true;
+        return AccountLockService::isCurrentlyLocked($this);
     }
 
     /**
@@ -522,27 +313,22 @@ class User extends Authenticatable implements FilamentUser
      */
     public function getLockStatusBadge(): array
     {
-        if (! $this->isCurrentlyLocked()) {
-            return [
-                'status' => 'Active',
-                'color' => 'success',
-                'icon' => 'heroicon-o-check-circle',
-            ];
-        }
+        return $this->present()->lockStatusBadge();
+    }
 
-        if ($this->locked_until === null) {
-            return [
-                'status' => 'Permanently Locked',
-                'color' => 'danger',
-                'icon' => 'heroicon-o-lock-closed',
-            ];
-        }
+    /**
+     * Get lockout message
+     */
+    public function getLockoutMessage(): string
+    {
+        return AccountLockService::getLockoutMessage($this);
+    }
 
-        return [
-            'status' => 'Locked',
-            'color' => 'danger',
-            'icon' => 'heroicon-o-lock-closed',
-            'until' => $this->locked_until->format('M j, Y H:i'),
-        ];
+    /**
+     * Get remaining lockout time in minutes
+     */
+    public function getRemainingLockoutMinutes(): int
+    {
+        return AccountLockService::getRemainingLockoutMinutes($this);
     }
 }

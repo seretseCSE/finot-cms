@@ -4,6 +4,11 @@ namespace App\Services;
 
 class PhoneFormattingService
 {
+    /**
+     * Get the phone number prefix from config.
+     *
+     * @return string The phone prefix
+     */
     public static function prefix(): string
     {
         return config('finot.phone_prefix', '+251');
@@ -11,6 +16,9 @@ class PhoneFormattingService
 
     /**
      * Strip the country prefix and leading zeros from a phone number for display/editing.
+     *
+     * @param string|null $state The phone number state
+     * @return string|null The formatted phone number
      */
     public static function formatStateUsing(?string $state): ?string
     {
@@ -21,6 +29,9 @@ class PhoneFormattingService
 
     /**
      * Prepend the country prefix to a phone number before saving.
+     *
+     * @param string|null $state The phone number state
+     * @return string|null The phone number with prefix
      */
     public static function dehydrateStateUsing(?string $state): ?string
     {
@@ -29,6 +40,9 @@ class PhoneFormattingService
 
     /**
      * Format a phone number for display with prefix.
+     *
+     * @param string|null $phone The phone number
+     * @return string The formatted phone number
      */
     public static function formatForDisplay(?string $phone): string
     {
@@ -47,6 +61,8 @@ class PhoneFormattingService
 
     /**
      * Helper text for phone input fields.
+     *
+     * @return string The helper text
      */
     public static function helperText(): string
     {

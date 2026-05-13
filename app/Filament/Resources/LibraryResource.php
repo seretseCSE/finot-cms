@@ -18,6 +18,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -37,32 +38,32 @@ class LibraryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 10;
+        return 8;
     }
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function form(Schema $schema): Schema
@@ -127,6 +128,7 @@ class LibraryResource extends Resource
                             ->label('File')
                             ->required()
                             ->disk('library')
+                            ->maxSize(51200)
                             ->acceptedFileTypes([
                                 'application/pdf',                                          // PDF
                                 'application/epub+zip',                                     // EPUB
@@ -167,7 +169,12 @@ class LibraryResource extends Resource
                                         }
                                     } catch (\Exception $e) {
                                         // If we can't check the size, let it proceed and handle in create method
-                                        Log::warning('Could not validate file size: '.$e->getMessage());
+                                        Log::warning('Could not validate file size', [
+                                            'file' => $component->getUploadedFileName(),
+                                            'error' => $e->getMessage(),
+                                            'context' => 'library_file_validation',
+                                            'user_id' => auth()->id(),
+                                        ]);
                                     }
                                 }
                             }),

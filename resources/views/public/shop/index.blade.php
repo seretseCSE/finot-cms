@@ -7,7 +7,7 @@
 {{-- ═══════════════════════════════════════════════════════
      1.  HERO — Shop Header
      ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:clamp(60px,12vw,120px) clamp(12px,4vw,24px) clamp(40px,8vw,80px);background:var(--dark-950);overflow:hidden;">
+<section style="position:relative;padding:120px 24px 80px;background:var(--dark-950);overflow:hidden;">
     <div class="hero-parallax" style="position:absolute;inset:-10% 0;background:url('{{ asset('images/page-title-bg.jpg') }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
     <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--overlay-90) 0%,rgba(26,68,247,.2) 50%,var(--overlay-95) 100%);"></div>
     <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>

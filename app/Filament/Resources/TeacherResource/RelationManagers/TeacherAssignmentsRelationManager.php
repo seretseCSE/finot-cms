@@ -78,7 +78,7 @@ class TeacherAssignmentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('assignment_status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Active' => 'success',
                         'Inactive' => 'danger',
                         'On Leave' => 'warning',

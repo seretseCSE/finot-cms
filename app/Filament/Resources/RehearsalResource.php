@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 
 class RehearsalResource extends Resource
 {
@@ -34,31 +35,31 @@ class RehearsalResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 2;
+        return 5;
     }
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function canDelete($record): bool
     {
         if ($record === null) {
-            return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
+            return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
         }
 
-        return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function form(Schema $schema): Schema
@@ -232,7 +233,7 @@ class RehearsalResource extends Resource
                         }),
 
                     Actions\DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin'])),
+                        ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS)),
                 ]),
             ])
             ->emptyStateActions([

@@ -13,6 +13,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 
 class AidDistributionResource extends Resource
 {
@@ -30,7 +31,12 @@ class AidDistributionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Charity';
+        return 'Financial Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 7;
     }
 
     public static function getModelLabel(): string
@@ -191,22 +197,22 @@ class AidDistributionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['charity_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['charity_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['charity_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['charity_head', 'admin', 'superadmin']);
+        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
     }
 
     public static function getPages(): array

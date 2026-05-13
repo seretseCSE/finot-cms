@@ -52,9 +52,8 @@ class AssignDepartmentsCommand extends Command
         }
         $this->newLine();
 
-        // Get all members (reassign all)
-        $members = Member::all();
-        $memberCount = $members->count();
+        // Get member count for confirmation
+        $memberCount = Member::count();
 
         $this->info("Found {$memberCount} members to assign departments");
         $this->newLine();
@@ -72,18 +71,20 @@ class AssignDepartmentsCommand extends Command
             }
         }
 
-        // Randomly assign departments
+        // Randomly assign departments using chunking to avoid memory issues
         $assignedCount = 0;
         $progressBar = $this->output->createProgressBar($memberCount);
         $progressBar->start();
 
-        foreach ($members as $member) {
-            $randomDepartmentId = $departmentIds[array_rand($departmentIds)];
-            $member->department_id = $randomDepartmentId;
-            $member->save();
-            $assignedCount++;
-            $progressBar->advance();
-        }
+        Member::chunk(1000, function ($members) use ($departmentIds, &$assignedCount, $progressBar) {
+            foreach ($members as $member) {
+                $randomDepartmentId = $departmentIds[array_rand($departmentIds)];
+                $member->department_id = $randomDepartmentId;
+                $member->save();
+                $assignedCount++;
+                $progressBar->advance();
+            }
+        });
 
         $progressBar->finish();
         $this->newLine();

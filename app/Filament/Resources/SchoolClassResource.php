@@ -19,7 +19,12 @@ class SchoolClassResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
     }
 
     public static function getNavigationIcon(): ?string
@@ -77,7 +82,7 @@ class SchoolClassResource extends Resource
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Active')
                     ->badge()
-                    ->color(fn($state) => $state ? 'success' : 'gray')
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
                 Tables\Columns\TextColumn::make('enrollments_count')
                     ->counts('enrollments')

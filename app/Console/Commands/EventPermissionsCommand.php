@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Enums\Roles;
 
 class EventPermissionsCommand extends Command
 {
@@ -57,7 +58,7 @@ class EventPermissionsCommand extends Command
         $this->newLine();
 
         // Get target roles (superadmin, admin, av_head as audiovisual)
-        $targetRoles = DB::table('roles')->whereIn('name', ['superadmin', 'admin', 'av_head'])->get();
+        $targetRoles = DB::table('roles')->whereIn('name', Roles::EVENT_MANAGERS)->get();
         $this->info('Target Roles:');
         foreach ($targetRoles as $role) {
             $this->line("- {$role->name} (ID: {$role->id})");

@@ -29,12 +29,12 @@ class ContactMessageResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Archives';
+        return 'System';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 2;
+        return 6;
     }
 
     public static function canViewAny(): bool

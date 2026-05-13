@@ -3,7 +3,7 @@
 @section('title', app()->getLocale() === 'am' ? ($announcement->title_am ?? $announcement->title) : $announcement->title)
 
 @section('content')
-<section style="padding:140px 24px 60px;background:var(--dark-950);position:relative;overflow:hidden;border-bottom:1px solid var(--border-subtle);">
+<section style="position:relative;padding:140px 24px 80px;background:var(--dark-950);overflow:hidden;">
     <div style="position:absolute;inset:0;background:url('{{ asset('images/hero-bg.jpg') }}') center/cover no-repeat;filter:brightness(.15) blur(5px);opacity:.5;"></div>
     
     <div style="max-width:800px;margin:0 auto;position:relative;z-index:2;width:100%;">
@@ -26,7 +26,7 @@
             </div>
         @endif
 
-        <h1 class="am" style="font-size:clamp(2rem,5vw,3rem);margin-bottom:24px;color:var(--text-display);line-height:1.2;">
+        <h1 class="display sr" style="font-size:clamp(2rem,4vw,3.2rem);margin-bottom:24px;line-height:1.2;color:var(--text-hero);">
             {{ app()->getLocale() === 'am' ? ($announcement->title_am ?? $announcement->title) : $announcement->title }}
         </h1>
 

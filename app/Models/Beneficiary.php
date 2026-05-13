@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BeneficiaryType;
 use App\Models\Traits\HasAuditLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,6 +41,7 @@ class Beneficiary extends BaseModel
     ];
 
     protected $casts = [
+        'type' => BeneficiaryType::class,
         'dependents_count' => 'integer',
         'monthly_income' => 'decimal:2',
     ];

@@ -2,17 +2,16 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Forms\Components\CustomOptionSelect;
 use Filament\Schemas\Schema;
 use App\Filament\Forms\Components\EthiopianDatePicker;
 use App\Filament\Resources\DonationResource\Pages;
 use App\Models\Donation;
+use App\Services\DonationDataService;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -39,6 +38,11 @@ class DonationResource extends Resource
         return 'Financial Management';
     }
 
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
+
     public static function getModelLabel(): string
     {
         return 'Donation';
@@ -53,22 +57,50 @@ class DonationResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can view everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getModel(), 'getPermissionName')) {
+            $permission = static::getModel()::getPermissionName('view');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can create everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getModel(), 'getPermissionName')) {
+            $permission = static::getModel()::getPermissionName('create');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return parent::canEdit($record);
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']) && ($record?->canBeDeleted() ?? true);
+        return parent::canDelete($record) && ($record?->canBeDeleted() ?? true);
     }
 
     public static function form(Schema $schema): Schema
@@ -88,7 +120,11 @@ class DonationResource extends Resource
                             ->step(0.01)
                             ->minValue(0.01)
                             ->required()
-                            ->prefix('Birr'),
+                            ->prefix('Birr')
+                            ->rules([
+                                'min:0.01',
+                                'max:9999999.99',
+                            ]),
 
                         EthiopianDatePicker::make('donation_date')
                             ->label('Donation Date')
@@ -286,39 +322,35 @@ class DonationResource extends Resource
 
     public static function beforeSave(array $data): array
     {
-        // Debug: Log the incoming data
-        \Log::info('Donation beforeSave data:', $data);
-
-        // Set recorded_by to current user
-        $data['recorded_by'] = Auth::id();
-
-        // Handle Anonymous donor
-        if (empty($data['donor_name'])) {
-            $data['donor_name'] = null;
-        }
-
-        // No longer using CustomOptionSelect, so no special handling needed
-
-        \Log::info('Donation beforeSave processed data:', $data);
-
-        return $data;
+        return app(DonationDataService::class)->processBeforeSave($data);
     }
 
     public static function afterCreate($record, array $data): void
     {
-        Notification::make()
-            ->title('Donation Recorded')
-            ->body("Successfully recorded donation of {$record->formatted_amount} from {$record->formatted_donor_name}")
-            ->success()
-            ->send();
+        app(DonationDataService::class)->sendCreateNotification($record);
     }
 
     public static function afterUpdate($record, array $data): void
     {
-        Notification::make()
-            ->title('Donation Updated')
-            ->body('Donation information has been updated successfully')
-            ->success()
-            ->send();
+        app(DonationDataService::class)->sendUpdateNotification();
+    }
+
+    public static function getGlobalSearchResultTitle($record): string
+    {
+        return $record->formatted_donor_name;
+    }
+
+    public static function getGlobalSearchResultDetails($record): array
+    {
+        return [
+            'Amount' => $record->formatted_amount,
+            'Date' => $record->donation_date->format('M d, Y'),
+            'Type' => $record->formatted_donation_type,
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['donor_name', 'amount', 'donation_type', 'donation_date'];
     }
 }

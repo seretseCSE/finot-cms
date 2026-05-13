@@ -29,12 +29,12 @@ class LibraryCategoryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 11;
+        return 9;
     }
 
     public static function canViewAny(): bool

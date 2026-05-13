@@ -2,6 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\Gender;
+use App\Enums\MaritalStatus;
+use App\Enums\MemberStatus;
+use App\Enums\MemberType;
+use App\Enums\OccupationStatus;
 use App\Models\Traits\HasAuditLog;
 use App\Models\Traits\ScopedByDepartment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -64,6 +69,11 @@ class Member extends BaseModel
     ];
 
     protected $casts = [
+        'member_type' => MemberType::class,
+        'status' => MemberStatus::class,
+        'gender' => Gender::class,
+        'marital_status' => MaritalStatus::class,
+        'occupation_status' => OccupationStatus::class,
         'member_since' => 'date',
         'date_of_birth' => 'date',
         'sunday_school_entry_year' => 'date',
@@ -111,7 +121,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get full name accessor
+     * Get full name accessor.
+     *
+     * @return string The full name
      */
     public function getFullNameAttribute(): string
     {
@@ -139,7 +151,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get full name with title accessor
+     * Get full name with title accessor.
+     *
+     * @return string The full name with title
      */
     public function getFullNameWithTitleAttribute(): string
     {
@@ -147,7 +161,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get age accessor
+     * Get age accessor.
+     *
+     * @return int The member's age
      */
     public function getAgeAttribute(): int
     {
@@ -155,7 +171,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get formatted phone accessor
+     * Get formatted phone accessor.
+     *
+     * @return string The formatted phone number
      */
     public function getFormattedPhoneAttribute(): string
     {
@@ -163,7 +181,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get address as string accessor
+     * Get address as string accessor.
+     *
+     * @return string The full address
      */
     public function getFullAddressAttribute(): string
     {
@@ -182,7 +202,9 @@ class Member extends BaseModel
     // Relationships
 
     /**
-     * Get parent/guardian relationships
+     * Get parent/guardian relationships.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function parentGuardians()
     {
@@ -190,7 +212,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get linked parents through member_parent_guardians
+     * Get linked parents through member_parent_guardians.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function parents()
     {
@@ -205,7 +229,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get member group assignments
+     * Get member group assignments.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function groupAssignments()
     {
@@ -213,7 +239,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get current group assignment
+     * Get current group assignment.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function currentGroupAssignment()
     {
@@ -223,7 +251,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get current group attribute
+     * Get current group attribute.
+     *
+     * @return mixed The current group
      */
     public function getCurrentGroupAttribute()
     {
@@ -231,7 +261,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get member group attribute (alias for currentGroup)
+     * Get member group attribute (alias for currentGroup).
+     *
+     * @return mixed The member group
      */
     public function getMemberGroupAttribute()
     {
@@ -239,7 +271,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get student enrollments
+     * Get student enrollments.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function studentEnrollments()
     {
@@ -247,7 +281,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get contributions
+     * Get contributions.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function contributions()
     {
@@ -255,7 +291,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get attendance records
+     * Get attendance records.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function attendanceRecords()
     {
@@ -263,7 +301,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get tour passengers (via phone matching)
+     * Get tour passengers (via phone matching).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function tourPassengers()
     {
@@ -271,7 +311,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get department
+     * Get department.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function department()
     {
@@ -279,7 +321,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get children information
+     * Get children information.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function children()
     {
@@ -287,7 +331,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get education history
+     * Get education history.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function educationHistory()
     {
@@ -295,7 +341,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get current education
+     * Get current education.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function currentEducation()
     {
@@ -304,7 +352,9 @@ class Member extends BaseModel
     }
 
     /**
-     * Get children names (for marital status)
+     * Get children names (for marital status).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function childrenNames()
     {
@@ -314,7 +364,11 @@ class Member extends BaseModel
     // Scopes
 
     /**
-     * Scope by member type
+     * Scope by member type.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder
+     * @param string $type The member type
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByType($query, $type)
     {
@@ -322,7 +376,11 @@ class Member extends BaseModel
     }
 
     /**
-     * Scope by status
+     * Scope by status.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder
+     * @param string $status The member status
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByStatus($query, $status)
     {
@@ -330,7 +388,10 @@ class Member extends BaseModel
     }
 
     /**
-     * Scope active members
+     * Scope active members.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {
@@ -338,7 +399,10 @@ class Member extends BaseModel
     }
 
     /**
-     * Scope kids members
+     * Scope kids members.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeKids($query)
     {
@@ -346,7 +410,10 @@ class Member extends BaseModel
     }
 
     /**
-     * Scope youth members
+     * Scope youth members.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeYouth($query)
     {
@@ -354,7 +421,10 @@ class Member extends BaseModel
     }
 
     /**
-     * Scope adult members
+     * Scope adult members.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeAdult($query)
     {
@@ -363,6 +433,8 @@ class Member extends BaseModel
 
     /**
      * Get the resource name for permissions.
+     *
+     * @return string The resource name
      */
     public static function getResourceName(): string
     {
@@ -371,6 +443,8 @@ class Member extends BaseModel
 
     /**
      * Get the navigation label for the resource.
+     *
+     * @return string The navigation label
      */
     public static function getNavigationLabel(): string
     {
@@ -379,6 +453,8 @@ class Member extends BaseModel
 
     /**
      * Get the navigation icon for the resource.
+     *
+     * @return string|null The navigation icon
      */
     public static function getNavigationIcon(): ?string
     {
@@ -387,6 +463,8 @@ class Member extends BaseModel
 
     /**
      * Get the navigation group for the resource.
+     *
+     * @return string|null The navigation group
      */
     public static function getNavigationGroup(): ?string
     {

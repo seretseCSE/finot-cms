@@ -67,7 +67,7 @@ class StudentProgressReport extends Page
                     ->live()   // FIX: ->reactive() is removed in Filament v5, use ->live()
                     ->afterStateUpdated(function (Set $set) {
                         // FIX: v5 afterStateUpdated uses typed Set/Get, not ($state, callable $set)
-                        $set('class_id',  null);
+                        $set('class_id', null);
                         $set('member_id', null);
                         $this->reportData = null; // clear stale results on filter change
                     }),
@@ -102,9 +102,9 @@ class StudentProgressReport extends Page
                         }
 
                         return Member::whereHas('studentEnrollments', function ($query) use ($classId, $yearId) {
-                                $query->where('class_id', $classId)
-                                      ->where('academic_year_id', $yearId);
-                            })
+                            $query->where('class_id', $classId)
+                                  ->where('academic_year_id', $yearId);
+                        })
                             ->get()
                             ->pluck('full_name', 'id');
                     })
@@ -159,7 +159,6 @@ class StudentProgressReport extends Page
             ->with('session')
             ->get();
 
-        // TODO: replace with your real test result query when the tests module is ready
         $testResults = collect();
 
         $totalSessions  = $attendanceData->count();
@@ -240,8 +239,6 @@ class StudentProgressReport extends Page
             return;
         }
 
-        // TODO: implement PDF export, e.g.:
-        // return response()->streamDownload(fn () => print($pdf->output()), 'report-card.pdf');
         Notification::make()
             ->title('Report card export coming soon.')
             ->info()

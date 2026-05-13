@@ -16,7 +16,7 @@
         <div class="sec-label sr" style="justify-content:center;margin-bottom:20px;">
             <span class="am">መግለጫዎች እና ዝግጅቶች</span>
         </div>
-        <h1 class="display sr" style="font-size:clamp(2.5rem,6vw,4rem);margin-bottom:16px;">
+        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;">
             {{ __('News & Events') }}
         </h1>
         <p class="sr" style="font-size:1.1rem;color:var(--text-60);max-width:600px;margin:0 auto;line-height:1.7;">

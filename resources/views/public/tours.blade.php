@@ -114,6 +114,60 @@
                                 </div>
                             </div>
 
+                            @if($tour->ethiopian_registration_deadline)
+                                <div style="display:flex;align-items:center;gap:10px;padding:12px 0 0;">
+                                    <div style="width:28px;height:28px;border-radius:6px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                        <svg width="12" height="12" fill="none" stroke="var(--red-400)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div style="font-size:.75rem;color:var(--text-40);">
+                                        <span style="color:var(--red-400);">{{ __('Register by') }}:</span> {{ $tour->ethiopian_registration_deadline }}
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Days Left Display --}}
+                            @if($tour->days_left !== null)
+                                <div style="display:flex;align-items:center;gap:10px;padding:12px 0 0;">
+                                    @if($tour->days_left < 0)
+                                        <div style="width:28px;height:28px;border-radius:6px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <svg width="12" height="12" fill="none" stroke="var(--red-400)" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div style="font-size:.75rem;color:var(--red-400);">
+                                            {{ abs($tour->days_left) }} {{ __('days ago') }}
+                                        </div>
+                                    @elseif($tour->days_left <= 3)
+                                        <div style="width:28px;height:28px;border-radius:6px;background:rgba(249,115,22,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <svg width="12" height="12" fill="none" stroke="var(--orange-400)" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div style="font-size:.75rem;color:var(--orange-400);">
+                                            {{ $tour->days_left == 0 ? __('Today') : ($tour->days_left == 1 ? __('Tomorrow') : $tour->days_left . ' ' . __('days left')) }}
+                                        </div>
+                                    @elseif($tour->days_left <= 7)
+                                        <div style="width:28px;height:28px;border-radius:6px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <svg width="12" height="12" fill="none" stroke="var(--yellow-400)" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div style="font-size:.75rem;color:var(--yellow-400);">
+                                            {{ $tour->days_left }} {{ __('days left') }}
+                                        </div>
+                                    @else
+                                        <div style="width:28px;height:28px;border-radius:6px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <svg width="12" height="12" fill="none" stroke="var(--green-400)" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div style="font-size:.75rem;color:var(--green-400);">
+                                            {{ $tour->days_left }} {{ __('days left') }}
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+
                             @if($tour->is_registration_open)
                                 <a href="{{ route('tour.register', $tour->id) }}" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">
                                     {{ __('Register Now') }}

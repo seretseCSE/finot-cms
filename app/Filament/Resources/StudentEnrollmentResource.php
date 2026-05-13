@@ -20,6 +20,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 use Illuminate\Support\Facades\DB;
 
 class StudentEnrollmentResource extends Resource
@@ -28,7 +29,12 @@ class StudentEnrollmentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 6;
     }
 
     public static function getNavigationIcon(): ?string
@@ -43,12 +49,12 @@ class StudentEnrollmentResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        $hasRole = (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        $hasRole = (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
         $hasActiveYear = AcademicYear::query()->where('status', 'Active')->exists();
 
         return $hasRole && $hasActiveYear;
@@ -56,7 +62,7 @@ class StudentEnrollmentResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function form(Schema $schema): Schema
@@ -173,19 +179,18 @@ class StudentEnrollmentResource extends Resource
             ->query(
                 StudentEnrollment::query()
                     ->select('student_enrollments.*')
-                    ->selectRaw('COALESCE(NULLIF(TRIM(CONCAT_WS(" ", members.first_name, members.father_name, members.grandfather_name)), ""), members.member_code, CONCAT("Member ", members.id)) as student_full_name')
-                    ->leftJoin('members', 'student_enrollments.member_id', '=', 'members.id')
-                    ->with(['class', 'academicYear'])
+                    ->with(['member', 'class', 'academicYear'])
             )
             ->columns([
                 Tables\Columns\TextColumn::make('student_full_name')
                     ->label('Student Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(fn ($record) => $record->student_full_name),
                 Tables\Columns\TextColumn::make('class.name')->label('Class')->sortable(),
                 Tables\Columns\TextColumn::make('academicYear.name')->label('Academic Year')->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Enrolled' => 'success',
                         'Withdrawn' => 'danger',
                         'Completed' => 'gray',
@@ -432,7 +437,7 @@ class StudentEnrollmentResource extends Resource
                         ->label('Promote Selected')
                         ->icon('heroicon-o-arrow-up')
                         ->color('warning')
-                        ->visible(fn () => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']))
+                        ->visible(fn () => Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS))
                         ->form([
                             Forms\Components\Select::make('target_class_id')
                                 ->label('Target Class')

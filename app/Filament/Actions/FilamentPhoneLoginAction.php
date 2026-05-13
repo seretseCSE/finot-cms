@@ -10,6 +10,11 @@ use Illuminate\Validation\ValidationException;
 
 class FilamentPhoneLoginAction extends Action
 {
+    /**
+     * Configure the phone login action.
+     *
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -20,6 +25,12 @@ class FilamentPhoneLoginAction extends Action
             ->submit('authenticate');
     }
 
+    /**
+     * Authenticate user with phone number and password.
+     *
+     * @param array $data The login credentials
+     * @return LoginResponse|null The login response
+     */
     public function authenticate(array $data): ?LoginResponse
     {
         try {
@@ -94,6 +105,12 @@ class FilamentPhoneLoginAction extends Action
         return app(LoginResponse::class);
     }
 
+    /**
+     * Build the login form schema.
+     *
+     * @param Schema $schema The form schema
+     * @return Schema The configured form schema
+     */
     public function form(Schema $schema): Schema
     {
         return $schema->components([

@@ -92,6 +92,7 @@ class ProductResource extends BaseResource
                         ->directory('products')
                         ->image()
                         ->imageEditor()
+                        ->maxSize(4096) // 4MB for product images
                         ->helperText('Optional: Product display image')
                         ->saveUploadedFileUsing(UploadSanitizer::saveCallback('products', 'public', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])),
                 ]),

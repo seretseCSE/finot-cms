@@ -33,7 +33,7 @@ class FAQResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 6;
+        return 10;
     }
 
     public static function canViewAny(): bool

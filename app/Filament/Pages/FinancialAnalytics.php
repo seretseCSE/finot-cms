@@ -14,7 +14,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 class FinancialAnalytics extends Page
 {
@@ -197,12 +196,12 @@ class FinancialAnalytics extends Page
     protected function getGroupPerformance(): array
     {
         $groupPerformance = MemberGroup::with(['members.contributions' => function ($query) {
-                $query->where('academic_year_id', $this->academic_year_id)
-                    ->where('is_paid', true)
-                    ->when($this->start_date && $this->end_date, function ($query) {
-                        $query->whereBetween('payment_date', [$this->start_date, $this->end_date]);
-                    });
-            }])
+            $query->where('academic_year_id', $this->academic_year_id)
+                ->where('is_paid', true)
+                ->when($this->start_date && $this->end_date, function ($query) {
+                    $query->whereBetween('payment_date', [$this->start_date, $this->end_date]);
+                });
+        }])
             ->get()
             ->map(function ($group) {
                 $totalContributions = $group->members->flatMap->contributions->sum('amount');
@@ -291,7 +290,7 @@ class FinancialAnalytics extends Page
     protected function getRevenueTrendChart(): array
     {
         $data = $this->getTrendsData()['monthly_trends'];
-        
+
         return [
             'type' => 'line',
             'data' => array_map(function ($item) {
@@ -306,7 +305,7 @@ class FinancialAnalytics extends Page
     protected function getGroupComparisonChart(): array
     {
         $data = $this->getGroupPerformance();
-        
+
         return [
             'type' => 'bar',
             'data' => array_map(function ($item) {
@@ -321,7 +320,7 @@ class FinancialAnalytics extends Page
     protected function getMonthlyDistributionChart(): array
     {
         $data = $this->getMonthlyBreakdown();
-        
+
         return [
             'type' => 'pie',
             'data' => array_map(function ($item) {
@@ -343,12 +342,12 @@ class FinancialAnalytics extends Page
             })
             ->sum('amount');
 
-        $previousPeriodStart = $this->start_date ? 
-            date('Y-m-d', strtotime($this->start_date . ' -1 year')) : 
+        $previousPeriodStart = $this->start_date ?
+            date('Y-m-d', strtotime($this->start_date . ' -1 year')) :
             date('Y-m-d', strtotime('-1 year'));
-        
-        $previousPeriodEnd = $this->end_date ? 
-            date('Y-m-d', strtotime($this->end_date . ' -1 year')) : 
+
+        $previousPeriodEnd = $this->end_date ?
+            date('Y-m-d', strtotime($this->end_date . ' -1 year')) :
             date('Y-m-d', strtotime('-1 year'));
 
         $previousPeriod = Contribution::where('academic_year_id', $this->academic_year_id)
@@ -356,7 +355,7 @@ class FinancialAnalytics extends Page
             ->whereBetween('payment_date', [$previousPeriodStart, $previousPeriodEnd])
             ->sum('amount');
 
-        return $previousPeriod > 0 ? 
+        return $previousPeriod > 0 ?
             round((($currentPeriod - $previousPeriod) / $previousPeriod) * 100, 1) : 0;
     }
 
@@ -369,7 +368,7 @@ class FinancialAnalytics extends Page
         $firstMonth = $monthlyData->first();
         $lastMonth = $monthlyData->last();
 
-        return $firstMonth['total'] > 0 ? 
+        return $firstMonth['total'] > 0 ?
             round((($lastMonth['total'] - $firstMonth['total']) / $firstMonth['total']) * 100, 1) : 0;
     }
 

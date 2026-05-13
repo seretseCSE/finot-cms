@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Models\PushSubscription;
+use App\Services\Contracts\PushNotificationServiceInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class PushNotificationService
+class PushNotificationService implements PushNotificationServiceInterface
 {
     /**
      * Send a push notification to a specific user.
@@ -15,9 +16,15 @@ class PushNotificationService
     {
         $subscriptions = PushSubscription::query()
             ->where('user_id', $userId)
-            ->get();
+            ->lazy();
 
-        if ($subscriptions->isEmpty()) {
+        $isEmpty = true;
+        foreach ($subscriptions as $subscription) {
+            $isEmpty = false;
+            break;
+        }
+
+        if ($isEmpty) {
             return false;
         }
 
@@ -47,7 +54,7 @@ class PushNotificationService
     {
         $subscriptions = PushSubscription::query()
             ->whereIn('user_id', $userIds)
-            ->get();
+            ->lazy();
 
         $payload = json_encode([
             'notification' => [
@@ -92,7 +99,8 @@ class PushNotificationService
             }
 
             return $response->successful();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            ExceptionHandlerService::handleServiceException($e, 'PushNotificationService');
             Log::error('Push notification failed', [
                 'subscription_id' => $subscription->id,
                 'error' => $e->getMessage(),

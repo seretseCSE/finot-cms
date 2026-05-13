@@ -33,6 +33,11 @@ class MemberGroupResource extends Resource
         return 'Membership Management';
     }
 
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
+
     public static function getNavigationLabel(): string
     {
         return 'Member Groups';
@@ -136,7 +141,7 @@ class MemberGroupResource extends Resource
                 Tables\Columns\TextColumn::make('group_type')
                     ->label('Type')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Kids' => 'info',
                         'Youth' => 'warning',
                         'Adult' => 'success',
@@ -147,7 +152,7 @@ class MemberGroupResource extends Resource
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Status')
                     ->badge()
-                    ->color(fn($state) => $state ? 'success' : 'danger')
+                    ->color(fn ($state) => $state ? 'success' : 'danger')
                     ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
 
                 Tables\Columns\TextColumn::make('created_at')

@@ -35,7 +35,21 @@ trait HasUserSessions
      */
     public function hasMaxSessions(): bool
     {
-        return $this->activeSessionsCount() >= 3;
+        $maxSessions = config('finot.max_active_sessions');
+
+        if ($maxSessions === null) {
+            return false; // No limit if config is null
+        }
+
+        return $this->activeSessionsCount() >= $maxSessions;
+    }
+
+    /**
+     * Get the maximum allowed sessions for this user.
+     */
+    public function getMaxSessions(): ?int
+    {
+        return config('finot.max_active_sessions');
     }
 
     /**

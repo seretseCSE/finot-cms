@@ -63,4 +63,24 @@ class StudentEnrollment extends BaseModel
     {
         return $this->hasOne(self::class, 'promoted_to_enrollment_id');
     }
+
+    /**
+     * Get the student's full name with proper formatting
+     */
+    public function getStudentFullNameAttribute(): string
+    {
+        $member = $this->member;
+
+        if (! $member) {
+            return 'Unknown Student';
+        }
+
+        $parts = array_filter([
+            $member->first_name,
+            $member->father_name,
+            $member->grandfather_name
+        ]);
+
+        return implode(' ', $parts);
+    }
 }

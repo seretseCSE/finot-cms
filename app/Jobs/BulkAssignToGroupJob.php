@@ -39,44 +39,49 @@ class BulkAssignToGroupJob implements ShouldQueue
     public function handle(): void
     {
         $group = MemberGroup::query()->findOrFail($this->groupId);
-        $members = Member::query()->whereIn('id', $this->memberIds)->get();
         $effectiveFrom = $this->effectiveFrom;
+        $memberCount = 0;
 
-        DB::transaction(function () use ($members, $group, $effectiveFrom): void {
-            foreach ($members as $member) {
-                MemberGroupAssignment::query()
-                    ->forMember($member->id)
-                    ->active()
-                    ->update([
-                        'effective_to' => $effectiveFrom,
-                        'removed_by' => $this->assignedBy,
+        DB::transaction(function () use ($group, $effectiveFrom, &$memberCount): void {
+            Member::query()
+                ->whereIn('id', $this->memberIds)
+                ->lazy()
+                ->each(function ($member) use ($group, $effectiveFrom, &$memberCount) {
+                    MemberGroupAssignment::query()
+                        ->forMember($member->id)
+                        ->active()
+                        ->update([
+                            'effective_to' => $effectiveFrom,
+                            'removed_by' => $this->assignedBy,
+                        ]);
+
+                    $assignment = MemberGroupAssignment::create([
+                        'member_id' => $member->id,
+                        'group_id' => $group->id,
+                        'effective_from' => $effectiveFrom,
+                        'assigned_by' => $this->assignedBy,
+                        'created_by' => $this->assignedBy,
                     ]);
 
-                $assignment = MemberGroupAssignment::create([
-                    'member_id' => $member->id,
-                    'group_id' => $group->id,
-                    'effective_from' => $effectiveFrom,
-                    'assigned_by' => $this->assignedBy,
-                    'created_by' => $this->assignedBy,
-                ]);
+                    Log::channel('audit')->warning('Tier 2 Audit Log', [
+                        'tier' => '2',
+                        'action' => 'member_group_assigned',
+                        'member_id' => $member->id,
+                        'member_name' => $member->full_name,
+                        'group_id' => $group->id,
+                        'group_name' => $group->name,
+                        'effective_from' => $assignment->effective_from?->toDateString(),
+                        'assigned_by' => $this->assignedBy,
+                        'timestamp' => now()->toDateTimeString(),
+                    ]);
 
-                Log::channel('audit')->warning('Tier 2 Audit Log', [
-                    'tier' => '2',
-                    'action' => 'member_group_assigned',
-                    'member_id' => $member->id,
-                    'member_name' => $member->full_name,
-                    'group_id' => $group->id,
-                    'group_name' => $group->name,
-                    'effective_from' => $assignment->effective_from?->toDateString(),
-                    'assigned_by' => $this->assignedBy,
-                    'timestamp' => now()->toDateTimeString(),
-                ]);
-            }
+                    $memberCount++;
+                });
         });
 
         Notification::make()
             ->title('Assignment successful')
-            ->body("{$members->count()} members assigned to {$group->name} successfully")
+            ->body("{$memberCount} members assigned to {$group->name} successfully")
             ->success()
             ->sendToDatabase(\App\Models\User::find($this->assignedBy));
     }

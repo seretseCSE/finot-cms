@@ -23,7 +23,12 @@ class EventResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Events';
+        return 'Tour Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
     }
 
     public static function form(Schema $schema): Schema

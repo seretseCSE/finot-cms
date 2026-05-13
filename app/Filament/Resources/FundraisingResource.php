@@ -20,9 +20,14 @@ class FundraisingResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Events';
+    protected static string|UnitEnum|null $navigationGroup = 'Tour Management';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Schema $schema): Schema
     {

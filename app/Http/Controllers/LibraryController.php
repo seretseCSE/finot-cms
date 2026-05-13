@@ -42,7 +42,25 @@ class LibraryController extends Controller
         $totalResources = LibraryResource::where('is_active', true)->count();
         $featuredResources = LibraryResource::where('is_active', true)->where('is_featured', true)->count();
 
-        return view('public.library', compact('categories', 'subcategories', 'resources', 'totalResources', 'featuredResources'));
+        $formatStat = LibraryResource::where('is_active', true)
+            ->selectRaw('file_type, COUNT(*) as count')
+            ->groupBy('file_type')
+            ->orderByDesc('count')
+            ->value('file_type') ?? '—';
+
+        return view('public.library', compact('categories', 'subcategories', 'resources', 'totalResources', 'featuredResources', 'formatStat'));
+    }
+
+    public function subcategories(Request $request)
+    {
+        $request->validate(['category' => 'required|integer|exists:library_categories,id']);
+
+        $subcategories = \App\Models\LibrarySubcategory::where('category_id', $request->category)
+            ->where('status', 'Active')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return response()->json($subcategories);
     }
 
     public function download(LibraryResource $resource)

@@ -127,7 +127,7 @@ class TourAttendanceResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Present' => 'success',
                         'Not Present' => 'danger',
                     }),

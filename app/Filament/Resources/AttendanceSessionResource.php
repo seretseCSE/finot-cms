@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\Roles;
 
 class AttendanceSessionResource extends Resource
 {
@@ -23,7 +24,7 @@ class AttendanceSessionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Education Management';
     }
 
     public static function getNavigationIcon(): ?string
@@ -38,27 +39,27 @@ class AttendanceSessionResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 1;
+        return 7;
     }
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
     }
 
     public static function canCreate(): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_monitor', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
     }
 
     public static function canEdit($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::ADMINISTRATORS);
     }
 
     public static function canDelete($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['admin', 'superadmin']);
+        return (bool) Auth::user()?->hasRole(Roles::ADMINISTRATORS);
     }
 
     public static function canMarkAttendance($record): bool
@@ -104,7 +105,7 @@ class AttendanceSessionResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Open' => 'success',
                         'Completed' => 'warning',
                         'Locked' => 'danger',
@@ -171,7 +172,7 @@ class AttendanceSessionResource extends Resource
 
                         Notification::make()->title('Sessions locked')->success()->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(['education_monitor', 'admin', 'superadmin']) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS) ?? false),
 
                 Actions\BulkAction::make('unlock')
                     ->label('Unlock Selected')
@@ -213,10 +214,10 @@ class AttendanceSessionResource extends Resource
 
                         Notification::make()->title('Sessions unlocked')->success()->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS) ?? false),
 
                 Actions\DeleteBulkAction::make()
-                    ->visible(fn (): bool => Auth::user()?->hasRole(['admin', 'superadmin']) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
             ]);
     }
 

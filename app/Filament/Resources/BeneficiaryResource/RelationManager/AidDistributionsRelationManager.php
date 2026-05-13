@@ -81,11 +81,39 @@ class AidDistributionsRelationManager extends RelationManager
 
     public function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['charity_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can view everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getRelatedModel(), 'getPermissionName')) {
+            $permission = static::getRelatedModel()::getPermissionName('view');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 
     public function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['charity_head', 'admin', 'superadmin']);
+        $user = Auth::user();
+
+        // Superadmin can create everything
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        // Check specific permission if model supports it
+        if (method_exists(static::getRelatedModel(), 'getPermissionName')) {
+            $permission = static::getRelatedModel()::getPermissionName('create');
+            return $user->can($permission);
+        }
+
+        // Fallback to superadmin only for models without permission system
+        return false;
     }
 }

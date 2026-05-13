@@ -89,7 +89,18 @@ class FileOptimizer
                 'disk' => $disk,
                 'path' => $path,
                 'error' => $e->getMessage(),
+                'context' => 'image_optimization',
+                'user_id' => auth()->id(),
             ]);
+
+            // Show notification to users in Filament context
+            if (request()->routeIs('filament.*')) {
+                \Filament\Notifications\Notification::make()
+                    ->title('Image Optimization Failed')
+                    ->body('Unable to optimize image: ' . basename($path) . ' - ' . $e->getMessage())
+                    ->warning()
+                    ->send();
+            }
 
             return $path;
         }
@@ -137,7 +148,17 @@ class FileOptimizer
                 'disk' => $disk,
                 'path' => $path,
                 'error' => $e->getMessage(),
+                'context' => 'audio_optimization',
+                'user_id' => auth()->id(),
             ]);
+
+            if (request()->routeIs('filament.*')) {
+                \Filament\Notifications\Notification::make()
+                    ->title('Audio Optimization Failed')
+                    ->body('Unable to optimize audio: ' . basename($path))
+                    ->warning()
+                    ->send();
+            }
 
             return $path;
         }
@@ -187,7 +208,17 @@ class FileOptimizer
                 'disk' => $disk,
                 'path' => $path,
                 'error' => $e->getMessage(),
+                'context' => 'video_optimization',
+                'user_id' => auth()->id(),
             ]);
+
+            if (request()->routeIs('filament.*')) {
+                \Filament\Notifications\Notification::make()
+                    ->title('Video Optimization Failed')
+                    ->body('Unable to optimize video: ' . basename($path))
+                    ->warning()
+                    ->send();
+            }
 
             return $path;
         }

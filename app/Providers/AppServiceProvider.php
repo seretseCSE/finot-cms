@@ -10,6 +10,7 @@ use App\Models\AidDistribution;
 use App\Models\AttendanceSession;
 use App\Models\Contribution;
 use App\Models\Department;
+use App\Models\Document;
 use App\Models\Member;
 use App\Models\Rehearsal;
 use App\Models\Tour;
@@ -17,9 +18,20 @@ use App\Observers\AidDistributionObserver;
 use App\Observers\AttendanceSessionObserver;
 use App\Observers\ContributionObserver;
 use App\Observers\DepartmentObserver;
+use App\Observers\DocumentObserver;
 use App\Observers\MemberObserver;
 use App\Observers\RehearsalObserver;
 use App\Observers\TourObserver;
+use App\Services\BackupCreationService;
+use App\Services\BackupRestorationService;
+use App\Services\BackupCleanupService;
+use App\Services\Contracts\BackupCreationServiceInterface;
+use App\Services\Contracts\BackupRestorationServiceInterface;
+use App\Services\Contracts\BackupCleanupServiceInterface;
+use App\Services\Contracts\OfflineSyncServiceInterface;
+use App\Services\Contracts\PushNotificationServiceInterface;
+use App\Services\OfflineSyncService;
+use App\Services\PushNotificationService;
 use Carbon\Carbon;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse as LoginResponseContract;
 use Illuminate\Auth\Events\Login;
@@ -36,6 +48,29 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(EthiopianDateHelper::class, function ($app) {
             return new EthiopianDateHelper();
+        });
+
+        // Register backup services
+        $this->app->singleton(BackupCreationServiceInterface::class, function ($app) {
+            return new BackupCreationService();
+        });
+
+        $this->app->singleton(BackupRestorationServiceInterface::class, function ($app) {
+            return new BackupRestorationService();
+        });
+
+        $this->app->singleton(BackupCleanupServiceInterface::class, function ($app) {
+            return new BackupCleanupService();
+        });
+
+        // Register sync service
+        $this->app->singleton(OfflineSyncServiceInterface::class, function ($app) {
+            return new OfflineSyncService();
+        });
+
+        // Register notification service
+        $this->app->singleton(PushNotificationServiceInterface::class, function ($app) {
+            return new PushNotificationService();
         });
 
         // Register FilamentServiceProvider (when Filament is installed)
@@ -64,6 +99,7 @@ class AppServiceProvider extends ServiceProvider
         AidDistribution::observe(AidDistributionObserver::class);
         Rehearsal::observe(RehearsalObserver::class);
         Contribution::observe(ContributionObserver::class);
+        Document::observe(DocumentObserver::class);
 
         // Register Carbon macro for Ethiopian date conversion
         Carbon::macro('ethiopian', function () {

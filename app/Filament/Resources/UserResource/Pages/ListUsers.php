@@ -37,7 +37,7 @@ class ListUsers extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatchSync(
+                    ProcessExportJob::dispatch(
                         exportClass: UserExport::class,
                         columns: $data['columns'],
                         format: $data['format'],

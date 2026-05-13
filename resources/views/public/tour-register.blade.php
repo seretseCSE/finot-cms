@@ -7,13 +7,13 @@
 {{-- ═══════════════════════════════════════════════════════
      1.  HERO — Registration Header
      ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:100px 24px 60px;background:var(--dark-950);overflow:hidden;">
+<section style="position:relative;padding:140px 24px 80px;background:var(--dark-950);overflow:hidden;">
     <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,10,28,.98) 0%,rgba(26,68,247,.1) 50%,rgba(5,10,28,.98) 100%);"></div>
     <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
 
     <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
         <div class="sec-label sr" style="justify-content:center;">{{ __('Tour Registration') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2rem,4vw,3.2rem);margin-bottom:20px;">
+        <h1 class="display sr" style="font-size:clamp(2rem,4vw,3.2rem);margin-bottom:24px;line-height:1.2;">
             {{ __('Join Us at') }}
             <span style="color:var(--gold);">{{ $tour->place }}</span>
         </h1>
@@ -115,13 +115,6 @@
                         {{ $info }}
                     </li>
                 @endforeach
-                
-                @if($tour->max_capacity)
-                    <li style="display:flex;align-items:flex-start;gap:12px;font-size:.85rem;color:var(--parchment-60);">
-                        <svg width="16" height="16" fill="var(--gold)" viewBox="0 0 20 20" style="margin-top:2px;"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                        <span>{{ __('Limited capacity:') }} {{ $tour->confirmedPassengers->sum('passenger_count') }}/{{ $tour->max_capacity }} {{ __('spots filled') }}</span>
-                    </li>
-                @endif
             </ul>
         </div>
     </div>
@@ -151,6 +144,13 @@
                 div.innerHTML = `
                     <label style="display:block;font-size:.85rem;color:var(--parchment-40);margin-bottom:8px;margin-top:8px;">{{ __('Passenger') }} ${i + 1} {{ __('Name') }} <span style="color:var(--gold);">*</span></label>
                     <input type="text" name="passenger_names[]" required style="width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 16px;color:#fff;outline:none;" placeholder="{{ __('Enter passenger name') }}">
+                    
+                    <label style="display:block;font-size:.85rem;color:var(--parchment-40);margin-bottom:8px;margin-top:8px;">{{ __('Passenger') }} ${i + 1} {{ __('Phone') }} ({{ __('Optional') }})</label>
+                    <div style="display:flex;">
+                        <span style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-right:none;border-radius:10px 0 0 10px;padding:12px 16px;color:var(--parchment-40);font-size:.9rem;">+251</span>
+                        <input type="tel" name="passenger_phones[]" pattern="[0-9]{9}" maxlength="9" style="flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:0 10px 10px 0;padding:12px 16px;color:#fff;outline:none;" placeholder="912345678">
+                    </div>
+                    <p style="font-size:.7rem;color:var(--parchment-40);margin-top:6px;">{{ __('Enter 9 digits after +251 (optional)') }}</p>
                 `;
                 additionalPassengersDiv.appendChild(div);
             }

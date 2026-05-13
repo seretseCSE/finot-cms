@@ -37,7 +37,7 @@ class ListFinancialTransactions extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatchSync(
+                    ProcessExportJob::dispatch(
                         exportClass: FinancialTransactionExport::class,
                         columns: $data['columns'],
                         format: $data['format'],

@@ -64,7 +64,7 @@ class SiteSetting extends Model
      */
     public static function getAll(): array
     {
-        return static::all()
+        return static::lazy()
             ->mapWithKeys(fn ($setting) => [$setting->key => $setting->value])
             ->toArray();
     }

@@ -37,7 +37,7 @@ class ListTours extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatchSync(
+                    ProcessExportJob::dispatch(
                         exportClass: TourExport::class,
                         columns: $data['columns'],
                         format: $data['format'],

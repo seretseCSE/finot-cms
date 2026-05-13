@@ -34,7 +34,7 @@ class PageResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 5;
+        return 9;
     }
 
     public static function canViewAny(): bool

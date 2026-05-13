@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\DemoContactMessageController;
 use App\Http\Controllers\Api\OfflineAttendanceController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:10,1'])->group(function () {
     Route::post('/attendance/sync', [AttendanceSyncController::class, 'sync']);
     Route::post('/offline-attendance/sync', [OfflineAttendanceController::class, 'sync']);
     Route::get('/offline-attendance/status', [OfflineAttendanceController::class, 'status']);

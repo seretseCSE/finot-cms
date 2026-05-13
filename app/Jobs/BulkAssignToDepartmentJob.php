@@ -37,33 +37,38 @@ class BulkAssignToDepartmentJob implements ShouldQueue
     public function handle(): void
     {
         $department = \App\Models\Department::query()->findOrFail($this->departmentId);
-        $members = Member::query()->whereIn('id', $this->memberIds)->get();
+        $memberCount = 0;
 
-        DB::transaction(function () use ($members, $department): void {
-            foreach ($members as $member) {
-                $oldDepartmentId = $member->department_id;
-                $member->update([
-                    'department_id' => $department->id,
-                    'updated_by' => $this->assignedBy,
-                ]);
+        DB::transaction(function () use ($department, &$memberCount): void {
+            Member::query()
+                ->whereIn('id', $this->memberIds)
+                ->lazy()
+                ->each(function ($member) use ($department, &$memberCount) {
+                    $oldDepartmentId = $member->department_id;
+                    $member->update([
+                        'department_id' => $department->id,
+                        'updated_by' => $this->assignedBy,
+                    ]);
 
-                Log::channel('audit')->warning('Member Department Assignment Changed', [
-                    'action' => 'bulk_department_assignment',
-                    'member_id' => $member->id,
-                    'member_name' => $member->full_name,
-                    'old_department_id' => $oldDepartmentId,
-                    'new_department_id' => $department->id,
-                    'new_department_name' => $department->name_en,
-                    'reason' => $this->reason,
-                    'assigned_by' => $this->assignedBy,
-                    'timestamp' => now()->toDateTimeString(),
-                ]);
-            }
+                    Log::channel('audit')->warning('Member Department Assignment Changed', [
+                        'action' => 'bulk_department_assignment',
+                        'member_id' => $member->id,
+                        'member_name' => $member->full_name,
+                        'old_department_id' => $oldDepartmentId,
+                        'new_department_id' => $department->id,
+                        'new_department_name' => $department->name_en,
+                        'reason' => $this->reason,
+                        'assigned_by' => $this->assignedBy,
+                        'timestamp' => now()->toDateTimeString(),
+                    ]);
+
+                    $memberCount++;
+                });
         });
 
         Notification::make()
             ->title('Department Assignment Successful')
-            ->body("{$members->count()} members assigned to {$department->name_en} successfully")
+            ->body("{$memberCount} members assigned to {$department->name_en} successfully")
             ->success()
             ->sendToDatabase(\App\Models\User::find($this->assignedBy));
     }

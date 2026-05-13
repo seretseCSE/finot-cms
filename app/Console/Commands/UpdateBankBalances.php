@@ -28,23 +28,26 @@ class UpdateBankBalances extends Command
     {
         $this->info('Updating bank account balances...');
 
-        $accounts = BankAccount::all();
-        $updatedCount = 0;
+        \DB::transaction(function () {
+            $updatedCount = 0;
 
-        foreach ($accounts as $account) {
-            $oldBalance = $account->current_balance;
-            $account->updateBalance();
-            $newBalance = $account->current_balance;
+            BankAccount::chunk(1000, function ($accounts) use (&$updatedCount) {
+                foreach ($accounts as $account) {
+                    $oldBalance = $account->current_balance;
+                    $account->updateBalance();
+                    $newBalance = $account->current_balance;
 
-            $this->line("Updated: {$account->account_name}");
-            $this->line("  Old balance: {$oldBalance}");
-            $this->line("  New balance: {$newBalance}");
-            $this->line('');
+                    $this->line("Updated: {$account->account_name}");
+                    $this->line("  Old balance: {$oldBalance}");
+                    $this->line("  New balance: {$newBalance}");
+                    $this->line('');
 
-            $updatedCount++;
-        }
+                    $updatedCount++;
+                }
+            });
 
-        $this->info("Successfully updated {$updatedCount} bank account balances!");
+            $this->info("Successfully updated {$updatedCount} bank account balances!");
+        });
 
         return Command::SUCCESS;
     }

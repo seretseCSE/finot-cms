@@ -142,6 +142,7 @@ class TourPassengerResource extends Resource
                             ->image()
                             ->disk('public')
                             ->directory(fn (callable $get) => 'receipts/tours/'.$get('tour_id'))
+                            ->maxSize(2048) // 2MB for receipt images
                             ->formatStateUsing(function ($state, $record) {
                                 if (! $state) {
                                     return null;
@@ -199,7 +200,7 @@ class TourPassengerResource extends Resource
                 Tables\Columns\TextColumn::make('registration_type')
                     ->label('Type')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Public' => 'primary',
                         'Internal' => 'success',
                     }),
@@ -207,7 +208,7 @@ class TourPassengerResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match($state) {
+                    ->color(fn (string $state): string => match($state) {
                         'Pending' => 'warning',
                         'Confirmed' => 'success',
                         'Cancelled' => 'danger',

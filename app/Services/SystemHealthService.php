@@ -68,8 +68,10 @@ class SystemHealthService
         try {
             // Get database size
             $dbName = config('database.connections.mysql.database');
-            $sizeQuery = "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size FROM information_schema.tables WHERE table_schema = '{$dbName}'";
-            $size = DB::select($sizeQuery)[0]->size ?? 0;
+            $size = DB::select(
+                'SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size FROM information_schema.tables WHERE table_schema = ?',
+                [$dbName]
+            )[0]->size ?? 0;
 
             // Get average query time (cached)
             $avgQueryTime = Cache::remember('health_avg_query_time', 300, function () {

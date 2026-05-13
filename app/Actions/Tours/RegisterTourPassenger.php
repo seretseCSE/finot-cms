@@ -4,6 +4,7 @@ namespace App\Actions\Tours;
 
 use App\Models\Tour;
 use App\Models\TourPassenger;
+use App\Exceptions\TourCapacityExceededException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -26,6 +27,14 @@ class RegisterTourPassenger
         $passengerCount = (int) ($data['passenger_count'] ?? 1);
         $passengerNames = $data['passenger_names'] ?? [];
         $createdPassengers = [];
+
+        // Check tour capacity
+        $currentPassengers = TourPassenger::where('tour_id', $tour->id)->count();
+        $availableCapacity = $tour->max_passengers - $currentPassengers;
+
+        if ($passengerCount > $availableCapacity) {
+            throw new TourCapacityExceededException("Cannot register {$passengerCount} passengers. Only {$availableCapacity} spots available.");
+        }
 
         // Create primary passenger (the one with the phone)
         $primaryCode = $this->generatePassengerCode(++$lastCode);

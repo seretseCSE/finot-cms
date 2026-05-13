@@ -346,4 +346,46 @@ abstract class BaseResource extends Resource
     {
         return static::getModel()::getNavigationGroup();
     }
+
+    /**
+     * Determine if the current user is a department head.
+     */
+    protected static function isDepartmentHead(?Model $record = null): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Check if user is head of any department (or specific record's department)
+        $query = Department::query()->where('head_user_id', $user->id);
+
+        if ($record?->department_id) {
+            $query->where('id', $record->department_id);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Determine if the current user is a department secretary.
+     */
+    protected static function isDepartmentSecretary(?Model $record = null): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Check if user is secretary of any department (or specific record's department)
+        $query = Department::query()->where('secretary_user_id', $user->id);
+
+        if ($record?->department_id) {
+            $query->where('id', $record->department_id);
+        }
+
+        return $query->exists();
+    }
 }

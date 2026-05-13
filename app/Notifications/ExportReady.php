@@ -12,7 +12,8 @@ class ExportReady extends Notification
     public function __construct(
         protected string $filePath,
         protected string $filename,
-    ) {}
+    ) {
+    }
 
     public function via(object $notifiable): array
     {

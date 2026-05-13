@@ -37,7 +37,7 @@ class AnnouncementResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 5;
+        return 7;
     }
 
     public static function canViewAny(): bool

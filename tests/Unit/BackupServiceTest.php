@@ -3,7 +3,9 @@
 namespace Tests\Unit;
 
 use App\Models\SystemBackup;
-use App\Services\BackupService;
+use App\Services\BackupCreationService;
+use App\Services\BackupRestorationService;
+use App\Services\BackupCleanupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -28,9 +30,9 @@ class BackupServiceTest extends TestCase
     /**
      * Create a testable backup service that skips the actual backup execution.
      */
-    protected function createTestableService(): BackupService
+    protected function createTestableService(): BackupCreationService
     {
-        return new class () extends BackupService {
+        return new class () extends BackupCreationService {
             protected function performBackup(\App\Models\SystemBackup $backup): void
             {
                 // Create an empty file so Storage::size() succeeds

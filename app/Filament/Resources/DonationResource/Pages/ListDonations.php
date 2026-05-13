@@ -37,7 +37,7 @@ class ListDonations extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatchSync(
+                    ProcessExportJob::dispatch(
                         exportClass: DonationExport::class,
                         columns: $data['columns'],
                         format: $data['format'],

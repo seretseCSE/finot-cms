@@ -7,6 +7,7 @@ use App\Models\AcademicYear;
 use App\Models\Contribution;
 use App\Models\Donation;
 use App\Models\MemberGroup;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
@@ -15,11 +16,10 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 class FinancialStatements extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationLabel = 'Financial Statements';
 
@@ -125,7 +125,7 @@ class FinancialStatements extends Page
         }
 
         $dateRange = $this->getDateRange();
-        
+
         if (!$dateRange) {
             return;
         }
@@ -181,7 +181,7 @@ class FinancialStatements extends Page
                 $quarter = ceil($ethiopianDate['month'] / 3);
                 $startMonth = (($quarter - 1) * 3) + 1;
                 $endMonth = $quarter * 3;
-                
+
                 $quarterStart = EthiopianDateHelper::getEthiopianMonthStart($ethiopianDate['year'], $startMonth);
                 $quarterEnd = EthiopianDateHelper::getEthiopianMonthEnd($ethiopianDate['year'], min($endMonth, 12));
                 return [$quarterStart, $quarterEnd];
@@ -205,10 +205,10 @@ class FinancialStatements extends Page
     {
         $data = [];
         $currentDate = $startDate->copy();
-        
+
         while ($currentDate <= $endDate) {
             $periodKey = $this->getPeriodKey($currentDate);
-            
+
             if (!isset($data[$periodKey])) {
                 $data[$periodKey] = [
                     'period' => $periodKey,
@@ -326,8 +326,8 @@ class FinancialStatements extends Page
             case 'yearly':
                 return $yearName;
             case 'custom':
-                return ($this->start_date ? date('M d, Y', strtotime($this->start_date)) : 'Start') . 
-                       ' - ' . 
+                return ($this->start_date ? date('M d, Y', strtotime($this->start_date)) : 'Start') .
+                       ' - ' .
                        ($this->end_date ? date('M d, Y', strtotime($this->end_date)) : 'End');
             default:
                 return 'Unknown Period';
