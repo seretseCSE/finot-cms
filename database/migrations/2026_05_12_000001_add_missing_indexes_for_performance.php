@@ -14,7 +14,6 @@ return new class () extends Migration {
         Schema::table('attendance_sessions', function (Blueprint $table) {
             $table->index('locked_by');
             $table->index('unlocked_by');
-            $table->index('substitute_teacher_id');
             $table->index('created_by');
             $table->index('created_at');
         });
@@ -121,7 +120,6 @@ return new class () extends Migration {
         Schema::table('attendance_sessions', function (Blueprint $table) {
             $table->dropIndex(['locked_by']);
             $table->dropIndex(['unlocked_by']);
-            $table->dropIndex(['substitute_teacher_id']);
             $table->dropIndex(['created_by']);
             $table->dropIndex(['created_at']);
         });
