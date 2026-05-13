@@ -18,9 +18,9 @@ class FundraisingResource extends Resource
 {
     protected static ?string $model = FundraisingCampaign::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Tour Management';
+    protected static UnitEnum|string|null $navigationGroup = 'Tour Management';
 
     protected static ?int $navigationSort = 5;
 

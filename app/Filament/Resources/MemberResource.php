@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\MemberStatus;
+use App\Enums\MemberType;
 use App\Filament\Forms\Components\MemberForms\PersonalInformationTab;
 use App\Filament\Forms\Components\MemberForms\AddressContactTab;
 use App\Filament\Forms\Components\MemberForms\EmergencySpiritualTab;
@@ -20,7 +22,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Services\EthiopianDateHelper;
+use App\Helpers\EthiopianDateHelper;
 
 class MemberResource extends BaseResource
 {
@@ -90,7 +92,7 @@ class MemberResource extends BaseResource
                 $parentId = request()->query('parent_id');
                 if ($parentId) {
                     $query->whereHas('parentGuardians', function (Builder $q) use ($parentId) {
-                        $q->where('parent_id', $parentId);
+                        $q->where('parent_id', $parentId)->where('is_external', false);
                     });
                 }
             })
@@ -106,21 +108,19 @@ class MemberResource extends BaseResource
 
                 Tables\Columns\TextColumn::make('member_type')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Kids' => 'info',
-                        'Youth' => 'warning',
-                        'Adult' => 'success',
-                        default => 'gray',
+                    ->color(fn (MemberType $state): string => match ($state) {
+                        MemberType::KIDS => 'info',
+                        MemberType::YOUTH => 'warning',
+                        MemberType::ADULT => 'success',
                     }),
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Draft' => 'gray',
-                        'Member' => 'info',
-                        'Active' => 'success',
-                        'Former' => 'danger',
-                        default => 'gray',
+                    ->color(fn (MemberStatus $state): string => match ($state) {
+                        MemberStatus::DRAFT => 'gray',
+                        MemberStatus::MEMBER => 'info',
+                        MemberStatus::ACTIVE => 'success',
+                        MemberStatus::FORMER => 'danger',
                     }),
 
                 Tables\Columns\TextColumn::make('phone')
@@ -263,17 +263,7 @@ class MemberResource extends BaseResource
 
     protected static function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        $query = parent::getTableQuery();
-
-        // Handle parent_id filter from ParentResource
-        if (request()->has('parent_id')) {
-            $parentId = request()->get('parent_id');
-            $query->whereHas('parentGuardians', function ($q) use ($parentId) {
-                $q->where('parent_id', $parentId);
-            });
-        }
-
-        return $query;
+        return parent::getTableQuery();
     }
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder

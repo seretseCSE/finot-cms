@@ -143,10 +143,10 @@ class MemberGroupResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match($state) {
                         'Kids' => 'info',
+                        'Elder Kids' => 'gray',
+                        'Youngsters' => 'purple',
                         'Youth' => 'warning',
-                        'Adult' => 'success',
-                        'Ministry' => 'primary',
-                        'Other' => 'secondary',
+                        'Finot Family' => 'rose',
                     }),
 
                 Tables\Columns\TextColumn::make('is_active')
@@ -166,10 +166,10 @@ class MemberGroupResource extends Resource
                     ->label('Group Type')
                     ->options([
                         'Kids' => 'Kids',
+                        'Elder Kids' => 'Elder Kids',
+                        'Youngsters' => 'Youngsters',
                         'Youth' => 'Youth',
-                        'Adult' => 'Adult',
-                        'Ministry' => 'Ministry',
-                        'Other' => 'Other',
+                        'Finot Family' => 'Finot Family',
                     ]),
 
                 Tables\Filters\SelectFilter::make('is_active')

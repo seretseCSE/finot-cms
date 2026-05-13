@@ -25,6 +25,23 @@ class MemberParentGuardian extends BaseModel
         'is_external' => 'boolean',
     ];
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function ($memberParentGuardian) {
+            if ($memberParentGuardian->parent_id && !$memberParentGuardian->is_external) {
+                $memberParentGuardian->parent?->updateMemberCount();
+            }
+        });
+
+        static::deleted(function ($memberParentGuardian) {
+            if ($memberParentGuardian->parent_id && !$memberParentGuardian->is_external) {
+                $memberParentGuardian->parent?->updateMemberCount();
+            }
+        });
+    }
+
     /**
      * Get the member that owns this parent/guardian.
      */

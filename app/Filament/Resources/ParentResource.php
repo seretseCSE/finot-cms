@@ -100,8 +100,7 @@ class ParentResource extends Resource
                     ->icon('heroicon-o-users')
                     ->url(fn ($record) => route('filament.admin.resources.members.index', [
                         'parent_id' => $record->id,
-                    ]))
-                    ->openUrlInNewTab(),
+                    ])),
             ])
             ->bulkActions([
                 DeleteBulkAction::make(),

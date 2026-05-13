@@ -4,7 +4,7 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DwIwHn-C.css",
+    "file": "assets/app-DfnwJWtZ.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -13,7 +13,7 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-zgPdBPBc.js",
+    "file": "assets/admin-fBxQv8aN.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
