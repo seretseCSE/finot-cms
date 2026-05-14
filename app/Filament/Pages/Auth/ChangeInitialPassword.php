@@ -3,6 +3,11 @@
 namespace App\Filament\Pages\Auth;
 
 use App\Rules\PasswordHistoryRule;
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Form;
 use Filament\Schemas\Schema;
 use App\Rules\PasswordStrengthRule;
 use Filament\Forms\Components\TextInput;
@@ -15,6 +20,15 @@ class ChangeInitialPassword extends Page
     protected static ?string $title = 'Change Password';
 
     protected static ?string $slug = 'change-password';
+
+    protected string $view = 'filament-panels::pages.simple';
+
+    protected static string $layout = 'filament-panels::components.layout.simple';
+
+    public function hasLogo(): bool
+    {
+        return true;
+    }
 
     public ?array $data = [];
 
@@ -83,6 +97,37 @@ class ChangeInitialPassword extends Page
     {
         // Never show in navigation - this is a forced flow page
         return false;
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                $this->getFormContentComponent(),
+            ]);
+    }
+
+    protected function getFormContentComponent(): Component
+    {
+        return Form::make([EmbeddedSchema::make('form')])
+            ->id('form')
+            ->livewireSubmitHandler('changePassword')
+            ->footer([
+                Actions::make($this->getFormActions())
+                    ->alignment(\Filament\Support\Enums\Alignment::Center)
+                    ->fullWidth()
+                    ->key('form-actions'),
+            ]);
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            Action::make('changePassword')
+                ->label('Change Password')
+                ->submit('changePassword')
+                ->color('primary'),
+        ];
     }
 
     public function getBreadcrumbs(): array
