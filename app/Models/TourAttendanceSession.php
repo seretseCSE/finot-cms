@@ -18,14 +18,19 @@ class TourAttendanceSession extends BaseModel
         'session_date',
         'status',
         'created_by',
+        'locked_at',
+        'locked_by',
+        'locked_reason',
     ];
 
     protected $casts = [
         'session_date' => 'date',
+        'locked_at' => 'datetime',
     ];
 
     protected $dates = [
         'session_date',
+        'locked_at',
     ];
 
     public function tour()
@@ -38,14 +43,16 @@ class TourAttendanceSession extends BaseModel
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function lockedBy()
+    {
+        return $this->belongsTo(User::class, 'locked_by');
+    }
+
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(TourAttendance::class, 'session_id');
     }
 
-    /**
-     * Get formatted session date in Ethiopian
-     */
     public function getEthiopianSessionDateAttribute(): string
     {
         return app(\App\Helpers\EthiopianDateHelper::class)
@@ -56,9 +63,6 @@ class TourAttendanceSession extends BaseModel
                 ->toEthiopian($this->session_date)['year'];
     }
 
-    /**
-     * Get attendance summary
-     */
     public function getAttendanceSummaryAttribute(): array
     {
         $present = $this->attendanceRecords()->where('status', 'Present')->count();
@@ -73,14 +77,10 @@ class TourAttendanceSession extends BaseModel
         ];
     }
 
-    /**
-     * Complete the attendance session
-     */
     public function complete(): void
     {
         $this->update(['status' => 'Completed']);
 
-        // Log to audit trail
         Log::channel('audit')->info('Tier 1 Audit Log', [
             'tier' => 1,
             'action' => 'tour_attendance_completed',
@@ -88,6 +88,48 @@ class TourAttendanceSession extends BaseModel
             'entity_type' => 'tour_attendance_session',
             'old_value' => json_encode(['status' => 'Open']),
             'new_value' => json_encode(['status' => 'Completed']),
+            'user_id' => Auth::id(),
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+    }
+
+    public function lock(string $reason): void
+    {
+        $this->update([
+            'status' => 'Locked',
+            'locked_at' => now(),
+            'locked_by' => Auth::id(),
+            'locked_reason' => $reason,
+        ]);
+
+        Log::channel('audit')->warning('Tier 2 Audit Log', [
+            'tier' => 2,
+            'action' => 'tour_attendance_session_locked',
+            'entity_id' => $this->id,
+            'entity_type' => 'tour_attendance_session',
+            'old_value' => json_encode(['status' => $this->getOriginal('status')]),
+            'new_value' => json_encode(['status' => 'Locked', 'reason' => $reason]),
+            'user_id' => Auth::id(),
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+    }
+
+    public function unlock(string $reason): void
+    {
+        $this->update([
+            'status' => 'Open',
+            'locked_at' => null,
+            'locked_by' => null,
+            'locked_reason' => null,
+        ]);
+
+        Log::channel('audit')->warning('Tier 2 Audit Log', [
+            'tier' => 2,
+            'action' => 'tour_attendance_session_unlocked',
+            'entity_id' => $this->id,
+            'entity_type' => 'tour_attendance_session',
+            'old_value' => json_encode(['status' => 'Locked']),
+            'new_value' => json_encode(['status' => 'Open', 'reason' => $reason]),
             'user_id' => Auth::id(),
             'timestamp' => now()->toDateTimeString(),
         ]);

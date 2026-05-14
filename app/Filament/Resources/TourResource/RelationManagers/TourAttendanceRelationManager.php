@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TourResource\RelationManagers;
 
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -52,16 +53,13 @@ class TourAttendanceRelationManager extends RelationManager
                     ->label('Passengers')
                     ->sortable(),
 
-                Tables\Columns\ToggleColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->onColor('success')
-                    ->offColor('danger')
-                    ->afterStateUpdated(function ($record, $state) {
-                        if ($state === 'Present') {
-                            $record->markPresent();
-                        } else {
-                            $record->markNotPresent();
-                        }
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Present' => 'success',
+                        'Not Present' => 'danger',
+                        default => 'gray',
                     }),
 
                 Tables\Columns\TextColumn::make('notes')
@@ -92,11 +90,35 @@ class TourAttendanceRelationManager extends RelationManager
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->action(function () {
+                        $count = 0;
                         foreach ($this->getRecords() as $record) {
                             if ($record->status === 'Not Present') {
                                 $record->markPresent();
+                                $count++;
                             }
                         }
+                        Notification::make()
+                            ->title("Marked {$count} passenger(s) as Present")
+                            ->success()
+                            ->send();
+                    }),
+
+                Actions\Action::make('mark_all_not_present')
+                    ->label('Mark All Not Present')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->action(function () {
+                        $count = 0;
+                        foreach ($this->getRecords() as $record) {
+                            if ($record->status === 'Present') {
+                                $record->markNotPresent();
+                                $count++;
+                            }
+                        }
+                        Notification::make()
+                            ->title("Marked {$count} passenger(s) as Not Present")
+                            ->success()
+                            ->send();
                     }),
 
                 Actions\Action::make('complete_attendance')
@@ -106,9 +128,39 @@ class TourAttendanceRelationManager extends RelationManager
                     ->visible(fn () => $this->ownerRecord->status === 'In Progress')
                     ->action(function () {
                         $this->ownerRecord->complete();
+                        Notification::make()
+                            ->title('Attendance session completed')
+                            ->success()
+                            ->send();
                     }),
             ])
             ->actions([
+                Actions\Action::make('mark_present')
+                    ->label('Present')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record): bool => $record && $record->status === 'Not Present')
+                    ->action(function ($record) {
+                        $record->markPresent();
+                        Notification::make()
+                            ->title("{$record->passenger->full_name} marked as Present")
+                            ->success()
+                            ->send();
+                    }),
+
+                Actions\Action::make('mark_not_present')
+                    ->label('Not Present')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn ($record): bool => $record && $record->status === 'Present')
+                    ->action(function ($record) {
+                        $record->markNotPresent();
+                        Notification::make()
+                            ->title("{$record->passenger->full_name} marked as Not Present")
+                            ->warning()
+                            ->send();
+                    }),
+
                 Actions\EditAction::make()
                     ->modalHeading('Edit Attendance')
                     ->mutateFormDataUsing(function (array $data, $record) {
@@ -122,45 +174,48 @@ class TourAttendanceRelationManager extends RelationManager
                                 $record->markNotPresent($data['notes'] ?? null);
                             }
                         } else {
-                            // Update notes if status didn't change
                             $record->update(['notes' => $data['notes'] ?? null]);
                         }
 
                         return $data;
                     }),
-
-                Actions\Action::make('call_passenger')
-                    ->label('Call')
-                    ->icon('heroicon-o-phone')
-                    ->color('primary')
-                    ->visible(fn ($record) => $record->status === 'Not Present')
-                    ->url(fn ($record) => 'tel:'.$record->passenger->phone)
-                    ->openUrlInNewTab(false),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\BulkAction::make('mark_present')
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('bulk_mark_present')
                         ->label('Mark Present')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function ($records) {
+                            $count = 0;
                             foreach ($records as $record) {
                                 if ($record->status === 'Not Present') {
                                     $record->markPresent();
+                                    $count++;
                                 }
                             }
+                            Notification::make()
+                                ->title("Marked {$count} passenger(s) as Present")
+                                ->success()
+                                ->send();
                         }),
 
-                    Actions\BulkAction::make('mark_not_present')
+                    Tables\Actions\BulkAction::make('bulk_mark_not_present')
                         ->label('Mark Not Present')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(function ($records) {
+                            $count = 0;
                             foreach ($records as $record) {
                                 if ($record->status === 'Present') {
                                     $record->markNotPresent();
+                                    $count++;
                                 }
                             }
+                            Notification::make()
+                                ->title("Marked {$count} passenger(s) as Not Present")
+                                ->success()
+                                ->send();
                         }),
                 ]),
             ])

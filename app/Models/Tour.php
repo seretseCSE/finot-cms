@@ -164,6 +164,29 @@ class Tour extends BaseModel
         return $this->hasMany(TourAttendance::class);
     }
 
+    public function autoCreateAttendanceSession(): ?TourAttendanceSession
+    {
+        if ($this->attendanceSessions()->exists()) {
+            return null;
+        }
+
+        $session = TourAttendanceSession::create([
+            'tour_id' => $this->id,
+            'session_date' => $this->tour_date,
+            'status' => 'Open',
+            'created_by' => auth()->id(),
+        ]);
+
+        $this->confirmedPassengers->each(function ($passenger) use ($session) {
+            $session->attendanceRecords()->create([
+                'passenger_id' => $passenger->id,
+                'status' => 'Not Present',
+            ]);
+        });
+
+        return $session;
+    }
+
     /**
      * Get formatted tour date in Ethiopian
      */
@@ -373,15 +396,17 @@ class Tour extends BaseModel
         $today = now()->startOfDay();
         $tourDate = $this->tour_date ? $this->tour_date->startOfDay() : null;
 
-        // If tour date has passed, mark as Completed
-        if ($tourDate && $tourDate->isBefore($today) && $this->status !== 'Completed') {
-            $this->update(['status' => 'Completed']);
-            return;
-        }
-
         // If tour date is today, mark as In Progress
         if ($tourDate && $tourDate->isSameDay($today) && $this->status !== 'In Progress') {
             $this->update(['status' => 'In Progress']);
+            $this->autoCreateAttendanceSession();
+            return;
+        }
+
+        // If tour date has passed, mark as Completed
+        if ($tourDate && $tourDate->isBefore($today) && $this->status !== 'Completed') {
+            $this->update(['status' => 'Completed']);
+            $this->autoCreateAttendanceSession();
             return;
         }
 
@@ -416,6 +441,12 @@ class Tour extends BaseModel
             // Note: Tour is not auto-completed when full.
             // is_full already prevents registration via is_registration_open.
             // 'Completed' status is reserved for tours whose date has passed.
+        });
+
+        static::saved(function (self $tour) {
+            if ($tour->wasChanged('status') && in_array($tour->status, ['In Progress', 'Completed'])) {
+                $tour->autoCreateAttendanceSession();
+            }
         });
     }
 }

@@ -3,12 +3,16 @@
 namespace App\Filament\Resources\TourResource\RelationManagers;
 
 use App\Models\TourAttendanceSession;
+use App\Filament\Resources\TourAttendanceResource;
 use Filament\Schemas\Schema;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceRelationManager extends RelationManager
 {
@@ -49,6 +53,7 @@ class AttendanceRelationManager extends RelationManager
                     ->color(fn ($record) => match ($record->status) {
                         'Open' => 'yellow',
                         'Completed' => 'green',
+                        'Locked' => 'red',
                         default => 'gray',
                     }),
 
@@ -74,6 +79,7 @@ class AttendanceRelationManager extends RelationManager
                     ->options([
                         'Open' => 'Open',
                         'Completed' => 'Completed',
+                        'Locked' => 'Locked',
                     ]),
             ])
             ->headerActions([
@@ -92,7 +98,6 @@ class AttendanceRelationManager extends RelationManager
                             }),
                     ])
                     ->action(function () {
-                        // Create attendance session
                         $session = TourAttendanceSession::create([
                             'tour_id' => $this->ownerRecord->id,
                             'session_date' => $this->ownerRecord->tour_date,
@@ -100,7 +105,6 @@ class AttendanceRelationManager extends RelationManager
                             'created_by' => auth()->id(),
                         ]);
 
-                        // Create attendance records for all confirmed passengers
                         foreach ($this->ownerRecord->confirmedPassengers as $passenger) {
                             $session->attendanceRecords()->create([
                                 'passenger_id' => $passenger->id,
@@ -108,7 +112,6 @@ class AttendanceRelationManager extends RelationManager
                             ]);
                         }
 
-                        // Log to audit trail
                         \Log::channel('audit')->info('Tier 1 Audit Log', [
                             'tier' => 1,
                             'action' => 'tour_attendance_generated',
@@ -122,28 +125,125 @@ class AttendanceRelationManager extends RelationManager
                             'user_id' => auth()->id(),
                             'timestamp' => now()->toDateTimeString(),
                         ]);
-                    }),
 
-                Actions\Action::make('view_attendance')
-                    ->label('View Attendance')
-                    ->icon('heroicon-eye')
-                    ->url(fn ($record) => route('filament.admin.resources.tour-attendances.index', ['tour' => $this->ownerRecord->id, 'session' => $record->id]))
-                    ->visible(fn () => $this->ownerRecord->attendanceSessions()->exists()),
+                        Notification::make()
+                            ->title('Attendance list generated')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->actions([
-                Actions\Action::make('view_details')
-                    ->label('View Details')
-                    ->icon('heroicon-eye')
-                    ->url(fn ($record) => route('filament.admin.resources.tour-attendances.index', ['tour' => $this->ownerRecord->id, 'session' => $record->id])),
+                Action::make('mark_attendance')
+                    ->label('Mark Attendance')
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->color('primary')
+                    ->visible(fn ($record): bool => $record && $record->status === 'Open')
+                    ->url(fn ($record) => TourAttendanceResource::getUrl('index', [
+                        'session' => $record->id,
+                    ])),
 
-                Actions\Action::make('complete_attendance')
-                    ->label('Complete Attendance')
+                Action::make('complete_attendance')
+                    ->label('Complete')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn ($record): bool => $record && $record->status === 'Open')
+                    ->requiresConfirmation()
                     ->action(function ($record) {
                         $record->complete();
+                        Notification::make()
+                            ->title('Attendance session completed')
+                            ->success()
+                            ->send();
                     }),
+
+                Action::make('lock_session')
+                    ->label('Lock')
+                    ->icon('heroicon-o-lock')
+                    ->color('danger')
+                    ->visible(fn ($record): bool => $record && $record->status === 'Open')
+                    ->form([
+                        Forms\Components\Textarea::make('reason')
+                            ->label('Lock Reason')
+                            ->required()
+                            ->minLength(10)
+                            ->rows(3),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->lock($data['reason']);
+                        Notification::make()
+                            ->title('Attendance session locked')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('unlock_session')
+                    ->label('Unlock')
+                    ->icon('heroicon-o-unlock')
+                    ->color('warning')
+                    ->visible(fn ($record): bool => $record && $record->status === 'Locked')
+                    ->form([
+                        Forms\Components\Textarea::make('reason')
+                            ->label('Unlock Reason')
+                            ->required()
+                            ->minLength(10)
+                            ->rows(3),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->unlock($data['reason']);
+                        Notification::make()
+                            ->title('Attendance session unlocked')
+                            ->success()
+                            ->send();
+                    }),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('lock_selected')
+                        ->label('Lock Selected')
+                        ->icon('heroicon-o-lock')
+                        ->color('danger')
+                        ->form([
+                            Forms\Components\Textarea::make('reason')
+                                ->label('Lock Reason')
+                                ->required()
+                                ->minLength(10)
+                                ->rows(3),
+                        ])
+                        ->action(function ($records, array $data) {
+                            foreach ($records as $record) {
+                                if ($record->status === 'Open') {
+                                    $record->lock($data['reason']);
+                                }
+                            }
+                            Notification::make()
+                                ->title('Selected sessions locked')
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\BulkAction::make('unlock_selected')
+                        ->label('Unlock Selected')
+                        ->icon('heroicon-o-unlock')
+                        ->color('warning')
+                        ->form([
+                            Forms\Components\Textarea::make('reason')
+                                ->label('Unlock Reason')
+                                ->required()
+                                ->minLength(10)
+                                ->rows(3),
+                        ])
+                        ->action(function ($records, array $data) {
+                            foreach ($records as $record) {
+                                if ($record->status === 'Locked') {
+                                    $record->unlock($data['reason']);
+                                }
+                            }
+                            Notification::make()
+                                ->title('Selected sessions unlocked')
+                                ->success()
+                                ->send();
+                        }),
+                ]),
             ])
             ->emptyStateActions([
                 Actions\Action::make('generate_attendance')
@@ -152,7 +252,6 @@ class AttendanceRelationManager extends RelationManager
                     ->color('success')
                     ->visible(fn () => $this->ownerRecord->confirmedPassengers->isNotEmpty())
                     ->action(function () {
-                        // Create attendance session
                         $session = TourAttendanceSession::create([
                             'tour_id' => $this->ownerRecord->id,
                             'session_date' => $this->ownerRecord->tour_date,
@@ -160,13 +259,17 @@ class AttendanceRelationManager extends RelationManager
                             'created_by' => auth()->id(),
                         ]);
 
-                        // Create attendance records for all confirmed passengers
                         foreach ($this->ownerRecord->confirmedPassengers as $passenger) {
                             $session->attendanceRecords()->create([
                                 'passenger_id' => $passenger->id,
                                 'status' => 'Not Present',
                             ]);
                         }
+
+                        Notification::make()
+                            ->title('Attendance list generated')
+                            ->success()
+                            ->send();
                     }),
             ])
             ->emptyStateHeading('No attendance sessions')

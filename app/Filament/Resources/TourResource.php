@@ -210,6 +210,7 @@ class TourResource extends BaseResource
                     ->visible(fn (Tour $record): bool => $record && $record->status === 'Published' && static::canEdit($record))
                     ->action(function (Tour $record) {
                         $record->update(['status' => 'In Progress']);
+                        $record->autoCreateAttendanceSession();
                     }),
 
                 Actions\Action::make('mark_completed')
@@ -218,6 +219,7 @@ class TourResource extends BaseResource
                     ->color('success')
                     ->visible(fn (Tour $record): bool => $record && in_array($record->status, ['In Progress', 'Published']) && static::canEdit($record))
                     ->action(function (Tour $record) {
+                        $record->autoCreateAttendanceSession();
                         $record->update(['status' => 'Completed']);
                     }),
 
