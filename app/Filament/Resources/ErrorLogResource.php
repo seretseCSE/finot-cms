@@ -11,7 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class ErrorLogResource extends Resource
+class ErrorLogResource extends BaseResource
 {
     protected static ?string $model = ErrorLog::class;
 
@@ -72,7 +72,7 @@ class ErrorLogResource extends Resource
             ])
             ->bulkActions([
                 Actions\DeleteBulkAction::make()
-                    ->visible(fn () => auth()->user()?->hasRole('superadmin')),
+                    ->visible(fn () => auth()->user()?->can('error_logs.delete')),
             ]);
     }
 
@@ -90,8 +90,5 @@ class ErrorLogResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
+
 }

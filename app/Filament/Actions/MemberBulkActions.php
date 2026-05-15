@@ -129,7 +129,7 @@ class MemberBulkActions
             ->label('Assign to Department')
             ->icon('heroicon-o-building-office')
             ->deselectRecordsAfterCompletion()
-            ->visible(fn (): bool => Auth::user()?->hasRole(\App\Enums\Roles::HR_MANAGERS) ?? false)
+            ->visible(fn (): bool => Auth::user()?->can('members.manage') ?? false)
             ->mountUsing(fn (BulkAction $action) => BulkAssignmentValidationAction::validateSelectionLimit($action))
             ->form([
                 Forms\Components\Select::make('department_id')

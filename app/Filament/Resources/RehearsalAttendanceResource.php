@@ -11,13 +11,11 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class RehearsalAttendanceResource extends Resource
+class RehearsalAttendanceResource extends BaseResource
 {
     protected static ?string $model = RehearsalAttendance::class;
 
@@ -41,24 +39,9 @@ class RehearsalAttendanceResource extends Resource
         return 3;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['mezmur_head', 'worship_monitor', 'admin', 'superadmin']);
-    }
-
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['mezmur_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('rehearsal_attendances.delete');
     }
 
     public static function form(Schema $schema): Schema

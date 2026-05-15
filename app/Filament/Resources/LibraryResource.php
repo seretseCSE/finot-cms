@@ -22,7 +22,7 @@ use App\Enums\Roles;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class LibraryResource extends Resource
+class LibraryResource extends BaseResource
 {
     protected static ?string $model = LibraryResourceModel::class;
 
@@ -46,25 +46,6 @@ class LibraryResource extends Resource
         return 8;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
-    }
 
     public static function form(Schema $schema): Schema
     {

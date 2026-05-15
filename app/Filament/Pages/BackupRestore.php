@@ -37,7 +37,7 @@ class BackupRestore extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()->hasRole('superadmin');
+        return Auth::user()->can('system.backups');
     }
 
     public function getBackups(): array

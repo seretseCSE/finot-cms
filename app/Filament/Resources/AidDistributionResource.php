@@ -8,14 +8,11 @@ use App\Models\AidDistribution;
 use App\Models\Beneficiary;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
-use App\Enums\Roles;
 
-class AidDistributionResource extends Resource
+class AidDistributionResource extends BaseResource
 {
     protected static ?string $model = AidDistribution::class;
 
@@ -186,33 +183,13 @@ class AidDistributionResource extends Resource
                     ->label('Unlock')
                     ->icon('heroicon-o-lock-open')
                     ->color('success')
-                    ->visible(fn ($record) => $record->is_locked && Auth::user()?->hasRole('charity_head'))
+                    ->visible(fn ($record) => $record->is_locked && Auth::user()?->can('aid_distributions.update'))
                     ->action(fn ($record) => $record->unlock()),
             ])
             ->bulkActions([
                 Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('distribution_date', 'desc');
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
     }
 
     public static function getPages(): array

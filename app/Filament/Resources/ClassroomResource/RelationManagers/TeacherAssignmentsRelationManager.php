@@ -78,25 +78,20 @@ class TeacherAssignmentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']))
-                    ->using(function (array $data): array {
-                        $data['assigned_date'] = now()->toDateString();
-                        $data['effective_from'] = $data['effective_from'] ?? now()->toDateString();
-                        $data['assignment_status'] = 'Active';
-                        $data['created_by'] = Auth::id();
-                        return $data;
-                    }),
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.create')),
             ])
             ->actions([
                 Actions\EditAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin'])),
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.update')),
                 Actions\DeleteAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.delete')),
+                Actions\RestoreAction::make()
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+                        ->visible(fn () => Auth::user()?->can('teacher_assignments.delete')),
                 ]),
             ]);
     }

@@ -23,7 +23,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class ContributionAmountResource extends Resource
+class ContributionAmountResource extends BaseResource
 {
     protected static ?string $model = ContributionAmount::class;
 
@@ -59,40 +59,12 @@ class ContributionAmountResource extends Resource
 
     public static function canViewAny(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can view everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('view');
-            return $user->can($permission);
-        }
-
-        // Fallback to superadmin only for models without permission system
-        return false;
+        return (bool) Auth::user()?->can('contribution_amounts.view');
     }
 
     public static function canCreate(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can create everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('create');
-            return $user->can($permission);
-        }
-
-        // Fallback to superadmin only for models without permission system
-        return false;
+        return (bool) Auth::user()?->can('contribution_amounts.create');
     }
 
     public static function canEdit($record): bool

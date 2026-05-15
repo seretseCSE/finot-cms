@@ -7,12 +7,10 @@ use Filament\Schemas\Schema;
 use App\Models\Subject;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class SubjectResource extends Resource
+class SubjectResource extends BaseResource
 {
     protected static ?string $model = Subject::class;
 
@@ -36,24 +34,9 @@ class SubjectResource extends Resource
         return 'Subjects';
     }
 
-    public static function canViewAny(): bool
-    {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
     public static function canDelete($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return (bool) Auth::user()?->can('subjects.delete');
     }
 
     public static function form(Schema $schema): Schema

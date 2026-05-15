@@ -101,18 +101,22 @@ class TeacherAssignmentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin'])),
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.create')),
             ])
             ->actions([
                 Actions\EditAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['education_head', 'admin', 'superadmin'])),
+->visible(fn () => Auth::user()?->can('teacher_assignments.update')),
+                Actions\EditAction::make()
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.update')),
                 Actions\DeleteAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.delete')),
+                Actions\RestoreAction::make()
+                    ->visible(fn () => Auth::user()?->can('teacher_assignments.delete')),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
                     Actions\DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+                        ->visible(fn () => Auth::user()?->can('teacher_assignments.delete')),
                 ]),
             ]);
     }

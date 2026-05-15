@@ -8,13 +8,10 @@ use App\Filament\Resources\BeneficiaryResource\RelationManager\AidDistributionsR
 use App\Models\Beneficiary;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
-use App\Enums\Roles;
 
-class BeneficiaryResource extends Resource
+class BeneficiaryResource extends BaseResource
 {
     protected static ?string $model = Beneficiary::class;
 
@@ -187,24 +184,9 @@ class BeneficiaryResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS);
-    }
-
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(Roles::CHARITY_MANAGERS) && $record->canBeDeleted();
+        return Auth::user()?->can('beneficiaries.delete') && $record->canBeDeleted();
     }
 
     public static function getPages(): array

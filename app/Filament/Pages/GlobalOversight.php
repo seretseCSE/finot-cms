@@ -31,7 +31,7 @@ class GlobalOversight extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()->hasRole('superadmin');
+        return Auth::user()->can('system.global_oversight');
     }
 
     protected function getHeaderActions(): array

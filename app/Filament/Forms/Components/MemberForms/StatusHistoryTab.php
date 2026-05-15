@@ -23,7 +23,7 @@ class StatusHistoryTab
                             ->options(MemberStatus::getAll())
                             ->enum(MemberStatus::class)
                             ->required()
-                            ->disabled(fn () => ! Auth::user()->hasRole(Roles::HR_MANAGERS))
+                            ->disabled(fn () => ! Auth::user()->can('members.update'))
                             ->live(),
                     ]),
 

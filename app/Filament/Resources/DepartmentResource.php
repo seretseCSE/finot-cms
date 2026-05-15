@@ -39,22 +39,22 @@ class DepartmentResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
+        return Auth::user()?->can('departments.view');
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
+        return Auth::user()?->can('departments.create');
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
+        return Auth::user()?->can('departments.update');
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['superadmin']);
+        return Auth::user()?->can('departments.delete');
     }
 
     public static function form(Schema $schema): Schema
@@ -149,7 +149,7 @@ class DepartmentResource extends Resource
             ])
             ->bulkActions([
                 Actions\DeleteBulkAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole('superadmin')),
+                    ->visible(fn () => Auth::user()?->can('departments.delete')),
             ])
             ->headerActions([
                 Actions\CreateAction::make()

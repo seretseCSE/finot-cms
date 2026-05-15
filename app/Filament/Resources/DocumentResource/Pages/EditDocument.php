@@ -17,7 +17,7 @@ class EditDocument extends EditRecord
         $user = Auth::user();
 
         // Prevent non-admins from changing department
-        if (! $user?->hasRole(['admin', 'superadmin'])) {
+        if (! $user?->can('documents.update')) {
             unset($data['department_id']);
         }
 

@@ -262,7 +262,7 @@ class TourResource extends BaseResource
                     ->label('Update All Tour Statuses')
                     ->icon('heroicon-o-arrow-path')
                     ->color('info')
-                    ->visible(fn () => Auth::user()?->hasRole(Roles::TOUR_MANAGERS) ?? false)
+                    ->visible(fn () => Auth::user()?->can('tours.view') ?? false)
                     ->action(function () {
                         $tours = Tour::whereNotIn('status', ['Cancelled', 'Completed'])->get();
                         $updatedCount = 0;

@@ -39,7 +39,7 @@ class DonationReportPage extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'charity_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('page.report.donation');
     }
 
     public ?array $data = [];

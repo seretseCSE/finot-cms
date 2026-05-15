@@ -15,12 +15,10 @@ use Filament\Actions\RestoreAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class ParentResource extends Resource
+class ParentResource extends BaseResource
 {
     protected static ?string $model = ParentModel::class;
 
@@ -160,59 +158,13 @@ class ParentResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'hr_head',
-            'admin',
-            'superadmin',
-        ]);
-    }
-
-    public static function canCreate(): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'hr_head',
-            'admin',
-            'superadmin',
-        ]);
-    }
-
-    public static function canEdit($record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'hr_head',
-            'admin',
-            'superadmin',
-        ]);
-    }
-
     public static function canDelete($record): bool
     {
-        $user = Auth::user();
-
-        if (! $user->hasRole(['hr_head', 'admin', 'superadmin'])) {
+        if (! parent::canDelete($record)) {
             return false;
         }
 
-        // Cannot delete if linked to any active member
         return $record->canBeDeleted();
-    }
-
-    public static function canRestore($record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'admin',
-            'superadmin',
-        ]);
     }
 
     protected static function getTableQuery(): \Illuminate\Database\Eloquent\Builder

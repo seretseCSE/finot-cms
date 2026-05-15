@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class MediaCategoryResource extends Resource
+class MediaCategoryResource extends BaseResource
 {
     protected static ?string $model = MediaCategory::class;
 
@@ -37,28 +37,14 @@ class MediaCategoryResource extends Resource
         return 2;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
 
     public static function canDelete($record): bool
     {
         if ($record === null) {
-            return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
+            return Auth::user()?->can('media_categories.delete');
         }
 
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']) && $record->canBeDeleted();
+        return Auth::user()?->can('media_categories.delete') && $record->canBeDeleted();
     }
 
     public static function form(Schema $schema): Schema

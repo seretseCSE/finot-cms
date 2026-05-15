@@ -37,7 +37,7 @@ class AttendanceSummaryReport extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('page.report.attendance-summary');
     }
 
     public function mount(): void

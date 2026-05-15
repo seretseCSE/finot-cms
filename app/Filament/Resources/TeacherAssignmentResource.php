@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
-class TeacherAssignmentResource extends Resource
+class TeacherAssignmentResource extends BaseResource
 {
     protected static ?string $model = TeacherAssignment::class;
 
@@ -46,22 +46,22 @@ class TeacherAssignmentResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
+        return Auth::user()?->can('teacher_assignments.view');
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('teacher_assignments.create');
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('teacher_assignments.update');
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('teacher_assignments.delete');
     }
 
     public static function form(Schema $schema): Schema

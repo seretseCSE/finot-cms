@@ -149,7 +149,7 @@ class MarkAttendance extends Page
 
     public function saveTeacherAttendance(): void
     {
-        if (! Auth::user()?->hasRole(['education_monitor', 'admin', 'superadmin'])) {
+        if (! Auth::user()?->can('attendance_records.mark')) {
             Notification::make()
                 ->title('Access denied')
                 ->danger()
@@ -177,7 +177,7 @@ class MarkAttendance extends Page
 
     public function saveStudentAttendance(): void
     {
-        if (! Auth::user()?->hasRole(['education_monitor', 'admin', 'superadmin'])) {
+        if (! Auth::user()?->can('attendance_records.mark')) {
             Notification::make()
                 ->title('Access denied')
                 ->danger()

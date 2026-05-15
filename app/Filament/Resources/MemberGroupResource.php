@@ -14,12 +14,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class MemberGroupResource extends Resource
+class MemberGroupResource extends BaseResource
 {
     protected static ?string $model = MemberGroup::class;
 
@@ -272,62 +270,16 @@ class MemberGroupResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'admin',
-            'superadmin',
-            'hr_head',
-            'internal_relations_head'
-        ]);
-    }
-
-    public static function canCreate(): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'admin',
-            'superadmin',
-            'hr_head',
-            'internal_relations_head'
-        ]);
-    }
-
-    public static function canEdit($record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'admin',
-            'superadmin',
-            'hr_head',
-            'internal_relations_head'
-        ]);
-    }
-
     public static function canDelete($record): bool
     {
         $user = Auth::user();
 
-        if (!$user->hasRole(['admin', 'superadmin'])) {
+        if (!$user->can('member_groups.delete')) {
             return false;
         }
 
         // Check if group has active assignments
         return $record->canBeDeleted();
-    }
-
-    public static function canRestore($record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole([
-            'admin',
-            'superadmin'
-        ]);
     }
 
     protected static function getTableQuery(): \Illuminate\Database\Eloquent\Builder

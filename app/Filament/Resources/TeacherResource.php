@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles;
 use Illuminate\Support\Facades\DB;
 
-class TeacherResource extends Resource
+class TeacherResource extends BaseResource
 {
     protected static ?string $model = Teacher::class;
 
@@ -50,22 +50,22 @@ class TeacherResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
+        return (bool) Auth::user()?->can('teachers.view');
     }
 
     public static function canCreate(): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
+        return (bool) Auth::user()?->can('teachers.create');
     }
 
     public static function canEdit($record): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
+        return (bool) Auth::user()?->can('teachers.update');
     }
 
     public static function canDelete($record): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS) && $record->canDelete();
+        return (bool) Auth::user()?->can('teachers.delete') && $record->canDelete();
     }
 
     public static function form(Schema $schema): Schema
@@ -200,7 +200,7 @@ class TeacherResource extends Resource
                 Tables\Columns\TextColumn::make('attendance_rate')
                     ->label('Attendance Rate')
                     ->state(function (Teacher $record): string {
-                        if (! Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS)) {
+                        if (! Auth::user()?->can('teachers.update')) {
                             return '-';
                         }
 

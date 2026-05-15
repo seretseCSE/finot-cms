@@ -16,7 +16,7 @@ class EditUser extends EditRecord
         return [
             Actions\ViewAction::make(),
             Actions\DeleteAction::make()
-                ->visible(fn () => auth()->user()?->hasRole('superadmin')),
+                ->visible(fn () => auth()->user()?->can('users.delete')),
         ];
     }
 

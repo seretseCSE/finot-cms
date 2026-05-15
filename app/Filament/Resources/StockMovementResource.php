@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class StockMovementResource extends Resource
+class StockMovementResource extends BaseResource
 {
     protected static ?string $model = InventoryMovement::class;
 
@@ -40,10 +40,6 @@ class StockMovementResource extends Resource
         return 'Inventory';
     }
 
-    public static function canAccess(array $parameters = []): bool
-    {
-        return Auth::user()?->hasRole(['inventory_staff', 'nibret_hisab_head', 'admin', 'superadmin']);
-    }
 
     public static function form(Schema $schema): Schema
     {

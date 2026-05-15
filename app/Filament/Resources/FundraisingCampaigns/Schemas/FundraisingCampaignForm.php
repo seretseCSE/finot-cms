@@ -31,7 +31,7 @@ class FundraisingCampaignForm
                     ->disabled(function () {
                         $user = auth()->user();
 
-                        return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                        return ! $user?->can('fundraising.update');
                     }),
 
                 TextInput::make('target_amount')
@@ -43,7 +43,7 @@ class FundraisingCampaignForm
                     ->disabled(function () {
                         $user = auth()->user();
 
-                        return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                        return ! $user?->can('fundraising.update');
                     }),
 
                 Textarea::make('description')
@@ -54,7 +54,7 @@ class FundraisingCampaignForm
                     ->disabled(function () {
                         $user = auth()->user();
 
-                        return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                        return ! $user?->can('fundraising.update');
                     }),
 
                 Select::make('campaign_category')
@@ -77,7 +77,7 @@ class FundraisingCampaignForm
                     ->disabled(function () {
                         $user = auth()->user();
 
-                        return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                        return ! $user?->can('fundraising.update');
                     }),
 
                 DatePicker::make('end_date')
@@ -90,7 +90,7 @@ class FundraisingCampaignForm
                     ->disabled(function () {
                         $user = auth()->user();
 
-                        return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                        return ! $user?->can('fundraising.update');
                     }),
 
                 Select::make('status')
@@ -106,7 +106,7 @@ class FundraisingCampaignForm
                     ->disabled(function () {
                         $user = auth()->user();
 
-                        return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                        return ! $user?->can('fundraising.update');
                     }),
             ])
                 ->columns(3),
@@ -123,7 +123,7 @@ class FundraisingCampaignForm
                 ->disabled(function () {
                     $user = auth()->user();
 
-                    return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                    return ! $user?->can('fundraising.update');
                 }),
 
             Textarea::make('bank_account_info')
@@ -134,7 +134,7 @@ class FundraisingCampaignForm
                 ->disabled(function () {
                     $user = auth()->user();
 
-                    return $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+                    return ! $user?->can('fundraising.update');
                 }),
 
             // Fundraising Progress

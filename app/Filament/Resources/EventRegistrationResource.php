@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class EventRegistrationResource extends Resource
+class EventRegistrationResource extends BaseResource
 {
     protected static ?string $model = EventRegistration::class;
 
@@ -144,23 +144,5 @@ class EventRegistrationResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
 
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
 }

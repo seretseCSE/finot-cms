@@ -15,13 +15,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class TourPassengerResource extends Resource
+class TourPassengerResource extends BaseResource
 {
     protected static ?string $model = TourPassenger::class;
 
@@ -45,24 +43,9 @@ class TourPassengerResource extends Resource
         return 2;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['tour_head', 'tour_manager', 'revenue_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['tour_head', 'tour_manager', 'revenue_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['tour_head', 'tour_manager', 'revenue_head', 'admin', 'superadmin']);
-    }
-
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['tour_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('tour_passengers.delete');
     }
 
     public static function form(Schema $schema): Schema

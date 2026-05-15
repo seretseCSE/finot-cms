@@ -38,7 +38,7 @@ class ClassPerformanceReport extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('page.report.class-performance');
     }
 
     public function mount(): void

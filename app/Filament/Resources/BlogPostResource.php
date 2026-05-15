@@ -8,14 +8,13 @@ use Filament\Schemas\Schema;
 use App\Models\BlogPost;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class BlogPostResource extends Resource
+class BlogPostResource extends BaseResource
 {
     protected static ?string $model = BlogPost::class;
 
@@ -37,26 +36,6 @@ class BlogPostResource extends Resource
     public static function getNavigationSort(): ?int
     {
         return 6;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
     }
 
     public static function form(Schema $schema): Schema

@@ -48,8 +48,7 @@ class FinancialAnalytics extends Page
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
-        return $user?->hasRole(['superadmin', 'finance_head', 'nibret_hisab_head', 'admin']);
+        return auth()->user()?->can('page.financial.analytics');
     }
 
     public function mount(): void

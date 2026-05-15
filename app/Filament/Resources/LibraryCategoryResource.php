@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class LibraryCategoryResource extends Resource
+class LibraryCategoryResource extends BaseResource
 {
     protected static ?string $model = LibraryCategory::class;
 
@@ -37,25 +37,6 @@ class LibraryCategoryResource extends Resource
         return 9;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
 
     public static function form(Schema $schema): Schema
     {

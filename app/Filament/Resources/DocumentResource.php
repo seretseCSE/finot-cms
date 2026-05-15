@@ -76,7 +76,7 @@ class DocumentResource extends Resource
             return false;
         }
 
-        if (! $user->hasRole('department_secretary')) {
+        if (! $user->can('documents.upload')) {
             return false;
         }
 
@@ -100,7 +100,7 @@ class DocumentResource extends Resource
             return false;
         }
 
-        return $user->hasRole(Roles::ADMINISTRATORS)
+        return $user->can('documents.create')
             || $user->hasPermissionTo('documents.upload')
             || static::isDepartmentHead()
             || static::isDepartmentSecretary();
@@ -115,7 +115,7 @@ class DocumentResource extends Resource
         }
 
         // Superadmin and admin can edit everything
-        if ($user->hasRole(Roles::ADMINISTRATORS)) {
+        if ($user->can('documents.update')) {
             return true;
         }
 
@@ -141,7 +141,7 @@ class DocumentResource extends Resource
         }
 
         // Superadmin and admin can delete everything
-        if ($user->hasRole(Roles::ADMINISTRATORS)) {
+        if ($user->can('documents.delete')) {
             return true;
         }
 
@@ -167,7 +167,7 @@ class DocumentResource extends Resource
         }
 
         // Superadmin and admin can see all documents
-        if ($user->hasRole(['superadmin', 'admin'])) {
+        if ($user->can('documents.view')) {
             return $query;
         }
 
@@ -184,7 +184,7 @@ class DocumentResource extends Resource
     public static function form(Schema $schema): Schema
     {
         $user = Auth::user();
-        $isAdmin = $user?->hasRole(Roles::ADMINISTRATORS);
+        $isAdmin = $user?->can('documents.create');
 
         return $schema->components([
                 Section::make('Document Information')

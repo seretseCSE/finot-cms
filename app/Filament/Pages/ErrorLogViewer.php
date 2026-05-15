@@ -31,7 +31,7 @@ class ErrorLogViewer extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()->hasRole('superadmin');
+        return Auth::user()->can('error_logs.view');
     }
 
     protected function getHeaderActions(): array

@@ -122,6 +122,11 @@ class PermissionSeeder extends Seeder
         // Mobile & PWA
         'pwa' => ['install'],
         'mobile' => ['attendance_offline', 'cached_content', 'download_content'],
+
+        // System admin resources
+        'predefined_reports' => [],
+        'duplicate_records' => [],
+        'temporary_filters' => [],
     ];
 
     /**
@@ -155,6 +160,37 @@ class PermissionSeeder extends Seeder
         'reports.teacher_reports',
         'content.schedule_publication',
         'help.documentation',
+
+        // Page access permissions
+        'page.report.tour',
+        'page.custom-options',
+        'page.settings.global-church',
+        'page.financial.statements',
+        'page.financial.statement',
+        'page.financial.audit-trail',
+        'page.financial.analytics',
+        'page.system.audit-logs-export',
+        'page.report.teacher-attendance',
+        'page.report.student-progress',
+        'page.report.class-performance',
+        'page.report.attendance-summary',
+        'page.report.donation',
+        'page.report.contribution',
+        'page.report.contribution-matrix',
+        'page.report.charity',
+        'page.report.beneficiary',
+        'page.settings.auto-purge',
+        'page.attendance.teacher',
+        'page.attendance.student',
+        'page.search.archives',
+        'page.system.health',
+        'page.addon-marketplace',
+        'page.user-manual',
+
+        // Timeline view permissions (category-specific)
+        'members.timeline.all',
+        'members.timeline.education',
+        'members.timeline.finance',
     ];
 
     /**
@@ -202,6 +238,16 @@ class PermissionSeeder extends Seeder
                 'contact_messages.*',
                 'custom_options.*',
                 'pages.*',
+                // Page access
+                'page.report.tour', 'page.custom-options',
+                'page.financial.statements', 'page.financial.statement',
+                'page.financial.audit-trail', 'page.financial.analytics',
+                'page.report.teacher-attendance', 'page.report.student-progress',
+                'page.report.class-performance', 'page.report.attendance-summary',
+                'page.report.donation', 'page.report.contribution', 'page.report.contribution-matrix',
+                'page.report.charity', 'page.report.beneficiary',
+                'page.attendance.teacher', 'page.attendance.student',
+                'page.search.archives', 'page.user-manual',
                 // Core
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'help.documentation',
@@ -211,10 +257,13 @@ class PermissionSeeder extends Seeder
             'label' => 'HR Head',
             'description' => 'Member & group management for all departments',
             'permissions' => [
-                'members.*', 'member_groups.*', 'group_assignments.*', 'parents.*',
+                'members.*', 'group_assignments.*',
+                'member_groups.view', 'member_groups.create', 'member_groups.update',
+                'parents.view', 'parents.create', 'parents.update', 'parents.delete',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'reports.*',
                 'help.documentation',
+                'page.attendance.teacher',
             ],
         ],
         'finance_head' => [
@@ -228,9 +277,14 @@ class PermissionSeeder extends Seeder
                 'tours.reports',
                 'fundraising.update_total',
                 'members.view', 'members.export',
+                'members.timeline.finance',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*',
                 'help.documentation',
+                'page.financial.statements', 'page.financial.statement',
+                'page.financial.audit-trail', 'page.financial.analytics',
+                'page.report.donation', 'page.report.contribution',
+                'page.report.contribution-matrix', 'page.search.archives',
             ],
         ],
         'nibret_hisab_head' => [
@@ -248,6 +302,10 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*',
                 'help.documentation',
+                'page.financial.statements', 'page.financial.statement',
+                'page.financial.audit-trail', 'page.financial.analytics',
+                'page.report.donation', 'page.report.contribution',
+                'page.report.contribution-matrix',
             ],
         ],
         'inventory_staff' => [
@@ -271,9 +329,13 @@ class PermissionSeeder extends Seeder
                 'library_resources.upload', 'library_categories.*', 'library_subcategories.*',
                 'reports.teacher_reports',
                 'members.view', 'members.export',
+                'members.timeline.education',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'reports.*',
                 'help.documentation',
+                'page.report.teacher-attendance', 'page.report.student-progress',
+                'page.report.class-performance', 'page.report.attendance-summary',
+                'page.attendance.teacher', 'page.attendance.student',
             ],
         ],
         'education_monitor' => [
@@ -288,6 +350,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'reports.*',
                 'help.documentation',
+                'page.attendance.student',
             ],
         ],
         'worship_monitor' => [
@@ -331,6 +394,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'reports.*',
                 'help.documentation',
+                'page.search.archives',
             ],
         ],
         'charity_head' => [
@@ -345,6 +409,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'reports.*',
                 'help.documentation',
+                'page.report.donation', 'page.report.charity', 'page.report.beneficiary',
             ],
         ],
         'tour_head' => [
@@ -356,13 +421,16 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'reports.*',
                 'help.documentation',
+                'page.report.tour',
             ],
         ],
         'internal_relations_head' => [
             'label' => 'Internal Relations Head',
             'description' => 'Member relations and document management',
             'permissions' => [
-                'members.*', 'member_groups.*', 'group_assignments.*', 'parents.*',
+                'members.*', 'group_assignments.*',
+                'member_groups.view', 'member_groups.create', 'member_groups.update',
+                'parents.view', 'parents.create', 'parents.update', 'parents.delete',
                 'media_items.delete',
                 'documents.*',
                 'contact_messages.view',
@@ -428,8 +496,8 @@ class PermissionSeeder extends Seeder
 
         // Generate resource-based permissions
         foreach ($this->resources as $resource => $customActions) {
-            // Base CRUD
-            $actions = ['view', 'create', 'update', 'delete'];
+            // Base CRUD + extended actions (matching BaseResource checks)
+            $actions = ['view', 'create', 'update', 'delete', 'restore', 'force_delete', 'delete_any', 'force_delete_any', 'reorder', 'replicate', 'restore_any'];
             // Add custom actions
             $actions = array_merge($actions, $customActions);
 

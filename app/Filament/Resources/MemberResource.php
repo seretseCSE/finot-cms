@@ -23,6 +23,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\EthiopianDateHelper;
+use App\Models\Scopes\DepartmentScope;
 
 class MemberResource extends BaseResource
 {
@@ -268,6 +269,14 @@ class MemberResource extends BaseResource
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
+        // When viewing linked children from a parent, bypass department scoping
+        // so hr_head and internal_relations_head can see all linked children
+        if (request()->query('parent_id')) {
+            return static::getModel()::query()
+                ->withoutGlobalScope(DepartmentScope::class)
+                ->with(['currentGroupAssignment.group']);
+        }
+
         return parent::getEloquentQuery()
             ->with(['currentGroupAssignment.group']);
     }

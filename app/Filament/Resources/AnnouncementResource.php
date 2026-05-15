@@ -8,7 +8,6 @@ use Filament\Schemas\Schema;
 use App\Models\Announcement;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class AnnouncementResource extends Resource
+class AnnouncementResource extends BaseResource
 {
     protected static ?string $model = Announcement::class;
 
@@ -38,26 +37,6 @@ class AnnouncementResource extends Resource
     public static function getNavigationSort(): ?int
     {
         return 7;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
     }
 
     public static function form(Schema $schema): Schema

@@ -12,13 +12,11 @@ use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class TourAttendanceResource extends Resource
+class TourAttendanceResource extends BaseResource
 {
     protected static ?string $model = TourAttendance::class;
 
@@ -42,24 +40,9 @@ class TourAttendanceResource extends Resource
         return 3;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['tour_head', 'tour_manager', 'revenue_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['tour_head', 'tour_manager', 'revenue_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['tour_head', 'tour_manager', 'revenue_head', 'admin', 'superadmin']);
-    }
-
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['tour_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('tour_attendances.delete');
     }
 
     public static function form(Schema $schema): Schema

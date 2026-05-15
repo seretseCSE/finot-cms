@@ -57,40 +57,12 @@ class ContributionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can view everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('view');
-            return $user->can($permission);
-        }
-
-        // Fallback to superadmin only for models without permission system
-        return false;
+        return Auth::user()?->can('contributions.view');
     }
 
     public static function canCreate(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can create everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('create');
-            return $user->can($permission);
-        }
-
-        // Fallback to superadmin only for models without permission system
-        return false;
+        return Auth::user()?->can('contributions.create');
     }
 
     public static function canEdit($record): bool

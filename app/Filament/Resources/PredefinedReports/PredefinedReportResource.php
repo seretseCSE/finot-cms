@@ -24,7 +24,7 @@ class PredefinedReportResource extends BaseResource
     {
         $user = auth()->user();
 
-        return $user && ($user->hasRole('superadmin') || $user->hasRole('admin'));
+        return $user && $user->can('predefined_reports.view');
     }
 
     public static function canViewAny(): bool

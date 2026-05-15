@@ -11,13 +11,11 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class NotificationResource extends Resource
+class NotificationResource extends BaseResource
 {
     protected static ?string $model = Notification::class;
 
@@ -39,26 +37,6 @@ class NotificationResource extends Resource
     public static function getNavigationSort(): ?int
     {
         return 4;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
     }
 
     public static function form(Schema $schema): Schema

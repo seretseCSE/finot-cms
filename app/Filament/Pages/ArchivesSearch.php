@@ -43,7 +43,7 @@ class ArchivesSearch extends Page implements HasForms
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin', 'finance_head', 'av_head']);
+        return Auth::user()?->can('page.search.archives');
     }
 
     public ?array $filters = [];

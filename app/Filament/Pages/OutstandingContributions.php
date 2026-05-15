@@ -49,7 +49,7 @@ class OutstandingContributions extends Page
     {
         $user = auth()->user();
 
-        return $user?->hasRole('superadmin') || $user?->hasRole('finance_head');
+        return $user?->can('reports.outstanding_view');
     }
 
     public function mount(): void

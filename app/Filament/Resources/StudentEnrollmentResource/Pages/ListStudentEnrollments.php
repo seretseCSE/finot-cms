@@ -32,7 +32,7 @@ class ListStudentEnrollments extends ListRecords
                 ->label('Bulk Enroll Students')
                 ->icon('heroicon-o-user-group')
                 ->color('primary')
-                ->visible(fn (): bool => (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']))
+                ->visible(fn (): bool => Auth::user()?->can('student_enrollments.delete'))
                 ->form([
                     Forms\Components\Select::make('group_id')
                         ->label('Member Group')

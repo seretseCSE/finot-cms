@@ -12,7 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class FAQResource extends Resource
+class FAQResource extends BaseResource
 {
     protected static ?string $model = FAQ::class;
 
@@ -36,25 +36,6 @@ class FAQResource extends Resource
         return 10;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
 
     public static function form(Schema $schema): Schema
     {

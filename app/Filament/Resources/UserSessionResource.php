@@ -33,22 +33,22 @@ class UserSessionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['tour_manager', 'revenue_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('user_sessions.view');
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(['tour_manager', 'revenue_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('user_sessions.create');
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(['tour_manager', 'revenue_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('user_sessions.update');
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['tour_manager', 'revenue_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('user_sessions.delete');
     }
 
     public static function form(Schema $schema): Schema

@@ -299,26 +299,26 @@ class FinancialTransactionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(Roles::FINANCE_MANAGERS);
+        return Auth::user()?->can('financial_transactions.view');
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(Roles::FINANCE_MANAGERS);
+        return Auth::user()?->can('financial_transactions.create');
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->hasRole(Roles::FINANCE_MANAGERS);
+        return Auth::user()?->can('financial_transactions.update');
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
+        return Auth::user()?->can('financial_transactions.delete');
     }
 
     public static function canDeleteAny(): bool
     {
-        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
+        return Auth::user()?->can('financial_transactions.delete');
     }
 }

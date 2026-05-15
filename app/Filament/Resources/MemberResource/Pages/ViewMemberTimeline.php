@@ -493,15 +493,15 @@ class ViewMemberTimeline extends Page implements HasForms
             return [];
         }
 
-        if ($user->hasRole(['admin', 'superadmin', 'hr_head'])) {
+        if ($user->can('members.timeline.all')) {
             return ['all'];
         }
 
-        if ($user->hasRole(['education_head'])) {
+        if ($user->can('members.timeline.education')) {
             return ['education', 'attendance'];
         }
 
-        if ($user->hasRole(['finance_head'])) {
+        if ($user->can('members.timeline.finance')) {
             return ['contributions'];
         }
 

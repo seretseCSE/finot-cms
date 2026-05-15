@@ -65,11 +65,4 @@ class FundraisingCampaignResource extends BaseResource
             ]);
     }
 
-    public static function canDeleteAny(): bool
-    {
-        $user = auth()->user();
-
-        // Only Admin and Superadmin can delete campaigns
-        return $user?->hasRole('admin') || $user?->hasRole('superadmin');
-    }
 }

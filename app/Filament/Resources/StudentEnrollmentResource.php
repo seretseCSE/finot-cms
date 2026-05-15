@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles;
 use Illuminate\Support\Facades\DB;
 
-class StudentEnrollmentResource extends Resource
+class StudentEnrollmentResource extends BaseResource
 {
     protected static ?string $model = StudentEnrollment::class;
 
@@ -49,20 +49,19 @@ class StudentEnrollmentResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
+        return (bool) Auth::user()?->can('student_enrollments.view');
     }
 
     public static function canCreate(): bool
     {
-        $hasRole = (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
         $hasActiveYear = AcademicYear::query()->where('status', 'Active')->exists();
 
-        return $hasRole && $hasActiveYear;
+        return Auth::user()?->can('student_enrollments.create') && $hasActiveYear;
     }
 
     public static function canEdit($record): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
+        return (bool) Auth::user()?->can('student_enrollments.update');
     }
 
     public static function form(Schema $schema): Schema
@@ -437,7 +436,7 @@ class StudentEnrollmentResource extends Resource
                         ->label('Promote Selected')
                         ->icon('heroicon-o-arrow-up')
                         ->color('warning')
-                        ->visible(fn () => Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS))
+                        ->visible(fn () => Auth::user()?->can('student_enrollments.update'))
                         ->form([
                             Forms\Components\Select::make('target_class_id')
                                 ->label('Target Class')

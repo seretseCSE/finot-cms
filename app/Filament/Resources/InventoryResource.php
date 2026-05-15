@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class InventoryResource extends Resource
+class InventoryResource extends BaseResource
 {
     protected static ?string $model = InventoryItem::class;
 
@@ -37,24 +37,10 @@ class InventoryResource extends Resource
         return 1;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['inventory_staff', 'nibret_hisab_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['inventory_staff', 'nibret_hisab_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['inventory_staff', 'nibret_hisab_head', 'admin', 'superadmin']);
-    }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['inventory_staff', 'nibret_hisab_head', 'admin', 'superadmin']) && $record->canBeDeleted();
+        return Auth::user()?->can('inventory_items.delete') && $record->canBeDeleted();
     }
 
     public static function form(Schema $schema): Schema

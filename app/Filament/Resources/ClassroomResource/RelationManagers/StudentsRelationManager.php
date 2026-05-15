@@ -65,18 +65,22 @@ class StudentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin', 'education_head'])),
+                    ->visible(fn () => Auth::user()?->can('students.create')),
             ])
             ->actions([
                 Actions\EditAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin', 'education_head'])),
+->visible(fn () => Auth::user()?->can('students.update')),
+                Actions\EditAction::make()
+                    ->visible(fn () => Auth::user()?->can('students.update')),
                 Actions\DeleteAction::make()
-                    ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+                    ->visible(fn () => Auth::user()?->can('students.delete')),
+                Actions\RestoreAction::make()
+                    ->visible(fn () => Auth::user()?->can('students.delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()?->hasRole(['admin', 'superadmin'])),
+                        ->visible(fn () => Auth::user()?->can('students.delete')),
                 ]),
             ]);
     }

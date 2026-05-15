@@ -27,7 +27,7 @@ class DuplicateRecordResource extends BaseResource
     {
         $user = auth()->user();
 
-        return $user && ($user->hasRole('superadmin') || $user->hasRole('admin'));
+        return $user && $user->can('duplicate_records.view');
     }
 
     public static function canViewAny(): bool

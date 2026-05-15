@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class ContactMessageResource extends Resource
+class ContactMessageResource extends BaseResource
 {
     protected static ?string $model = ContactMessage::class;
 
@@ -39,7 +39,7 @@ class ContactMessageResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin', 'internal_relations_head']);
+        return Auth::user()?->can('contact_messages.view');
     }
 
     public static function canCreate(): bool
@@ -54,7 +54,7 @@ class ContactMessageResource extends Resource
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
+        return Auth::user()?->can('contact_messages.delete');
     }
 
     public static function form(Schema $schema): Schema

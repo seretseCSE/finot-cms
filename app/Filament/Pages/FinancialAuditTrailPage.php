@@ -41,7 +41,7 @@ class FinancialAuditTrailPage extends Page implements HasForms, HasTable
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('page.financial.audit-trail');
     }
 
     public function table(Table $table): Table

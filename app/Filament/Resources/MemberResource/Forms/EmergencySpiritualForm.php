@@ -73,7 +73,7 @@ class EmergencySpiritualForm
                             'Former' => 'Former',
                         ])
                         ->required()
-                        ->disabled(fn () => ! Auth::user()->hasRole(['hr_head', 'admin', 'superadmin'])),
+                        ->disabled(fn () => ! Auth::user()->can('members.update')),
                 ]),
 
             Section::make('Assignment History')

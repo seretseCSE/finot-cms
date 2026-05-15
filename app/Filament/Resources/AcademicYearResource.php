@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles;
 use Illuminate\Support\Facades\DB;
 
-class AcademicYearResource extends Resource
+class AcademicYearResource extends BaseResource
 {
     protected static ?string $model = AcademicYear::class;
 
@@ -46,28 +46,24 @@ class AcademicYearResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
+        return (bool) Auth::user()?->can('academic_years.view');
     }
 
     public static function canCreate(): bool
     {
-        $user = Auth::user();
-
-        return (bool) $user?->hasRole(Roles::DEPARTMENT_MANAGERS);
+        return (bool) Auth::user()?->can('academic_years.create');
     }
 
     public static function canEdit($record): bool
     {
-        $user = Auth::user();
-
-        return (bool) $user?->hasRole(Roles::DEPARTMENT_MANAGERS);
+        return (bool) Auth::user()?->can('academic_years.update');
     }
 
     public static function canDelete($record): bool
     {
         $user = Auth::user();
 
-        if (! $user?->hasRole(Roles::ADMINISTRATORS)) {
+        if (! $user?->can('academic_years.delete')) {
             return false;
         }
 
@@ -230,7 +226,7 @@ class AcademicYearResource extends Resource
                     ->label('Reactivate')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
-                    ->visible(fn (AcademicYear $record): bool => $record->status === 'Deactivated' && Auth::user()?->hasRole(Roles::ADMINISTRATORS))
+                    ->visible(fn (AcademicYear $record): bool => $record->status === 'Deactivated' && Auth::user()?->can('academic_years.update'))
                     ->requiresConfirmation()
                     ->action(fn (AcademicYear $record) => $record->update(['status' => 'Draft', 'phase' => null])),
             ])

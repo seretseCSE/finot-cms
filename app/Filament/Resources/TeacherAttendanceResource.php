@@ -10,7 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class TeacherAttendanceResource extends Resource
+class TeacherAttendanceResource extends BaseResource
 {
     protected static ?string $model = TeacherAttendance::class;
 
@@ -36,12 +36,12 @@ class TeacherAttendanceResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
+        return Auth::user()?->can('teacher_attendances.view');
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('teacher_attendances.delete');
     }
 
     public static function table(Table $table): Table

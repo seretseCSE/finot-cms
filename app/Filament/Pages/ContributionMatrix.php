@@ -46,9 +46,7 @@ class ContributionMatrix extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        $user = Auth::user();
-
-        return $user !== null && $user->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin']);
+        return auth()->user()?->can('page.report.contribution-matrix');
     }
 
     // Filter properties

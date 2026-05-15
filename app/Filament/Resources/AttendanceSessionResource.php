@@ -18,7 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\Roles;
 
-class AttendanceSessionResource extends Resource
+class AttendanceSessionResource extends BaseResource
 {
     protected static ?string $model = AttendanceSession::class;
 
@@ -44,22 +44,22 @@ class AttendanceSessionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::EDUCATION_MANAGERS);
+        return (bool) Auth::user()?->can('attendance_sessions.view');
     }
 
     public static function canCreate(): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS);
+        return (bool) Auth::user()?->can('attendance_sessions.create');
     }
 
     public static function canEdit($record): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::ADMINISTRATORS);
+        return (bool) Auth::user()?->can('attendance_sessions.update');
     }
 
     public static function canDelete($record): bool
     {
-        return (bool) Auth::user()?->hasRole(Roles::ADMINISTRATORS);
+        return (bool) Auth::user()?->can('attendance_sessions.delete');
     }
 
     public static function canMarkAttendance($record): bool
@@ -172,7 +172,7 @@ class AttendanceSessionResource extends Resource
 
                         Notification::make()->title('Sessions locked')->success()->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->can('attendance_sessions.update') ?? false),
 
                 Actions\BulkAction::make('unlock')
                     ->label('Unlock Selected')
@@ -214,10 +214,10 @@ class AttendanceSessionResource extends Resource
 
                         Notification::make()->title('Sessions unlocked')->success()->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::DEPARTMENT_MANAGERS) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->can('attendance_sessions.update') ?? false),
 
                 Actions\DeleteBulkAction::make()
-                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->can('attendance_sessions.delete') ?? false),
             ]);
     }
 

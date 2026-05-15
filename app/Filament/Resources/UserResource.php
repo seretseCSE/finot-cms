@@ -59,19 +59,19 @@ class UserResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
+        return Auth::user()?->can('users.view');
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->hasRole(Roles::ADMINISTRATORS);
+        return Auth::user()?->can('users.create');
     }
 
     public static function canEdit($record): bool
     {
         $user = Auth::user();
 
-        if (! $user?->hasRole(Roles::ADMINISTRATORS)) {
+        if (! $user?->can('users.update')) {
             return false;
         }
 
@@ -81,7 +81,7 @@ class UserResource extends Resource
         }
 
         // Admin cannot edit superadmin
-        if ($record?->hasRole('superadmin') && ! $user->hasRole('superadmin')) {
+        if ($record?->hasRole('superadmin') && ! $user->can('users.delete')) {
             return false;
         }
 
@@ -93,7 +93,7 @@ class UserResource extends Resource
         $user = Auth::user();
 
         // Only superadmin can delete users
-        if (! $user?->hasRole('superadmin')) {
+        if (! $user?->can('users.delete')) {
             return false;
         }
 
@@ -128,7 +128,7 @@ class UserResource extends Resource
                             ->label('Roles')
                             ->multiple()
                             ->relationship('roles', 'label', modifyQueryUsing: function ($query) {
-                                if (! Auth::user()?->hasRole('superadmin')) {
+                                if (! Auth::user()?->can('users.delete')) {
                                     $query->where('name', '!=', 'superadmin');
                                 }
                             })
@@ -279,7 +279,7 @@ class UserResource extends Resource
                 Tables\Filters\SelectFilter::make('role')
                     ->label('Role')
                     ->relationship('roles', 'label', modifyQueryUsing: function ($query) {
-                        if (! Auth::user()?->hasRole('superadmin')) {
+                        if (! Auth::user()?->can('users.delete')) {
                             $query->where('name', '!=', 'superadmin');
                         }
                     })
@@ -320,7 +320,7 @@ class UserResource extends Resource
                     ->visible(function (User $record): bool {
                         $currentUser = Auth::user();
 
-                        return $currentUser?->hasRole(Roles::ADMINISTRATORS)
+                        return $currentUser?->can('users.update')
                             && $record->id !== $currentUser->id
                             && ! $record->isCurrentlyLocked();
                     })
@@ -358,7 +358,7 @@ class UserResource extends Resource
                     ->visible(function (User $record): bool {
                         $currentUser = Auth::user();
 
-                        return $currentUser?->hasRole(Roles::ADMINISTRATORS)
+                        return $currentUser?->can('users.update')
                             && $record->isCurrentlyLocked();
                     })
                     ->requiresConfirmation()
@@ -380,7 +380,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-key')
                     ->color('warning')
                     ->visible(function (User $record): bool {
-                        return Auth::user()?->hasRole(Roles::ADMINISTRATORS)
+                        return Auth::user()?->can('users.update')
                             && $record->id !== Auth::id();
                     })
                     ->requiresConfirmation()
@@ -412,7 +412,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->color('danger')
                     ->visible(function (User $record): bool {
-                        return Auth::user()?->hasRole(Roles::ADMINISTRATORS)
+                        return Auth::user()?->can('users.update')
                             && $record->id !== Auth::id();
                     })
                     ->requiresConfirmation()
@@ -456,7 +456,7 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->can('users.update') ?? false),
 
                 Actions\BulkAction::make('unlock')
                     ->label('Unlock Selected')
@@ -476,10 +476,10 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->can('users.update') ?? false),
 
                 Actions\DeleteBulkAction::make()
-                    ->visible(fn (): bool => Auth::user()?->hasRole(Roles::ADMINISTRATORS) ?? false),
+                    ->visible(fn (): bool => Auth::user()?->can('users.delete') ?? false),
             ])
             ->defaultSort('created_at', 'desc')
             ->emptyStateHeading('No users found')

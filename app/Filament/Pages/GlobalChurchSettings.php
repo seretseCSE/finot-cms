@@ -47,7 +47,7 @@ class GlobalChurchSettings extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return Auth::user()->hasRole('superadmin');
+        return Auth::user()->can('page.settings.global-church');
     }
 
     public function mount(): void

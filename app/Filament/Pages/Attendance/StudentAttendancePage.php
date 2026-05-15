@@ -51,7 +51,7 @@ class StudentAttendancePage extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->hasRole(['education_monitor', 'education_head', 'admin', 'superadmin']);
+        return Auth::user()?->can('page.attendance.student');
     }
 
     public function mount(): void
@@ -168,7 +168,7 @@ class StudentAttendancePage extends Page
             return;
         }
 
-        if (! Auth::user()?->hasRole(['education_monitor', 'education_head', 'admin', 'superadmin'])) {
+        if (! Auth::user()?->can('attendance_records.mark')) {
             Notification::make()->title('Access denied')->danger()->send();
 
             return;

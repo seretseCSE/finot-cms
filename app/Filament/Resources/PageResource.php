@@ -7,13 +7,11 @@ use Filament\Schemas\Schema;
 use App\Models\Page;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class PageResource extends Resource
+class PageResource extends BaseResource
 {
     protected static ?string $model = Page::class;
 
@@ -35,26 +33,6 @@ class PageResource extends Resource
     public static function getNavigationSort(): ?int
     {
         return 9;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(['av_head', 'admin', 'superadmin']);
     }
 
     public static function form(Schema $schema): Schema

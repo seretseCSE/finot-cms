@@ -57,9 +57,7 @@ class ContributionReport extends Page
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
-
-        return $user?->hasRole('superadmin') || $user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head');
+        return auth()->user()?->can('page.report.contribution');
     }
 
     public function mount(): void

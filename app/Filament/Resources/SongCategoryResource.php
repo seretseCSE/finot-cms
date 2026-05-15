@@ -8,12 +8,10 @@ use App\Filament\Resources\SongCategoryResource\RelationManagers;
 use App\Models\SongCategory;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class SongCategoryResource extends Resource
+class SongCategoryResource extends BaseResource
 {
     protected static ?string $model = SongCategory::class;
 
@@ -37,28 +35,13 @@ class SongCategoryResource extends Resource
         return 4;
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
-    }
-
     public static function canDelete($record): bool
     {
         if ($record === null) {
-            return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']);
+            return Auth::user()?->can('song_categories.delete');
         }
 
-        return Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin']) && $record->canBeDeleted();
+        return Auth::user()?->can('song_categories.delete') && $record->canBeDeleted();
     }
 
     public static function form(Schema $schema): Schema

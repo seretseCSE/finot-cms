@@ -70,7 +70,7 @@ class UserManual extends Page
     {
         $tabs = [];
 
-        if (Auth::user()?->hasRole(['superadmin'])) {
+        if (Auth::user()?->can('system.settings')) {
             $tabs['superadmin'] = [
                 'label' => 'Super Admin',
                 'icon' => 'heroicon-o-shield-check',
@@ -78,7 +78,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['admin', 'superadmin'])) {
+        if (Auth::user()?->can('dashboard.view')) {
             $tabs['admin'] = [
                 'label' => 'Admin',
                 'icon' => 'heroicon-o-user-group',
@@ -86,7 +86,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['hr_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('members.view')) {
             $tabs['hr_head'] = [
                 'label' => 'HR Head',
                 'icon' => 'heroicon-o-users',
@@ -94,14 +94,14 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['finance_head', 'nibret_hisab_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('contributions.view')) {
             $tabs['finance_head'] = [
                 'label' => 'Finance',
                 'icon' => 'heroicon-o-banknotes',
                 'color' => 'warning',
             ];
 
-            if (Auth::user()?->hasRole(['nibret_hisab_head', 'admin', 'superadmin'])) {
+            if (Auth::user()?->can('inventory_items.view')) {
                 $tabs['nibret_hisab_head'] = [
                     'label' => 'Nibret Hisab',
                     'icon' => 'heroicon-o-calculator',
@@ -110,7 +110,7 @@ class UserManual extends Page
             }
         }
 
-        if (Auth::user()?->hasRole(['inventory_staff', 'nibret_hisab_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('inventory_items.view')) {
             $tabs['inventory_staff'] = [
                 'label' => 'Inventory',
                 'icon' => 'heroicon-o-archive-box',
@@ -118,7 +118,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('academic_years.view')) {
             $tabs['education_head'] = [
                 'label' => 'Education',
                 'icon' => 'heroicon-o-academic-cap',
@@ -126,7 +126,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['worship_monitor', 'mezmur_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('songs.view')) {
             $tabs['worship_monitor'] = [
                 'label' => 'Worship',
                 'icon' => 'heroicon-o-musical-note',
@@ -134,7 +134,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['av_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('media_items.view')) {
             $tabs['av_head'] = [
                 'label' => 'AV / Media',
                 'icon' => 'heroicon-o-camera',
@@ -142,7 +142,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['charity_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('beneficiaries.view')) {
             $tabs['charity_head'] = [
                 'label' => 'Charity',
                 'icon' => 'heroicon-o-heart',
@@ -150,7 +150,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['tour_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('tours.view')) {
             $tabs['tour_head'] = [
                 'label' => 'Tours',
                 'icon' => 'heroicon-o-globe-alt',
@@ -158,7 +158,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['internal_relations_head', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('contact_messages.view')) {
             $tabs['internal_relations_head'] = [
                 'label' => 'Internal Relations',
                 'icon' => 'heroicon-o-hand-raised',
@@ -166,7 +166,7 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->hasRole(['department_secretary', 'staff', 'admin', 'superadmin'])) {
+        if (Auth::user()?->can('members.view')) {
             $tabs['department_secretary'] = [
                 'label' => 'Secretary / Staff',
                 'icon' => 'heroicon-o-clipboard-document',

@@ -7,14 +7,11 @@ use Filament\Schemas\Schema;
 use App\Models\Song;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use App\Enums\Roles;
 
-class SongResource extends Resource
+class SongResource extends BaseResource
 {
     protected static ?string $model = Song::class;
 
@@ -36,26 +33,6 @@ class SongResource extends Resource
     public static function getNavigationSort(): ?int
     {
         return 3;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
-    }
-
-    public static function canDelete($record): bool
-    {
-        return Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS);
     }
 
     public static function form(Schema $schema): Schema
@@ -194,7 +171,7 @@ class SongResource extends Resource
 
                 Tables\Columns\ToggleColumn::make('is_active')
                     ->label('Active')
-                    ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS)),
+                    ->visible(fn () => Auth::user()?->can('songs.update')),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
@@ -254,7 +231,7 @@ class SongResource extends Resource
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS))
+                        ->visible(fn () => Auth::user()?->can('songs.update'))
                         ->action(function ($records) {
                             foreach ($records as $record) {
                                 $record->update(['is_active' => true]);
@@ -265,7 +242,7 @@ class SongResource extends Resource
                         ->label('Deactivate Selected')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS))
+                        ->visible(fn () => Auth::user()?->can('songs.update'))
                         ->action(function ($records) {
                             foreach ($records as $record) {
                                 $record->update(['is_active' => false]);
@@ -273,7 +250,7 @@ class SongResource extends Resource
                         }),
 
                     Actions\DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()?->hasRole(Roles::WORSHIP_MANAGERS)),
+                        ->visible(fn () => Auth::user()?->can('songs.delete')),
                 ]),
             ])
             ->headerActions([

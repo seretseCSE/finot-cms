@@ -66,65 +66,27 @@ class FundraisingResource extends Resource
 
     public static function canViewAny(): bool
     {
-        $user = auth()->user();
-
-        // Superadmin can see everything
-        if ($user?->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Admin can see everything
-        if ($user?->hasRole('admin')) {
-            return true;
-        }
-
-        // Finance Head and Nibret Hisab Head can view and update
-        if ($user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head')) {
-            return true;
-        }
-
-        return false;
+        return (bool) auth()->user()?->can('fundraising.view');
     }
 
     public static function canCreate(): bool
     {
-        $user = auth()->user();
-
-        // Only Admin and Superadmin can create campaigns
-        return $user?->hasRole('admin') || $user?->hasRole('superadmin');
+        return (bool) auth()->user()?->can('fundraising.create');
     }
 
     public static function canEdit($record): bool
     {
-        $user = auth()->user();
-
-        // Admin and Superadmin can edit everything
-        if ($user?->hasRole('admin') || $user?->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Finance Head and Nibret Hisab Head can only edit total_raised field
-        if ($user?->hasRole('finance_head') || $user?->hasRole('nibret_hisab_head')) {
-            return true;
-        }
-
-        return false;
+        return (bool) auth()->user()?->can('fundraising.update');
     }
 
     public static function canDelete($record): bool
     {
-        $user = auth()->user();
-
-        // Only Admin and Superadmin can delete
-        return $user?->hasRole('admin') || $user?->hasRole('superadmin');
+        return (bool) auth()->user()?->can('fundraising.delete');
     }
 
     public static function canDeleteAny(): bool
     {
-        $user = auth()->user();
-
-        // Only Admin and Superadmin can delete
-        return $user?->hasRole('admin') || $user?->hasRole('superadmin');
+        return (bool) auth()->user()?->can('fundraising.delete');
     }
 
     public static function getEloquentQuery(): Builder

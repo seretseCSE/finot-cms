@@ -11,7 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class SyncConflictsResource extends Resource
+class SyncConflictsResource extends BaseResource
 {
     protected static ?string $model = AttendanceSyncConflict::class;
 
@@ -35,10 +35,6 @@ class SyncConflictsResource extends Resource
         return 6;
     }
 
-    public static function canViewAny(): bool
-    {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
-    }
 
     public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
@@ -103,7 +99,7 @@ class SyncConflictsResource extends Resource
                     ->label('Resolve')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn ($record) => is_null($record->winner_value) && Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']))
+                    ->visible(fn ($record) => is_null($record->winner_value) && Auth::user()?->can('attendance_sync_conflicts.delete'))
                     ->form([
                         Forms\Components\Radio::make('chosen_value')
                             ->label('Choose winning value')

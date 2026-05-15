@@ -70,7 +70,7 @@ class AidDistributionsRelationManager extends RelationManager
                     ->label('Unlock')
                     ->icon('heroicon-o-lock-open')
                     ->color('success')
-                    ->visible(fn ($record) => $record->is_locked && Auth::user()?->hasRole('charity_head'))
+                    ->visible(fn ($record) => $record->is_locked && Auth::user()?->can('aid_distributions.delete'))
                     ->action(fn ($record) => $record->unlock()),
             ])
             ->headerActions([

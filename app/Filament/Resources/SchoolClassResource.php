@@ -8,12 +8,10 @@ use App\Filament\Resources\SchoolClassResource\RelationManagers\TeachersRelation
 use App\Models\ClassModel;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
-class SchoolClassResource extends Resource
+class SchoolClassResource extends BaseResource
 {
     protected static ?string $model = ClassModel::class;
 
@@ -37,24 +35,9 @@ class SchoolClassResource extends Resource
         return 'Classes';
     }
 
-    public static function canViewAny(): bool
-    {
-        return (bool) Auth::user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']);
-    }
-
-    public static function canCreate(): bool
-    {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
-    public static function canEdit($record): bool
-    {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']);
-    }
-
     public static function canDelete($record): bool
     {
-        return (bool) Auth::user()?->hasRole(['education_head', 'admin', 'superadmin']) && $record->canBeDeleted();
+        return (bool) Auth::user()?->can('class_models.delete') && $record->canBeDeleted();
     }
 
     public static function form(Schema $schema): Schema

@@ -10,7 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
-class AuditLogResource extends Resource
+class AuditLogResource extends BaseResource
 {
     protected static ?string $model = AuditLog::class;
 
@@ -111,8 +111,5 @@ class AuditLogResource extends Resource
         ];
     }
 
-    public static function canViewAny(): bool
-    {
-        return Auth::user()?->hasRole(['admin', 'superadmin']);
-    }
+
 }

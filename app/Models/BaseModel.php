@@ -36,7 +36,7 @@ abstract class BaseModel extends Model
     public static function getResourceName(): string
     {
         // Default to table name, can be overridden in child classes
-        return static::getTable();
+        return (new static)->getTable();
     }
 
     /**
@@ -44,7 +44,7 @@ abstract class BaseModel extends Model
      */
     public static function getNavigationLabel(): string
     {
-        return ucfirst(str_replace('_', ' ', static::getTable()));
+        return ucfirst(str_replace('_', ' ', (new static)->getTable()));
     }
 
     /**

@@ -26,7 +26,7 @@ class TemporaryFilterResource extends BaseResource
     {
         $user = auth()->user();
 
-        return $user && ($user->hasRole('superadmin') || $user->hasRole('admin'));
+        return $user && $user->can('temporary_filters.view');
     }
 
     public static function canViewAny(): bool
@@ -151,7 +151,7 @@ class TemporaryFilterResource extends BaseResource
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                if (! Auth::user()?->hasRole(['admin', 'superadmin'])) {
+                if (! Auth::user()?->can('temporary_filters.view')) {
                     $query->where('user_id', Auth::id());
                 }
             })
