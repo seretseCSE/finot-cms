@@ -47,8 +47,8 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Membership Management',
                 'Education Management',
-                'Financial Reports',
                 'Contributions',
+                'Financial Reports',
                 'Revenue & Banking',
                 'Charity Management',
                 'Inventory Management',

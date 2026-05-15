@@ -34,8 +34,8 @@ enum MaritalStatus: string
     public static function getAll(): array
     {
         return [
-            self::SINGLE->value,
-            self::MARRIED->value,
+            self::SINGLE->value => self::SINGLE->getLabel(),
+            self::MARRIED->value => self::MARRIED->getLabel(),
         ];
     }
 }

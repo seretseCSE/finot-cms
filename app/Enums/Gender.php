@@ -34,8 +34,8 @@ enum Gender: string
     public static function getAll(): array
     {
         return [
-            self::MALE->value,
-            self::FEMALE->value,
+            self::MALE->value => self::MALE->getLabel(),
+            self::FEMALE->value => self::FEMALE->getLabel(),
         ];
     }
 }

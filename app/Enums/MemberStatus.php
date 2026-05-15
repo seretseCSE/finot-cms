@@ -52,10 +52,10 @@ enum MemberStatus: string
     public static function getAll(): array
     {
         return [
-            self::DRAFT->value,
-            self::MEMBER->value,
-            self::ACTIVE->value,
-            self::FORMER->value,
+            self::DRAFT->value => self::DRAFT->getLabel(),
+            self::MEMBER->value => self::MEMBER->getLabel(),
+            self::ACTIVE->value => self::ACTIVE->getLabel(),
+            self::FORMER->value => self::FORMER->getLabel(),
         ];
     }
 }

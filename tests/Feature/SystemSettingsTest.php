@@ -65,28 +65,6 @@ class SystemSettingsTest extends TestCase
     }
 
     #[Test]
-    public function send_notification_page_accessible(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/send-notification');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
-    public function notifications_resource_accessible(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/notifications');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
     public function departments_resource_accessible(): void
     {
         $user = $this->createAdminUser();

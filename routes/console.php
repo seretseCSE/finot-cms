@@ -56,12 +56,6 @@ Schedule::command('media:auto-archive')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/scheduler.log'));
 
-// Notifications: Purge read notifications older than 30 days
-Schedule::command('notifications:purge-read')
-    ->dailyAt('06:30')
-    ->withoutOverlapping()
-    ->appendOutputTo(storage_path('logs/scheduler.log'));
-
 // System Health Check
 Schedule::command('system:check-health')
     ->dailyAt('07:00')

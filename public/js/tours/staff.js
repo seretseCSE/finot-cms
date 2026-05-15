@@ -2,7 +2,6 @@
     const steps = [
         { target: '[data-tour-target="dashboard"]', title: 'Staff Dashboard', content: 'Your daily tasks and shortcuts.', side: 'bottom' },
         { target: '[data-tour-target="profile"]', title: 'Profile', content: 'Update your personal information and preferences.', side: 'right' },
-        { target: '[data-tour-target="notifications"]', title: 'Notifications', content: 'Review system notifications and messages.', side: 'left' },
         { target: '[data-tour-target="help"]', title: 'Help', content: 'Use help resources and restart tours from the user menu.', side: 'bottom' },
     ];
 

@@ -97,9 +97,9 @@ class FinancialTransaction extends Model
         });
     }
 
-    private static function getSignedEffect(string $type, float $amount): float
+    private static function getSignedEffect($type, float $amount): float
     {
-        return $type === 'income' ? $amount : -$amount;
+        return $type->value === 'income' ? $amount : -$amount;
     }
 
     private static function applyEffectToAccount(?int $accountId, float $effect): void

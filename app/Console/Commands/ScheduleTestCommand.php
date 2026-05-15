@@ -21,7 +21,6 @@ class ScheduleTestCommand extends Command
             'content:publish-scheduled',
             'aid:auto-lock',
             'system:check-health',
-            'notifications:purge-read',
             'logs:purge-security-audit',
             'logs:purge-session-logs',
             'logs:purge-error-logs',

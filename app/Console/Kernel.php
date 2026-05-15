@@ -44,9 +44,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('aid:auto-lock')->daily()
             ->description('Auto-lock aid records after cutoff');
 
-        $schedule->command('notifications:purge-read')->daily()
-            ->description('Purge read notifications older than 90 days');
-
         $schedule->command('logs:purge-security-audit')->daily()
             ->description('Purge security audit logs older than 30 days');
 

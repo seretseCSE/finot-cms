@@ -6,6 +6,7 @@ use App\Actions\Members\SyncParentGuardiansAction;
 use App\Filament\Forms\Components\CustomOptionSelect;
 use App\Filament\Resources\MemberResource;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Log;
 
@@ -64,22 +65,26 @@ class EditMember extends EditRecord
     protected function getFormActions(): array
     {
         return [
-            \Filament\Actions\Action::make('previous_tab')
+            $this->getSaveFormAction()
+                ->label('Save Changes')
+                ->icon('heroicon-o-check'),
+
+            $this->getCancelFormAction(),
+
+            Action::make('previous_tab')
                 ->label('Previous')
                 ->icon('heroicon-o-chevron-left')
                 ->color('gray')
-                ->extraAttributes(['class' => 'member-tab-previous'])
+                ->extraAttributes(['class' => 'member-tab-previous ms-auto'])
                 ->action(function () {
-                    // JavaScript will handle this
                 }),
 
-            \Filament\Actions\Action::make('next_tab')
+            Action::make('next_tab')
                 ->label('Next')
                 ->icon('heroicon-o-chevron-right')
                 ->color('primary')
                 ->extraAttributes(['class' => 'member-tab-next'])
                 ->action(function () {
-                    // JavaScript will handle this
                 }),
         ];
     }

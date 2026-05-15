@@ -38,9 +38,9 @@ enum BeneficiaryType: string
     public static function getAll(): array
     {
         return [
-            self::INDIVIDUAL->value,
-            self::FAMILY->value,
-            self::ORGANIZATION->value,
+            self::INDIVIDUAL->value => self::INDIVIDUAL->getLabel(),
+            self::FAMILY->value => self::FAMILY->getLabel(),
+            self::ORGANIZATION->value => self::ORGANIZATION->getLabel(),
         ];
     }
 }

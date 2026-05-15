@@ -50,7 +50,8 @@ class ListBeneficiaries extends ListRecords
                         ->success()
                         ->send();
                 }),
-            CreateAction::make(),
+            CreateAction::make()
+                ->visible(fn () => BeneficiaryResource::canCreate()),
         ];
     }
 }

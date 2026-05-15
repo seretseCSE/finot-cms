@@ -73,7 +73,6 @@ class AutoPurgeSettings extends Page
         $errorLogsDays = SiteSetting::get('error_logs_retention_days', 60);
         $securityAuditDays = SiteSetting::get('security_audit_retention_days', 30);
         $sessionLogsDays = SiteSetting::get('session_logs_retention_days', 90);
-        $notificationsDays = SiteSetting::get('read_notifications_retention_days', 90);
         $mediaYears = SiteSetting::get('media_files_retention_years', 5);
 
         // Calculate what would be purged
@@ -81,7 +80,6 @@ class AutoPurgeSettings extends Page
             'error_logs_older_than' => now()->subDays($errorLogsDays)->format('Y-m-d'),
             'security_audit_older_than' => now()->subDays($securityAuditDays)->format('Y-m-d'),
             'session_logs_older_than' => now()->subDays($sessionLogsDays)->format('Y-m-d'),
-            'notifications_older_than' => now()->subDays($notificationsDays)->format('Y-m-d'),
             'media_older_than' => now()->subYears($mediaYears)->format('Y-m-d'),
         ];
 
@@ -91,7 +89,6 @@ class AutoPurgeSettings extends Page
                 "• Error logs older than: {$results['error_logs_older_than']}\n" .
                 "• Security audit logs older than: {$results['security_audit_older_than']}\n" .
                 "• Session logs older than: {$results['session_logs_older_than']}\n" .
-                "• Read notifications older than: {$results['notifications_older_than']}\n" .
                 "• Media files older than: {$results['media_older_than']}")
             ->info()
             ->send();
@@ -103,15 +100,12 @@ class AutoPurgeSettings extends Page
         $errorLogsDays = SiteSetting::get('error_logs_retention_days', 60);
         $securityAuditDays = SiteSetting::get('security_audit_retention_days', 30);
         $sessionLogsDays = SiteSetting::get('session_logs_retention_days', 90);
-        $notificationsDays = SiteSetting::get('read_notifications_retention_days', 90);
-
         try {
             // Run the actual purge commands
             $commands = [
                 'logs:purge-error' => "--days={$errorLogsDays}",
                 'logs:purge-security-audit' => "--days={$securityAuditDays}",
                 'logs:purge-session' => "--days={$sessionLogsDays}",
-                'notifications:purge-read' => "--days={$notificationsDays}",
             ];
 
             $results = [];

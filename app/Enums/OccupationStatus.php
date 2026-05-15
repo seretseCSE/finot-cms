@@ -34,8 +34,8 @@ enum OccupationStatus: string
     public static function getAll(): array
     {
         return [
-            self::STUDENT->value,
-            self::EMPLOYEE->value,
+            self::STUDENT->value => self::STUDENT->getLabel(),
+            self::EMPLOYEE->value => self::EMPLOYEE->getLabel(),
         ];
     }
 }

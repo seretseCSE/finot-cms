@@ -30,10 +30,6 @@
                         <span class="text-gray-600">Session Logs Retention</span>
                         <span class="font-medium">{{ \App\Models\SiteSetting::get('session_logs_retention_days', 90) }} days</span>
                     </div>
-                    <div class="flex justify-between items-center py-2 border-b">
-                        <span class="text-gray-600">Read Notifications Retention</span>
-                        <span class="font-medium">{{ \App\Models\SiteSetting::get('read_notifications_retention_days', 90) }} days</span>
-                    </div>
                     <div class="flex justify-between items-center py-2">
                         <span class="text-gray-600">Media Files Retention</span>
                         <span class="font-medium">{{ \App\Models\SiteSetting::get('media_files_retention_years', 5) }} years</span>

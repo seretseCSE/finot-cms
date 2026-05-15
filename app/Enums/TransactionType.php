@@ -34,8 +34,8 @@ enum TransactionType: string
     public static function getAll(): array
     {
         return [
-            self::INCOME->value,
-            self::EXPENSE->value,
+            self::INCOME->value => self::INCOME->getLabel(),
+            self::EXPENSE->value => self::EXPENSE->getLabel(),
         ];
     }
 }

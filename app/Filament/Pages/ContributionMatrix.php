@@ -26,7 +26,7 @@ class ContributionMatrix extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Contribution Form';
+        return 'Contributions';
     }
 
     public static function getNavigationSort(): ?int
@@ -36,7 +36,7 @@ class ContributionMatrix extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Contribution';
+        return 'Contribution Form';
     }
 
     public static function getSlug(?Panel $panel = null): string

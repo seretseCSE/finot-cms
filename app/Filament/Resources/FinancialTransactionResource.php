@@ -195,7 +195,7 @@ class FinancialTransactionResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn ($state): string => match ($state->value) {
                         'income' => 'success',
                         'expense' => 'danger',
                     }),
@@ -257,12 +257,6 @@ class FinancialTransactionResource extends Resource
                                 fn (Builder $query, $date): Builder => $query->whereDate('transaction_date', '<=', $date),
                             );
                     }),
-            ])
-            ->headerActions([
-                Actions\CreateAction::make()
-                    ->label('New Member')
-                    ->icon('heroicon-o-plus')
-                    ->visible(fn () => static::canCreate()),
             ])
             ->actions([
                 ViewAction::make(),

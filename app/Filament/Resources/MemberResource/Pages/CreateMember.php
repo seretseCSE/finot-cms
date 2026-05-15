@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MemberResource\Pages;
 
 use App\Services\MemberCreationService;
 use App\Filament\Resources\MemberResource;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateMember extends CreateRecord
@@ -36,22 +37,29 @@ class CreateMember extends CreateRecord
     protected function getFormActions(): array
     {
         return [
-            \Filament\Actions\Action::make('previous_tab')
+            $this->getCreateFormAction()
+                ->label('Create Member')
+                ->icon('heroicon-o-check'),
+
+            $this->getCreateAnotherFormAction()
+                ->label('Create & Create Another'),
+
+            $this->getCancelFormAction(),
+
+            Action::make('previous_tab')
                 ->label('Previous')
                 ->icon('heroicon-o-chevron-left')
                 ->color('gray')
-                ->extraAttributes(['class' => 'member-tab-previous'])
+                ->extraAttributes(['class' => 'member-tab-previous ms-auto'])
                 ->action(function () {
-                    // JavaScript will handle this
                 }),
 
-            \Filament\Actions\Action::make('next_tab')
+            Action::make('next_tab')
                 ->label('Next')
                 ->icon('heroicon-o-chevron-right')
                 ->color('primary')
                 ->extraAttributes(['class' => 'member-tab-next'])
                 ->action(function () {
-                    // JavaScript will handle this
                 }),
         ];
     }

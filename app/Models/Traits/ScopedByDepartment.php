@@ -83,6 +83,18 @@ trait ScopedByDepartment
             return true;
         }
 
+        // Bypass for users with view permission on members/groups
+        $table = $this->getTable();
+        if (in_array($table, ['members', 'member_groups'])) {
+            $permissionMap = [
+                'members' => 'members.view',
+                'member_groups' => 'member_groups.view',
+            ];
+            if ($user->can($permissionMap[$table])) {
+                return true;
+            }
+        }
+
         // Check department access
         if ($user->department_id && $this->department_id) {
             return $user->department_id === $this->department_id;

@@ -155,7 +155,6 @@ class ComprehensivePermissionTest extends TestCase
 
             // === GENERAL ===
             'reports.view', 'reports.export',
-            'notifications.view', 'notifications.receive',
         ];
     }
 

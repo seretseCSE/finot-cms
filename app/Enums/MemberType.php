@@ -38,9 +38,9 @@ enum MemberType: string
     public static function getAll(): array
     {
         return [
-            self::KIDS->value,
-            self::YOUTH->value,
-            self::ADULT->value,
+            self::KIDS->value => self::KIDS->getLabel(),
+            self::YOUTH->value => self::YOUTH->getLabel(),
+            self::ADULT->value => self::ADULT->getLabel(),
         ];
     }
 }

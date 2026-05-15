@@ -60,12 +60,10 @@ enum EventStatus: string
     public static function getAll(): array
     {
         return [
-            self::DRAFT->value,
-            self::PUBLISHED->value,
-            self::FULL->value,
-            self::ONGOING->value,
-            self::COMPLETED->value,
-            self::CANCELLED->value,
+            self::DRAFT->value => self::DRAFT->getLabel(),
+            self::PUBLISHED->value => self::PUBLISHED->getLabel(),
+            self::CANCELLED->value => self::CANCELLED->getLabel(),
+            self::COMPLETED->value => self::COMPLETED->getLabel(),
         ];
     }
 }

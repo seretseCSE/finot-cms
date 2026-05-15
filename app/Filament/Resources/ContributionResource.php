@@ -70,7 +70,7 @@ class ContributionResource extends Resource
         if ($record === null) {
             return false;
         }
-        return parent::canEdit($record);
+        return Auth::user()?->can('contributions.update');
     }
 
     public static function canDelete($record): bool
@@ -78,7 +78,7 @@ class ContributionResource extends Resource
         if ($record === null) {
             return false;
         }
-        return parent::canDelete($record) && ! $record->is_archived;
+        return Auth::user()?->can('contributions.delete') && ! $record->is_archived;
     }
 
     public static function form(Schema $schema): Schema
