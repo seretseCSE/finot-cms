@@ -28,12 +28,12 @@ class AidDistributionResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Charity Management';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 7;
+        return 2;
     }
 
     public static function getModelLabel(): string

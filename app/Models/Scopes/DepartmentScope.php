@@ -31,6 +31,19 @@ class DepartmentScope implements Scope
             return;
         }
 
+        // Bypass scope for users with direct view permission on members/groups
+        $modelTable = $model->getTable();
+        if (in_array($modelTable, ['members', 'member_groups', 'groups'])) {
+            $permissionMap = [
+                'members' => 'members.view',
+                'member_groups' => 'member_groups.view',
+                'groups' => 'member_groups.view',
+            ];
+            if ($user->can($permissionMap[$modelTable])) {
+                return;
+            }
+        }
+
         // Apply department scope for other authenticated users
         if ($user->department_id) {
             $builder->where('department_id', $user->department_id);

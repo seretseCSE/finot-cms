@@ -284,7 +284,7 @@ class PermissionSeeder extends Seeder
                 'page.financial.statements', 'page.financial.statement',
                 'page.financial.audit-trail', 'page.financial.analytics',
                 'page.report.donation', 'page.report.contribution',
-                'page.report.contribution-matrix', 'page.search.archives',
+                'page.report.contribution-matrix',
             ],
         ],
         'nibret_hisab_head' => [
@@ -394,7 +394,6 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'notifications.*', 'reports.*',
                 'help.documentation',
-                'page.search.archives',
             ],
         ],
         'charity_head' => [

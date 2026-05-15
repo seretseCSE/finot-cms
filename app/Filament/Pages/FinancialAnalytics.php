@@ -25,10 +25,10 @@ class FinancialAnalytics extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Financial Reports';
     }
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 5;
 
     protected string $view = 'filament.pages.financial-analytics';
 

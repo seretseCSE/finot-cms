@@ -160,6 +160,10 @@ class ParentResource extends BaseResource
 
     public static function canDelete($record): bool
     {
+        if ($record === null) {
+            return false;
+        }
+
         if (! parent::canDelete($record)) {
             return false;
         }

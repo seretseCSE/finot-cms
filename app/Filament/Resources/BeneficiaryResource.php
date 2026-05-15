@@ -22,12 +22,12 @@ class BeneficiaryResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Charity Management';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 6;
+        return 1;
     }
 
     public static function form(Schema $schema): Schema

@@ -27,7 +27,7 @@ class DonationReportPage extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Reports';
+        return 'Financial Reports';
     }
 
     protected string $view = 'filament.pages.donation-report';

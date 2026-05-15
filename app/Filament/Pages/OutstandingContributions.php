@@ -18,7 +18,7 @@ class OutstandingContributions extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Contributions';
     }
 
     public static function getNavigationSort(): ?int

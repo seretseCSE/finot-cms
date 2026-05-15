@@ -26,12 +26,12 @@ class FinancialOverviewPage extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Financial Reports';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 3;
+        return 1;
     }
 
     public $selectedPeriod = 'current_month';

@@ -29,15 +29,15 @@ class FinancialAuditTrailPage extends Page implements HasForms, HasTable
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Finance';
+        return 'Financial Reports';
     }
-
-    protected string $view = 'filament.pages.financial-audit-trail';
 
     public static function getNavigationSort(): ?int
     {
-        return 7;
+        return 4;
     }
+
+    protected string $view = 'filament.pages.financial-audit-trail';
 
     public static function canAccess(array $parameters = []): bool
     {

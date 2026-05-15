@@ -43,15 +43,6 @@ return [
             'topNavigation' => false,
             'collapsibleNavigationGroups' => true,
             'globalSearch' => true,
-            'navigationGroups' => [
-                'Membership Management',
-                'Education Management',
-                'Financial Management',
-                'Inventory Management',
-                'Tour Management',
-                'Content Management',
-                'System',
-            ],
             'pages' => [
                 \App\Filament\Pages\Auth\ChangeInitialPassword::class,
                 \App\Filament\Pages\EditProfile::class,

@@ -16,7 +16,6 @@ class Contribution extends Model
         'month_name',
         'is_paid',
         'amount',
-        'status',
         'payment_date',
         'payment_method',
         'custom_payment_method',

@@ -29,15 +29,15 @@ class FinancialStatementPage extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Finance';
+        return 'Financial Reports';
     }
-
-    protected string $view = 'filament.pages.financial-statement';
 
     public static function getNavigationSort(): ?int
     {
-        return 6;
+        return 2;
     }
+
+    protected string $view = 'filament.pages.financial-statement';
 
     public static function canAccess(array $parameters = []): bool
     {

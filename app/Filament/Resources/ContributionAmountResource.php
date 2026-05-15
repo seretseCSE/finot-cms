@@ -39,7 +39,7 @@ class ContributionAmountResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Contributions';
     }
 
     public static function getNavigationSort(): ?int
@@ -69,11 +69,17 @@ class ContributionAmountResource extends BaseResource
 
     public static function canEdit($record): bool
     {
+        if ($record === null) {
+            return false;
+        }
         return parent::canEdit($record);
     }
 
     public static function canDelete($record): bool
     {
+        if ($record === null) {
+            return false;
+        }
         return parent::canDelete($record) && $record->canBeDeleted();
     }
 

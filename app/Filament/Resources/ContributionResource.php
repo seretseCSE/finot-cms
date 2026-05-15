@@ -35,7 +35,7 @@ class ContributionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Contributions';
     }
 
     public static function getNavigationSort(): ?int
@@ -67,12 +67,18 @@ class ContributionResource extends Resource
 
     public static function canEdit($record): bool
     {
+        if ($record === null) {
+            return false;
+        }
         return parent::canEdit($record);
     }
 
     public static function canDelete($record): bool
     {
-        return parent::canDelete($record) && !($record?->is_archived ?? false);
+        if ($record === null) {
+            return false;
+        }
+        return parent::canDelete($record) && ! $record->is_archived;
     }
 
     public static function form(Schema $schema): Schema
@@ -182,22 +188,9 @@ class ContributionResource extends Resource
                             ])
                             ->required(),
 
-                        Forms\Components\Select::make('status')
-                            ->label('Status')
-                            ->options([
-                                'Paid' => 'Paid',
-                                'Not Paid' => 'Not Paid',
-                            ])
-                            ->default('Paid')
-                            ->required(),
-
                         Forms\Components\Toggle::make('is_paid')
-                            ->label('Is Paid')
-                            ->default(true)
-                            ->live()
-                            ->afterStateUpdated(function (Forms\Set $set, $state) {
-                                $set('status', $state ? 'Paid' : 'Not Paid');
-                            }),
+                            ->label('Paid')
+                            ->default(true),
 
                         Forms\Components\Textarea::make('notes')
                             ->label('Notes')
@@ -254,19 +247,11 @@ class ContributionResource extends Resource
                         default => 'gray',
                     }),
 
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\TextColumn::make('is_paid')
                     ->label('Status')
                     ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'Paid' => 'success',
-                        'Not Paid' => 'danger',
-                        default => 'gray',
-                    }),
-
-                Tables\Columns\IconColumn::make('is_paid')
-                    ->label('Paid')
-                    ->boolean()
-                    ->alignCenter(),
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
+                    ->formatStateUsing(fn ($state) => $state ? 'Paid' : 'Not Paid'),
 
                 Tables\Columns\TextColumn::make('recordedBy.name')
                     ->label('Recorded By')
@@ -290,13 +275,6 @@ class ContributionResource extends Resource
                 Tables\Filters\SelectFilter::make('month_name')
                     ->label('Month')
                     ->options(EthiopianDateHelper::getMonthsForContribution('ethiopian')),
-
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Status')
-                    ->options([
-                        'Paid' => 'Paid',
-                        'Not Paid' => 'Not Paid',
-                    ]),
 
                 Tables\Filters\SelectFilter::make('payment_method')
                     ->label('Payment Method')

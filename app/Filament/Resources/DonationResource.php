@@ -35,12 +35,12 @@ class DonationResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Management';
+        return 'Revenue & Banking';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return 3;
+        return 1;
     }
 
     public static function getModelLabel(): string
@@ -67,12 +67,18 @@ class DonationResource extends BaseResource
 
     public static function canEdit($record): bool
     {
+        if ($record === null) {
+            return false;
+        }
         return parent::canEdit($record);
     }
 
     public static function canDelete($record): bool
     {
-        return parent::canDelete($record) && ($record?->canBeDeleted() ?? true);
+        if ($record === null) {
+            return false;
+        }
+        return parent::canDelete($record) && $record->canBeDeleted();
     }
 
     public static function form(Schema $schema): Schema

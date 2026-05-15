@@ -44,6 +44,18 @@ class AdminPanelProvider extends PanelProvider
             ->font('Noto Sans Ethiopic', 'Noto Sans')
             ->topNavigation(false)
             ->collapsibleNavigationGroups(true)
+            ->navigationGroups([
+                'Membership Management',
+                'Education Management',
+                'Financial Reports',
+                'Contributions',
+                'Revenue & Banking',
+                'Charity Management',
+                'Inventory Management',
+                'Tour Management',
+                'Content Management',
+                'System',
+            ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

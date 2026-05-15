@@ -26,7 +26,7 @@ class ContributionMatrix extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Finance';
+        return 'Contribution Form';
     }
 
     public static function getNavigationSort(): ?int
@@ -57,8 +57,6 @@ class ContributionMatrix extends Page
     public ?int $group = null;
 
     public ?string $type = null;
-
-    public ?string $status = null;
 
     // Data properties
     public Collection $members;
@@ -322,6 +320,19 @@ class ContributionMatrix extends Page
         $isPaid = $this->grid[$memberId][$month] ?? false;
         $groupAmount = $this->getMemberGroupAmount($member, $month);
 
+        if ($isPaid && $groupAmount === 0.0) {
+            $this->grid[$memberId][$month] = false;
+            $this->isDirty = false;
+
+            Notification::make()
+                ->title('No Amount Set')
+                ->body('No contribution amount is configured for this member\'s group. Please set an amount in Contribution Settings first.')
+                ->warning()
+                ->send();
+
+            return;
+        }
+
         DB::beginTransaction();
         try {
             if ($isPaid && $groupAmount > 0) {
@@ -342,6 +353,7 @@ class ContributionMatrix extends Page
                         'payment_date' => now(),
                         'payment_method' => 'Cash',
                         'recorded_by' => Auth::id(),
+                        'is_paid' => true,
                         'is_archived' => false,
                     ]);
                 }
@@ -381,7 +393,7 @@ class ContributionMatrix extends Page
      */
     public function updated($property): void
     {
-        if (in_array($property, ['academicYear', 'department', 'group', 'type', 'status'])) {
+        if (in_array($property, ['academicYear', 'department', 'group', 'type'])) {
             if ($property === 'academicYear') {
                 $this->loadGrid();
             } else {
@@ -458,12 +470,19 @@ class ContributionMatrix extends Page
             ];
 
             $toInsert = [];
+            $skippedCount = 0;
 
             foreach ($this->members as $member) {
                 foreach (range(1, 12) as $monthNum) {
                     $groupAmount = $this->getMemberGroupAmount($member, $monthNum);
                     $isPaid = $this->grid[$member->id][$monthNum] ?? false;
                     $monthName = $monthNames[$monthNum];
+
+                    if ($isPaid && $groupAmount === 0.0) {
+                        $this->grid[$member->id][$monthNum] = false;
+                        $skippedCount++;
+                        continue;
+                    }
 
                     if ($isPaid && $groupAmount > 0) {
                         // Check if contribution already exists
@@ -482,6 +501,8 @@ class ContributionMatrix extends Page
                                 'payment_date' => now(),
                                 'payment_method' => 'Cash',
                                 'recorded_by' => Auth::id(),
+                                'is_paid' => true,
+                                'status' => 'Paid',
                                 'is_archived' => false,
                                 'created_at' => now(),
                                 'updated_at' => now(),
@@ -543,11 +564,20 @@ class ContributionMatrix extends Page
             $this->loadGrid();
 
             $totalChanges = $insertCount + $updateCount;
-            Notification::make()
-                ->title('Contributions Updated')
-                ->body("{$totalChanges} contributions have been recorded ({$insertCount} new, {$updateCount} updated).")
-                ->success()
-                ->send();
+
+            if ($skippedCount > 0) {
+                Notification::make()
+                    ->title('Contributions Saved with Warnings')
+                    ->body("{$totalChanges} contributions recorded. {$skippedCount} items skipped — no contribution amount is set for those members' groups. Configure amounts in Contribution Settings.")
+                    ->warning()
+                    ->send();
+            } else {
+                Notification::make()
+                    ->title('Contributions Updated')
+                    ->body("{$totalChanges} contributions have been recorded ({$insertCount} new, {$updateCount} updated).")
+                    ->success()
+                    ->send();
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -591,7 +621,6 @@ class ContributionMatrix extends Page
             'departments' => Department::pluck('name_en', 'id')->toArray(),
             'groups' => MemberGroup::pluck('name', 'id')->toArray(),
             'types' => ['Adult' => 'Adult', 'Youth' => 'Youth', 'Kids' => 'Kids'],
-            'statuses' => ['Active' => 'Active', 'Member' => 'Member', 'Draft' => 'Draft'],
         ];
     }
 

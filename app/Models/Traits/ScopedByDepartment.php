@@ -47,6 +47,18 @@ trait ScopedByDepartment
             return $query;
         }
 
+        // Bypass scope for users with direct view permission on members/groups
+        $modelTable = $query->getModel()->getTable();
+        if (in_array($modelTable, ['members', 'member_groups'])) {
+            $permissionMap = [
+                'members' => 'members.view',
+                'member_groups' => 'member_groups.view',
+            ];
+            if ($user->can($permissionMap[$modelTable])) {
+                return $query;
+            }
+        }
+
         // Apply department scope for other users
         if ($user->department_id) {
             return $query->where('department_id', $user->department_id);
