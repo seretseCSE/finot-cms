@@ -22,8 +22,10 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Services\UploadSanitizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Enums\Roles;
 
 class FinancialTransactionResource extends Resource
@@ -164,9 +166,25 @@ class FinancialTransactionResource extends Resource
                         Forms\Components\FileUpload::make('attachment_path')
                             ->label('Attachment (Receipt/Invoice)')
                             ->helperText('Upload receipt, invoice, or other proof document')
-                            ->acceptedFileTypes(['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'])
+                            ->disk('documents')
                             ->directory('financial-attachments')
-                            ->maxSize(5120) // 5MB for financial attachments
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'image/jpeg',
+                                'image/png',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ])
+                            ->maxSize(5120)
+                            ->downloadable()
+                            ->openable()
+                            ->saveUploadedFileUsing(UploadSanitizer::saveCallback('financial-attachments', 'documents', [
+                                'application/pdf',
+                                'image/jpeg',
+                                'image/png',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ]))
                             ->nullable(),
 
                         Forms\Components\Select::make('attachment_type')
@@ -176,9 +194,8 @@ class FinancialTransactionResource extends Resource
                                 'invoice' => 'Invoice',
                                 'other' => 'Other',
                             ])
-                            ->required(),
-                    ])
-                    ->collapsible(),
+                            ->nullable(),
+                    ]),
 
             ]);
     }
@@ -261,11 +278,23 @@ class FinancialTransactionResource extends Resource
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (FinancialTransaction $record): void {
+                        if ($record->attachment_path && Storage::disk('documents')->exists($record->attachment_path)) {
+                            Storage::disk('documents')->delete($record->attachment_path);
+                        }
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->before(function ($records): void {
+                            foreach ($records as $record) {
+                                if ($record->attachment_path && Storage::disk('documents')->exists($record->attachment_path)) {
+                                    Storage::disk('documents')->delete($record->attachment_path);
+                                }
+                            }
+                        }),
                 ]),
             ]);
     }

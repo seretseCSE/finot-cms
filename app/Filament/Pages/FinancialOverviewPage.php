@@ -61,8 +61,8 @@ class FinancialOverviewPage extends Page
                 })
                 ->approved();
 
-            $totalIncome = $transactions->income()->sum('amount');
-            $totalExpenses = $transactions->expense()->sum('amount');
+            $totalIncome = (clone $transactions)->income()->sum('amount');
+            $totalExpenses = (clone $transactions)->expense()->sum('amount');
             $netProfit = $totalIncome - $totalExpenses;
 
             // Contributions

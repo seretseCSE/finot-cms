@@ -13,54 +13,60 @@ class Donation extends BaseModel
     protected static function booted(): void
     {
         static::created(function ($donation) {
-            \DB::transaction(function () use ($donation) {
-                \Log::info('Donation created', [
-                    'id' => $donation->id,
-                    'amount' => $donation->amount,
-                    'campaign_id' => $donation->fundraising_campaign_id
-                ]);
-
-                if ($donation->bank_account_id) {
-                    $donation->bankAccount->updateBalance();
-                }
-
-                // Update fundraising campaign total
-                if ($donation->fundraising_campaign_id) {
-                    $campaign = $donation->fundraisingCampaign;
-                    if ($campaign) {
-                        $campaign->updateTotalRaised();
-                        \Log::info('Campaign total updated', ['campaign_id' => $campaign->id, 'new_total' => $campaign->total_raised]);
-                    } else {
-                        \Log::warning('Campaign not found for donation', ['donation_id' => $donation->id]);
+            try {
+                \DB::transaction(function () use ($donation) {
+                    if ($donation->bank_account_id && $donation->bankAccount) {
+                        $donation->bankAccount->updateBalance();
                     }
-                }
-            });
+
+                    if ($donation->fundraising_campaign_id && $donation->fundraisingCampaign) {
+                        $donation->fundraisingCampaign->updateTotalRaised();
+                    }
+                });
+            } catch (\Exception $e) {
+                \Log::error('Donation created event failed', [
+                    'donation_id' => $donation->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         });
 
         static::updated(function ($donation) {
-            \DB::transaction(function () use ($donation) {
-                if ($donation->bank_account_id) {
-                    $donation->bankAccount->updateBalance();
-                }
+            try {
+                \DB::transaction(function () use ($donation) {
+                    if ($donation->bank_account_id && $donation->bankAccount) {
+                        $donation->bankAccount->updateBalance();
+                    }
 
-                // Update fundraising campaign total if amount changed
-                if ($donation->fundraising_campaign_id && $donation->wasChanged('amount')) {
-                    $donation->fundraisingCampaign->updateTotalRaised();
-                }
-            });
+                    if ($donation->fundraising_campaign_id && $donation->wasChanged('amount') && $donation->fundraisingCampaign) {
+                        $donation->fundraisingCampaign->updateTotalRaised();
+                    }
+                });
+            } catch (\Exception $e) {
+                \Log::error('Donation updated event failed', [
+                    'donation_id' => $donation->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         });
 
         static::deleted(function ($donation) {
-            \DB::transaction(function () use ($donation) {
-                if ($donation->bank_account_id) {
-                    $donation->bankAccount->updateBalance();
-                }
+            try {
+                \DB::transaction(function () use ($donation) {
+                    if ($donation->bank_account_id && $donation->bankAccount) {
+                        $donation->bankAccount->updateBalance();
+                    }
 
-                // Update fundraising campaign total
-                if ($donation->fundraising_campaign_id) {
-                    $donation->fundraisingCampaign->updateTotalRaised();
-                }
-            });
+                    if ($donation->fundraising_campaign_id && $donation->fundraisingCampaign) {
+                        $donation->fundraisingCampaign->updateTotalRaised();
+                    }
+                });
+            } catch (\Exception $e) {
+                \Log::error('Donation deleted event failed', [
+                    'donation_id' => $donation->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         });
     }
 

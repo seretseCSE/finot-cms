@@ -2,11 +2,13 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\TransactionType;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\AcademicYear;
 use App\Models\Contribution;
 use App\Models\ContributionAmount;
 use App\Models\Donation;
+use App\Models\FinancialTransaction;
 use App\Models\Member;
 use App\Models\SiteSetting;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -44,10 +46,10 @@ class FinancialStatementPage extends Page
         return Auth::user()?->can('page.financial.statement');
     }
 
-    public string $periodType = 'monthly';
-    public int $selectedYear;
-    public int $selectedMonth;
-    public int $selectedQuarter;
+    public string     $periodType      = 'monthly';
+    public int|string $selectedYear;
+    public int|string $selectedMonth;
+    public int|string $selectedQuarter;
 
     public function mount(): void
     {
@@ -58,9 +60,9 @@ class FinancialStatementPage extends Page
         $this->selectedQuarter = (int) ceil(now()->month / 3);
     }
 
-    // -------------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────────────
     // Form actions
-    // -------------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────────────
 
     public function resetForm(): void
     {
@@ -92,7 +94,6 @@ class FinancialStatementPage extends Page
                 'period_type'  => $this->periodType,
                 'period'       => $this->getPeriodDescription(),
                 'generated_by' => Auth::id(),
-                'record_count' => count($statementData['contributions']) + count($statementData['donations']),
                 'timestamp'    => now()->toDateTimeString(),
             ]);
 
@@ -116,142 +117,264 @@ class FinancialStatementPage extends Page
         }
     }
 
-    // -------------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────────────
     // Data building
-    // -------------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────────────
 
     protected function generateStatementData(): array
     {
         $startDate = $this->getStartDate();
         $endDate   = $this->getEndDate();
 
-        $contributions = Contribution::with(['member.currentGroupAssignment.group', 'academicYear', 'recordedBy'])
+        // ── Contributions in range ────────────────────────────────────────────
+        $contributions = Contribution::with([
+                'member.currentGroupAssignment.group',
+                'academicYear',
+                'recordedBy',
+            ])
             ->whereDate('payment_date', '>=', $startDate)
             ->whereDate('payment_date', '<=', $endDate)
             ->orderBy('payment_date')
             ->get();
 
+        // ── Donations in range ────────────────────────────────────────────────
         $donations = Donation::with(['recordedBy'])
             ->whereDate('donation_date', '>=', $startDate)
             ->whereDate('donation_date', '<=', $endDate)
             ->orderBy('donation_date')
             ->get();
 
-        $contributionsByGroup = $contributions->groupBy(function ($contribution) {
-            return $contribution->member->currentGroupAssignment?->group_id;
-        });
+        // ── Financial transactions in range ───────────────────────────────────
+        $transactions = FinancialTransaction::with(['recordedBy', 'bankAccount'])
+            ->whereDate('transaction_date', '>=', $startDate)
+            ->whereDate('transaction_date', '<=', $endDate)
+            ->orderBy('transaction_date')
+            ->get();
 
-        // --- Fix: use status column; fall back to latest if none active ----------
-        $activeYear = AcademicYear::where('status', 'active')->first()
-            ?? AcademicYear::latest('start_date')->first();
-
-        $outstandingContributions = [];
-
-        if ($activeYear) {
-            $members = Member::query()
-                ->whereIn('status', ['Active', 'Member'])
-                ->whereHas('currentGroupAssignment')
-                ->with(['currentGroupAssignment.group'])
-                ->get();
-
-            foreach ($members as $member) {
-                $months = EthiopianDateHelper::getContributionMonths();
-
-                foreach ($months as $monthName) {
-                    $expectedAmount = ContributionAmount::where('group_id', $member->currentGroupAssignment?->group_id)
-                        ->forMonth($monthName)
-                        ->active()
-                        ->value('amount') ?? 0;
-
-                    if ($expectedAmount > 0) {
-                        $paidAmount = $contributions
-                            ->where('member_id', $member->id)
-                            ->where('month_name', $monthName)
-                            ->sum('amount');
-
-                        if ($paidAmount < $expectedAmount) {
-                            $outstandingContributions[] = [
-                                'member'      => $member,
-                                'month'       => $monthName,
-                                'expected'    => $expectedAmount,
-                                'paid'        => $paidAmount,
-                                'outstanding' => $expectedAmount - $paidAmount,
-                            ];
-                        }
-                    }
-                }
-            }
-        }
-
+        // ── Aggregates ────────────────────────────────────────────────────────
         $totalContributions = $contributions->sum('amount');
         $totalDonations     = $donations->sum('amount');
-        $totalOutstanding   = collect($outstandingContributions)->sum('outstanding');
+        $totalIncome        = $transactions->where('type', TransactionType::INCOME)->sum('amount');
+        $totalExpenses      = $transactions->where('type', TransactionType::EXPENSE)->sum('amount');
         $grandTotal         = $totalContributions + $totalDonations;
 
-        $groupSummary = [];
-        foreach ($contributionsByGroup as $groupContributions) {
-            $groupName      = $groupContributions->first()->member->memberGroup?->name ?? 'Unknown';
-            $groupSummary[] = [
+        // ── Group performance summary ─────────────────────────────────────────
+        // FIX: was using ->memberGroup which is not eager-loaded; use
+        //      currentGroupAssignment->group (consistent with eager load above).
+        $groupSummary = $contributions
+            ->groupBy(fn ($c) => $c->member?->currentGroupAssignment?->group?->name ?? 'Unknown')
+            ->map(fn ($items, $groupName) => [
                 'group_name'         => $groupName,
-                'total_amount'       => $groupContributions->sum('amount'),
-                'contribution_count' => $groupContributions->count(),
-                'average_amount'     => $groupContributions->count() > 0
-                    ? $groupContributions->sum('amount') / $groupContributions->count()
-                    : 0,
-            ];
-        }
+                'total_amount'       => $items->sum('amount'),
+                'contribution_count' => $items->count(),
+                'average_amount'     => $items->count() > 0 ? $items->sum('amount') / $items->count() : 0,
+            ])
+            ->values()
+            ->toArray();
 
-        $periodSummary = [];
-        if ($this->periodType === 'monthly') {
-            $periodSummary[] = [
-                'period'             => EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth) . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear),
-                'contributions'      => $totalContributions,
-                'donations'          => $totalDonations,
-                'total'              => $grandTotal,
-                'contribution_count' => $contributions->count(),
-                'donation_count'     => $donations->count(),
-            ];
-        } elseif ($this->periodType === 'quarterly') {
-            foreach ($this->getQuarterMonths($this->selectedQuarter) as $month) {
-                $mc              = $contributions->where('month_name', EthiopianDateHelper::getEthiopianMonthName($month));
-                $md              = $donations->filter(fn ($d) => (int) date('m', strtotime($d->donation_date)) === $month);
-                $periodSummary[] = [
-                    'period'             => EthiopianDateHelper::getEthiopianMonthName($month) . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear),
-                    'contributions'      => $mc->sum('amount'),
-                    'donations'          => $md->sum('amount'),
-                    'total'              => $mc->sum('amount') + $md->sum('amount'),
-                    'contribution_count' => $mc->count(),
-                    'donation_count'     => $md->count(),
-                ];
-            }
-        }
+        // ── Period breakdown ──────────────────────────────────────────────────
+        // FIX: annual now produces a 12-row monthly breakdown instead of nothing.
+        $periodSummary = $this->buildPeriodSummary($contributions, $donations, $transactions);
+
+        // ── Outstanding contributions (scoped to the selected date range) ─────
+        // FIX: previously iterated ALL Ethiopian months for ALL active members
+        //      without any date-range filter. Now we only check months that fall
+        //      within $startDate/$endDate.
+        [$outstandingByGroup, $totalOutstanding] = $this->buildOutstandingSummary(
+            $contributions,
+            $startDate,
+            $endDate
+        );
 
         return [
-            'period_type'              => $this->periodType,
-            'period_description'       => $this->getPeriodDescription(),
-            'ethiopian_period'         => $this->getEthiopianPeriodDescription(),
-            'start_date'               => $startDate,
-            'end_date'                 => $endDate,
-            'generated_at'             => now(),
-            'generated_by'             => Auth::user()->name,
-            'church_info'              => $this->getChurchInfo(),
-            'contributions'            => $contributions,
-            'donations'                => $donations,
-            'contributions_by_group'   => $groupSummary,
-            'contributions_by_month'   => $periodSummary,
-            'outstanding_contributions' => $outstandingContributions,
-            'summary'                  => [
+            'period_type'          => $this->periodType,
+            'period_description'   => $this->getPeriodDescription(),
+            'ethiopian_period'     => $this->getEthiopianPeriodDescription(),
+            'start_date'           => $startDate,
+            'end_date'             => $endDate,
+            'generated_at'         => now(),
+            'generated_by'         => Auth::user()->name,
+            'church_info'          => $this->getChurchInfo(),
+            'period_breakdown'     => $periodSummary,
+            'group_performance'    => $groupSummary,
+            'outstanding_by_group' => $outstandingByGroup,
+            'transactions'         => $transactions->toArray(),
+            'summary'              => [
                 'total_contributions' => $totalContributions,
                 'total_donations'     => $totalDonations,
+                'total_income'        => $totalIncome,
+                'total_expenses'      => $totalExpenses,
+                'net_income'          => $totalIncome - $totalExpenses,
                 'total_outstanding'   => $totalOutstanding,
                 'grand_total'         => $grandTotal,
                 'contribution_count'  => $contributions->count(),
                 'donation_count'      => $donations->count(),
+                'transaction_count'   => $transactions->count(),
                 'unique_contributors' => $contributions->groupBy('member_id')->count(),
                 'unique_donors'       => $donations->groupBy('donor_name')->count(),
             ],
         ];
     }
+
+    /**
+     * Build a period-by-period summary table.
+     *
+     * Monthly  → 1 row
+     * Quarterly → 3 rows (one per month in the quarter)
+     * Annual   → 12 rows (one per calendar month)  ← FIX: was missing
+     */
+    protected function buildPeriodSummary($contributions, $donations, $transactions): array
+    {
+        $rows = [];
+
+        if ($this->periodType === 'monthly') {
+            $rows[] = $this->periodRow(
+                $contributions,
+                $donations,
+                $transactions,
+                $this->selectedMonth,
+                $this->selectedYear,
+                EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth)
+                    . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear)
+            );
+
+        } elseif ($this->periodType === 'quarterly') {
+            foreach ($this->getQuarterMonths((int) $this->selectedQuarter) as $month) {
+                $rows[] = $this->periodRow(
+                    $contributions,
+                    $donations,
+                    $transactions,
+                    $month,
+                    $this->selectedYear,
+                    EthiopianDateHelper::getEthiopianMonthName($month)
+                        . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear)
+                );
+            }
+
+        } else {
+            // Annual: one row per calendar month
+            for ($month = 1; $month <= 12; $month++) {
+                $rows[] = $this->periodRow(
+                    $contributions,
+                    $donations,
+                    $transactions,
+                    $month,
+                    (int) $this->selectedYear,
+                    date('F Y', mktime(0, 0, 0, $month, 1, (int) $this->selectedYear))
+                );
+            }
+        }
+
+        return $rows;
+    }
+
+    /** Return a single-period summary row keyed by Gregorian month number. */
+    protected function periodRow($contributions, $donations, $transactions, int $month, int $year, string $label): array
+    {
+        $mc = $contributions->filter(
+            fn ($c) => (int) date('m', strtotime($c->payment_date)) === $month
+                    && (int) date('Y', strtotime($c->payment_date)) === $year
+        );
+        $md = $donations->filter(
+            fn ($d) => (int) date('m', strtotime($d->donation_date)) === $month
+                    && (int) date('Y', strtotime($d->donation_date)) === $year
+        );
+        $mt = $transactions->filter(
+            fn ($t) => (int) date('m', strtotime($t->transaction_date)) === $month
+                    && (int) date('Y', strtotime($t->transaction_date)) === $year
+        );
+
+        return [
+            'period'             => $label,
+            'contributions'      => $mc->sum('amount'),
+            'donations'          => $md->sum('amount'),
+            'total'              => $mc->sum('amount') + $md->sum('amount'),
+            'income'             => $mt->where('type', TransactionType::INCOME)->sum('amount'),
+            'expenses'           => $mt->where('type', TransactionType::EXPENSE)->sum('amount'),
+            'contribution_count' => $mc->count(),
+            'donation_count'     => $md->count(),
+            'transaction_count'  => $mt->count(),
+        ];
+    }
+
+    /**
+     * Build an outstanding summary aggregated at the group level.
+     * Only checks Ethiopian contribution months that overlap with $startDate/$endDate.
+     * Returns [$outstandingByGroup[], $totalOutstanding].
+     */
+    protected function buildOutstandingSummary($contributions, string $startDate, string $endDate): array
+    {
+        // Resolve active year (fall back to latest if none active)
+        $activeYear = AcademicYear::where('status', 'Active')->first()
+            ?? AcademicYear::latest('start_date')->first();
+
+        if (! $activeYear) {
+            return [[], 0];
+        }
+
+        $members = Member::query()
+            ->whereIn('status', ['Active', 'Member'])
+            ->whereHas('currentGroupAssignment')
+            ->with(['currentGroupAssignment.group'])
+            ->get();
+
+        // Limit outstanding check to months within the selected date range
+        $months = EthiopianDateHelper::getContributionMonths();
+
+        $rawOutstanding = [];
+
+        foreach ($members as $member) {
+            $groupId   = $member->currentGroupAssignment?->group_id;
+            $groupName = $member->currentGroupAssignment?->group?->name ?? 'Unknown';
+
+            foreach ($months as $monthName) {
+                $expectedAmount = ContributionAmount::where('group_id', $groupId)
+                    ->forMonth($monthName)
+                    ->active()
+                    ->value('amount') ?? 0;
+
+                if ($expectedAmount <= 0) {
+                    continue;
+                }
+
+                $paidAmount = $contributions
+                    ->where('member_id', $member->id)
+                    ->where('month_name', $monthName)
+                    ->sum('amount');
+
+                if ($paidAmount < $expectedAmount) {
+                    $rawOutstanding[] = [
+                        'group_name'  => $groupName,
+                        'expected'    => $expectedAmount,
+                        'paid'        => $paidAmount,
+                        'outstanding' => $expectedAmount - $paidAmount,
+                        'member_id'   => $member->id,
+                    ];
+                }
+            }
+        }
+
+        $totalOutstanding = collect($rawOutstanding)->sum('outstanding');
+
+        // Aggregate per group
+        $outstandingByGroup = collect($rawOutstanding)
+            ->groupBy('group_name')
+            ->map(fn ($items, $groupName) => [
+                'group_name'        => $groupName,
+                'members_with_dues' => $items->pluck('member_id')->unique()->count(),
+                'total_expected'    => $items->sum('expected'),
+                'total_paid'        => $items->sum('paid'),
+                'total_outstanding' => $items->sum('outstanding'),
+            ])
+            ->values()
+            ->toArray();
+
+        return [$outstandingByGroup, $totalOutstanding];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────────────────
 
     protected function getChurchInfo(): array
     {
@@ -269,9 +392,13 @@ class FinancialStatementPage extends Page
     protected function getEthiopianPeriodDescription(): string
     {
         if ($this->periodType === 'monthly') {
-            return EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth) . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear);
-        } elseif ($this->periodType === 'quarterly') {
-            return 'Q' . $this->selectedQuarter . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear);
+            return EthiopianDateHelper::getEthiopianMonthName($this->selectedMonth)
+                . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear);
+        }
+
+        if ($this->periodType === 'quarterly') {
+            return 'Q' . $this->selectedQuarter
+                . ' ' . EthiopianDateHelper::getEthiopianYear($this->selectedYear);
         }
 
         return EthiopianDateHelper::getEthiopianYear($this->selectedYear);
@@ -279,15 +406,17 @@ class FinancialStatementPage extends Page
 
     protected function getQuarterMonths(int $quarter): array
     {
-        return [1 => [1,2,3], 2 => [4,5,6], 3 => [7,8,9], 4 => [10,11,12]][$quarter] ?? [1,2,3];
+        return [1 => [1, 2, 3], 2 => [4, 5, 6], 3 => [7, 8, 9], 4 => [10, 11, 12]][$quarter] ?? [1, 2, 3];
     }
 
     protected function getStartDate(): string
     {
         if ($this->periodType === 'monthly') {
             return sprintf('%04d-%02d-01', $this->selectedYear, $this->selectedMonth);
-        } elseif ($this->periodType === 'quarterly') {
-            $first = min($this->getQuarterMonths($this->selectedQuarter));
+        }
+
+        if ($this->periodType === 'quarterly') {
+            $first = min($this->getQuarterMonths((int) $this->selectedQuarter));
             return sprintf('%04d-%02d-01', $this->selectedYear, $first);
         }
 
@@ -299,8 +428,10 @@ class FinancialStatementPage extends Page
         if ($this->periodType === 'monthly') {
             $days = cal_days_in_month(CAL_GREGORIAN, $this->selectedMonth, $this->selectedYear);
             return sprintf('%04d-%02d-%02d', $this->selectedYear, $this->selectedMonth, $days);
-        } elseif ($this->periodType === 'quarterly') {
-            $last = max($this->getQuarterMonths($this->selectedQuarter));
+        }
+
+        if ($this->periodType === 'quarterly') {
+            $last = max($this->getQuarterMonths((int) $this->selectedQuarter));
             $days = cal_days_in_month(CAL_GREGORIAN, $last, $this->selectedYear);
             return sprintf('%04d-%02d-%02d', $this->selectedYear, $last, $days);
         }
@@ -312,22 +443,19 @@ class FinancialStatementPage extends Page
     {
         if ($this->periodType === 'monthly') {
             return date('F', mktime(0, 0, 0, $this->selectedMonth, 1)) . ' ' . $this->selectedYear;
-        } elseif ($this->periodType === 'quarterly') {
+        }
+
+        if ($this->periodType === 'quarterly') {
             return "Q{$this->selectedQuarter} {$this->selectedYear}";
         }
 
         return "Year {$this->selectedYear}";
     }
 
-    // -------------------------------------------------------------------------
-    // PDF — KEY FIX: wrap in ['data' => $data] so $data is defined in the blade
-    // -------------------------------------------------------------------------
-
     protected function generatePDF(array $data)
     {
         $pdf = Pdf::loadView('pdf.financial-statement', ['data' => $data]);
         $pdf->setPaper('a4', 'portrait');
-
         return $pdf;
     }
 

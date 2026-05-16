@@ -27,8 +27,7 @@ class EditContribution extends EditRecord
     {
         return [
             $this->getSaveFormAction()
-                ->label('Update Contribution')
-                ->submit(null),
+                ->label('Update Contribution'),
         ];
     }
 

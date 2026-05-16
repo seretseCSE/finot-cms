@@ -188,6 +188,8 @@ class LossRecordResource extends Resource
                     }),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -209,6 +211,7 @@ class LossRecordResource extends Resource
             'index' => Pages\ListLossRecords::route('/'),
             'create' => Pages\CreateLossRecord::route('/create'),
             'view' => Pages\ViewLossRecord::route('/{record}'),
+            'edit' => Pages\EditLossRecord::route('/{record}/edit'),
         ];
     }
 }

@@ -27,8 +27,7 @@ class EditDonation extends EditRecord
     {
         return [
             $this->getSaveFormAction()
-                ->label('Update Donation')
-                ->submit(null),
+                ->label('Update Donation'),
         ];
     }
 
@@ -44,8 +43,8 @@ class EditDonation extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        // Ensure recorded_by remains the original user
-        unset($data['recorded_by']);
+        // Preserve the original recorded_by user on edits
+        $data['recorded_by'] = $this->record->recorded_by;
 
         // Handle Anonymous donor
         if (empty($data['donor_name'])) {

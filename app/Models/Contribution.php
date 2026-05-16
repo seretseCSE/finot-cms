@@ -29,6 +29,7 @@ class Contribution extends Model
         'is_paid' => 'boolean',
         'is_archived' => 'boolean',
         'amount' => 'decimal:2',
+        'payment_date' => 'date',
     ];
 
     /**

@@ -232,6 +232,7 @@ class MonthlyContributionReports extends Page
                 ->iconSize('xs')
                 ->size('xs')
                 ->color('success')
+                ->visible(fn () => ! auth()->user()?->hasRole('nibret_hisab_head'))
                 ->action(function () {
                     // Export logic here
                     Notification::make()

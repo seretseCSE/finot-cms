@@ -8,6 +8,7 @@ use App\Models\Contribution;
 use App\Models\ContributionAmount;
 use App\Models\Member;
 use Filament\Pages\Page;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class OutstandingContributions extends Page
 {
@@ -45,6 +46,29 @@ class OutstandingContributions extends Page
 
     public $tableData = [];
 
+    public $perPage = 10;
+
+    public $page = 1;
+
+    protected function getQueryString(): array
+    {
+        return ['page' => ['except' => 1]];
+    }
+
+    public function getTableDataPaginator(): LengthAwarePaginator
+    {
+        $page = max(1, (int) $this->page);
+        $total = count($this->tableData);
+
+        return new LengthAwarePaginator(
+            array_slice($this->tableData, ($page - 1) * $this->perPage, $this->perPage),
+            $total,
+            $this->perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+    }
+
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -63,6 +87,7 @@ class OutstandingContributions extends Page
 
     public function updatedGroupId(): void
     {
+        $this->page = 1;
         if ($this->activeYear) {
             $this->calculateData();
         }
@@ -70,6 +95,15 @@ class OutstandingContributions extends Page
 
     public function updatedMonth(): void
     {
+        $this->page = 1;
+        if ($this->activeYear) {
+            $this->calculateData();
+        }
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->page = 1;
         if ($this->activeYear) {
             $this->calculateData();
         }
@@ -79,6 +113,7 @@ class OutstandingContributions extends Page
     {
         $this->group_id = null;
         $this->month = null;
+        $this->page = 1;
 
         if ($this->activeYear) {
             $this->calculateData();
@@ -152,7 +187,10 @@ class OutstandingContributions extends Page
 
             if ($memberOutstanding > 0) {
                 $this->tableData[] = [
-                    'member' => $member,
+                    'member_id' => $member->id,
+                    'member_name' => $member->full_name,
+                    'member_code' => $member->member_code,
+                    'group_name' => $member->currentGroupAssignment?->group?->name ?? 'Unassigned',
                     'month' => $this->month ? reset($monthsToCalculate) : null,
                     'month_name' => $this->month
                         ? EthiopianDateHelper::getEthiopianMonthName(reset($monthsToCalculate))

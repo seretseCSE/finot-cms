@@ -13,18 +13,16 @@ class DonationDataService
      */
     public function processBeforeSave(array $data): array
     {
-        // Debug: Log the incoming data
         \Log::info('Donation beforeSave data:', $data);
 
-        // Set recorded_by to current user
-        $data['recorded_by'] = Auth::id();
+        // Only set recorded_by if not already present (preserves original during edits)
+        if (! isset($data['recorded_by'])) {
+            $data['recorded_by'] = Auth::id();
+        }
 
-        // Handle Anonymous donor
         if (empty($data['donor_name'])) {
             $data['donor_name'] = null;
         }
-
-        // No longer using CustomOptionSelect, so no special handling needed
 
         \Log::info('Donation beforeSave processed data:', $data);
 

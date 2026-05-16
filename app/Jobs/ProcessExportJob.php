@@ -26,14 +26,14 @@ class ProcessExportJob implements ShouldQueue
         protected int $userId,
         protected ?array $ids = null,
         protected ?array $filters = null,
+        protected ?string $filename = null,
     ) {
     }
 
     public function handle(): void
     {
-        $timestamp = now()->format('Y-m-d_His');
         $resourceType = $this->exportClass::resourceType();
-        $filename = "{$resourceType}_{$timestamp}.{$this->format}";
+        $filename = $this->filename ?? "{$resourceType}_" . now()->format('Y-m-d_His') . ".{$this->format}";
         $diskPath = "exports/{$filename}";
 
         $writerType = match ($this->format) {

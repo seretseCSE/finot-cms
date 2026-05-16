@@ -3,14 +3,14 @@
 namespace App\Filament\Pages;
 
 use App\Models\AcademicYear;
+use App\Models\AidDistribution;
 use App\Models\Contribution;
 use App\Models\Donation;
+use App\Models\FinancialTransaction;
 use App\Models\Member;
 use App\Models\MemberGroup;
-use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -73,7 +73,9 @@ class FinancialAnalytics extends Page
 
     public function form(Schema $form): Schema
     {
-        return $form->schema([
+        return $form
+            ->columns(4)
+            ->schema([
             Select::make('academic_year_id')
                 ->label('Academic Year')
                 ->options($this->academicYears)
@@ -104,24 +106,23 @@ class FinancialAnalytics extends Page
     {
         if (!$this->academic_year_id) {
             $this->analyticsData = [];
-            $this->charts = [];
+        $this->charts = [
+            'revenue_trend' => $this->getRevenueTrendChart(),
+            'group_comparison' => $this->getGroupComparisonChart(),
+            'monthly_distribution' => $this->getMonthlyDistributionChart(),
+        ];
             return;
         }
 
         $this->analyticsData = [
             'overview' => $this->getOverviewStats(),
             'trends' => $this->getTrendsData(),
+            'financial_trends' => $this->getFinancialTrends(),
             'group_performance' => $this->getGroupPerformance(),
             'monthly_breakdown' => $this->getMonthlyBreakdown(),
-            'top_contributors' => $this->getTopContributors(),
-            'payment_patterns' => $this->getPaymentPatterns(),
         ];
 
-        $this->charts = [
-            'revenue_trend' => $this->getRevenueTrendChart(),
-            'group_comparison' => $this->getGroupComparisonChart(),
-            'monthly_distribution' => $this->getMonthlyDistributionChart(),
-        ];
+        $this->charts = [];
     }
 
     protected function getOverviewStats(): array
@@ -131,9 +132,16 @@ class FinancialAnalytics extends Page
 
         $donationsQuery = Donation::query();
 
+        $incomeQuery = FinancialTransaction::income()->approved();
+        $expenseQuery = FinancialTransaction::expense()->approved();
+        $aidQuery = AidDistribution::query();
+
         if ($this->start_date && $this->end_date) {
             $contributionsQuery->whereBetween('payment_date', [$this->start_date, $this->end_date]);
             $donationsQuery->whereBetween('donation_date', [$this->start_date, $this->end_date]);
+            $incomeQuery->whereBetween('transaction_date', [$this->start_date, $this->end_date]);
+            $expenseQuery->whereBetween('transaction_date', [$this->start_date, $this->end_date]);
+            $aidQuery->whereBetween('distribution_date', [$this->start_date, $this->end_date]);
         }
 
         if ($this->group_id) {
@@ -144,7 +152,12 @@ class FinancialAnalytics extends Page
 
         $totalContributions = $contributionsQuery->sum('amount');
         $totalDonations = $donationsQuery->sum('amount');
-        $grandTotal = $totalContributions + $totalDonations;
+        $totalIncome = $incomeQuery->sum('amount');
+        $totalExpenses = $expenseQuery->sum('amount');
+        $totalAid = $aidQuery->sum('amount');
+        $grandTotal = $totalContributions + $totalDonations + $totalIncome;
+        $totalAllExpenses = $totalExpenses + $totalAid;
+        $netIncome = $grandTotal - $totalAllExpenses;
 
         $activeMembers = Member::where('status', 'Active')
             ->when($this->group_id, function ($query) {
@@ -155,9 +168,16 @@ class FinancialAnalytics extends Page
             ->count();
 
         $contributingMembers = $contributionsQuery->distinct('member_id')->count();
+        $incomeGrowth = $this->calculateFinancialGrowth($incomeQuery);
+        $expenseGrowth = $this->calculateFinancialGrowth($expenseQuery);
 
         return [
             'total_revenue' => $grandTotal,
+            'total_income' => $totalIncome,
+            'total_expenses' => $totalExpenses,
+            'total_aid' => $totalAid,
+            'total_all_expenses' => $totalAllExpenses,
+            'net_income' => $netIncome,
             'total_contributions' => $totalContributions,
             'total_donations' => $totalDonations,
             'active_members' => $activeMembers,
@@ -165,6 +185,8 @@ class FinancialAnalytics extends Page
             'participation_rate' => $activeMembers > 0 ? round(($contributingMembers / $activeMembers) * 100, 1) : 0,
             'average_contribution' => $contributingMembers > 0 ? round($totalContributions / $contributingMembers, 2) : 0,
             'revenue_growth' => $this->calculateRevenueGrowth(),
+            'income_growth' => $incomeGrowth,
+            'expense_growth' => $expenseGrowth,
         ];
     }
 
@@ -181,7 +203,7 @@ class FinancialAnalytics extends Page
                 });
             })
             ->selectRaw('MONTH(payment_date) as month, SUM(amount) as total, COUNT(*) as count')
-            ->groupBy('month')
+            ->groupByRaw('MONTH(payment_date)')
             ->orderBy('month')
             ->get();
 
@@ -239,51 +261,53 @@ class FinancialAnalytics extends Page
             ->toArray();
     }
 
-    protected function getTopContributors(): array
+    protected function getFinancialTrends(): array
     {
-        return Contribution::where('academic_year_id', $this->academic_year_id)
-            ->where('is_paid', true)
-            ->when($this->start_date && $this->end_date, function ($query) {
-                $query->whereBetween('payment_date', [$this->start_date, $this->end_date]);
+        $incomeQuery = FinancialTransaction::income()->approved();
+        $expenseQuery = FinancialTransaction::expense()->approved();
+
+        if ($this->start_date && $this->end_date) {
+            $incomeQuery->whereBetween('transaction_date', [$this->start_date, $this->end_date]);
+            $expenseQuery->whereBetween('transaction_date', [$this->start_date, $this->end_date]);
+        }
+
+        $incomeMonthly = $incomeQuery->selectRaw('MONTH(transaction_date) as month, SUM(amount) as total, COUNT(*) as count')
+            ->groupByRaw('MONTH(transaction_date)')
+            ->orderBy('month')
+            ->get();
+
+        $expenseMonthly = $expenseQuery->selectRaw('MONTH(transaction_date) as month, SUM(amount) as total, COUNT(*) as count')
+            ->groupByRaw('MONTH(transaction_date)')
+            ->orderBy('month')
+            ->get();
+
+        $categories = FinancialTransaction::selectRaw('category, SUM(amount) as total, COUNT(*) as count')
+            ->when($this->start_date && $this->end_date, function ($q) {
+                $q->whereBetween('transaction_date', [$this->start_date, $this->end_date]);
             })
-            ->when($this->group_id, function ($query) {
-                $query->whereHas('member.currentGroupAssignment', function (Builder $query) {
-                    $query->where('group_id', $this->group_id);
-                });
-            })
-            ->with('member.currentGroupAssignment.group')
-            ->selectRaw('member_id, SUM(amount) as total_amount, COUNT(*) as contribution_count')
-            ->groupBy('member_id')
-            ->orderByDesc('total_amount')
-            ->limit(10)
-            ->get()
-            ->toArray();
+            ->groupBy('category')
+            ->get();
+
+        return [
+            'income_monthly' => $incomeMonthly->toArray(),
+            'expense_monthly' => $expenseMonthly->toArray(),
+            'categories' => $categories->toArray(),
+        ];
     }
 
-    protected function getPaymentPatterns(): array
+    protected function calculateFinancialGrowth($query): float
     {
-        return [
-            'payment_methods' => Contribution::where('academic_year_id', $this->academic_year_id)
-                ->where('is_paid', true)
-                ->when($this->start_date && $this->end_date, function ($query) {
-                    $query->whereBetween('payment_date', [$this->start_date, $this->end_date]);
-                })
-                ->selectRaw('payment_method, COUNT(*) as count, SUM(amount) as total')
-                ->groupBy('payment_method')
-                ->get()
-                ->toArray(),
+        $clone = clone $query;
+        $current = $clone->sum('amount');
 
-            'payment_timing' => Contribution::where('academic_year_id', $this->academic_year_id)
-                ->where('is_paid', true)
-                ->when($this->start_date && $this->end_date, function ($query) {
-                    $query->whereBetween('payment_date', [$this->start_date, $this->end_date]);
-                })
-                ->selectRaw('DAYOFMONTH(payment_date) as day_of_month, COUNT(*) as count')
-                ->groupBy('day_of_month')
-                ->orderBy('day_of_month')
-                ->get()
-                ->toArray(),
-        ];
+        $previousStart = $this->start_date ? date('Y-m-d', strtotime($this->start_date . ' -1 year')) : now()->subYear()->startOfYear()->format('Y-m-d');
+        $previousEnd = $this->end_date ? date('Y-m-d', strtotime($this->end_date . ' -1 year')) : now()->subYear()->format('Y-m-d');
+
+        $previous = (clone $query)
+            ->whereBetween('transaction_date', [$previousStart, $previousEnd])
+            ->sum('amount');
+
+        return $previous > 0 ? round((($current - $previous) / $previous) * 100, 1) : 0;
     }
 
     protected function getRevenueTrendChart(): array
@@ -401,38 +425,6 @@ class FinancialAnalytics extends Page
 
     protected function getHeaderActions(): array
     {
-        return [
-            Action::make('exportAnalytics')
-                ->label('Export Analytics')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('success')
-                ->action(function () {
-                    // Export comprehensive analytics report
-                    Notification::make()
-                        ->title('Export Started')
-                        ->body('Financial analytics report is being generated.')
-                        ->success()
-                        ->send();
-                }),
-
-            Action::make('scheduleReport')
-                ->label('Schedule Report')
-                ->icon('heroicon-o-calendar')
-                ->color('info')
-                ->action(function () {
-                    // Schedule regular analytics reports
-                    Notification::make()
-                        ->title('Report Scheduled')
-                        ->body('Monthly analytics report has been scheduled.')
-                        ->success()
-                        ->send();
-                }),
-
-            Action::make('refresh')
-                ->label('Refresh Data')
-                ->icon('heroicon-o-arrow-path')
-                ->color('primary')
-                ->action(fn () => $this->loadAnalytics()),
-        ];
+        return [];
     }
 }

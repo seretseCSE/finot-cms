@@ -9,8 +9,10 @@ use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Radio;
+use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Log;
 
 class ListDonations extends ListRecords
 {
@@ -37,18 +39,41 @@ class ListDonations extends ListRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    ProcessExportJob::dispatch(
-                        exportClass: DonationExport::class,
-                        columns: $data['columns'],
-                        format: $data['format'],
-                        userId: auth()->id(),
-                    );
+                    try {
+                        $timestamp = now()->format('Y-m-d_His');
+                        $filename = "donations_{$timestamp}.{$data['format']}";
 
-                    Notification::make()
-                        ->title('Export queued')
-                        ->body('Your export is being processed. You will be notified when it is ready.')
-                        ->success()
-                        ->send();
+                        ProcessExportJob::dispatch(
+                            exportClass: DonationExport::class,
+                            columns: $data['columns'],
+                            format: $data['format'],
+                            userId: auth()->id(),
+                            filename: $filename,
+                        );
+
+                        $url = route('exports.download', ['filename' => $filename]);
+
+                        Notification::make()
+                            ->title('Export Ready')
+                            ->body('Your donation export is ready for download.')
+                            ->success()
+                            ->actions([
+                                NotificationAction::make('download')
+                                    ->label('Download')
+                                    ->url($url, shouldOpenInNewTab: true),
+                            ])
+                            ->send();
+
+                        Log::info('Donation export dispatched', ['filename' => $filename]);
+                    } catch (\Exception $e) {
+                        Log::error('Donation export failed', ['error' => $e->getMessage()]);
+
+                        Notification::make()
+                            ->title('Export Failed')
+                            ->body('An error occurred while generating the export: ' . $e->getMessage())
+                            ->danger()
+                            ->send();
+                    }
                 }),
             CreateAction::make()
                 ->visible(fn () => DonationResource::canCreate()),

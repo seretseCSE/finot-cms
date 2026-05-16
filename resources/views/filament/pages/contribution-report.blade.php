@@ -1,253 +1,400 @@
 <x-filament-panels::page>
-    <div class="space-y-6">
-        <!-- Filters -->
-        <x-filament::section>
-            <x-slot name="heading">Report Filters</x-slot>
 
-            <form wire:submit.prevent="applyFilters">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {{ $this->form }}
-                </div>
+@push('styles')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+.cr-page { font-family: 'DM Sans', sans-serif; }
 
-                <div class="mt-4 flex items-center gap-3">
-                    <x-filament::button type="submit" icon="heroicon-m-magnifying-glass">
-                        Apply Filters
-                    </x-filament::button>
+.cr-filter-bar {
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem 1.5rem;
+}
+.cr-filter-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--color-text-secondary);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 1rem;
+}
+.cr-filter-actions { display: flex; gap: 8px; margin-top: 1rem; }
+.cr-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: var(--border-radius-md);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary); transition: all 0.15s;
+}
+.cr-btn:hover { background: var(--color-background-secondary); }
+.cr-btn.primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+.cr-btn.primary:hover { background: #0C447C; border-color: #0C447C; }
 
-                    <x-filament::button type="button" wire:click="resetFilters" color="gray" icon="heroicon-m-arrow-path">
-                        Reset
-                    </x-filament::button>
-                </div>
-            </form>
-        </x-filament::section>
+.cr-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.cr-kpi {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.1rem 1.25rem;
+}
+.cr-kpi-icon {
+    width: 34px; height: 34px; border-radius: var(--border-radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; margin-bottom: 10px;
+}
+.cr-kpi-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-secondary); margin-bottom: 5px; }
+.cr-kpi-value { font-size: 22px; font-weight: 600; color: var(--color-text-primary); line-height: 1.1; }
+.cr-kpi-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
 
-        @if(!empty($reportData['contributions']))
-            <!-- Summary Cards -->
+.cr-section {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+.cr-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-secondary);
+}
+.cr-section-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; }
+.cr-section-title i { font-size: 15px; color: var(--color-text-secondary); }
+.cr-count-pill {
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: 99px; background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-secondary);
+    color: var(--color-text-secondary);
+}
+
+.cr-table { width: 100%; border-collapse: collapse; }
+.cr-table thead tr { border-bottom: 0.5px solid var(--color-border-tertiary); }
+.cr-table th {
+    padding: 10px 14px; text-align: left;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+.cr-table th.right { text-align: right; }
+.cr-table tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); transition: background 0.12s; }
+.cr-table tbody tr:last-child { border-bottom: none; }
+.cr-table tbody tr:hover { background: var(--color-background-secondary); }
+.cr-table td { padding: 10px 14px; font-size: 13px; color: var(--color-text-primary); vertical-align: middle; }
+.cr-table td.muted { color: var(--color-text-secondary); }
+.cr-table td.right { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.avatar-circle {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    background: #e6f1fb; color: #185FA5;
+}
+.group-pill {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: 99px;
+    font-size: 11px; font-weight: 500;
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    border: 0.5px solid var(--color-border-secondary);
+    white-space: nowrap;
+}
+.method-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 99px;
+    font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.method-cash    { background: #eaf3de; color: #3B6D11; }
+.method-bank    { background: #e6f1fb; color: #185FA5; }
+.method-mobile  { background: #eeedfe; color: #534AB7; }
+.method-other   { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-secondary); }
+
+.status-active   { background: #eaf3de; color: #3B6D11; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+.status-archived { background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; border: 0.5px solid var(--color-border-secondary); }
+
+.progress-bar-wrap { height: 3px; background: var(--color-background-secondary); border-radius: 99px; margin-top: 6px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 99px; }
+
+.two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+
+.cr-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 1rem; gap: 10px; }
+.cr-empty i { font-size: 32px; color: var(--color-text-secondary); }
+.cr-empty p { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.cr-empty span { font-size: 12px; color: var(--color-text-secondary); }
+
+.dist-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 10px 1.5rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    transition: background 0.12s;
+}
+.dist-row:last-child { border-bottom: none; }
+.dist-row:hover { background: var(--color-background-secondary); }
+
+.top-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    transition: border-color 0.15s;
+}
+.top-card:hover { border-color: var(--color-border-secondary); }
+.top-card.gold { border-color: #fac775; }
+.rank-num { font-size: 10px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.rank-num.gold { color: #633806; }
+.top-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    background: #e6f1fb; color: #185FA5; margin-bottom: 8px;
+}
+.top-avatar.gold { background: #faeeda; color: #633806; }
+</style>
+@endpush
+
+<div class="cr-page" style="display:flex; flex-direction:column; gap:1.25rem; padding-bottom:2rem;">
+
+    {{-- Filters --}}
+    <div class="cr-filter-bar">
+        <div class="cr-filter-label">
+            <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+            Report Filters
+        </div>
+        <form wire:submit.prevent="applyFilters">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Total Contributions</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-1">{{ count($reportData['contributions']) }}</p>
-                        </div>
-                        <div class="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-                            <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+                {{ $this->form }}
+            </div>
+            <div class="cr-filter-actions">
+                <button type="submit" class="cr-btn primary">
+                    <i class="ti ti-search" aria-hidden="true"></i> Apply Filters
+                </button>
+                <button type="button" wire:click="resetFilters" class="cr-btn">
+                    <i class="ti ti-refresh" aria-hidden="true"></i> Reset
+                </button>
+            </div>
+        </form>
+    </div>
 
-                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Total Amount</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-1">Birr {{ number_format($reportData['contributions']->sum('amount'), 0) }}</p>
-                        </div>
-                        <div class="p-2 bg-success-50 dark:bg-success-900/20 rounded-lg">
-                            <svg class="w-5 h-5 text-success-600 dark:text-success-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+    @if(!empty($reportData['contributions']) && count($reportData['contributions']) > 0)
+    @php
+        $contributions  = $reportData['contributions'];
+        $totalAmount    = $contributions->sum('amount');
+        $avgAmount      = $contributions->avg('amount') ?? 0;
+        $uniqueMembers  = $contributions->pluck('member_id')->unique()->count();
+        $totalCount     = count($contributions);
+    @endphp
 
-                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Average Contribution</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-1">Birr {{ number_format($reportData['contributions']->avg('amount'), 0) }}</p>
-                        </div>
-                        <div class="p-2 bg-info-50 dark:bg-info-900/20 rounded-lg">
-                            <svg class="w-5 h-5 text-info-600 dark:text-info-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+    {{-- KPI Row --}}
+    <div class="cr-kpi-grid">
+        <div class="cr-kpi">
+            <div class="cr-kpi-icon" style="background:#e6f1fb; color:#185FA5;">
+                <i class="ti ti-receipt" aria-hidden="true"></i>
+            </div>
+            <div class="cr-kpi-label">Total Records</div>
+            <div class="cr-kpi-value">{{ number_format($totalCount) }}</div>
+            <div class="cr-kpi-sub">Contribution entries</div>
+        </div>
+        <div class="cr-kpi">
+            <div class="cr-kpi-icon" style="background:#eaf3de; color:#3B6D11;">
+                <i class="ti ti-currency-dollar" aria-hidden="true"></i>
+            </div>
+            <div class="cr-kpi-label">Total Amount</div>
+            <div class="cr-kpi-value">Birr {{ number_format($totalAmount, 0) }}</div>
+            <div class="cr-kpi-sub">Across all records</div>
+        </div>
+        <div class="cr-kpi">
+            <div class="cr-kpi-icon" style="background:#faeeda; color:#633806;">
+                <i class="ti ti-chart-bar" aria-hidden="true"></i>
+            </div>
+            <div class="cr-kpi-label">Average</div>
+            <div class="cr-kpi-value">Birr {{ number_format($avgAmount, 0) }}</div>
+            <div class="cr-kpi-sub">Per contribution</div>
+        </div>
+        <div class="cr-kpi">
+            <div class="cr-kpi-icon" style="background:#eeedfe; color:#534AB7;">
+                <i class="ti ti-users" aria-hidden="true"></i>
+            </div>
+            <div class="cr-kpi-label">Contributors</div>
+            <div class="cr-kpi-value">{{ number_format($uniqueMembers) }}</div>
+            <div class="cr-kpi-sub">Unique members</div>
+        </div>
+    </div>
 
-                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Unique Contributors</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-1">{{ $reportData['contributions']->pluck('member_id')->unique()->count() }}</p>
-                        </div>
-                        <div class="p-2 bg-warning-50 dark:bg-warning-900/20 rounded-lg">
-                            <svg class="w-5 h-5 text-warning-600 dark:text-warning-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                        </div>
-                    </div>
+    {{-- Payment Methods + Group Distribution --}}
+    <div class="two-col">
+
+        {{-- Payment Methods --}}
+        <div class="cr-section">
+            <div class="cr-section-header">
+                <div class="cr-section-title">
+                    <i class="ti ti-credit-card" aria-hidden="true"></i>
+                    Payment Methods
                 </div>
             </div>
-
-            <!-- Payment Methods & Group Distribution -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <x-filament::section>
-                    <x-slot name="heading">Payment Methods</x-slot>
-                    <div class="space-y-2">
-                        @php $paymentMethods = $reportData['contributions']->groupBy('payment_method'); @endphp
-                        @foreach($paymentMethods as $method => $contributions)
-                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
-                                        @if($method === 'cash')
-                                            <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                            </svg>
-                                        @elseif($method === 'bank')
-                                            <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                            </svg>
-                                        @else
-                                            <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                                            </svg>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $contributions->first()->formatted_payment_method }}</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $contributions->count() }} transactions</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">Birr {{ number_format($contributions->sum('amount'), 0) }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ round(($contributions->sum('amount') / $reportData['contributions']->sum('amount')) * 100, 1) }}%</p>
-                                </div>
-                            </div>
-                        @endforeach
+            @php $paymentMethods = $contributions->groupBy('payment_method'); @endphp
+            @foreach($paymentMethods as $method => $methodContribs)
+                @php
+                    $mpct = $totalAmount > 0 ? ($methodContribs->sum('amount') / $totalAmount) * 100 : 0;
+                    $methodClass = match(strtolower($method)) {
+                        'cash'   => 'method-cash',
+                        'bank'   => 'method-bank',
+                        'mobile' => 'method-mobile',
+                        default  => 'method-other',
+                    };
+                    $methodIcon = match(strtolower($method)) {
+                        'cash'   => 'ti-cash',
+                        'bank'   => 'ti-building-bank',
+                        'mobile' => 'ti-device-mobile',
+                        default  => 'ti-credit-card',
+                    };
+                @endphp
+                <div class="dist-row">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="method-pill {{ $methodClass }}">
+                            <i class="ti {{ $methodIcon }}" style="font-size:11px;" aria-hidden="true"></i>
+                            {{ $methodContribs->first()->formatted_payment_method }}
+                        </span>
+                        <span style="font-size:11px; color:var(--color-text-secondary);">{{ $methodContribs->count() }} transactions</span>
                     </div>
-                </x-filament::section>
-
-                <x-filament::section>
-                    <x-slot name="heading">Group Distribution</x-slot>
-                    <div class="space-y-2">
-                        @php
-                            $groups = $reportData['contributions']->groupBy(function($contribution) {
-                                return $contribution->member->memberGroup?->name ?? 'Unknown';
-                            });
-                        @endphp
-                        @foreach($groups->take(5) as $groupName => $contributions)
-                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $groupName }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $contributions->pluck('member_id')->unique()->count() }} members</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">Birr {{ number_format($contributions->sum('amount'), 0) }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $contributions->count() }} contributions</p>
-                                </div>
-                            </div>
-                        @endforeach
+                    <div style="text-align:right; min-width:120px;">
+                        <div style="font-size:13px; font-weight:600; color:var(--color-text-primary);">Birr {{ number_format($methodContribs->sum('amount'), 0) }}</div>
+                        <div class="progress-bar-wrap" style="margin-top:5px;">
+                            <div class="progress-bar-fill" style="width:{{ $mpct }}%; background:#378ADD;"></div>
+                        </div>
+                        <div style="font-size:10px; color:var(--color-text-secondary); margin-top:3px;">{{ number_format($mpct,1) }}%</div>
                     </div>
-                </x-filament::section>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Group Distribution --}}
+        <div class="cr-section">
+            <div class="cr-section-header">
+                <div class="cr-section-title">
+                    <i class="ti ti-building-community" aria-hidden="true"></i>
+                    Group Distribution
+                </div>
             </div>
-        @endif
-
-        <!-- Contribution Details Table -->
-        <x-filament::section>
-            <x-slot name="heading">
-                <div class="flex items-center justify-between w-full">
-                    <div class="flex items-center gap-2">
-                        <span>Contribution Details</span>
-                        @if($selectedAcademicYear && $selectedAcademicYear !== 'all')
-                            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">- {{ $academicYears[$selectedAcademicYear] ?? 'All Years' }}</span>
-                        @endif
+            @php
+                $groups = $contributions->groupBy(function($c) {
+                    return $c->member->memberGroup?->name ?? 'Unknown';
+                })->take(5);
+                $maxGroupAmt = $groups->map(fn($g) => $g->sum('amount'))->max() ?: 1;
+            @endphp
+            @foreach($groups as $groupName => $groupContribs)
+                @php $gpct = ($groupContribs->sum('amount') / $totalAmount) * 100; @endphp
+                <div class="dist-row">
+                    <div>
+                        <div style="font-size:13px; font-weight:500; color:var(--color-text-primary);">{{ $groupName }}</div>
+                        <div style="font-size:11px; color:var(--color-text-secondary);">{{ $groupContribs->pluck('member_id')->unique()->count() }} members · {{ $groupContribs->count() }} contributions</div>
                     </div>
-                    <x-filament::badge color="primary" size="sm">
-                        {{ count($reportData['contributions']) }} contributions
-                    </x-filament::badge>
+                    <div style="text-align:right; min-width:120px;">
+                        <div style="font-size:13px; font-weight:600; color:var(--color-text-primary);">Birr {{ number_format($groupContribs->sum('amount'), 0) }}</div>
+                        <div class="progress-bar-wrap" style="margin-top:5px;">
+                            <div class="progress-bar-fill" style="width:{{ $gpct }}%; background:#1D9E75;"></div>
+                        </div>
+                        <div style="font-size:10px; color:var(--color-text-secondary); margin-top:3px;">{{ number_format($gpct,1) }}%</div>
+                    </div>
                 </div>
-            </x-slot>
+            @endforeach
+        </div>
+    </div>
 
-            @if(empty($reportData['contributions']))
-                <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <svg class="w-8 h-8 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <h3 class="text-base font-medium text-gray-900 dark:text-white">No Contributions Found</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">No contributions match the selected criteria.</p>
-                </div>
-            @else
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
-                        <thead class="bg-gray-50 dark:bg-gray-800 text-xs uppercase text-gray-500 dark:text-gray-400">
+    @endif
+
+    {{-- Contributions Table --}}
+    <div class="cr-section">
+        <div class="cr-section-header">
+            <div class="cr-section-title">
+                <i class="ti ti-table" aria-hidden="true"></i>
+                Contribution Details
+                @if($selectedAcademicYear && $selectedAcademicYear !== 'all')
+                    <span style="font-size:12px; font-weight:400; color:var(--color-text-secondary);">— {{ $academicYears[$selectedAcademicYear] ?? '' }}</span>
+                @endif
+            </div>
+            <span class="cr-count-pill">{{ count($reportData['contributions']) }} records</span>
+        </div>
+
+        @if(empty($reportData['contributions']) || count($reportData['contributions']) === 0)
+            <div class="cr-empty">
+                <i class="ti ti-file-off" aria-hidden="true"></i>
+                <p>No contributions found</p>
+                <span>Try adjusting your filters or date range</span>
+            </div>
+        @else
+            <div style="overflow-x:auto;">
+                <table class="cr-table">
+                    <thead>
+                        <tr>
+                            <th style="width:32px;">#</th>
+                            <th>Member</th>
+                            <th>Group</th>
+                            <th>Month</th>
+                            <th class="right">Amount</th>
+                            <th>Payment</th>
+                            <th>Date</th>
+                            <th>Recorded By</th>
+                            @if($selectedAcademicYear && $selectedAcademicYear !== 'all')
+                                <th>Status</th>
+                            @endif
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($reportData['contributions'] as $i => $contribution)
                             <tr>
-                                <th scope="col" class="px-4 py-3 font-medium">Member</th>
-                                <th scope="col" class="px-4 py-3 font-medium">Group</th>
-                                <th scope="col" class="px-4 py-3 font-medium">Month</th>
-                                <th scope="col" class="px-4 py-3 font-medium text-right">Amount</th>
-                                <th scope="col" class="px-4 py-3 font-medium">Payment</th>
-                                <th scope="col" class="px-4 py-3 font-medium">Date</th>
-                                <th scope="col" class="px-4 py-3 font-medium">Recorded By</th>
+                                <td class="muted" style="font-size:11px;">{{ $i + 1 }}</td>
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <div class="avatar-circle">
+                                            {{ $contribution->member ? mb_substr($contribution->member->full_name, 0, 1) : '?' }}
+                                        </div>
+                                        <span style="font-weight:500; white-space:nowrap;">
+                                            {{ $contribution->member ? $contribution->member->full_name : 'Unknown Member' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="group-pill">
+                                        {{ $contribution->member->memberGroup?->name ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td class="muted">{{ $contribution->month_name }}</td>
+                                <td class="right">Birr {{ number_format($contribution->amount, 2) }}</td>
+                                <td>
+                                    @php
+                                        $pm = strtolower($contribution->payment_method ?? '');
+                                        $pmClass = match($pm) { 'cash' => 'method-cash', 'bank' => 'method-bank', 'mobile' => 'method-mobile', default => 'method-other' };
+                                        $pmIcon  = match($pm) { 'cash' => 'ti-cash', 'bank' => 'ti-building-bank', 'mobile' => 'ti-device-mobile', default => 'ti-credit-card' };
+                                    @endphp
+                                    <span class="method-pill {{ $pmClass }}">
+                                        <i class="ti {{ $pmIcon }}" style="font-size:11px;" aria-hidden="true"></i>
+                                        {{ $contribution->formatted_payment_method }}
+                                    </span>
+                                </td>
+                                <td class="muted" style="white-space:nowrap;">
+                                    @php
+                                        $ethDate = app(\App\Helpers\EthiopianDateHelper::class)->toEthiopian($contribution->payment_date);
+                                    @endphp
+                                    {{ $ethDate['month_name_am'] . ' ' . $ethDate['day'] . ', ' . $ethDate['year'] }}
+                                </td>
+                                <td class="muted" style="white-space:nowrap;">{{ $contribution->recordedBy->name }}</td>
                                 @if($selectedAcademicYear && $selectedAcademicYear !== 'all')
-                                    <th scope="col" class="px-4 py-3 font-medium">Status</th>
+                                    <td>
+                                        @if($contribution->is_archived)
+                                            <span class="status-archived">Archived</span>
+                                        @else
+                                            <span class="status-active">Active</span>
+                                        @endif
+                                    </td>
                                 @endif
                             </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                            @foreach($reportData['contributions'] as $contribution)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                                    <td class="px-4 py-3 whitespace-nowrap">
-                                        <div class="flex items-center gap-3">
-                                            <div class="flex-shrink-0 h-7 w-7 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-xs font-medium text-gray-700 dark:text-gray-300">
-                                                {{ $contribution->member ? substr($contribution->member->full_name, 0, 1) : '?' }}
-                                            </div>
-                                            <span class="font-medium text-gray-900 dark:text-white">{{ $contribution->member ? $contribution->member->full_name : 'Unknown Member' }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-3 whitespace-nowrap">
-                                        <x-filament::badge color="gray" size="sm">
-                                            {{ $contributor->member->memberGroup?->name ?? 'N/A' }}
-                                        </x-filament::badge>
-                                    </td>
-                                    <td class="px-4 py-3 whitespace-nowrap">{{ $contribution->month_name }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap text-right font-semibold text-gray-900 dark:text-white">Birr {{ number_format($contribution->amount, 2) }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap">{{ $contribution->formatted_payment_method }}</td>
-                                    <td class="px-4 py-3 whitespace-nowrap">
-                                        @php
-                                            $ethDate = app(\App\Helpers\EthiopianDateHelper::class)->toEthiopian($contribution->payment_date);
-                                        @endphp
-                                        {{ $ethDate['month_name_am'] . ' ' . $ethDate['day'] . ', ' . $ethDate['year'] }}
-                                    </td>
-                                    <td class="px-4 py-3 whitespace-nowrap">{{ $contribution->recordedBy->name }}</td>
-                                    @if($selectedAcademicYear && $selectedAcademicYear !== 'all')
-                                        <td class="px-4 py-3 whitespace-nowrap">
-                                            @if($contribution->is_archived)
-                                                <x-filament::badge color="gray" size="sm">Archived</x-filament::badge>
-                                            @else
-                                                <x-filament::badge color="success" size="sm">Active</x-filament::badge>
-                                            @endif
-                                        </td>
-                                    @endif
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </x-filament::section>
-
-        @if(!empty($reportData['topContributors']))
-            <x-filament::section>
-                <x-slot name="heading">Top Contributors</x-slot>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    @foreach($reportData['topContributors'] as $index => $contributor)
-                        <div class="flex flex-col items-center text-center p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900">
-                            <div class="mb-2 text-xs font-semibold text-gray-400 dark:text-gray-500">#{{ $index + 1 }}</div>
-                            <div class="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                                {{ $contributor['member'] ? substr($contributor['member']->full_name, 0, 1) : '?' }}
-                            </div>
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate w-full">{{ $contributor['member'] ? $contributor['member']->full_name : 'Unknown' }}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">{{ $contributor['member']->memberGroup?->name ?? '' }}</p>
-                            <div class="mt-auto w-full bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
-                                <p class="text-base font-bold text-gray-900 dark:text-white">Birr {{ number_format($contributor['total'], 0) }}</p>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </x-filament::section>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
-    </div>
+    </div> 
+
+</div>
+
 </x-filament-panels::page>

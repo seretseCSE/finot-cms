@@ -29,7 +29,7 @@ class InventoryResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Inventory Management';
+        return 'Inventory';
     }
 
     public static function getNavigationSort(): ?int

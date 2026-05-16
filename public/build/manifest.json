@@ -1,10 +1,10 @@
 {
-  "_vendor-C0Zqfgkc.js": {
-    "file": "assets/vendor-C0Zqfgkc.js",
+  "_vendor-BYIAvQxD.js": {
+    "file": "assets/vendor-BYIAvQxD.js",
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DfnwJWtZ.css",
+    "file": "assets/app-Buo-81ph.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -13,25 +13,34 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-fBxQv8aN.js",
+    "file": "assets/admin-D8P_1wYs.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_vendor-C0Zqfgkc.js"
+      "_vendor-BYIAvQxD.js"
     ],
     "dynamicImports": [
       "resources/js/pwa-tour.js"
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-O-pZlwva.js",
+    "file": "assets/app-BWSsXgQj.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_vendor-C0Zqfgkc.js"
+      "_vendor-BYIAvQxD.js"
+    ]
+  },
+  "resources/js/financial-charts.js": {
+    "file": "assets/financial-charts-BbJYJBRA.js",
+    "name": "financial-charts",
+    "src": "resources/js/financial-charts.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-BYIAvQxD.js"
     ]
   },
   "resources/js/pwa-tour.js": {

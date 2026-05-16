@@ -259,6 +259,7 @@ class PermissionSeeder extends Seeder
                 'members.*', 'group_assignments.*',
                 'member_groups.view', 'member_groups.create', 'member_groups.update',
                 'parents.view', 'parents.create', 'parents.update', 'parents.delete',
+                'documents.*',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
@@ -271,6 +272,7 @@ class PermissionSeeder extends Seeder
             'permissions' => [
                 'contributions.*', 'contribution_amounts.*', 'donations.*',
                 'financial_transactions.*', 'bank_accounts.*',
+                'documents.*',
                 'reports.*',
                 'charity.reports',
                 'tours.reports',
@@ -293,6 +295,7 @@ class PermissionSeeder extends Seeder
                 'contributions.*', 'contribution_amounts.*', 'donations.*',
                 'financial_transactions.*', 'bank_accounts.*',
                 'inventory_items.*', 'inventory_movements.*', 'stock_movements.*', 'loss_records.*',
+                'documents.*',
                 'reports.*',
                 'beneficiaries.view', 'charity.reports',
                 'tours.reports',
@@ -312,6 +315,7 @@ class PermissionSeeder extends Seeder
             'description' => 'Inventory management and tracking',
             'permissions' => [
                 'inventory_items.*', 'inventory_movements.*', 'stock_movements.*', 'loss_records.*',
+                'documents.*',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
@@ -325,6 +329,7 @@ class PermissionSeeder extends Seeder
                 'students.*', 'teachers.*', 'teacher_assignments.*', 'teacher_attendances.*',
                 'school_classes.*', 'student_enrollments.*',
                 'attendance_sessions.*', 'attendance_records.*',
+                'documents.*',
                 'library_resources.upload', 'library_categories.*', 'library_subcategories.*',
                 'reports.teacher_reports',
                 'members.view', 'members.export',
@@ -342,6 +347,7 @@ class PermissionSeeder extends Seeder
             'description' => 'Attendance tracking and monitoring',
             'permissions' => [
                 'attendance_sessions.*', 'attendance_records.*',
+                'documents.*',
                 'teachers.substitute_assign',
                 'academic_years.view', 'classes.view', 'subjects.view', 'enrollments.view',
                 'teachers.view', 'school_classes.view', 'student_enrollments.view',
@@ -358,6 +364,7 @@ class PermissionSeeder extends Seeder
             'permissions' => [
                 'songs.*', 'song_categories.*', 'song_subcategories.*',
                 'rehearsals.*', 'rehearsal_attendances.*',
+                'documents.*',
                 'media_items.visibility',
                 'attendance_records.record_offline',
                 'dashboard.view', 'profile.update', 'sessions.manage',
@@ -400,6 +407,7 @@ class PermissionSeeder extends Seeder
             'description' => 'Beneficiary and aid distribution management',
             'permissions' => [
                 'beneficiaries.*', 'aid_distributions.*', 'charity.*',
+                'documents.*',
                 'contributions.view', 'contributions.create',
                 'donations.*',
                 'tours.reports',
@@ -415,6 +423,7 @@ class PermissionSeeder extends Seeder
             'description' => 'Tour and registration management',
             'permissions' => [
                 'tours.*', 'tour_attendances.*', 'tour_passengers.*',
+                'documents.*',
                 'members.view', 'members.export',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
@@ -443,7 +452,7 @@ class PermissionSeeder extends Seeder
             'description' => 'Department-level resource management (no delete)',
             'permissions' => [
                 'department_resources.view', 'department_resources.create', 'department_resources.update',
-                'documents.upload', 'documents.search',
+                'documents.*',
                 'members.view', 'members.create', 'members.update',
                 'members.export',
                 'events.view', 'events.create', 'events.update',
@@ -460,7 +469,7 @@ class PermissionSeeder extends Seeder
             'permissions' => [
                 'department_resources.view',
                 'members.view', 'events.view', 'contributions.view',
-                'inventory_items.view', 'beneficiaries.view', 'documents.view',
+                'inventory_items.view', 'beneficiaries.view', 'documents.*',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',

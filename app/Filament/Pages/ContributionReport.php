@@ -182,6 +182,7 @@ class ContributionReport extends Page
                 ->label('Export')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
+                ->visible(fn () => ! auth()->user()?->hasRole('nibret_hisab_head'))
                 ->form([
                     CheckboxList::make('columns')
                         ->label('Columns')

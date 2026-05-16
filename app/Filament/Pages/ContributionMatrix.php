@@ -604,6 +604,7 @@ class ContributionMatrix extends Page
                 ->label('Export to Excel')
                 ->color('primary')
                 ->icon('heroicon-o-arrow-down-tray')
+                ->visible(fn () => ! auth()->user()?->hasRole('nibret_hisab_head'))
                 ->action('export'),
 
             Action::make('refresh')
