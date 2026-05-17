@@ -31,7 +31,7 @@ class ProductResource extends BaseResource
                         ->label('Name')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (Forms\Set $set, $state, $record) {
+                        ->afterStateUpdated(function ($set, $state, $record) {
                             if (! $record?->slug) {
                                 $set('slug', Product::generateUniqueSlug($state));
                             }

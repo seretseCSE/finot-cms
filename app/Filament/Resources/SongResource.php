@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SongResource\Pages;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Models\Song;
 use Filament\Actions;
 use Filament\Forms;
@@ -102,14 +103,12 @@ class SongResource extends BaseResource
                             ->helperText('MP3 or WAV files, max 20MB')
                             ->visibility('public'),
 
-                        Forms\Components\FileUpload::make('video_file')
-                            ->label('Video File')
-                            ->disk('songs-video')
-                            ->directory('songs-video')
-                            ->acceptedFileTypes(['video/mp4'])
-                            ->maxSize(51200) // 50MB
-                            ->helperText('MP4 files, max 50MB')
-                            ->visibility('public'),
+                        Forms\Components\TextInput::make('video_url')
+                            ->label('Video Link')
+                            ->placeholder('https://www.youtube.com/watch?v=...')
+                            ->url()
+                            ->maxLength(500)
+                            ->helperText('Paste a YouTube, Vimeo, or direct video URL'),
                     ])
                     ->columns(2),
 
@@ -204,8 +203,8 @@ class SongResource extends BaseResource
                     ->trueLabel('With Video')
                     ->falseLabel('Without Video')
                     ->queries(
-                        true: fn ($query) => $query->whereNotNull('video_file'),
-                        false: fn ($query) => $query->whereNull('video_file'),
+                        true: fn ($query) => $query->whereNotNull('video_url'),
+                        false: fn ($query) => $query->whereNull('video_url'),
                     ),
 
                 Tables\Filters\TernaryFilter::make('is_active')

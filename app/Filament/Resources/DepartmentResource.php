@@ -85,6 +85,12 @@ class DepartmentResource extends Resource
                             ->searchable()
                             ->preload()
                             ->nullable(),
+                        Forms\Components\FileUpload::make('head_image')
+                            ->label('Head Image')
+                            ->image()
+                            ->directory('department-heads')
+                            ->visibility('public')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
 

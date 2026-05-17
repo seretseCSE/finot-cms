@@ -36,7 +36,7 @@ class SongController extends Controller
 
         // Has video filter
         if ($request->input('has_video')) {
-            $query->whereNotNull('video_file');
+            $query->whereNotNull('video_url');
         }
 
         $songs = $query->paginate(12)->withQueryString();

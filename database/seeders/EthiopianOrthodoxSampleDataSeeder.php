@@ -136,7 +136,7 @@ class EthiopianOrthodoxSampleDataSeeder extends Seeder
                 'artist' => 'Debre Libanos Choir',
                 'category_id' => $songCategoryIds[0],
                 'audio_file' => 'kidus_kidus.mp3',
-                'video_file' => 'kidus_kidus.mp4',
+                'video_url' => 'https://www.youtube.com/watch?v=kidus_kidus_example',
             ],
             [
                 'title' => 'Meskel Demera Song',
@@ -157,7 +157,7 @@ class EthiopianOrthodoxSampleDataSeeder extends Seeder
                 'lyrics' => '<p>Ketera, ketera, yesegnewu ketera</p><p>Be Gondar be Addis, yetesemewu timket</p><p>Yesus be Yordanos, yetebekewu timket</p><p>Ketera, ketera, yesegnewu ketera</p>',
                 'artist' => 'Gondar Church Choir',
                 'category_id' => $songCategoryIds[3],
-                'video_file' => 'timket_ketera.mp4',
+                'video_url' => 'https://www.youtube.com/watch?v=timket_ketera_example',
             ],
             [
                 'title' => 'Eyesus Kristos (Jesus Christ)',
@@ -172,7 +172,7 @@ class EthiopianOrthodoxSampleDataSeeder extends Seeder
                 'artist' => 'Easter Celebration Choir',
                 'category_id' => $songCategoryIds[3],
                 'audio_file' => 'fasika_mezmur.mp3',
-                'video_file' => 'fasika_mezmur.mp4',
+                'video_url' => 'https://www.youtube.com/watch?v=fasika_mezmur_example',
             ],
             [
                 'title' => 'Amlak Ameskalu (God of Patience)',

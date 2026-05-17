@@ -88,15 +88,18 @@
             --bg-800:        #F1F3F5;
             --bg-700:        #E9ECEF;
 
+            --gold:          #C8960A;
+            --gold-accent:   #C8960A;
+
             --text-main:     #0F172A;
             --text-60:       #475569;
-            --text-40:       #64748B;
+            --text-40:       #475569;
             --text-display:  #0F172A;
             --text-hero:     #0F172A;
 
-            --glass:         rgba(0,0,0,0.05);
-            --glass-hover:   rgba(0,0,0,0.08);
-            --border-subtle: rgba(15,23,42,0.12);
+            --glass:         rgba(0,0,0,0.07);
+            --glass-hover:   rgba(0,0,0,0.11);
+            --border-subtle: rgba(15,23,42,0.15);
             --blue-glow:     rgba(26,68,247,0.15);
             --overlay-98:    rgba(248,249,250,0.98);
             --overlay-95:    rgba(248,249,250,0.95);
@@ -305,6 +308,18 @@
         </div>
     </div>
 
+    <!-- PWA Update Toast -->
+    <div id="pwa-update-toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);z-index:700;max-width:420px;width:calc(100% - 40px);display:none;opacity:0;transition:opacity .4s,transform .4s;">
+        <div style="background:rgba(10,18,48,.95);border:1px solid rgba(26,68,247,.25);padding:16px 20px;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.5);backdrop-filter:blur(20px);display:flex;align-items:center;gap:12px;">
+            <div style="flex:1">
+                <div style="font-weight:600;font-size:.9rem;">Update Available</div>
+                <div style="font-size:.78rem;color:var(--text-60);">A new version is ready.</div>
+            </div>
+            <button onclick="window.applyUpdate()" class="btn btn-primary" style="padding:8px 16px;font-size:.8rem;">Update</button>
+            <button onclick="window.dismissUpdate()" style="background:transparent;border:none;color:var(--text-60);cursor:pointer;font-size:1.4rem;line-height:1;">&times;</button>
+        </div>
+    </div>
+
     <script>
 
     /* ─── Scroll Reveal ─── */
@@ -385,28 +400,50 @@
                     registration.update();
                 }, 30000);
                 
-                // Listen for updates
+                // Listen for updates — show toast instead of confirm
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
                     if (newWorker) {
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // New version available
-                                if (confirm('A new version is available! Would you like to update?')) {
-                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                    window.location.reload();
+                                window.pendingWorker = newWorker;
+                                const toast = document.getElementById('pwa-update-toast');
+                                if (toast) {
+                                    toast.style.display = 'block';
+                                    requestAnimationFrame(() => {
+                                        toast.style.opacity = '1';
+                                        toast.style.transform = 'translateX(-50%) translateY(0)';
+                                    });
                                 }
                             }
                         });
                     }
                 });
+
+                window.applyUpdate = function() {
+                    if (window.pendingWorker) {
+                        window.pendingWorker.postMessage({ type: 'SKIP_WAITING' });
+                        window.location.reload();
+                    }
+                };
+
+                window.dismissUpdate = function() {
+                    const toast = document.getElementById('pwa-update-toast');
+                    if (toast) {
+                        toast.style.opacity = '0';
+                        toast.style.transform = 'translateX(-50%) translateY(20px)';
+                        setTimeout(() => { toast.style.display = 'none'; }, 400);
+                    }
+                };
             })
             .catch(error => console.error('Service Worker registration failed:', error));
         
         // Handle PWA install prompt
         let dp;
         window.addEventListener('beforeinstallprompt',e=>{
-            e.preventDefault(); dp=e;
+            e.preventDefault();
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
+            dp=e;
             const d=localStorage.getItem('pwaDismiss');
             if(!d||new Date(d)<=new Date()) document.getElementById('pwa-banner').style.display='block';
         });

@@ -47,7 +47,7 @@ class BlogPostResource extends BaseResource
                             ->label('Title (English)')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function (Forms\Set $set, $state, $record) {
+                            ->afterStateUpdated(function ($set, $state, $record) {
                                 if (! $record?->slug) {
                                     $set('slug', \App\Models\BlogPost::generateUniqueSlug($state));
                                 }
@@ -97,7 +97,7 @@ class BlogPostResource extends BaseResource
                             ->required()
                             ->default('Draft')
                             ->live()
-                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                            ->afterStateUpdated(function ($state, $set) {
                                 if ($state === 'Published') {
                                     $set('publish_date', now()->toDateString());
                                 }

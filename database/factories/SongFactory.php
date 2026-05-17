@@ -21,7 +21,7 @@ class SongFactory extends Factory
             'category_id' => SongCategory::factory(),
             'subcategory_id' => SongSubcategory::factory(),
             'audio_file' => $this->faker->optional(0.5)->word().'.mp3',
-            'video_file' => $this->faker->optional(0.3)->word().'.mp4',
+            'video_url' => $this->faker->optional(0.3)->url(),
             'artist' => $this->faker->name(),
             'is_active' => true,
             'created_by' => User::factory(),
@@ -45,7 +45,7 @@ class SongFactory extends Factory
     public function withVideo(): static
     {
         return $this->state(fn (array $attributes) => [
-            'video_file' => 'video_'.$this->faker->word().'.mp4',
+            'video_url' => $this->faker->url(),
         ]);
     }
 }

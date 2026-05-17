@@ -52,7 +52,7 @@ class PwaController extends Controller
             'description' => 'Complete church management system for FINOTE TSIDIK',
             'start_url' => '/',
             'display' => 'standalone',
-            'background_color' => '#1B4F72',
+            'background_color' => '#FFFFFF',
             'theme_color' => '#1B4F72',
             'orientation' => 'portrait-primary',
             'scope' => '/',
@@ -61,16 +61,22 @@ class PwaController extends Controller
             'version' => $buildInfo['hash'],
             'icons' => [
                 [
-                    'src' => asset('images/logo.png'),
+                    'src' => asset('images/pwa-icon-192x192.png'),
                     'sizes' => '192x192',
                     'type' => 'image/png',
-                    'purpose' => 'any maskable',
+                    'purpose' => 'any',
                 ],
                 [
-                    'src' => asset('images/logo.png'),
+                    'src' => asset('images/pwa-icon-256x256.png'),
+                    'sizes' => '256x256',
+                    'type' => 'image/png',
+                    'purpose' => 'any',
+                ],
+                [
+                    'src' => asset('images/pwa-icon-512x512.png'),
                     'sizes' => '512x512',
                     'type' => 'image/png',
-                    'purpose' => 'any maskable',
+                    'purpose' => 'maskable',
                 ],
             ],
         ]);

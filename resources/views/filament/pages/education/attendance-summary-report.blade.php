@@ -1,312 +1,222 @@
 <x-filament-panels::page>
-    <div class="space-y-6">
-        <!-- Filters Form -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold mb-4">Report Filters</h3>
-            {{ $this->form }}
+<div style="display:flex;flex-direction:column;gap:1.25rem;padding-bottom:2rem;">
+
+    {{-- ── Filters ── --}}
+    <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1.5rem;">
+        <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+            <x-filament::icon icon="heroicon-o-funnel" style="width:18px;height:18px;color:#6b7280;" />
+            Report Filters
+        </h3>
+        {{ $this->form }}
+        <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
+            <x-filament::button color="gray" wire:click="resetFilters">Reset Filters</x-filament::button>
+        </div>
+    </div>
+
+    @if($isLoading)
+        {{-- ── Skeleton ── --}}
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+            @for($i=1;$i<=5;$i++)
+            <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1rem;animation:pulse 1.5s infinite;">
+                <div style="width:36px;height:36px;border-radius:8px;background:#e5e7eb;margin-bottom:10px;"></div>
+                <div style="height:10px;background:#e5e7eb;border-radius:4px;width:70%;margin-bottom:8px;"></div>
+                <div style="height:20px;background:#e5e7eb;border-radius:4px;width:45%;"></div>
+            </div>
+            @endfor
         </div>
 
-        @if($isLoading)
-            <!-- Loading Skeleton -->
-            <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                            <div class="animate-pulse">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 bg-gray-200 rounded-lg p-3 w-12 h-12"></div>
-                                    <div class="ml-4 flex-1">
-                                        <div class="h-4 bg-gray-200 rounded w-20 mb-2"></div>
-                                        <div class="h-8 bg-gray-200 rounded w-16"></div>
+        <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1.5rem;animation:pulse 1.5s infinite;">
+            <div style="height:16px;background:#e5e7eb;border-radius:4px;width:180px;margin-bottom:1.25rem;"></div>
+            @for($i=1;$i<=5;$i++)
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f3f4f6;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#e5e7eb;flex-shrink:0;"></div>
+                <div style="flex:1;">
+                    <div style="height:10px;background:#e5e7eb;border-radius:4px;width:55%;margin-bottom:6px;"></div>
+                    <div style="height:10px;background:#e5e7eb;border-radius:4px;width:35%;"></div>
+                </div>
+                <div style="height:10px;background:#e5e7eb;border-radius:4px;width:30px;"></div>
+                <div style="height:10px;background:#e5e7eb;border-radius:4px;width:30px;"></div>
+                <div style="height:8px;background:#e5e7eb;border-radius:99px;width:80px;"></div>
+                <div style="height:20px;background:#e5e7eb;border-radius:99px;width:60px;"></div>
+            </div>
+            @endfor
+        </div>
+
+    @elseif($reportData)
+
+        {{-- ── Summary Metric Cards ── --}}
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+
+            <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1rem;">
+                <div style="width:36px;height:36px;border-radius:8px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                    <x-filament::icon icon="heroicon-o-calendar-days" style="width:18px;height:18px;color:#2563eb;" />
+                </div>
+                <p style="font-size:12px;color:#6b7280;margin-bottom:3px;">Total Sessions</p>
+                <p style="font-size:22px;font-weight:700;color:#111827;line-height:1;">{{ $reportData['summary']['total_sessions'] }}</p>
+            </div>
+
+            <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1rem;">
+                <div style="width:36px;height:36px;border-radius:8px;background:#eef2ff;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                    <x-filament::icon icon="heroicon-o-users" style="width:18px;height:18px;color:#4f46e5;" />
+                </div>
+                <p style="font-size:12px;color:#6b7280;margin-bottom:3px;">Total Students</p>
+                <p style="font-size:22px;font-weight:700;color:#111827;line-height:1;">{{ $reportData['summary']['total_students'] }}</p>
+            </div>
+
+            <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1rem;">
+                <div style="width:36px;height:36px;border-radius:8px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                    <x-filament::icon icon="heroicon-o-chart-pie" style="width:18px;height:18px;color:#16a34a;" />
+                </div>
+                <p style="font-size:12px;color:#6b7280;margin-bottom:3px;">Present Rate</p>
+                <p style="font-size:22px;font-weight:700;color:#111827;line-height:1;">{{ $reportData['summary']['present_rate'] }}%</p>
+            </div>
+
+            <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1rem;">
+                <div style="width:36px;height:36px;border-radius:8px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                    <x-filament::icon icon="heroicon-o-check-circle" style="width:18px;height:18px;color:#16a34a;" />
+                </div>
+                <p style="font-size:12px;color:#6b7280;margin-bottom:3px;">Present</p>
+                <p style="font-size:22px;font-weight:700;color:#111827;line-height:1;">{{ $reportData['summary']['present'] }}</p>
+            </div>
+
+            <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1rem;">
+                <div style="width:36px;height:36px;border-radius:8px;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                    <x-filament::icon icon="heroicon-o-x-circle" style="width:18px;height:18px;color:#dc2626;" />
+                </div>
+                <p style="font-size:12px;color:#6b7280;margin-bottom:3px;">Absent</p>
+                <p style="font-size:22px;font-weight:700;color:#111827;line-height:1;">{{ $reportData['summary']['absent'] }}</p>
+            </div>
+
+        </div>
+
+        {{-- ── Export Options ── --}}
+        <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="font-size:14px;font-weight:600;color:#111827;display:flex;align-items:center;gap:8px;">
+                <x-filament::icon icon="heroicon-o-arrow-down-tray" style="width:16px;height:16px;color:#6b7280;" />
+                Export Options
+            </h3>
+            <div style="display:flex;gap:8px;">
+                <x-filament::button color="gray" size="sm" wire:click="exportToExcel">
+                    <x-filament::icon icon="heroicon-o-document-arrow-down" style="width:15px;height:15px;margin-right:5px;" />
+                    Export Excel
+                </x-filament::button>
+                <x-filament::button color="gray" size="sm" wire:click="exportToPdf">
+                    <x-filament::icon icon="heroicon-o-document-arrow-down" style="width:15px;height:15px;margin-right:5px;" />
+                    Export PDF
+                </x-filament::button>
+            </div>
+        </div>
+
+        {{-- ── Attendance by Student ── --}}
+        <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1.5rem;">
+            <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                <x-filament::icon icon="heroicon-o-users" style="width:18px;height:18px;color:#6b7280;" />
+                Attendance by Student
+            </h3>
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr style="background:#f9fafb;">
+                            <th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f3f4f6;">Student</th>
+                            <th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f3f4f6;">Sessions</th>
+                            <th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f3f4f6;">Present</th>
+                            <th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f3f4f6;">Rate</th>
+                            <th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #f3f4f6;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $avatarPalette = [
+                                ['bg'=>'#dbeafe','color'=>'#1d4ed8'],
+                                ['bg'=>'#e0e7ff','color'=>'#4338ca'],
+                                ['bg'=>'#dcfce7','color'=>'#15803d'],
+                                ['bg'=>'#fef9c3','color'=>'#a16207'],
+                                ['bg'=>'#fee2e2','color'=>'#b91c1c'],
+                                ['bg'=>'#ccfbf1','color'=>'#0f766e'],
+                            ];
+                        @endphp
+                        @foreach($reportData['by_student'] as $index => $student)
+                            @php
+                                $palette = $avatarPalette[$index % count($avatarPalette)];
+                                $words = explode(' ', $student['student']->full_name);
+                                $initials = strtoupper(substr($words[0],0,1) . (isset($words[1]) ? substr($words[1],0,1) : ''));
+                                $rate = $student['rate'];
+                                if($rate >= 90) { $barColor='#16a34a'; $badgeBg='#dcfce7'; $badgeColor='#166534'; $badgeText='Excellent'; }
+                                elseif($rate >= 75) { $barColor='#2563eb'; $badgeBg='#dbeafe'; $badgeColor='#1e40af'; $badgeText='Good'; }
+                                elseif($rate >= 60) { $barColor='#d97706'; $badgeBg='#fef9c3'; $badgeColor='#92400e'; $badgeText='Fair'; }
+                                else { $barColor='#dc2626'; $badgeBg='#fee2e2'; $badgeColor='#991b1b'; $badgeText='Poor'; }
+                            @endphp
+                            <tr style="border-bottom:1px solid #f3f4f6;">
+                                <td style="padding:11px 14px;">
+                                    <div style="display:flex;align-items:center;gap:10px;">
+                                        <div style="width:34px;height:34px;border-radius:50%;background:{{ $palette['bg'] }};color:{{ $palette['color'] }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;">
+                                            {{ $initials }}
+                                        </div>
+                                        <div>
+                                            <div style="font-weight:600;color:#111827;font-size:13px;">{{ $student['student']->full_name }}</div>
+                                            <div style="color:#9ca3af;font-size:12px;">{{ $student['student']->phone }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endfor
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="animate-pulse">
-                        <div class="h-6 bg-gray-200 rounded w-32 mb-4"></div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Sessions</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Present</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance Rate</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-10 w-10">
-                                                        <div class="h-10 w-10 rounded-full bg-gray-200"></div>
-                                                    </div>
-                                                    <div class="ml-4">
-                                                        <div class="h-4 bg-gray-200 rounded w-32 mb-2"></div>
-                                                        <div class="h-4 bg-gray-200 rounded w-24"></div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="h-4 bg-gray-200 rounded w-8"></div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="h-4 bg-gray-200 rounded w-8"></div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="h-4 bg-gray-200 rounded w-12 mr-2"></div>
-                                                    <div class="w-16 bg-gray-200 rounded h-2"></div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="h-6 bg-gray-200 rounded w-16"></div>
-                                            </td>
-                                        </tr>
-                                    @endfor
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @elseif($reportData)
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3">
-                            <x-filament::icon icon="heroicon-o-calendar" class="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Total Sessions</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $reportData['summary']['total_sessions'] }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
-                            <x-filament::icon icon="heroicon-o-users" class="w-6 h-6 text-green-600" />
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Total Students</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $reportData['summary']['total_students'] }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
-                            <x-filament::icon icon="heroicon-o-check-circle" class="w-6 h-6 text-green-600" />
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Present Rate</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $reportData['summary']['present_rate'] }}%</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
-                            <x-filament::icon icon="heroicon-o-check-circle" class="w-6 h-6 text-green-600" />
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Present</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $reportData['summary']['present'] }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-red-100 rounded-lg p-3">
-                            <x-filament::icon icon="heroicon-o-x-circle" class="w-6 h-6 text-red-600" />
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-600">Absent</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $reportData['summary']['absent'] }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Export Buttons -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold">Export Options</h3>
-                    <div class="flex gap-2">
-                        <x-filament::button wire:click="exportToExcel">
-                            <x-filament::icon icon="heroicon-o-document-arrow-down" class="w-4 h-4 mr-2" />
-                            Export Excel
-                        </x-filament::button>
-                        <x-filament::button wire:click="exportToPdf">
-                            <x-filament::icon icon="heroicon-o-document-arrow-down" class="w-4 h-4 mr-2" />
-                            Export PDF
-                        </x-filament::button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Attendance by Student Table -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold mb-4">Attendance by Student</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Sessions</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Present</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance Rate</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </td>
+                                <td style="padding:11px 14px;color:#374151;">{{ $student['total_sessions'] }}</td>
+                                <td style="padding:11px 14px;color:#374151;">{{ $student['present'] }}</td>
+                                <td style="padding:11px 14px;">
+                                    <div style="display:flex;align-items:center;gap:8px;">
+                                        <span style="font-size:13px;font-weight:500;color:#111827;min-width:36px;">{{ $rate }}%</span>
+                                        <div style="width:64px;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;">
+                                            <div style="height:100%;border-radius:99px;background:{{ $barColor }};width:{{ $rate }}%;"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding:11px 14px;">
+                                    <span style="display:inline-flex;align-items:center;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:600;background:{{ $badgeBg }};color:{{ $badgeColor }};">
+                                        {{ $badgeText }}
+                                    </span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($reportData['by_student'] as $student)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                    <x-filament::icon icon="heroicon-o-user" class="w-5 h-5 text-gray-500" />
-                                                </div>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">{{ $student['student']->full_name }}</div>
-                                                <div class="text-sm text-gray-500">{{ $student['student']->phone }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $student['total_sessions'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $student['present'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <span class="text-sm text-gray-900">{{ $student['rate'] }}%</span>
-                                            <div class="ml-2 w-16 bg-gray-200 rounded-full h-2">
-                                                <div class="bg-green-600 h-2 rounded-full" style="width: {{ $student['rate'] }}%"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($student['rate'] >= 90)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Excellent</span>
-                                        @elseif($student['rate'] >= 75)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Good</span>
-                                        @elseif($student['rate'] >= 60)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Fair</span>
-                                        @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Poor</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <!-- Attendance by Date Chart -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold mb-4">Attendance Trend by Date</h3>
-                <div class="space-y-2">
-                    @foreach($reportData['by_date'] as $date)
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
-                            <div class="flex items-center space-x-4">
-                                <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($date['date'])->format('M d, Y') }}</span>
-                                <span class="text-sm text-gray-600">{{ $date['present'] }}/{{ $date['total'] }} present</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-sm font-medium text-gray-900">{{ $date['rate'] }}%</span>
-                                <div class="w-24 bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $date['rate'] }}%"></div>
-                                </div>
+        {{-- ── Attendance Trend by Date ── --}}
+        <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:1.5rem;">
+            <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
+                <x-filament::icon icon="heroicon-o-arrow-trending-up" style="width:18px;height:18px;color:#6b7280;" />
+                Attendance Trend by Date
+            </h3>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+                @foreach($reportData['by_date'] as $date)
+                    @php
+                        $r = $date['rate'];
+                        $barCol = $r >= 90 ? '#16a34a' : ($r >= 75 ? '#2563eb' : ($r >= 60 ? '#d97706' : '#dc2626'));
+                    @endphp
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9fafb;border-radius:8px;gap:12px;">
+                        <div style="display:flex;align-items:center;gap:16px;">
+                            <span style="font-size:13px;font-weight:600;color:#111827;white-space:nowrap;">
+                                {{ \Carbon\Carbon::parse($date['date'])->format('M d, Y') }}
+                            </span>
+                            <span style="font-size:12px;color:#9ca3af;">{{ $date['present'] }}/{{ $date['total'] }} present</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                            <span style="font-size:13px;font-weight:600;color:#111827;min-width:36px;text-align:right;">{{ $r }}%</span>
+                            <div style="width:80px;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;">
+                                <div style="height:100%;border-radius:99px;background:{{ $barCol }};width:{{ $r }}%;"></div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Teacher Attendance by Subject -->
-            @if(!empty($reportData['by_teacher_subject']))
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" x-data="{ activeSubject: '{{ array_key_first($reportData['by_teacher_subject']) }}' }">
-                <h3 class="text-lg font-semibold mb-4">Teacher Attendance by Subject</h3>
-
-                <!-- Subject Tabs -->
-                <div class="border-b border-gray-200 mb-4">
-                    <nav class="flex space-x-4 overflow-x-auto" aria-label="Subjects">
-                        @foreach(array_keys($reportData['by_teacher_subject']) as $subject)
-                            <button
-                                type="button"
-                                @click="activeSubject = '{{ $subject }}'"
-                                :class="activeSubject === '{{ $subject }}' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors"
-                            >
-                                {{ $subject }}
-                            </button>
-                        @endforeach
-                    </nav>
-                </div>
-
-                <!-- Subject Tables -->
-                @foreach($reportData['by_teacher_subject'] as $subject => $teachers)
-                <div x-show="activeSubject === '{{ $subject }}'" x-cloak>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teacher</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Sessions</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Present</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance Rate</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($teachers as $teacher)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">{{ $teacher['teacher_name'] }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $teacher['total_sessions'] }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $teacher['present'] }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <span class="text-sm text-gray-900">{{ $teacher['rate'] }}%</span>
-                                                <div class="ml-2 w-16 bg-gray-200 rounded-full h-2">
-                                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ $teacher['rate'] }}%"></div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($teacher['rate'] >= 90)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Excellent</span>
-                                            @elseif($teacher['rate'] >= 75)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Good</span>
-                                            @elseif($teacher['rate'] >= 60)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Fair</span>
-                                            @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Poor</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
                     </div>
-                </div>
                 @endforeach
             </div>
-            @endif
-        @endif
-    </div>
+        </div>
+
+    @endif
+</div>
+
+<style>
+@keyframes pulse {
+    0%,100% { opacity:1; }
+    50% { opacity:.5; }
+}
+</style>
 </x-filament-panels::page>

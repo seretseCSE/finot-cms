@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class RehearsalAttendanceResource extends BaseResource
 {
@@ -37,6 +38,21 @@ class RehearsalAttendanceResource extends BaseResource
     public static function getNavigationSort(): ?int
     {
         return 3;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->can('rehearsal_attendances.view');
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()?->can('rehearsal_attendances.create');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return Auth::user()?->can('rehearsal_attendances.update');
     }
 
     public static function canDelete($record): bool

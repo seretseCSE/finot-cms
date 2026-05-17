@@ -43,6 +43,7 @@
         let deferredPromptAdmin;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
             deferredPromptAdmin = e;
             window.dispatchEvent(new CustomEvent('pwa:install-available-admin'));
         });
@@ -71,6 +72,7 @@
         localStorage.setItem('pwaAdminVisitCount', adminVisitCount.toString());
 
         window.addEventListener('pwa:install-available-admin', () => {
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
             const dismissedUntil = localStorage.getItem('pwaPromptDismissedUntilAdmin');
             if (dismissedUntil && new Date(dismissedUntil) > new Date()) {
                 return;

@@ -16,6 +16,7 @@ class Department extends Model
         'name_am',
         'description',
         'head_user_id',
+        'head_image',
         'is_active',
     ];
 
@@ -45,6 +46,14 @@ class Department extends Model
     public function headUserNameAttribute(): string
     {
         return $this->headUser?->name ?? 'No Head Assigned';
+    }
+
+    /**
+     * Get the full URL for the head image.
+     */
+    public function getHeadImageUrlAttribute(): ?string
+    {
+        return $this->head_image ? asset('storage/' . $this->head_image) : null;
     }
 
     /**

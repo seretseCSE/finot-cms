@@ -68,6 +68,9 @@ class SecurityHeaders
             // Connect sources - allow self and API endpoints
             "connect-src 'self'",
             
+            // Frame sources - needed for YouTube/Vimeo embeds on public pages
+            "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vimeo.com",
+
             // Frame ancestors - restrict to same origin
             "frame-ancestors 'self'",
             
@@ -77,8 +80,8 @@ class SecurityHeaders
             // Form action - restrict to same origin
             "form-action 'self'",
             
-            // Media sources
-            "media-src 'self' blob:",
+            // Media sources - allow HTTPS for direct video/audio URLs
+            "media-src 'self' https: blob:",
             
             // Object sources
             "object-src 'none'",

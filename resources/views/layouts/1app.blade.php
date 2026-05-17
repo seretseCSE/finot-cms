@@ -155,6 +155,7 @@
             let deferredPrompt;
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
+                if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
                 deferredPrompt = e;
                 const banner = document.getElementById('pwa-install-banner');
                 const dismissedUntil = localStorage.getItem('pwaPromptDismissedUntil');

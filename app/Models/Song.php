@@ -22,7 +22,7 @@ class Song extends BaseModel
         'category_id',
         'subcategory_id',
         'audio_file',
-        'video_file',
+        'video_url',
         'artist',
         'is_active',
         'created_by',
@@ -97,15 +97,52 @@ class Song extends BaseModel
     }
 
     /**
-     * Get video URL
+     * Get video URL (raw URL stored in database)
      */
     public function getVideoUrlAttribute(): ?string
     {
-        if (! $this->video_file) {
+        return $this->attributes['video_url'] ?? null;
+    }
+
+    /**
+     * Get embed URL (converts YouTube/Vimeo links to embeddable format)
+     */
+    public function getEmbedUrlAttribute(): ?string
+    {
+        $url = $this->attributes['video_url'] ?? null;
+
+        if (! $url) {
             return null;
         }
 
-        return asset('storage/songs-video/'.$this->video_file);
+        // YouTube: https://www.youtube.com/watch?v=ABC -> https://www.youtube.com/embed/ABC
+        if (preg_match('/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $url, $matches)) {
+            return 'https://www.youtube.com/embed/'.$matches[1];
+        }
+
+        // YouTube short: https://youtu.be/ABC -> https://www.youtube.com/embed/ABC
+        if (preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $url, $matches)) {
+            return 'https://www.youtube.com/embed/'.$matches[1];
+        }
+
+        // Vimeo: https://vimeo.com/123456 -> https://player.vimeo.com/video/123456
+        if (preg_match('/vimeo\.com\/(\d+)/', $url, $matches)) {
+            return 'https://player.vimeo.com/video/'.$matches[1];
+        }
+
+        // Direct video file or unrecognized — return as-is
+        return $url;
+    }
+
+    /**
+     * Whether the video URL can be embedded as an iframe.
+     */
+    public function getIsEmbeddableAttribute(): bool
+    {
+        return $this->embed_url && (
+            str_contains($this->embed_url, '/embed/') ||
+            str_contains($this->embed_url, 'player.vimeo.com')
+        );
     }
 
     /**
@@ -121,7 +158,7 @@ class Song extends BaseModel
      */
     public function getHasVideoAttribute(): bool
     {
-        return ! empty($this->video_file);
+        return ! empty($this->video_url);
     }
 
     /**
@@ -183,7 +220,6 @@ class Song extends BaseModel
     {
         return [
             ['field' => 'audio_file', 'disk' => 'songs-audio', 'options' => ['bitrate' => '128k']],
-            ['field' => 'video_file', 'disk' => 'songs-video', 'options' => ['bitrate' => '2000k']],
         ];
     }
 }

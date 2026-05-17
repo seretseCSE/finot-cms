@@ -6,6 +6,7 @@ use App\Models\LibraryResource;
 use App\Models\Event;
 use App\Models\BlogPost;
 use App\Models\FAQ;
+use App\Models\MediaItem;
 
 class HomeController extends Controller
 {
@@ -69,6 +70,25 @@ class HomeController extends Controller
             $faqs = collect();
         }
 
-        return view('public.home', compact('featuredLibraryResources', 'totalLibraryResources', 'upcomingEvents', 'recentPosts', 'departments', 'faqs'));
+        // Fetch recent public photos for gallery
+        try {
+            $recentPhotos = MediaItem::where('visibility', 'Public')
+                ->where('type', 'Photo')
+                ->latest()
+                ->take(6)
+                ->get();
+        } catch (\Exception $e) {
+            $recentPhotos = collect();
+        }
+
+        return view('public.home', compact(
+            'featuredLibraryResources',
+            'totalLibraryResources',
+            'upcomingEvents',
+            'recentPosts',
+            'departments',
+            'faqs',
+            'recentPhotos'
+        ));
     }
 }

@@ -13,8 +13,6 @@ use App\Models\StudentEnrollment;
 use App\Rules\EnrollmentUniquePerYear;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -84,7 +82,7 @@ class StudentEnrollmentResource extends BaseResource
                     ->searchable()
                     ->preload()
                     ->live()
-                    ->afterStateUpdated(function (Set $set) {
+                    ->afterStateUpdated(function ($set) {
                         $set('member_id', null);
                     })
                     ->dehydrated(false),
@@ -93,7 +91,7 @@ class StudentEnrollmentResource extends BaseResource
                     ->label('Student')
                     ->searchable()
                     ->preload()
-                    ->options(function (Get $get): array {
+                    ->options(function ($get): array {
                         $groupId = $get('group_id');
                         $activeYear = AcademicYear::query()->where('status', 'Active')->first();
 

@@ -64,11 +64,18 @@
                         </div>
                     @endif
                     @if($song->video_url)
-                        <div style="display:flex;align-items:flex-end;">
-                            <a href="{{ $song->video_url }}" target="_blank" class="btn btn-primary" style="background:linear-gradient(135deg, #FF0000, #CC0000);box-shadow: 0 4px 15px rgba(255,0,0,.2);">
-                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                                {{ __('Watch Video') }}
-                            </a>
+                        <div style="flex:1;min-width:300px;">
+                            <div style="font-size:.7rem;text-transform:uppercase;color:var(--text-40);margin-bottom:12px;font-weight:700;">{{ __('Watch Video') }}</div>
+                            @if($song->is_embeddable)
+                                <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;">
+                                    <iframe src="{{ $song->embed_url }}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen loading="lazy"></iframe>
+                                </div>
+                            @else
+                                <video controls style="width:100%;border-radius:12px;" preload="metadata">
+                                    <source src="{{ $song->video_url }}" type="video/mp4">
+                                    {{ __('Your browser does not support the video tag.') }}
+                                </video>
+                            @endif
                         </div>
                     @endif
                 </div>

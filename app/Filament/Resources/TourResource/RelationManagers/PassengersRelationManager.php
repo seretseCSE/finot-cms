@@ -26,7 +26,7 @@ class PassengersRelationManager extends RelationManager
                     ->searchable(['first_name', 'father_name', 'grandfather_name', 'phone'])
                     ->preload()
                     ->live()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, $set) {
                         if ($state) {
                             $member = \App\Models\Member::find($state);
                             if ($member) {
@@ -46,7 +46,7 @@ class PassengersRelationManager extends RelationManager
                     ->placeholder('912345678')
                     ->helperText('Enter 9 digits after '.config('finot.phone_prefix', '+251'))
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, $set) {
                         if ($state && strlen($state) === 9) {
                             $fullPhone = config('finot.phone_prefix', '+251').$state;
                             $member = \App\Models\Member::where('phone', $fullPhone)->first();

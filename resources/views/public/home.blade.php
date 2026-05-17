@@ -287,26 +287,24 @@
             @endforeach
         </div>
 
-        {{-- Department Heads --}}
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px;justify-content:center;">
+        {{-- Department Heads: 3-4-3 centered flex layout with images --}}
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:28px;max-width:1024px;margin:0 auto;">
             @foreach($departments as $department)
-            <div class="sr" style="text-align:center;">
-                {{-- Circular Image Wrap --}}
-                <div style="width:clamp(100px, 15vw, 120px);height:clamp(100px, 15vw, 120px);border-radius:50%;margin:0 auto 20px;position:relative;padding:6px;background:var(--glass);border:2px dashed var(--gold-border);">
-                    <div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg, #1A44F722, #1A44F744);display:flex;align-items:center;justify-content:center;font-size:clamp(1.5rem, 4vw, 2.5rem);border:1px solid #1A44F733;box-shadow:0 8px 25px rgba(0,0,0,0.1);">
-                        🏢
-                    </div>
-                    {{-- Small decorative badge --}}
-                    <div style="position:absolute;bottom:4px;right:4px;width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--bg-950);display:flex;align-items:center;justify-content:center;font-size:.8rem;box-shadow:0 3px 12px rgba(243,186,21,0.4);border:2px solid var(--bg-950);">
-                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+            <div class="sr" style="width:220px;text-align:center;">
+                {{-- Circular Image — real photo or fallback icon --}}
+                <div style="width:120px;height:120px;border-radius:50%;margin:0 auto 16px;position:relative;padding:5px;background:var(--glass);border:2px dashed var(--gold-border);">
+                    <div style="width:100%;height:100%;border-radius:50%;overflow:hidden;background:linear-gradient(135deg, #1A44F722, #1A44F744);display:flex;align-items:center;justify-content:center;border:1px solid #1A44F733;">
+                        @if($department->head_image_url)
+                            <img src="{{ $department->head_image_url }}" alt="{{ $department->headUserName }}" style="width:100%;height:100%;object-fit:cover;">
+                        @else
+                            <span style="font-size:2.2rem;line-height:1;">🏢</span>
+                        @endif
                     </div>
                 </div>
-                {{-- Title/Role --}}
-                <div style="font-size:.7rem;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;">{{ __('Department Head') }}</div>
-                {{-- Department Name in Amharic --}}
-                <h3 class="am" style="font-size:1rem;font-weight:700;color:var(--text-display);margin-bottom:4px;line-height:1.3;">{{ $department->name_am ?? $department->name_en }}</h3>
-                {{-- Department Head Name in English --}}
-                <div style="font-size:.8rem;color:var(--text-60);">{{ $department->headUserName }}</div>
+                {{-- Head Name --}}
+                <h3 class="am" style="font-size:1rem;font-weight:700;color:var(--text-display);margin-bottom:2px;line-height:1.3;">{{ $department->headUserName }}</h3>
+                {{-- Department Name --}}
+                <div style="font-size:.78rem;color:var(--text-60);">{{ $department->name_am ?? $department->name_en }}</div>
             </div>
             @endforeach
         </div>
@@ -666,8 +664,53 @@ document.addEventListener('DOMContentLoaded', loadFundraising);
 
 
 {{-- ═══════════════════════════════════════════════════════
-     13.  FAQ + CTA SPLIT
+     12.5  PHOTO GALLERY — Recent public photos
 ═══════════════════════════════════════════════════════ --}}
+@if($recentPhotos && $recentPhotos->count() > 0)
+<section style="padding:80px 24px;background:var(--dark-900);">
+    <div style="max-width:1280px;margin:0 auto;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:40px;">
+            <div>
+                <div class="sec-label sr">{{ __('Gallery') }}</div>
+                <h2 class="display sr" style="font-size:clamp(1.8rem,3vw,2.8rem);">{{ __('Moments') }}</h2>
+            </div>
+            <a href="{{ route('media') }}" class="btn btn-ghost sr">{{ __('View All Photos') }}</a>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+            @foreach($recentPhotos as $photo)
+            <a href="{{ route('media.show', $photo) }}" class="sr" style="display:block;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;background:var(--bg-800);position:relative;" data-delay="{{ $loop->index * 60 }}">
+                <img src="{{ $photo->file_url }}" alt="{{ $photo->title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform .5s;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                @if($photo->title)
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:40px 14px 12px;background:linear-gradient(transparent,rgba(0,0,0,.6));">
+                    <span style="font-size:.8rem;font-weight:500;color:#fff;display:block;text-shadow:0 1px 4px rgba(0,0,0,.3);">{{ $photo->title }}</span>
+                </div>
+                @endif
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+@push('styles')
+<style>
+    @media(max-width:768px) {
+        section > div > div[style*="grid-template-columns:repeat(3,1fr)"] {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+    }
+    @media(max-width:480px) {
+        section > div > div[style*="grid-template-columns:repeat(3,1fr)"] {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+@endpush
+@endif
+
+{{-- ═══════════════════════════════════════════════════════
+     13.  FAQ + CTA SPLIT
+ ═══════════════════════════════════════════════════════ --}}
 <section style="padding:80px 24px;background:linear-gradient(180deg,var(--dark-900),var(--dark-950));">
     <div class="faq-cta-grid" style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;">
 

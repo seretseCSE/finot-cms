@@ -11,6 +11,7 @@ use Filament\Pages\Page;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceSummaryReport extends Page
 {
@@ -49,65 +50,57 @@ class AttendanceSummaryReport extends Page
             'end_date' => now()->format('Y-m-d'),
         ]);
 
-        // Try to load initial data
         $this->updateReportData();
     }
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->statePath('filters')->components([
                 Forms\Components\Select::make('academic_year_id')
                     ->label('Academic Year')
                     ->options(AcademicYear::pluck('name', 'id'))
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, callable $set) {
+                    ->live()
+                    ->afterStateUpdated(function ($state, $set) {
                         $set('class_id', null);
                         $this->updateReportData();
                     }),
 
                 Forms\Components\Select::make('class_id')
                     ->label('Class')
-                    ->options(function (callable $get) {
+                    ->options(function ($get) {
                         $yearId = $get('academic_year_id');
 
-                        // Get all classes, but prioritize those with sessions in the selected year
-                        $query = ClassModel::query();
+                        $query = ClassModel::orderBy('name');
 
                         if ($yearId) {
-                            // Get classes that have sessions in this year
-                            $classesWithSessions = ClassModel::whereHas('attendanceSessions', function ($query) use ($yearId) {
-                                $query->where('academic_year_id', $yearId);
-                            })->pluck('id')->toArray();
-
-                            // Get all classes and mark those with sessions
-                            $allClasses = ClassModel::orderBy('name')->get();
-
-                            return $allClasses->mapWithKeys(function ($class) use ($classesWithSessions, $yearId) {
-                                $hasSessions = in_array($class->id, $classesWithSessions);
-                                $label = $class->name . ($hasSessions ? ' ✓' : ' (No sessions)');
-                                return [$class->id => $label];
-                            });
-                        } else {
-                            return ClassModel::orderBy('name')
-                                ->get()
-                                ->mapWithKeys(fn ($class) => [$class->id => $class->name]);
+                            $query->whereHas('attendanceSessions', fn ($q) => $q->where('academic_year_id', $yearId));
                         }
+
+                        return $query->get()->mapWithKeys(function ($class) use ($yearId) {
+                            $hasSessions = $yearId
+                                ? $class->attendanceSessions()->where('academic_year_id', $yearId)->exists()
+                                : true;
+
+                            $label = $class->name . ($hasSessions ? ' ✓' : ' (No sessions)');
+                            return [$class->id => $label];
+                        });
                     })
-                    ->reactive()
-                    ->afterStateUpdated(function () {
-                        $this->updateReportData();
-                    }),
+                    ->searchable()
+                    ->preload()
+                    ->placeholder('All Classes')
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->updateReportData()),
 
                 Forms\Components\DatePicker::make('start_date')
                     ->label('Start Date')
-                    ->reactive()
+                    ->live()
                     ->afterStateUpdated(function () {
                         $this->updateReportData();
                     }),
 
                 Forms\Components\DatePicker::make('end_date')
                     ->label('End Date')
-                    ->reactive()
+                    ->live()
                     ->afterOrEqual('start_date')
                     ->afterStateUpdated(function () {
                         $this->updateReportData();
@@ -118,15 +111,15 @@ class AttendanceSummaryReport extends Page
 
     public function updateReportData(): void
     {
-        $formData = $this->form->getState();
+        $formData = $this->filters ?? [];
 
-        // Only load data if we have the basic required fields
-        if ($formData['academic_year_id'] && $formData['start_date'] && $formData['end_date']) {
+        $academicYearId = $formData['academic_year_id'] ?? null;
+        $startDate = $formData['start_date'] ?? null;
+        $endDate = $formData['end_date'] ?? null;
+
+        if ($academicYearId && $startDate && $endDate) {
             $this->isLoading = true;
-
-            // Load the report data
             $this->reportData = $this->getReportData();
-
             $this->isLoading = false;
         } else {
             $this->reportData = null;
@@ -134,33 +127,52 @@ class AttendanceSummaryReport extends Page
         }
     }
 
-    public function generateReport(): void
+    public function resetFilters(): void
     {
-        $this->reportData = $this->getReportData();
+        $this->form->fill([
+            'academic_year_id' => AcademicYear::where('status', 'Active')->first()?->id,
+            'class_id' => null,
+            'start_date' => now()->subMonth()->format('Y-m-d'),
+            'end_date' => now()->format('Y-m-d'),
+        ]);
+
+        $this->updateReportData();
     }
 
     public function getReportData(): array
     {
-        $filters = $this->form->getState();
+        $filters = $this->filters ?? [];
+
+        $classId = $filters['class_id'] ?? null;
+        $academicYearId = $filters['academic_year_id'] ?? null;
+        $startDate = $filters['start_date'] ?? null;
+        $endDate = $filters['end_date'] ?? null;
+
+        Log::debug('AttendanceSummaryReport::getReportData', [
+            'class_id' => $classId,
+            'academic_year_id' => $academicYearId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
 
         $studentQuery = StudentAttendance::with(['student', 'session.classes', 'session.academicYear'])
-            ->whereHas('session', function (Builder $query) use ($filters) {
-                if ($filters['academic_year_id']) {
-                    $query->where('academic_year_id', $filters['academic_year_id']);
+            ->whereHas('session', function (Builder $query) use ($academicYearId, $classId, $startDate, $endDate) {
+                if ($academicYearId) {
+                    $query->where('academic_year_id', $academicYearId);
                 }
-                if ($filters['class_id']) {
-                    $query->whereHas('classes', fn ($q) => $q->where('class_id', $filters['class_id']));
+                if ($classId) {
+                    $query->where(function (Builder $q) use ($classId) {
+                        $q->where('class_id', $classId)
+                          ->orWhereHas('classes', fn ($q2) => $q2->where('classes.id', $classId));
+                    });
+                }
+                if ($startDate && $endDate) {
+                    $query->whereBetween('session_date', [$startDate, $endDate]);
                 }
             });
 
-        // Apply date range filter
-        $studentQuery->whereHas('session', function (Builder $query) use ($filters) {
-            $query->whereBetween('session_date', [$filters['start_date'], $filters['end_date']]);
-        });
-
         $attendances = $studentQuery->get();
 
-        // Calculate statistics
         $totalSessions = $attendances->pluck('session_id')->unique()->count();
         $totalStudents = $attendances->pluck('student_id')->unique()->count();
         $presentCount = $attendances->where('status', 'Present')->count();
@@ -168,7 +180,6 @@ class AttendanceSummaryReport extends Page
         $lateCount = $attendances->where('status', 'Late')->count();
         $excusedCount = $attendances->where('status', 'Excused')->count();
 
-        // Calculate attendance rate by student
         $attendanceByStudent = $attendances->groupBy('student_id')->map(function ($studentAttendances) {
             $total = $studentAttendances->count();
             $present = $studentAttendances->where('status', 'Present')->count();
@@ -182,16 +193,20 @@ class AttendanceSummaryReport extends Page
             ];
         })->sortByDesc('rate');
 
-        // Teacher attendance by subject
         $teacherQuery = TeacherAttendance::with(['teacherAssignment.teacher', 'teacherAssignment.subject', 'session'])
-            ->whereHas('session', function (Builder $query) use ($filters) {
-                if ($filters['academic_year_id']) {
-                    $query->where('academic_year_id', $filters['academic_year_id']);
+            ->whereHas('session', function (Builder $query) use ($academicYearId, $classId, $startDate, $endDate) {
+                if ($academicYearId) {
+                    $query->where('academic_year_id', $academicYearId);
                 }
-                if ($filters['class_id']) {
-                    $query->whereHas('classes', fn ($q) => $q->where('class_id', $filters['class_id']));
+                if ($classId) {
+                    $query->where(function (Builder $q) use ($classId) {
+                        $q->where('class_id', $classId)
+                          ->orWhereHas('classes', fn ($q2) => $q2->where('classes.id', $classId));
+                    });
                 }
-                $query->whereBetween('session_date', [$filters['start_date'], $filters['end_date']]);
+                if ($startDate && $endDate) {
+                    $query->whereBetween('session_date', [$startDate, $endDate]);
+                }
             });
 
         $teacherAttendances = $teacherQuery->get();
@@ -219,30 +234,31 @@ class AttendanceSummaryReport extends Page
             })
             ->toArray();
 
+        $totalEntries = $presentCount + $absentCount + $lateCount + $excusedCount;
+
         return [
             'summary' => [
                 'total_sessions' => $totalSessions,
                 'total_students' => $totalStudents,
-                'present_rate' => $totalStudents > 0 ? round(($presentCount / ($presentCount + $absentCount + $lateCount + $excusedCount)) * 100, 2) : 0,
+                'present_rate' => $totalEntries > 0 ? round(($presentCount / $totalEntries) * 100, 2) : 0,
                 'present' => $presentCount,
                 'absent' => $absentCount,
                 'late' => $lateCount,
                 'excused' => $excusedCount,
             ],
             'by_student' => $attendanceByStudent,
-            'by_date' => $attendances->groupBy(function ($attendance) {
-                return $attendance->session->session_date;
-            })->map(function ($dateAttendances) {
-                $total = $dateAttendances->count();
-                $present = $dateAttendances->where('status', 'Present')->count();
+            'by_date' => $attendances->groupBy(fn ($a) => $a->session->session_date)
+                ->map(function ($dateAttendances) {
+                    $total = $dateAttendances->count();
+                    $present = $dateAttendances->where('status', 'Present')->count();
 
-                return [
-                    'date' => $dateAttendances->first()->session->session_date,
-                    'total' => $total,
-                    'present' => $present,
-                    'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
-                ];
-            })->sortBy('date'),
+                    return [
+                        'date' => $dateAttendances->first()->session->session_date,
+                        'total' => $total,
+                        'present' => $present,
+                        'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+                    ];
+                })->sortBy('date'),
             'by_teacher_subject' => $byTeacherSubject,
         ];
     }
@@ -255,8 +271,6 @@ class AttendanceSummaryReport extends Page
 
         $data = $this->reportData;
 
-        // Implementation for Excel export
-        // This would use Laravel Excel package
         return response()->json($data);
     }
 
@@ -268,8 +282,6 @@ class AttendanceSummaryReport extends Page
 
         $data = $this->reportData;
 
-        // Implementation for PDF export
-        // This would use DomPDF or similar
         return response()->json($data);
     }
 }

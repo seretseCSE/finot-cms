@@ -42,8 +42,8 @@ class SongFeatureTest extends TestCase
     #[Test]
     public function songs_index_filters_by_audio_only(): void
     {
-        Song::factory()->create(['title' => 'Audio Song', 'audio_file' => 'audio.mp3', 'video_file' => null, 'is_active' => true]);
-        Song::factory()->create(['title' => 'Video Song', 'audio_file' => null, 'video_file' => 'video.mp4', 'is_active' => true]);
+        Song::factory()->create(['title' => 'Audio Song', 'audio_file' => 'audio.mp3', 'video_url' => null, 'is_active' => true]);
+        Song::factory()->create(['title' => 'Video Song', 'audio_file' => null, 'video_url' => 'https://www.youtube.com/watch?v=test123', 'is_active' => true]);
 
         $response = $this->get('/songs?has_audio=1');
 
@@ -55,8 +55,8 @@ class SongFeatureTest extends TestCase
     #[Test]
     public function songs_index_filters_by_video_only(): void
     {
-        Song::factory()->create(['title' => 'Audio Only', 'audio_file' => 'audio.mp3', 'video_file' => null, 'is_active' => true]);
-        Song::factory()->create(['title' => 'Video Song', 'audio_file' => null, 'video_file' => 'video.mp4', 'is_active' => true]);
+        Song::factory()->create(['title' => 'Audio Only', 'audio_file' => 'audio.mp3', 'video_url' => null, 'is_active' => true]);
+        Song::factory()->create(['title' => 'Video Song', 'audio_file' => null, 'video_url' => 'https://www.youtube.com/watch?v=test456', 'is_active' => true]);
 
         $response = $this->get('/songs?has_video=1');
 

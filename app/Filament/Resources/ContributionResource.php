@@ -106,7 +106,7 @@ class ContributionResource extends Resource
                             ->label('Month')
                             ->options(EthiopianDateHelper::getMonthsForContribution('ethiopian'))
                             ->live()
-                            ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
+                            ->afterStateUpdated(function ($get, $set) {
                                 $memberId = $get('member_id');
                                 $academicYearId = $get('academic_year_id');
                                 $monthName = $get('month_name');
@@ -147,7 +147,7 @@ class ContributionResource extends Resource
                             ->required()
                             ->prefix('Birr')
                             ->rules([
-                                function (Forms\Get $get) {
+                                function ($get) {
                                     return function (string $attribute, mixed $value, \Closure $fail) use ($get) {
                                         $memberId = $get('member_id');
                                         $academicYearId = $get('academic_year_id');

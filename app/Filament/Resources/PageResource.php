@@ -44,7 +44,7 @@ class PageResource extends BaseResource
                             ->label('Title (English)')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function (Forms\Set $set, $state, $record) {
+                            ->afterStateUpdated(function ($set, $state, $record) {
                                 if (! $record?->slug) {
                                     $set('slug', \App\Models\Page::generateUniqueSlug($state));
                                 }

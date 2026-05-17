@@ -16,6 +16,8 @@ class PWATourManager {
     }
 
     captureInstallPrompt() {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (isStandalone) return;
         window.addEventListener('beforeinstallprompt', (event) => {
             event.preventDefault();
             this.deferredInstallPrompt = event;
