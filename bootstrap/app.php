@@ -29,5 +29,15 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\InvalidArgumentException $e, \Illuminate\Http\Request $request) {
+            if (str_contains($e->getMessage(), 'Malformed UTF-8 characters')) {
+                if ($request->expectsJson() || $request->is('livewire*')) {
+                    return response()->json([
+                        'error' => 'A data encoding error occurred. Please ensure all input contains valid UTF-8 characters.',
+                    ], 500);
+                }
+
+                return back()->with('error', 'A data encoding error occurred. Please ensure all input contains valid UTF-8 characters.');
+            }
+        });
     })->create();

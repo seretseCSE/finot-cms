@@ -356,6 +356,8 @@ class PermissionSeeder extends Seeder
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
                 'page.attendance.student',
+                'page.report.attendance-summary',
+                'page.report.teacher-attendance',
             ],
         ],
         'worship_monitor' => [
@@ -445,6 +447,8 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
+                'page.report.attendance-summary',
+                'page.report.teacher-attendance',
             ],
         ],
         'department_secretary' => [

@@ -178,22 +178,39 @@ class MonthlyContributionReports extends Page
                 $monthlyData[$monthNum] = [
                     'month_name' => $contribution->month_name,
                     'month_num' => $monthNum,
-                    'contributions' => collect(),
+                    'contributions' => [],
                     'total_amount' => 0,
                     'member_count' => 0,
+                    'member_ids' => [],
                 ];
             }
 
-            $monthlyData[$monthNum]['contributions']->push($contribution);
+            // Convert contribution to array to avoid serialization issues
+            $member = $contribution->member;
+            $monthlyData[$monthNum]['contributions'][] = [
+                'id' => $contribution->id,
+                'payment_date' => $contribution->payment_date instanceof \Carbon\Carbon ? $contribution->payment_date->format('Y-m-d') : $contribution->payment_date,
+                'amount' => $contribution->amount,
+                'member_name' => $member?->full_name ?? 'N/A',
+                'member_code' => $member?->member_code ?? 'N/A',
+                'month_name' => $contribution->month_name,
+                'is_archived' => $contribution->is_archived,
+            ];
             $monthlyData[$monthNum]['total_amount'] += $contribution->amount;
-            $monthlyData[$monthNum]['member_count'] = $monthlyData[$monthNum]['contributions']
-                ->pluck('member_id')
-                ->unique()
-                ->count();
+
+            // Track unique member IDs
+            if (!in_array($contribution->member_id, $monthlyData[$monthNum]['member_ids'])) {
+                $monthlyData[$monthNum]['member_ids'][] = $contribution->member_id;
+            }
+            $monthlyData[$monthNum]['member_count'] = count($monthlyData[$monthNum]['member_ids']);
         }
 
-        // Sort by month number
+        // Sort by month number and remove helper fields
         ksort($monthlyData);
+        foreach ($monthlyData as &$monthData) {
+            unset($monthData['member_ids']);
+        }
+
         $this->monthlyReports = collect($monthlyData);
     }
 

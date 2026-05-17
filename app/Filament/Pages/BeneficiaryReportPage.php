@@ -90,7 +90,21 @@ class BeneficiaryReportPage extends Page
             $beneficiaryQuery->whereIn('need_category', $needCategory);
         }
 
-        $beneficiaries = $beneficiaryQuery->orderBy('full_name')->get();
+        $beneficiaries = $beneficiaryQuery->orderBy('full_name')->get()->map(function ($beneficiary) {
+            return [
+                'id' => $beneficiary->id,
+                'beneficiary_code' => $beneficiary->beneficiary_code,
+                'full_name' => $beneficiary->full_name,
+                'phone' => $beneficiary->phone,
+                'address' => $beneficiary->address,
+                'type' => $beneficiary->type,
+                'need_category' => $beneficiary->need_category,
+                'email' => $beneficiary->email,
+                'status' => $beneficiary->status,
+                'dependents_count' => $beneficiary->dependents_count,
+                'monthly_income' => $beneficiary->monthly_income,
+            ];
+        });
 
         $aidQuery = AidDistribution::query();
 
@@ -102,7 +116,18 @@ class BeneficiaryReportPage extends Page
             $aidQuery->whereDate('distribution_date', '<=', $dateTo);
         }
 
-        $aidDistributions = $aidQuery->with(['beneficiary', 'distributedBy'])->orderBy('distribution_date', 'desc')->get();
+        $aidDistributions = $aidQuery->with(['beneficiary', 'distributedBy'])->orderBy('distribution_date', 'desc')->get()->map(function ($aid) {
+            return [
+                'id' => $aid->id,
+                'beneficiary_id' => $aid->beneficiary_id,
+                'beneficiary_name' => $aid->beneficiary?->full_name,
+                'distribution_date' => $aid->distribution_date?->format('Y-m-d'),
+                'aid_type' => $aid->aid_type,
+                'amount' => $aid->amount,
+                'receipt_number' => $aid->receipt_number,
+                'distributed_by_name' => $aid->distributedBy?->name,
+            ];
+        });
 
         $totalAidDistributed = $aidDistributions->sum('amount');
         $totalDistributions = $aidDistributions->count();
@@ -113,7 +138,7 @@ class BeneficiaryReportPage extends Page
             ->groupBy('aid_type')
             ->map(function ($group) {
                 return [
-                    'type' => $group->first()->aid_type,
+                    'type' => $group->first()['aid_type'],
                     'total' => $group->sum('amount'),
                     'count' => $group->count(),
                 ];
@@ -123,11 +148,11 @@ class BeneficiaryReportPage extends Page
 
         $monthlyTrend = $aidDistributions
             ->groupBy(function ($item) {
-                return $item->distribution_date->format('Y-m');
+                return substr($item['distribution_date'], 0, 7);
             })
             ->map(function ($group) {
                 return [
-                    'month' => $group->first()->distribution_date->format('M Y'),
+                    'month' => \Carbon\Carbon::parse($group->first()['distribution_date'])->format('M Y'),
                     'amount' => $group->sum('amount'),
                     'count' => $group->count(),
                 ];
@@ -136,14 +161,14 @@ class BeneficiaryReportPage extends Page
             ->values();
 
         return [
-            'beneficiaries' => $beneficiaries,
-            'aidDistributions' => $aidDistributions,
+            'beneficiaries' => $beneficiaries->toArray(),
+            'aidDistributions' => $aidDistributions->toArray(),
             'totalAidDistributed' => $totalAidDistributed,
             'totalDistributions' => $totalDistributions,
             'activeBeneficiaries' => $activeBeneficiaries,
             'totalBeneficiaries' => $totalBeneficiaries,
-            'aidByType' => $aidByType,
-            'monthlyTrend' => $monthlyTrend,
+            'aidByType' => $aidByType->toArray(),
+            'monthlyTrend' => $monthlyTrend->toArray(),
         ];
     }
 

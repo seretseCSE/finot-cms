@@ -39,7 +39,7 @@
         .at-select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
 
         .at-filter-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
-        .at-filter-field { width: 280px; }
+        .at-filter-field { width: 400px; }
 
         .at-btn-save {
             display: inline-flex; align-items: center; gap: 7px;
@@ -77,8 +77,6 @@
         .at-bulk-btn:hover { opacity: 0.85; }
         .at-bulk-btn.present { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
         .at-bulk-btn.absent  { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
-        .at-bulk-btn.late    { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
-        .at-bulk-btn.perm    { background: #fef9c3; color: #a16207; border-color: #fef08a; }
 
         .at-sel-info { font-size: 12px; color: #6b7280; margin-left: 4px; }
         .at-clear-btn {
@@ -110,6 +108,8 @@
 
         .at-name { font-size: 13px; font-weight: 500; color: #111827; }
         .dark .at-name { color: #f9fafb; }
+        .at-code { font-size: 11px; color: #6b7280; }
+        .dark .at-code { color: #9ca3af; }
 
         .at-status-group { display: flex; justify-content: center; gap: 6px; }
 
@@ -125,8 +125,6 @@
 
         .at-status-btn.active-present { background: #dcfce7; border-color: #86efac; color: #15803d; }
         .at-status-btn.active-absent  { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
-        .at-status-btn.active-late    { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
-        .at-status-btn.active-perm    { background: #fef9c3; border-color: #fde047; color: #a16207; }
 
         .at-status-btn:not([class*="active-"]):hover { border-color: #d1d5db; color: #374151; background: #f9fafb; }
 
@@ -140,6 +138,18 @@
         .at-alert svg { color: #d1d5db; margin: 0 auto; display: block; }
 
         .at-bottom-save { display: flex; justify-content: flex-end; }
+
+        .at-call-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 6px;
+            font-family: inherit; font-size: 12px; font-weight: 500;
+            text-decoration: none; cursor: pointer;
+            background: #eef2ff; color: #4338ca; border: 0.5px solid #c7d2fe;
+            transition: opacity 0.15s;
+        }
+        .at-call-btn:hover { opacity: 0.8; }
+        .dark .at-call-btn { background: #1e1b4b; color: #a5b4fc; border-color: #3730a3; }
+        .at-call-btn svg { width: 14px; height: 14px; }
     </style>
 
     <div class="at-wrap">
@@ -148,7 +158,7 @@
         <div class="at-card">
             <div class="at-filter-row">
                 <div class="at-filter-field">
-                    <label class="at-label">Session</label>
+                    <label class="at-label">Attendance Session</label>
                     <div class="at-select-wrap">
                         <select wire:model.live="sessionId" class="at-select">
                             <option value="">— Select a session —</option>
@@ -159,7 +169,7 @@
                     </div>
                 </div>
 
-                @if($sessionId && !empty($assignments) && !$isLocked)
+                @if($sessionId && !empty($passengers) && !$isLocked)
                     <button type="button" wire:click="saveAttendance" class="at-btn-save">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -167,18 +177,18 @@
                         Save attendance
                     </button>
                 @elseif($isLocked)
-                    <span style="font-size:12px;color:#9ca3af;margin-left:auto;">🔒 Locked — read only</span>
+                    <span style="font-size:12px;color:#9ca3af;margin-left:auto;"> Locked — read only</span>
                 @endif
             </div>
         </div>
 
-        @if($sessionId && !empty($assignments))
+        @if($sessionId && !empty($passengers))
 
             {{-- ── Summary ── --}}
             <div class="at-card">
                 <div class="at-summary">
                     <span class="at-summary-text">{!! $this->attendanceSummary !!}</span>
-                    <span class="at-summary-count">{{ count($assignments) }} assignments</span>
+                    <span class="at-summary-count">{{ count($passengers) }} passengers</span>
                 </div>
             </div>
 
@@ -189,13 +199,11 @@
                     <span class="at-bulk-label">Bulk mark</span>
 
                     <button type="button" wire:click="applyBulkStatus('Present')" class="at-bulk-btn present">Present</button>
-                    <button type="button" wire:click="applyBulkStatus('Absent')"  class="at-bulk-btn absent">Absent</button>
-                    <button type="button" wire:click="applyBulkStatus('Late')"    class="at-bulk-btn late">Late</button>
-                    <button type="button" wire:click="applyBulkStatus('Permission')" class="at-bulk-btn perm">Permission</button>
+                    <button type="button" wire:click="applyBulkStatus('Not Present')"  class="at-bulk-btn absent">Not Present</button>
 
-                    @if(count($selectedAssignments) > 0)
-                        <span class="at-sel-info">{{ count($selectedAssignments) }} selected</span>
-                        <button type="button" wire:click="$set('selectedAssignments', [])" class="at-clear-btn">
+                    @if(count($selectedPassengers) > 0)
+                        <span class="at-sel-info">{{ count($selectedPassengers) }} selected</span>
+                        <button type="button" wire:click="$set('selectedPassengers', [])" class="at-clear-btn">
                             Clear
                         </button>
                     @endif
@@ -203,64 +211,69 @@
             </div>
             @endif
 
-            {{-- ── Teacher table ── --}}
+            {{-- ── Passenger table ── --}}
             <div class="at-table-wrap">
                 <table class="at-table">
                     <thead>
                         <tr>
                             <th style="width:44px; text-align:center;">
                                 <input type="checkbox" wire:click="toggleSelectAll"
-                                    @if(count($selectedAssignments) === count($assignments)) checked @endif>
+                                    @if(count($selectedPassengers) === count($passengers)) checked @endif>
                             </th>
-                            <th>Teacher name</th>
-                            <th>Subject</th>
-                            <th style="width:260px; text-align:center;">Status</th>
+                            <th>Passenger name</th>
+                            <th>Code</th>
+                            <th>Phone</th>
+                            <th>Pax</th>
+                            <th style="width:200px; text-align:center;">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($assignments as $assignmentId => $assignment)
-                            @php $currentStatus = $attendance[$assignmentId] ?? null; @endphp
-                            <tr class="{{ in_array($assignmentId, $selectedAssignments) ? 'at-selected' : '' }}">
+                        @foreach($passengers as $passengerId => $passenger)
+                            @php $currentStatus = $attendance[$passengerId] ?? null; @endphp
+                            <tr class="{{ in_array($passengerId, $selectedPassengers) ? 'at-selected' : '' }}">
                                 <td style="text-align:center;">
-                                    <input type="checkbox" wire:model.live="selectedAssignments" value="{{ $assignmentId }}">
+                                    <input type="checkbox" wire:model.live="selectedPassengers" value="{{ $passengerId }}">
                                 </td>
                                 <td>
-                                    <span class="at-name">{{ $assignment['teacher_name'] }}</span>
+                                    <span class="at-name">{{ $passenger['full_name'] }}</span>
                                 </td>
                                 <td>
-                                    <span class="at-name">{{ $assignment['subject_name'] }}</span>
+                                    <span class="at-code">{{ $passenger['passenger_code'] }}</span>
+                                </td>
+                                <td>
+                                    @if($passenger['phone'])
+                                        <a href="tel:{{ $passenger['phone'] }}" class="at-call-btn">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/>
+                                            </svg>
+                                            Call
+                                        </a>
+                                    @else
+                                        <span style="color:#9ca3af;font-size:12px;">—</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="at-code">{{ $passenger['passenger_count'] }}</span>
                                 </td>
                                 <td>
                                     @if($isLocked)
                                         <span style="font-size:12px;font-weight:600;padding:4px 12px;border-radius:6px;
                                             {{ $currentStatus === 'Present' ? 'background:#dcfce7;color:#15803d;' : '' }}
-                                            {{ $currentStatus === 'Absent' ? 'background:#fee2e2;color:#b91c1c;' : '' }}
-                                            {{ $currentStatus === 'Late' ? 'background:#dbeafe;color:#1d4ed8;' : '' }}
-                                            {{ $currentStatus === 'Permission' ? 'background:#fef9c3;color:#a16207;' : '' }}
+                                            {{ $currentStatus === 'Not Present' ? 'background:#fee2e2;color:#b91c1c;' : '' }}
                                             {{ !$currentStatus ? 'background:#f3f4f6;color:#9ca3af;' : '' }}">
                                             {{ $currentStatus ?? 'Unmarked' }}
                                         </span>
                                     @else
                                     <div class="at-status-group">
                                         <button type="button"
-                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Present')"
+                                            wire:click="$set('attendance.{{ $passengerId }}', 'Present')"
                                             class="at-status-btn {{ $currentStatus === 'Present' ? 'active-present' : '' }}">
                                             <span class="dot" style="background:#22c55e;"></span> P
                                         </button>
                                         <button type="button"
-                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Absent')"
-                                            class="at-status-btn {{ $currentStatus === 'Absent' ? 'active-absent' : '' }}">
-                                            <span class="dot" style="background:#ef4444;"></span> A
-                                        </button>
-                                        <button type="button"
-                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Late')"
-                                            class="at-status-btn {{ $currentStatus === 'Late' ? 'active-late' : '' }}">
-                                            <span class="dot" style="background:#3b82f6;"></span> L
-                                        </button>
-                                        <button type="button"
-                                            wire:click="$set('attendance.{{ $assignmentId }}', 'Permission')"
-                                            class="at-status-btn {{ $currentStatus === 'Permission' ? 'active-perm' : '' }}">
-                                            <span class="dot" style="background:#eab308;"></span> X
+                                            wire:click="$set('attendance.{{ $passengerId }}', 'Not Present')"
+                                            class="at-status-btn {{ $currentStatus === 'Not Present' ? 'active-absent' : '' }}">
+                                            <span class="dot" style="background:#ef4444;"></span> N
                                         </button>
                                     </div>
                                     @endif
@@ -278,15 +291,15 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                     </svg>
-                    Save teacher attendance
+                    Save attendance
                 </button>
             </div>
             @endif
 
         @elseif(empty($sessions))
             <div class="at-alert warn">
-                <p style="font-weight:500;">No open sessions found.</p>
-                <p>Create an attendance session first from the "Create Session" page.</p>
+                <p style="font-weight:500;">No attendance sessions found.</p>
+                <p>Attendance sessions are auto-created when a tour becomes "In Progress" or "Completed".</p>
             </div>
 
         @elseif(!$sessionId)
@@ -294,8 +307,8 @@
                 <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
                 </svg>
-                <p>Select a session to view teacher attendance</p>
-                <p>Choose an open session from the filter above to begin marking attendance.</p>
+                <p>Select a session to view tour attendance</p>
+                <p>Choose an attendance session from the filter above to begin marking.</p>
             </div>
         @endif
 

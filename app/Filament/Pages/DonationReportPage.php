@@ -107,11 +107,23 @@ class DonationReportPage extends Page
             ->sortByDesc('total')
             ->values();
 
+        // Convert donations to arrays to avoid JSON serialization issues with Eloquent models
+        $donationsArray = $donations->map(function ($donation) {
+            return [
+                'id' => $donation->id,
+                'donation_date' => $donation->donation_date instanceof \Carbon\Carbon ? $donation->donation_date->format('Y-m-d') : $donation->donation_date,
+                'donation_type' => $donation->donation_type,
+                'amount' => $donation->amount,
+                'recorded_by_name' => $donation->recordedBy?->name,
+                'notes' => $donation->notes,
+            ];
+        })->toArray();
+
         return [
-            'donations' => $donations,
+            'donations' => $donationsArray,
             'totalDonated' => $totalDonated,
             'totalThisYear' => $totalThisYear,
-            'totalByType' => $totalByType,
+            'totalByType' => $totalByType->toArray(),
         ];
     }
 

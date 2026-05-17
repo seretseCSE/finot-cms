@@ -158,7 +158,7 @@ class AttendanceRelationManager extends RelationManager
 
                 Action::make('lock_session')
                     ->label('Lock')
-                    ->icon('heroicon-o-lock')
+                    ->icon('heroicon-o-lock-closed')
                     ->color('danger')
                     ->visible(fn ($record): bool => $record && $record->status === 'Open')
                     ->form([
@@ -178,7 +178,7 @@ class AttendanceRelationManager extends RelationManager
 
                 Action::make('unlock_session')
                     ->label('Unlock')
-                    ->icon('heroicon-o-unlock')
+                    ->icon('heroicon-o-lock-open')
                     ->color('warning')
                     ->visible(fn ($record): bool => $record && $record->status === 'Locked')
                     ->form([
@@ -197,10 +197,10 @@ class AttendanceRelationManager extends RelationManager
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('lock_selected')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('lock_selected')
                         ->label('Lock Selected')
-                        ->icon('heroicon-o-lock')
+                        ->icon('heroicon-o-lock-closed')
                         ->color('danger')
                         ->form([
                             Forms\Components\Textarea::make('reason')
@@ -221,9 +221,9 @@ class AttendanceRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('unlock_selected')
+                    Actions\BulkAction::make('unlock_selected')
                         ->label('Unlock Selected')
-                        ->icon('heroicon-o-unlock')
+                        ->icon('heroicon-o-lock-open')
                         ->color('warning')
                         ->form([
                             Forms\Components\Textarea::make('reason')

@@ -51,6 +51,20 @@ return new class () extends Migration {
     private function foreignKeyExists(string $table, string $fkName): bool
     {
         $conn = Schema::getConnection();
+
+        if ($conn->getDriverName() === 'sqlite') {
+            // SQLite does not expose information_schema; check via PRAGMA
+            try {
+                $fkList = $conn->select("PRAGMA foreign_key_list($table)");
+                return collect($fkList)->contains('id', function ($fk) use ($fkName) {
+                    // SQLite FK names are auto-generated; match by column name pattern
+                    return false;
+                });
+            } catch (\Exception) {
+                return false;
+            }
+        }
+
         $database = $conn->getDatabaseName();
         $result = $conn->select(
             "SELECT COUNT(*) as count FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND CONSTRAINT_NAME = ?",

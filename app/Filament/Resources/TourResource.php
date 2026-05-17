@@ -7,10 +7,6 @@ use App\Services\UploadSanitizer;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\TourResource\Pages;
 use App\Filament\Resources\TourResource\Pages\GenerateAttendanceAction;
-use App\Filament\Resources\TourResource\RelationManagers\AttendanceRelationManager;
-use App\Filament\Resources\TourResource\RelationManagers\InternalRegistrationRelationManager;
-use App\Filament\Resources\TourResource\RelationManagers\PassengersRelationManager;
-use App\Filament\Resources\TourResource\RelationManagers\TourAttendanceRelationManager;
 use App\Models\Tour;
 use Filament\Actions;
 use Filament\Forms;
@@ -68,11 +64,21 @@ class TourResource extends BaseResource
                             ->saveUploadedFileUsing(UploadSanitizer::saveCallback('tour-images', 'public', ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])),
 
                         EthiopianDatePicker::make('tour_date')
-                            ->label('Tour Date')
+                            ->label('Tour Start Date')
                             ->required()
                             ->live()
                             ->extraAttributes(['min' => now()->format('Y-m-d')])
                             ->rules(['date', 'after_or_equal:today'])
+                            ->disabled(fn ($record) => $record && ! $record->canEditDate()),
+
+                        EthiopianDatePicker::make('end_date')
+                            ->label('Tour End Date')
+                            ->nullable()
+                            ->live()
+                            ->extraAttributes(fn (callable $get) => [
+                                'min' => $get('tour_date') ?: now()->format('Y-m-d'),
+                            ])
+                            ->rules(['date', 'nullable', 'after_or_equal:tour_date'])
                             ->disabled(fn ($record) => $record && ! $record->canEditDate()),
 
                         Forms\Components\TimePicker::make('start_time')
@@ -134,6 +140,12 @@ class TourResource extends BaseResource
                     ->sortable()
                     ->formatStateUsing(fn ($record) => $record->ethiopian_date),
 
+                Tables\Columns\TextColumn::make('end_date')
+                    ->label('End Date')
+                    ->date()
+                    ->sortable()
+                    ->formatStateUsing(fn ($record) => $record->end_date ? $record->ethiopian_end_date : '—'),
+
                 Tables\Columns\TextColumn::make('start_time')
                     ->label('Start Time')
                     ->time()
@@ -185,9 +197,13 @@ class TourResource extends BaseResource
                             ->afterOrEqual('start_date'),
                     ])
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
-                        return $data['start_date'] && $data['end_date']
-                            ? $query->whereBetween('tour_date', [$data['start_date'], $data['end_date']])
-                            : $query;
+                        if ($data['start_date'] && $data['end_date']) {
+                            return $query->where(function ($q) use ($data) {
+                                $q->whereBetween('tour_date', [$data['start_date'], $data['end_date']])
+                                  ->orWhereBetween('end_date', [$data['start_date'], $data['end_date']]);
+                            });
+                        }
+                        return $query;
                     }),
             ])
             ->actions([
@@ -223,6 +239,111 @@ class TourResource extends BaseResource
                         $record->update(['status' => 'Completed']);
                     }),
 
+                Actions\Action::make('register_passenger')
+                    ->label('Register Passenger')
+                    ->icon('heroicon-o-user-plus')
+                    ->color('info')
+                    ->visible(fn (Tour $record): bool => $record && static::canEdit($record))
+                    ->modalHeading(fn (Tour $record): string => "Register Passenger — {$record->place}")
+                    ->form([
+                        Forms\Components\Select::make('member_id')
+                            ->label('Select Member')
+                            ->relationship('member', 'first_name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name)
+                            ->searchable(['first_name', 'father_name', 'grandfather_name', 'phone'])
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set) {
+                                if ($state) {
+                                    $member = \App\Models\Member::find($state);
+                                    if ($member) {
+                                        $set('full_name', $member->full_name);
+                                        $set('phone', preg_replace('/^' . preg_quote(config('finot.phone_prefix', '+251'), '/') . '/', '', $member->phone ?? ''));
+                                    }
+                                }
+                            })
+                            ->helperText('Select an existing member to auto-fill details')
+                            ->nullable(),
+
+                        Forms\Components\TextInput::make('phone')
+                            ->label('Phone Number')
+                            ->prefix(config('finot.phone_prefix', '+251'))
+                            ->regex('/^[0-9]{9}$/')
+                            ->maxLength(9)
+                            ->placeholder('912345678')
+                            ->helperText('Enter 9 digits after '.config('finot.phone_prefix', '+251'))
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($state, $set) {
+                                if ($state && strlen($state) === 9) {
+                                    $fullPhone = config('finot.phone_prefix', '+251').$state;
+                                    $member = \App\Models\Member::where('phone', $fullPhone)->first();
+                                    if ($member) {
+                                        $set('member_id', $member->id);
+                                        $set('full_name', $member->full_name);
+                                    } else {
+                                        $previous = \App\Models\TourPassenger::where('phone', $fullPhone)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                                        if ($previous) {
+                                            $set('full_name', $previous->full_name);
+                                        }
+                                    }
+                                }
+                            })
+                            ->required(),
+
+                        Forms\Components\TextInput::make('full_name')
+                            ->label('Full Name')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('passenger_count')
+                            ->label('Number of Passengers')
+                            ->required()
+                            ->integer()
+                            ->default(1)
+                            ->minValue(1),
+                    ])
+                    ->action(function (Tour $record, array $data) {
+                        $phonePrefix = config('finot.phone_prefix', '+251');
+                        $phone = $phonePrefix . preg_replace('/^' . preg_quote($phonePrefix, '/') . '/', '', $data['phone']);
+
+                        $exists = \App\Models\TourPassenger::where('tour_id', $record->id)
+                            ->where('phone', $phone)
+                            ->exists();
+
+                        if ($exists) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Duplicate Phone Number')
+                                ->body('This phone number is already registered for this tour.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        $tourPrefix = config('finot.tour_passenger_code_prefix', 'TP-');
+                        $lastPassenger = \App\Models\TourPassenger::orderBy('id', 'desc')->first();
+                        $lastCode = $lastPassenger ? intval(substr($lastPassenger->passenger_code, strlen($tourPrefix))) : 0;
+
+                        \App\Models\TourPassenger::create([
+                            'tour_id' => $record->id,
+                            'passenger_code' => $tourPrefix . str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT),
+                            'full_name' => $data['full_name'],
+                            'phone' => $phone,
+                            'passenger_count' => $data['passenger_count'],
+                            'member_id' => $data['member_id'] ?? null,
+                            'registration_type' => 'Internal',
+                            'status' => 'Confirmed',
+                            'registration_date' => now(),
+                            'registered_by' => Auth::id(),
+                        ]);
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Passenger registered successfully')
+                            ->success()
+                            ->send();
+                    }),
+
                 Actions\Action::make('cancel')
                     ->label('Cancel Tour')
                     ->icon('heroicon-o-x-circle')
@@ -240,6 +361,14 @@ class TourResource extends BaseResource
 
                 GenerateAttendanceAction::make('generate_attendance')
                     ->visible(fn (Tour $record): bool => $record && $record->status === 'In Progress' && static::canEdit($record)),
+
+                Actions\Action::make('view_attendance')
+                    ->label('Mark Attendance')
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->color('gray')
+                    ->visible(fn (Tour $record): bool => $record && ! in_array($record->status, ['Draft', 'Cancelled']))
+                    ->url(fn (Tour $record): string => \App\Filament\Pages\Attendance\TourAttendancePage::getUrl()),
+
 
                 Actions\DeleteAction::make()
                     ->before(function (?Tour $record, Actions\DeleteAction $action) {
@@ -294,12 +423,7 @@ class TourResource extends BaseResource
 
     public static function getRelations(): array
     {
-        return [
-            PassengersRelationManager::class,
-            InternalRegistrationRelationManager::class,
-            AttendanceRelationManager::class,
-            TourAttendanceRelationManager::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -318,8 +442,13 @@ class TourResource extends BaseResource
 
     public static function getGlobalSearchResultDetails($record): array
     {
+        $dateRange = $record->tour_date->format('M d, Y');
+        if ($record->end_date) {
+            $dateRange .= ' - ' . $record->end_date->format('M d, Y');
+        }
+
         return [
-            'Date' => $record->tour_date->format('M d, Y'),
+            'Date' => $dateRange,
             'Cost' => 'Birr ' . number_format($record->cost_per_person, 2),
             'Capacity' => $record->max_capacity . ' attendees',
             'Status' => $record->status,
@@ -328,6 +457,6 @@ class TourResource extends BaseResource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['place', 'description', 'tour_date', 'status'];
+        return ['place', 'description', 'tour_date', 'end_date', 'status'];
     }
 }

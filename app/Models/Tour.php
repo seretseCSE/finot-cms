@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Traits\HasAuditLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Log;
 
 class Tour extends BaseModel
@@ -17,6 +18,7 @@ class Tour extends BaseModel
         'description',
         'image',
         'tour_date',
+        'end_date',
         'start_time',
         'cost_per_person',
         'registration_deadline',
@@ -50,29 +52,24 @@ class Tour extends BaseModel
                 'required',
                 'date',
                 'after_or_equal:today',
-                'before_or_equal:today',
             ],
-            'registration_deadline' => [
-                'required',
+            'end_date' => [
+                'nullable',
                 'date',
                 'after_or_equal:tour_date',
-                'before_or_equal:tour_date',
             ],
-            'tour_date' => [
+            'registration_deadline' => [
                 'required',
                 'date',
                 'after_or_equal:today',
-            ],
-            'registration_deadline' => [
-                'required',
-                'date',
-                'after_or_equal:tour_date',
+                'before_or_equal:tour_date',
             ],
         ];
     }
 
     protected $casts = [
         'tour_date' => 'date',
+        'end_date' => 'date',
         'start_time' => 'datetime:H:i',
         'cost_per_person' => 'decimal:2',
         'registration_deadline' => 'date',
@@ -82,6 +79,7 @@ class Tour extends BaseModel
 
     protected $dates = [
         'tour_date',
+        'end_date',
         'registration_deadline',
         'cancelled_at',
     ];
@@ -159,9 +157,16 @@ class Tour extends BaseModel
         return $this->hasMany(TourAttendanceSession::class);
     }
 
-    public function attendanceRecords(): HasMany
+    public function attendanceRecords(): HasManyThrough
     {
-        return $this->hasMany(TourAttendance::class);
+        return $this->hasManyThrough(
+            TourAttendance::class,
+            TourAttendanceSession::class,
+            'tour_id',
+            'session_id',
+            'id',
+            'id'
+        );
     }
 
     public function autoCreateAttendanceSession(): ?TourAttendanceSession
@@ -201,6 +206,23 @@ class Tour extends BaseModel
     }
 
     /**
+     * Get formatted end date in Ethiopian
+     */
+    public function getEthiopianEndDateAttribute(): ?string
+    {
+        if (! $this->end_date) {
+            return null;
+        }
+
+        return app(\App\Helpers\EthiopianDateHelper::class)
+            ->toEthiopian($this->end_date)['month_name_am'].' '.
+            app(\App\Helpers\EthiopianDateHelper::class)
+                ->toEthiopian($this->end_date)['day'].', '.
+            app(\App\Helpers\EthiopianDateHelper::class)
+                ->toEthiopian($this->end_date)['year'];
+    }
+
+    /**
      * Get formatted registration deadline in Ethiopian
      */
     public function getEthiopianRegistrationDeadlineAttribute(): ?string
@@ -222,14 +244,15 @@ class Tour extends BaseModel
      */
     public function getDaysLeftAttribute(): ?int
     {
-        if (! $this->tour_date) {
+        $effectiveDate = $this->end_date ?? $this->tour_date;
+        if (! $effectiveDate) {
             return null;
         }
 
         $today = now()->startOfDay();
-        $tourDate = $this->tour_date->startOfDay();
+        $target = $effectiveDate->startOfDay();
 
-        return $today->diffInDays($tourDate, false); // false = negative for past dates
+        return $today->diffInDays($target, false);
     }
 
     /**
@@ -394,53 +417,48 @@ class Tour extends BaseModel
         }
 
         $today = now()->startOfDay();
-        $tourDate = $this->tour_date ? $this->tour_date->startOfDay() : null;
+        $effectiveEndDate = $this->end_date ?? $this->tour_date;
+        $effectiveEndDate = $effectiveEndDate ? $effectiveEndDate->startOfDay() : null;
 
-        // If tour date is today, mark as In Progress
-        if ($tourDate && $tourDate->isSameDay($today) && $this->status !== 'In Progress') {
-            $this->update(['status' => 'In Progress']);
-            $this->autoCreateAttendanceSession();
-            return;
-        }
-
-        // If tour date has passed, mark as Completed
-        if ($tourDate && $tourDate->isBefore($today) && $this->status !== 'Completed') {
+        // If end date has passed, mark as Completed
+        if ($effectiveEndDate && $effectiveEndDate->isBefore($today) && $this->status !== 'Completed') {
             $this->update(['status' => 'Completed']);
             $this->autoCreateAttendanceSession();
             return;
         }
 
-        // Note: Tour is no longer auto-completed when full.
-        // is_full already prevents registration via is_registration_open.
-        // 'Completed' status is reserved for tours whose date has passed.
+        // If end date is today (or start date is today with no end date), mark as In Progress
+        if ($effectiveEndDate && $effectiveEndDate->isSameDay($today) && $this->status !== 'In Progress' && $this->status !== 'Completed') {
+            $this->update(['status' => 'In Progress']);
+            $this->autoCreateAttendanceSession();
+            return;
+        }
     }
 
     protected static function booted(): void
     {
         static::saving(function (self $tour) {
-            // Auto-update status based on tour date and registration status
             if ($tour->status === 'Cancelled') {
                 return;
             }
 
             $today = now()->startOfDay();
-            $tourDate = $tour->tour_date ? $tour->tour_date->startOfDay() : null;
+            $effectiveEndDate = $tour->end_date ?? $tour->tour_date;
+            $effectiveEndDate = $effectiveEndDate ? $effectiveEndDate->startOfDay() : null;
 
-            // If tour date has passed, mark as Completed
-            if ($tourDate && $tourDate->isBefore($today)) {
+            // If end date has passed, mark as Completed
+            if ($effectiveEndDate && $effectiveEndDate->isBefore($today)) {
                 $tour->status = 'Completed';
                 return;
             }
 
-            // If tour date is today, mark as In Progress
-            if ($tourDate && $tourDate->isSameDay($today)) {
-                $tour->status = 'In Progress';
+            // If end date is today or tour date is today and no end date, mark as In Progress
+            if ($effectiveEndDate && $effectiveEndDate->isSameDay($today)) {
+                if ($tour->status !== 'Completed') {
+                    $tour->status = 'In Progress';
+                }
                 return;
             }
-
-            // Note: Tour is not auto-completed when full.
-            // is_full already prevents registration via is_registration_open.
-            // 'Completed' status is reserved for tours whose date has passed.
         });
 
         static::saved(function (self $tour) {

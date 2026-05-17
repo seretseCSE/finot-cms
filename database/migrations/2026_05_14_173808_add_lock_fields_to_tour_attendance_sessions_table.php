@@ -15,7 +15,9 @@ return new class extends Migration
             $table->text('locked_reason')->nullable()->after('locked_by');
         });
 
-        DB::statement("ALTER TABLE tour_attendance_sessions MODIFY COLUMN status VARCHAR(20) NOT NULL DEFAULT 'Open'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE tour_attendance_sessions MODIFY COLUMN status VARCHAR(20) NOT NULL DEFAULT 'Open'");
+        }
     }
 
     public function down(): void

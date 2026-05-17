@@ -181,8 +181,8 @@ class TourAttendanceRelationManager extends RelationManager
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('bulk_mark_present')
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('bulk_mark_present')
                         ->label('Mark Present')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -200,7 +200,7 @@ class TourAttendanceRelationManager extends RelationManager
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('bulk_mark_not_present')
+                    Actions\BulkAction::make('bulk_mark_not_present')
                         ->label('Mark Not Present')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')

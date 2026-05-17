@@ -17,16 +17,16 @@ return new class () extends Migration {
 
         // Step 2: Backfill any null teacher_assignment_id values
         DB::statement("
-            UPDATE teacher_attendance ta
+            UPDATE teacher_attendance
             SET teacher_assignment_id = (
                 SELECT ta2.id
                 FROM teacher_assignments ta2
                 INNER JOIN session_teacher_assigns sta ON sta.teacher_assignment_id = ta2.id
-                WHERE ta2.teacher_id = ta.teacher_id
-                  AND sta.session_id = ta.session_id
+                WHERE ta2.teacher_id = teacher_attendance.teacher_id
+                  AND sta.session_id = teacher_attendance.session_id
                 LIMIT 1
             )
-            WHERE ta.teacher_assignment_id IS NULL
+            WHERE teacher_assignment_id IS NULL
         ");
 
         // Step 3: Make teacher_assignment_id non-nullable
@@ -63,13 +63,17 @@ return new class () extends Migration {
             });
         }
 
-        // Step 7: Update session_outcome enum
-        DB::statement("ALTER TABLE teacher_attendance MODIFY session_outcome ENUM('Normal', 'Cancelled') DEFAULT 'Normal'");
+        // Step 7: Update session_outcome enum (MySQL only)
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE teacher_attendance MODIFY session_outcome ENUM('Normal', 'Cancelled') DEFAULT 'Normal'");
+        }
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE teacher_attendance MODIFY session_outcome ENUM('Normal', 'Cancelled', 'Substitute_Assigned') DEFAULT 'Normal'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE teacher_attendance MODIFY session_outcome ENUM('Normal', 'Cancelled', 'Substitute_Assigned') DEFAULT 'Normal'");
+        }
 
         Schema::table('teacher_attendance', function (Blueprint $table) {
             $table->dropUnique('ta_assignment_session_unique');

@@ -37,6 +37,8 @@ class TeacherAttendancePage extends Page
 
     public ?int $sessionId = null;
 
+    public bool $isLocked = false;
+
     public array $sessions = [];
 
     public array $assignments = [];
@@ -57,7 +59,7 @@ class TeacherAttendancePage extends Page
 
     public function updatedSessionId(): void
     {
-        $this->reset(['assignments', 'attendance', 'selectedAssignments']);
+        $this->reset(['assignments', 'attendance', 'selectedAssignments', 'isLocked']);
         $this->loadTeacherAttendance();
     }
 
@@ -66,7 +68,6 @@ class TeacherAttendancePage extends Page
         $this->sessions = AttendanceSession::query()
             ->with(['classes', 'teacherAssignmentsPivot'])
             ->where('status', 'Open')
-            ->whereDate('session_date', today())
             ->orderBy('session_date', 'desc')
             ->get()
             ->map(fn ($s) => [
@@ -90,6 +91,8 @@ class TeacherAttendancePage extends Page
         if (! $session) {
             return;
         }
+
+        $this->isLocked = $session->isLocked();
 
         $existing = TeacherAttendance::query()
             ->where('session_id', $session->id)
@@ -154,7 +157,19 @@ class TeacherAttendancePage extends Page
             return;
         }
 
-        DB::transaction(function (): void {
+        $session = AttendanceSession::find($this->sessionId);
+
+        if (! $session || $session->isLocked()) {
+            Notification::make()
+                ->title('Session is locked')
+                ->body('Attendance cannot be modified for a locked session.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        DB::transaction(function () use ($session): void {
             foreach ($this->attendance as $assignmentId => $status) {
                 if ($status === null) {
                     continue;

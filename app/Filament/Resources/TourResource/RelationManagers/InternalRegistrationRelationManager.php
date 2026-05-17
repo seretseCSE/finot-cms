@@ -128,11 +128,10 @@ class InternalRegistrationRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Actions\Action::make('add_passenger')
+                Actions\CreateAction::make('add_passenger')
                     ->label('Add Passenger')
                     ->icon('heroicon-o-user-plus')
                     ->modalHeading('Add Internal Passenger')
-                    ->form(fn () => $this->form(new \Filament\Forms\Form([]))->getComponents())
                     ->mutateFormDataUsing(function (array $data): array {
                         $phonePrefix = config('finot.phone_prefix', '+251');
 
@@ -177,9 +176,6 @@ class InternalRegistrationRelationManager extends RelationManager
                                     ->send();
                             }
                         }
-                    })
-                    ->action(function (array $data) {
-                        \App\Models\TourPassenger::create($data + ['tour_id' => $this->ownerRecord->id]);
                     }),
             ])
             ->actions([

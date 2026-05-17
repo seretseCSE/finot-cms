@@ -156,12 +156,14 @@ class ContributionReport extends Page
 
         $contributions = $this->buildQuery($query)->get();
 
-        // Calculate Top Contributors
+        // Calculate Top Contributors - convert to arrays to avoid serialization issues
         $grouped = $contributions->groupBy('member_id');
         $top = [];
         foreach ($grouped as $memberId => $memberContributions) {
+            $member = $memberContributions->first()->member;
             $top[] = [
-                'member' => $memberContributions->first()->member,
+                'member_name' => $member?->full_name ?? 'N/A',
+                'member_code' => $member?->member_code ?? 'N/A',
                 'total' => $memberContributions->sum('amount'),
             ];
         }
@@ -169,8 +171,22 @@ class ContributionReport extends Page
         usort($top, fn ($a, $b) => $b['total'] <=> $a['total']);
         $top = array_slice($top, 0, 5);
 
+        // Convert contributions to arrays to avoid JSON serialization issues
+        $contributionsArray = $contributions->map(function ($contribution) {
+            $member = $contribution->member;
+            return [
+                'id' => $contribution->id,
+                'payment_date' => $contribution->payment_date instanceof \Carbon\Carbon ? $contribution->payment_date->format('Y-m-d') : $contribution->payment_date,
+                'amount' => $contribution->amount,
+                'member_name' => $member?->full_name ?? 'N/A',
+                'member_code' => $member?->member_code ?? 'N/A',
+                'month_name' => $contribution->month_name,
+                'is_archived' => $contribution->is_archived,
+            ];
+        })->toArray();
+
         $this->reportData = [
-            'contributions' => $contributions,
+            'contributions' => $contributionsArray,
             'topContributors' => $top,
         ];
     }
