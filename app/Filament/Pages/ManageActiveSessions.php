@@ -19,6 +19,11 @@ class ManageActiveSessions extends Page implements HasTable
 
     protected static ?string $title = 'Manage Sessions';
 
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-finger-print';
+    }
+
     protected string $view = 'filament.pages.manage-active-sessions';
 
     public function getTitle(): string

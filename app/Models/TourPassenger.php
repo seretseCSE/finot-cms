@@ -22,6 +22,7 @@ class TourPassenger extends BaseModel
         'member_id',
         'registration_type',
         'status',
+        'total_tours',
         'registration_date',
         'registered_by',
         'cancellation_reason',
@@ -84,6 +85,25 @@ class TourPassenger extends BaseModel
     protected $dates = [
         'registration_date',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $passenger) {
+            if (! $passenger->passenger_code) {
+                $lastPassenger = static::orderBy('id', 'desc')->first();
+                $lastCode = $lastPassenger ? intval(substr($lastPassenger->passenger_code, 3)) : 0;
+                $prefix = config('finot.tour_passenger_code_prefix', 'TP-');
+                $passenger->passenger_code = $prefix . str_pad($lastCode + 1, 6, '0', STR_PAD_LEFT);
+            }
+
+            if ($passenger->phone) {
+                $passenger->total_tours = static::where('phone', $passenger->phone)
+                    ->where('tour_id', '!=', $passenger->tour_id ?? 0)
+                    ->distinct('tour_id')
+                    ->count('tour_id') + 1;
+            }
+        });
+    }
 
     public function tour()
     {

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\AttendanceRecord;
-use App\Models\Rehearsal;
 use App\Models\RehearsalAttendance;
 use App\Models\StudentAttendance;
 use App\Models\TeacherAttendance;

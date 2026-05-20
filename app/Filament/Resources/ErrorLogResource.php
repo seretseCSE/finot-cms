@@ -6,10 +6,8 @@ use App\Filament\Resources\ErrorLogResource\Pages;
 use App\Models\ErrorLog;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
 class ErrorLogResource extends BaseResource
 {

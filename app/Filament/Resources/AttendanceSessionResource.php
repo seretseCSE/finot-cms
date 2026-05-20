@@ -12,11 +12,9 @@ use App\Models\ClassModel;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use App\Enums\Roles;
 
 class AttendanceSessionResource extends BaseResource
 {

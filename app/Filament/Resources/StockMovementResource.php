@@ -7,11 +7,9 @@ use Filament\Schemas\Schema;
 use App\Models\InventoryMovement;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
 class StockMovementResource extends BaseResource
 {

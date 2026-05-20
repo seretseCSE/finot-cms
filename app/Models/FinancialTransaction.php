@@ -63,7 +63,7 @@ class FinancialTransaction extends Model
 
                 $oldAccountId = $transaction->getOriginal('bank_account_id');
                 $oldEffect = self::getSignedEffect(
-                    (string) $transaction->getOriginal('type'),
+                    $transaction->getOriginal('type'),
                     (float) $transaction->getOriginal('amount')
                 );
 

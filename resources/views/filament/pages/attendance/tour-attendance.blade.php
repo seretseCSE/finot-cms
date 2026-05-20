@@ -154,42 +154,20 @@
 
     <div class="at-wrap">
 
-        {{-- ── Filters ── --}}
-        <div class="at-card">
-            <div class="at-filter-row">
-                <div class="at-filter-field">
-                    <label class="at-label">Attendance Session</label>
-                    <div class="at-select-wrap">
-                        <select wire:model.live="sessionId" class="at-select">
-                            <option value="">— Select a session —</option>
-                            @foreach($sessions as $id => $label)
-                                <option value="{{ $id }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+        @if($tourId && $sessionId && !empty($passengers))
 
-                @if($sessionId && !empty($passengers) && !$isLocked)
-                    <button type="button" wire:click="saveAttendance" class="at-btn-save">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        Save attendance
-                    </button>
-                @elseif($isLocked)
-                    <span style="font-size:12px;color:#9ca3af;margin-left:auto;"> Locked — read only</span>
-                @endif
-            </div>
-        </div>
-
-        @if($sessionId && !empty($passengers))
-
-            {{-- ── Summary ── --}}
+            {{-- ── Tour header ── --}}
             <div class="at-card">
                 <div class="at-summary">
-                    <span class="at-summary-text">{!! $this->attendanceSummary !!}</span>
+                    <span style="font-size:15px;font-weight:600;">{{ $tourPlace }}</span>
                     <span class="at-summary-count">{{ count($passengers) }} passengers</span>
                 </div>
+                <div style="margin-top:8px;">
+                    <span class="at-summary-text">{!! $this->attendanceSummary !!}</span>
+                </div>
+                @if($isLocked)
+                    <span style="font-size:12px;color:#9ca3af;margin-top:6px;display:inline-block;"> Locked — read only</span>
+                @endif
             </div>
 
             {{-- ── Bulk actions ── --}}
@@ -296,19 +274,22 @@
             </div>
             @endif
 
-        @elseif(empty($sessions))
+        @elseif($tourId && !$sessionId)
             <div class="at-alert warn">
-                <p style="font-weight:500;">No attendance sessions found.</p>
-                <p>Attendance sessions are auto-created when a tour becomes "In Progress" or "Completed".</p>
+                <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" style="margin:0 auto;display:block;color:#d97706;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                </svg>
+                <p style="font-weight:500;margin-top:10px;">No attendance session for this tour</p>
+                <p>Mark the tour as "Completed" to auto-generate an attendance session, or use "Generate Attendance" batch action.</p>
             </div>
 
-        @elseif(!$sessionId)
+        @else
             <div class="at-alert neutral">
                 <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
                 </svg>
-                <p>Select a session to view tour attendance</p>
-                <p>Choose an attendance session from the filter above to begin marking.</p>
+                <p>Select a tour to take attendance</p>
+                <p>Go to the Tour Attendance list and click "Take Attendance" on a tour to begin marking.</p>
             </div>
         @endif
 

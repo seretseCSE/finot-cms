@@ -150,13 +150,23 @@ class TourRegistrationService
         $passengerPhones = $validated['passenger_phones'] ?? [];
         $createdPassengers = [];
 
+        $fullPhone = config('finot.phone_prefix', '+251') . $validated['phone'];
+
+        // Lookup returning passenger — use their previous name silently
+        $previous = TourPassenger::where('phone', $fullPhone)
+            ->where('tour_id', '!=', $tour->id)
+            ->latest('id')
+            ->first();
+
+        $nameToUse = $previous ? $previous->full_name : $validated['full_name'];
+
         // Create primary passenger
         $primaryCode = $this->generatePassengerCode(++$lastCode);
         $primaryPassenger = TourPassenger::create([
             'passenger_code' => $primaryCode,
             'tour_id' => $tour->id,
-            'full_name' => $validated['full_name'],
-            'phone' => config('finot.phone_prefix', '+251') . $validated['phone'],
+            'full_name' => $nameToUse,
+            'phone' => $fullPhone,
             'passenger_count' => 1,
             'receipt_image' => $receiptImage,
             'registration_type' => 'Public',

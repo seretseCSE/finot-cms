@@ -40,10 +40,6 @@ class EditTour extends EditRecord
 
     protected function afterSave(): void
     {
-        // Auto-update status if tour date has passed or is full
-        $this->getRecord()->refresh();
-        $this->getRecord()->updateStatusIfNeeded();
-
         // Log status changes to audit trail
         $original = $this->getRecord()->getOriginal();
         $current = $this->getRecord()->toArray();

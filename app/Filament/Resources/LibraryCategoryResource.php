@@ -8,10 +8,8 @@ use Filament\Schemas\Schema;
 use App\Models\LibraryCategory;
 use Filament\Actions;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
 class LibraryCategoryResource extends BaseResource
 {

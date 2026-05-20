@@ -228,11 +228,7 @@
                 @endif
             </form>
         </div>
-    </div>
-</section>
 
-<section style="padding:0 clamp(12px,4vw,24px) clamp(60px,12vw,100px);background:var(--dark-900);">
-    <div style="max-width:1200px;margin:0 auto;">
         @if($products && $products->count() > 0)
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(16px,4vw,24px);">
                 @foreach($products as $product)

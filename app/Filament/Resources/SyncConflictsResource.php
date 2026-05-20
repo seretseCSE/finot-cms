@@ -6,7 +6,6 @@ use App\Filament\Resources\SyncConflictsResource\Pages;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\AttendanceSyncConflict;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;

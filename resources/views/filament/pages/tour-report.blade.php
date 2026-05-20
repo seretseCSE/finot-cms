@@ -1,173 +1,332 @@
 <x-filament-panels::page>
 
 <style>
-/* ── Design tokens (same system as aid report) ── */
+/* ── Design tokens ── */
 :root {
-    --tr-bg:           #f8f7f4;
+    --tr-bg:           #f5f4f1;
     --tr-surface:      #ffffff;
-    --tr-surface2:     #f3f2ef;
-    --tr-border:       #e8e6e1;
-    --tr-text:         #1a1917;
-    --tr-text-2:       #6b6760;
-    --tr-text-3:       #9c9890;
-    --tr-accent:       #2d6a4f;
-    --tr-accent-light: #e8f5ee;
-    --tr-blue:         #1d4ed8;
-    --tr-blue-light:   #eff6ff;
-    --tr-amber:        #b45309;
-    --tr-amber-light:  #fffbeb;
-    --tr-red:          #dc2626;
-    --tr-red-light:    #fef2f2;
-    --tr-purple:       #7c3aed;
-    --tr-purple-light: #f5f3ff;
-    --tr-input-bg:     #ffffff;
-    --tr-shadow:       0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-    --tr-shadow-md:    0 4px 12px rgba(0,0,0,.08);
+    --tr-surface2:     #f9f8f6;
+    --tr-border:       rgba(0,0,0,.08);
+    --tr-border-md:    rgba(0,0,0,.13);
+    --tr-text:         #141412;
+    --tr-text-2:       #72706b;
+    --tr-text-3:       #b0ada7;
+    --tr-accent:       #1a6641;
+    --tr-accent-dim:   #dcefe5;
+    --tr-blue:         #1848a8;
+    --tr-blue-dim:     #dde8f9;
+    --tr-amber:        #8f4e08;
+    --tr-amber-dim:    #fdefd8;
+    --tr-red:          #b91c1c;
+    --tr-red-dim:      #fde8e8;
+    --tr-purple:       #5b21b6;
+    --tr-purple-dim:   #ede9fb;
 }
+
 .dark {
-    --tr-bg:           #0f0f0e;
-    --tr-surface:      #1a1917;
+    --tr-bg:           #111110;
+    --tr-surface:      #1c1b19;
     --tr-surface2:     #232220;
-    --tr-border:       #2e2c29;
-    --tr-text:         #f0ede8;
-    --tr-text-2:       #a09c95;
-    --tr-text-3:       #6b6760;
+    --tr-border:       rgba(255,255,255,.07);
+    --tr-border-md:    rgba(255,255,255,.13);
+    --tr-text:         #edebe6;
+    --tr-text-2:       #908e88;
+    --tr-text-3:       #5a5854;
     --tr-accent:       #4ade80;
-    --tr-accent-light: #0d2117;
-    --tr-blue:         #60a5fa;
-    --tr-blue-light:   #0d1829;
+    --tr-accent-dim:   #0c2118;
+    --tr-blue:         #6ba4f5;
+    --tr-blue-dim:     #0c1a34;
     --tr-amber:        #fbbf24;
-    --tr-amber-light:  #1c1508;
+    --tr-amber-dim:    #1c1306;
     --tr-red:          #f87171;
-    --tr-red-light:    #2a0d0d;
+    --tr-red-dim:      #2a0c0c;
     --tr-purple:       #a78bfa;
-    --tr-purple-light: #150d2b;
-    --tr-input-bg:     #232220;
-    --tr-shadow:       0 1px 3px rgba(0,0,0,.3);
-    --tr-shadow-md:    0 4px 16px rgba(0,0,0,.4);
+    --tr-purple-dim:   #160e2e;
 }
 
-.tr-page { display:flex;flex-direction:column;gap:1.5rem;padding-bottom:2.5rem; }
+/* ── Page layout ── */
+.tr-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-bottom: 3rem;
+}
 
-/* ── Filters ── */
+/* ── Filter bar ── */
 .tr-filters {
-    background:var(--tr-surface);
-    border:1px solid var(--tr-border);
-    border-radius:14px;
-    padding:1.25rem 1.5rem;
-    box-shadow:var(--tr-shadow);
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--tr-surface);
+    border: 0.5px solid var(--tr-border-md);
+    border-radius: 10px;
 }
-.tr-filters-label {
-    font-size:11px;font-weight:700;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--tr-text-3);
-    margin-bottom:.875rem;display:flex;align-items:center;gap:6px;
+
+.tr-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 160px;
 }
-.tr-filters-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:560px; }
-.tr-filter-group { display:flex;flex-direction:column;gap:5px; }
-.tr-filter-group label { font-size:11px;font-weight:600;color:var(--tr-text-2); }
+
+.tr-filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--tr-text-3);
+}
+
 .tr-input {
-    width:100%;padding:8px 11px;
-    background:var(--tr-input-bg);
-    border:1px solid var(--tr-border);
-    border-radius:8px;
-    font-size:13px;color:var(--tr-text);
-    transition:border-color .15s,box-shadow .15s;
-    outline:none;
-    box-shadow:var(--tr-shadow);
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    padding: 7px 10px;
+    background: var(--tr-surface2);
+    border: 0.5px solid var(--tr-border-md);
+    border-radius: 7px;
+    font-size: 13px;
+    color: var(--tr-text);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    cursor: pointer;
 }
-.tr-input:focus { border-color:var(--tr-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--tr-accent) 20%,transparent); }
+
+.tr-input:focus {
+    border-color: var(--tr-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tr-accent) 15%, transparent);
+}
 
 /* ── Stat cards ── */
-.tr-stats-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
+.tr-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
 .tr-card {
-    background:var(--tr-surface);
-    border:1px solid var(--tr-border);
-    border-radius:14px;
-    padding:1.125rem 1.25rem;
-    box-shadow:var(--tr-shadow);
-    position:relative;overflow:hidden;
-    transition:box-shadow .2s,transform .2s;
+    background: var(--tr-surface);
+    border: 0.5px solid var(--tr-border-md);
+    border-radius: 10px;
+    padding: 1.125rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: border-color .2s;
 }
-.tr-card:hover { box-shadow:var(--tr-shadow-md);transform:translateY(-1px); }
-.tr-card-accent { position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0; }
-.tr-card-icon {
-    width:36px;height:36px;border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    margin-bottom:.75rem;font-size:16px;
+
+.tr-card:hover {
+    border-color: var(--tr-border-md);
 }
-.tr-card-label { font-size:11px;font-weight:600;color:var(--tr-text-2);margin-bottom:4px;letter-spacing:.02em; }
-.tr-card-value { font-size:24px;font-weight:800;line-height:1;color:var(--tr-text);letter-spacing:-.02em; }
-.tr-card-sub   { font-size:11px;color:var(--tr-text-3);margin-top:4px; }
+
+.tr-card-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--tr-text-3);
+    margin-bottom: 6px;
+}
+
+.tr-card-value {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    line-height: 1;
+    color: var(--tr-text);
+}
+
+.tr-card-sub {
+    font-size: 12px;
+    color: var(--tr-text-3);
+    margin-top: 5px;
+}
 
 /* ── Table panel ── */
 .tr-panel {
-    background:var(--tr-surface);
-    border:1px solid var(--tr-border);
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:var(--tr-shadow);
+    background: var(--tr-surface);
+    border: 0.5px solid var(--tr-border-md);
+    border-radius: 10px;
+    overflow: hidden;
 }
+
 .tr-panel-header {
-    padding:.875rem 1.25rem;
-    border-bottom:1px solid var(--tr-border);
-    display:flex;align-items:center;gap:8px;
-    background:var(--tr-surface2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: .75rem 1.25rem;
+    border-bottom: 0.5px solid var(--tr-border);
+    background: var(--tr-surface2);
 }
-.tr-panel-title { font-size:13px;font-weight:700;color:var(--tr-text);letter-spacing:.01em; }
+
+.tr-panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--tr-text-2);
+}
+
+.tr-panel-count {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--tr-text-3);
+    font-variant-numeric: tabular-nums;
+}
 
 /* ── Table ── */
-.tr-table { width:100%;border-collapse:collapse;font-size:13px; }
-.tr-table thead tr { background:var(--tr-surface2); }
-.tr-table th {
-    padding:10px 14px;text-align:left;
-    font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-    color:var(--tr-text-3);border-bottom:1px solid var(--tr-border);
-    white-space:nowrap;
+.tr-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
 }
-.tr-table th.right { text-align:right; }
-.tr-table td {
-    padding:11px 14px;
-    border-bottom:1px solid var(--tr-border);
-    color:var(--tr-text);font-size:13px;
+
+.tr-table thead th {
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--tr-text-3);
+    background: var(--tr-surface2);
+    border-bottom: 0.5px solid var(--tr-border-md);
+    white-space: nowrap;
 }
-.tr-table td.muted  { color:var(--tr-text-2); }
-.tr-table td.right  { text-align:right; }
-.tr-table tbody tr:last-child td { border-bottom:none; }
-.tr-table tbody tr { transition:background .12s; }
-.tr-table tbody tr:hover { background:var(--tr-surface2); }
+
+.tr-table thead th.right { text-align: right; }
+
+.tr-table tbody td {
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--tr-border);
+    color: var(--tr-text);
+    vertical-align: middle;
+}
+
+.tr-table tbody td.muted { color: var(--tr-text-2); font-size: 12px; }
+.tr-table tbody td.right { text-align: right; }
+.tr-table tbody tr:last-child td { border-bottom: none; }
+
+.tr-table tbody tr {
+    transition: background .1s;
+}
+
+.tr-table tbody tr:hover {
+    background: var(--tr-surface2);
+}
 
 /* ── Place cell ── */
-.tr-place { display:flex;align-items:center;gap:10px; }
-.tr-place-pin {
-    width:30px;height:30px;border-radius:8px;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;font-size:14px;
-    background:var(--tr-surface2);border:1px solid var(--tr-border);
+.tr-place {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* ── Badges ── */
-.tr-badge {
-    display:inline-flex;align-items:center;gap:4px;
-    padding:3px 9px;border-radius:99px;
-    font-size:11px;font-weight:700;white-space:nowrap;
+.tr-place-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--tr-surface2);
+    border: 0.5px solid var(--tr-border-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
 }
-.tr-badge-dot { width:5px;height:5px;border-radius:50%; }
+
+.tr-place-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tr-text);
+}
+
+/* ── Status badge ── */
+.tr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+
+.tr-badge-pip {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
 
 /* ── Confirmation bar ── */
-.tr-conf-wrap { display:flex;align-items:center;gap:8px; }
-.tr-conf-bar-track { width:52px;height:4px;background:var(--tr-border);border-radius:99px;overflow:hidden; }
-.tr-conf-bar-fill  { height:100%;border-radius:99px;transition:width .3s; }
+.tr-conf {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.tr-conf-num {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tr-accent);
+    min-width: 20px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.tr-conf-track {
+    width: 48px;
+    height: 3px;
+    background: var(--tr-border-md);
+    border-radius: 99px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.tr-conf-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--tr-accent);
+}
+
+.tr-conf-pct {
+    font-size: 11px;
+    color: var(--tr-text-3);
+    min-width: 30px;
+    font-variant-numeric: tabular-nums;
+}
 
 /* ── Empty state ── */
 .tr-empty {
-    padding:3rem 1.25rem;text-align:center;
-    color:var(--tr-text-3);font-size:13px;
+    padding: 3.5rem 1.25rem;
+    text-align: center;
+    color: var(--tr-text-3);
+    font-size: 13px;
 }
-.tr-empty-icon { font-size:32px;margin-bottom:.5rem; }
+
+.tr-empty-icon {
+    font-size: 28px;
+    margin-bottom: .625rem;
+    display: block;
+    opacity: .6;
+}
+
+/* ── Divider between filter icon and label ── */
+.tr-filter-icon {
+    color: var(--tr-text-3);
+    flex-shrink: 0;
+}
 
 /* ── Responsive ── */
-@media(max-width:768px){
-    .tr-filters-grid { grid-template-columns:1fr;max-width:100%; }
-    .tr-stats-grid   { grid-template-columns:1fr; }
+@media (max-width: 768px) {
+    .tr-filters       { flex-direction: column; align-items: stretch; }
+    .tr-filter-group  { min-width: unset; }
+    .tr-stats-grid    { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -175,31 +334,25 @@
 
     {{-- ── Filters ── --}}
     <div class="tr-filters">
-        <div class="tr-filters-label">
-            <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L13 10.414V17a1 1 0 01-.553.894l-4-2A1 1 0 018 15v-4.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"/></svg>
-            Report Filters
+        <div class="tr-filter-group">
+            <span class="tr-filter-label">Status</span>
+            <select wire:model.live="status" class="tr-input">
+                <option value="all">All statuses</option>
+                <option value="Draft">Draft</option>
+                <option value="Published">Published</option>
+                <option value="In Progress">In progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
         </div>
-        <div class="tr-filters-grid">
-            <div class="tr-filter-group">
-                <label>Status</label>
-                <select wire:model.live="status" class="tr-input">
-                    <option value="all">All Statuses</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Published">Published</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
-            </div>
-            <div class="tr-filter-group">
-                <label>Date Range</label>
-                <select wire:model.live="date_range" class="tr-input">
-                    <option value="all">All Time</option>
-                    <option value="month">Last Month</option>
-                    <option value="quarter">Last Quarter</option>
-                    <option value="year">Last Year</option>
-                </select>
-            </div>
+        <div class="tr-filter-group">
+            <span class="tr-filter-label">Date range</span>
+            <select wire:model.live="date_range" class="tr-input">
+                <option value="all">All time</option>
+                <option value="month">Last month</option>
+                <option value="quarter">Last quarter</option>
+                <option value="year">Last year</option>
+            </select>
         </div>
     </div>
 
@@ -207,11 +360,11 @@
         $data = $this->getReportData();
 
         $statusMeta = [
-            'Draft'       => ['bg'=>'var(--tr-surface2)',      'color'=>'var(--tr-text-2)',   'dot'=>'var(--tr-text-3)',  'icon'=>'✏️'],
-            'Published'   => ['bg'=>'var(--tr-blue-light)',    'color'=>'var(--tr-blue)',     'dot'=>'var(--tr-blue)',    'icon'=>'📢'],
-            'In Progress' => ['bg'=>'var(--tr-amber-light)',   'color'=>'var(--tr-amber)',    'dot'=>'var(--tr-amber)',   'icon'=>'⚙️'],
-            'Completed'   => ['bg'=>'var(--tr-accent-light)',  'color'=>'var(--tr-accent)',   'dot'=>'var(--tr-accent)',  'icon'=>'✅'],
-            'Cancelled'   => ['bg'=>'var(--tr-red-light)',     'color'=>'var(--tr-red)',      'dot'=>'var(--tr-red)',     'icon'=>'🚫'],
+            'Draft'       => ['bg' => 'var(--tr-surface2)',  'color' => 'var(--tr-text-2)',  'pip' => 'var(--tr-text-3)',  'icon' => '✏️'],
+            'Published'   => ['bg' => 'var(--tr-blue-dim)',  'color' => 'var(--tr-blue)',    'pip' => 'var(--tr-blue)',    'icon' => '📢'],
+            'In Progress' => ['bg' => 'var(--tr-amber-dim)', 'color' => 'var(--tr-amber)',   'pip' => 'var(--tr-amber)',   'icon' => '⚙️'],
+            'Completed'   => ['bg' => 'var(--tr-accent-dim)','color' => 'var(--tr-accent)',  'pip' => 'var(--tr-accent)',  'icon' => '✅'],
+            'Cancelled'   => ['bg' => 'var(--tr-red-dim)',   'color' => 'var(--tr-red)',     'pip' => 'var(--tr-red)',     'icon' => '🚫'],
         ];
 
         $confirmedRate = ($data['totalPassengers'] ?? 0) > 0
@@ -219,50 +372,50 @@
             : 0;
     @endphp
 
-    {{-- ── Summary Cards ── --}}
+    {{-- ── Summary cards ── --}}
     <div class="tr-stats-grid">
 
         <div class="tr-card">
-            <div class="tr-card-accent" style="background:var(--tr-text-2);"></div>
-            <div class="tr-card-icon" style="background:var(--tr-surface2);">🗺️</div>
-            <div class="tr-card-label">Total Tours</div>
+            <div class="tr-card-eyebrow">Total tours</div>
             <div class="tr-card-value">{{ number_format($data['totalTours'] ?? 0) }}</div>
         </div>
 
         <div class="tr-card">
-            <div class="tr-card-accent" style="background:var(--tr-blue);"></div>
-            <div class="tr-card-icon" style="background:var(--tr-blue-light);">👤</div>
-            <div class="tr-card-label">Total Passengers</div>
-            <div class="tr-card-value" style="color:var(--tr-blue);">{{ number_format($data['totalPassengers'] ?? 0) }}</div>
+            <div class="tr-card-eyebrow">Passengers</div>
+            <div class="tr-card-value" style="color: var(--tr-blue);">
+                {{ number_format($data['totalPassengers'] ?? 0) }}
+            </div>
         </div>
 
         <div class="tr-card">
-            <div class="tr-card-accent" style="background:var(--tr-accent);"></div>
-            <div class="tr-card-icon" style="background:var(--tr-accent-light);">✅</div>
-            <div class="tr-card-label">Confirmed Passengers</div>
-            <div class="tr-card-value" style="color:var(--tr-accent);">{{ number_format($data['totalConfirmed'] ?? 0) }}</div>
+            <div class="tr-card-eyebrow">Confirmed</div>
+            <div class="tr-card-value" style="color: var(--tr-accent);">
+                {{ number_format($data['totalConfirmed'] ?? 0) }}
+            </div>
             <div class="tr-card-sub">{{ $confirmedRate }}% confirmation rate</div>
         </div>
 
     </div>
 
-    {{-- ── Tours Table ── --}}
+    {{-- ── Tours table ── --}}
     <div class="tr-panel">
         <div class="tr-panel-header">
-            <svg width="15" height="15" viewBox="0 0 20 20" fill="var(--tr-text-2)"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="color: var(--tr-text-3);" aria-hidden="true">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+            </svg>
             <span class="tr-panel-title">Tours</span>
-            <span style="margin-left:auto;font-size:11px;color:var(--tr-text-3);">
-                {{ count($data['tours'] ?? []) }} {{ Str::plural('tour', count($data['tours'] ?? [])) }}
+            <span class="tr-panel-count">
+                {{ count($data['tours'] ?? []) }} {{ Str::plural('result', count($data['tours'] ?? [])) }}
             </span>
         </div>
 
         @if(empty($data['tours']))
             <div class="tr-empty">
-                <div class="tr-empty-icon">🗺️</div>
-                No tours found for the selected filters.
+                <span class="tr-empty-icon">🗺️</span>
+                No tours match the selected filters.
             </div>
         @else
-            <div style="overflow-x:auto;">
+            <div style="overflow-x: auto;">
                 <table class="tr-table">
                     <thead>
                         <tr>
@@ -276,35 +429,37 @@
                     <tbody>
                         @foreach($data['tours'] as $tour)
                             @php
-                                $meta      = $statusMeta[$tour->status] ?? $statusMeta['Draft'];
-                                $paxTotal  = $tour->passengers->count();
-                                $paxConf   = $tour->passengers->where('status', 'Confirmed')->count();
-                                $confPct   = $paxTotal > 0 ? round(($paxConf / $paxTotal) * 100) : 0;
+                                $meta     = $statusMeta[$tour->status] ?? $statusMeta['Draft'];
+                                $paxTotal = $tour->passengers->count();
+                                $paxConf  = $tour->passengers->where('status', 'Confirmed')->count();
+                                $confPct  = $paxTotal > 0 ? round(($paxConf / $paxTotal) * 100) : 0;
                             @endphp
                             <tr>
                                 <td>
                                     <div class="tr-place">
-                                        <div class="tr-place-pin">{{ $meta['icon'] }}</div>
-                                        <span style="font-weight:600;color:var(--tr-text);">{{ $tour->place }}</span>
+                                        <div class="tr-place-icon">{{ $meta['icon'] }}</div>
+                                        <span class="tr-place-name">{{ $tour->place }}</span>
                                     </div>
                                 </td>
                                 <td class="muted">
                                     {{ $tour->tour_date?->format('M d, Y') ?? '—' }}
                                 </td>
                                 <td>
-                                    <span class="tr-badge" style="background:{{ $meta['bg'] }};color:{{ $meta['color'] }};">
-                                        <span class="tr-badge-dot" style="background:{{ $meta['dot'] }};"></span>
+                                    <span class="tr-badge" style="background: {{ $meta['bg'] }}; color: {{ $meta['color'] }};">
+                                        <span class="tr-badge-pip" style="background: {{ $meta['pip'] }};"></span>
                                         {{ $tour->status }}
                                     </span>
                                 </td>
-                                <td class="right" style="font-weight:600;">{{ $paxTotal }}</td>
+                                <td class="right" style="font-weight: 600; font-variant-numeric: tabular-nums;">
+                                    {{ $paxTotal }}
+                                </td>
                                 <td class="right">
-                                    <div class="tr-conf-wrap" style="justify-content:flex-end;">
-                                        <span style="font-weight:600;color:var(--tr-accent);min-width:20px;text-align:right;">{{ $paxConf }}</span>
-                                        <div class="tr-conf-bar-track">
-                                            <div class="tr-conf-bar-fill" style="width:{{ $confPct }}%;background:var(--tr-accent);"></div>
+                                    <div class="tr-conf">
+                                        <span class="tr-conf-num">{{ $paxConf }}</span>
+                                        <div class="tr-conf-track">
+                                            <div class="tr-conf-fill" style="width: {{ $confPct }}%;"></div>
                                         </div>
-                                        <span style="font-size:11px;color:var(--tr-text-3);min-width:28px;">{{ $confPct }}%</span>
+                                        <span class="tr-conf-pct">{{ $confPct }}%</span>
                                     </div>
                                 </td>
                             </tr>

@@ -3,7 +3,6 @@
 namespace App\Models\Traits;
 
 use App\Models\Scopes\HasDepartmentScope;
-use Illuminate\Database\Eloquent\Model;
 
 trait HasDepartmentTrait
 {

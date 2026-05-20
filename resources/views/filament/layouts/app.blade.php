@@ -14,7 +14,7 @@
             });
     }
 </script>
-<script src="{{ asset('css/tours.css') }}"></script>
+<link rel="stylesheet" href="{{ asset('css/tours.css') }}">
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const roles = @json(auth()->user()?->getRoleNames()?->values() ?? []);

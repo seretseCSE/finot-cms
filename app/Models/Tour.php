@@ -127,7 +127,7 @@ class Tour extends BaseModel
     {
         return !$this->isAtCapacity() &&
                $this->registration_deadline &&
-               $this->registration_deadline->isFuture();
+               !$this->registration_deadline->startOfDay()->isBefore(now()->startOfDay());
     }
 
     /**
@@ -142,7 +142,7 @@ class Tour extends BaseModel
             ];
         }
 
-        if ($this->registration_deadline && $this->registration_deadline->isPast()) {
+        if ($this->registration_deadline && $this->registration_deadline->startOfDay()->isBefore(now()->startOfDay())) {
             return [
                 'deadline' => 'Registration deadline has passed.',
                 'deadline_date' => $this->registration_deadline->format('M d, Y')
@@ -302,7 +302,7 @@ class Tour extends BaseModel
             return false;
         }
 
-        if ($this->registration_deadline && now()->isAfter($this->registration_deadline)) {
+        if ($this->registration_deadline && $this->registration_deadline->startOfDay()->isBefore(now()->startOfDay())) {
             return false;
         }
 
@@ -439,6 +439,11 @@ class Tour extends BaseModel
     {
         static::saving(function (self $tour) {
             if ($tour->status === 'Cancelled') {
+                return;
+            }
+
+            // Respect explicit status change on existing records
+            if ($tour->exists && $tour->isDirty('status')) {
                 return;
             }
 

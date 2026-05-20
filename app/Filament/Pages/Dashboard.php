@@ -2,6 +2,60 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\Charts\AttendanceTrendChart;
+use App\Filament\Widgets\Charts\BeneficiaryByStatusChart;
+use App\Filament\Widgets\Charts\BeneficiaryByTypeChart;
+use App\Filament\Widgets\Charts\EnrollmentTrendChart;
+use App\Filament\Widgets\Charts\ExpenseBreakdownChart;
+use App\Filament\Widgets\Charts\GenderDistributionChart;
+use App\Filament\Widgets\Charts\InventoryByCategoryChart;
+use App\Filament\Widgets\Charts\MediaByCategoryChart;
+use App\Filament\Widgets\Charts\MembersByGroupChart;
+use App\Filament\Widgets\Charts\MemberTypeChart;
+use App\Filament\Widgets\Charts\RehearsalAttendanceChart;
+use App\Filament\Widgets\Charts\RevenueTrendChart;
+use App\Filament\Widgets\Charts\SongsByCategoryChart;
+use App\Filament\Widgets\Charts\TourStatusChart;
+use App\Filament\Widgets\Charts\UserRegistrationChart;
+use App\Filament\Widgets\Stats\ActiveBeneficiariesWidget;
+use App\Filament\Widgets\Stats\ActiveEnrollmentsWidget;
+use App\Filament\Widgets\Stats\ActiveMembersWidget;
+use App\Filament\Widgets\Stats\ActiveSessionsWidget;
+use App\Filament\Widgets\Stats\ActiveTeachersWidget;
+use App\Filament\Widgets\Stats\AdultMembersWidget;
+use App\Filament\Widgets\Stats\AidDistributedWidget;
+use App\Filament\Widgets\Stats\AttendanceRateWidget;
+use App\Filament\Widgets\Stats\BlogPostsWidget;
+use App\Filament\Widgets\Stats\DeptAdultMembersWidget;
+use App\Filament\Widgets\Stats\DeptKidsMembersWidget;
+use App\Filament\Widgets\Stats\DeptTotalMembersWidget;
+use App\Filament\Widgets\Stats\DeptYouthMembersWidget;
+use App\Filament\Widgets\Stats\DepartmentMembersWidget;
+use App\Filament\Widgets\Stats\FailedLoginsWidget;
+use App\Filament\Widgets\Stats\KidsMembersWidget;
+use App\Filament\Widgets\Stats\LowStockItemsWidget;
+use App\Filament\Widgets\Stats\MonthlyContributionWidget;
+use App\Filament\Widgets\Stats\NetPositionWidget;
+use App\Filament\Widgets\Stats\PendingApprovalsWidget;
+use App\Filament\Widgets\Stats\PublishedMediaWidget;
+use App\Filament\Widgets\Stats\TotalExpensesWidget;
+use App\Filament\Widgets\Stats\TotalIncomeWidget;
+use App\Filament\Widgets\Stats\TotalInventoryItemsWidget;
+use App\Filament\Widgets\Stats\TotalMembersWidget;
+use App\Filament\Widgets\Stats\TotalRegisteredUsersWidget;
+use App\Filament\Widgets\Stats\TourPassengersWidget;
+use App\Filament\Widgets\Stats\UpcomingEventsWidget;
+use App\Filament\Widgets\Stats\UpcomingRehearsalsWidget;
+use App\Filament\Widgets\Stats\UpcomingToursWidget;
+use App\Filament\Widgets\Stats\YouthMembersWidget;
+use App\Filament\Widgets\Tables\PendingApprovalsTableWidget;
+use App\Filament\Widgets\Tables\RecentAidDistributionsTable;
+use App\Filament\Widgets\Tables\RecentAuditLogTable;
+use App\Filament\Widgets\Tables\RecentContentTable;
+use App\Filament\Widgets\Tables\RecentMembersTable;
+use App\Filament\Widgets\Tables\RecentStockMovementsTable;
+use App\Filament\Widgets\Tables\RecentTransactionsTable;
+use App\Filament\Widgets\Tables\UpcomingToursScheduleTable;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -20,6 +74,196 @@ class Dashboard extends BaseDashboard
 
     public function getWidgets(): array
     {
+        $user = auth()->user();
+
+        if ($user->hasRole('superadmin')) {
+            return [
+                TotalRegisteredUsersWidget::class,
+                ActiveSessionsWidget::class,
+                FailedLoginsWidget::class,
+
+                UserRegistrationChart::class,
+
+                RecentAuditLogTable::class,
+            ];
+        }
+
+        if ($user->hasRole('admin')) {
+            return [
+                TotalMembersWidget::class,
+                KidsMembersWidget::class,
+                YouthMembersWidget::class,
+                AdultMembersWidget::class,
+
+                TotalIncomeWidget::class,
+                TotalExpensesWidget::class,
+                MonthlyContributionWidget::class,
+
+                RevenueTrendChart::class,
+                ExpenseBreakdownChart::class,
+
+                RecentTransactionsTable::class,
+            ];
+        }
+
+        if ($user->hasRole('finance_head')) {
+            return [
+                TotalIncomeWidget::class,
+                TotalExpensesWidget::class,
+                NetPositionWidget::class,
+                PendingApprovalsWidget::class,
+                MonthlyContributionWidget::class,
+
+                RevenueTrendChart::class,
+                ExpenseBreakdownChart::class,
+
+                RecentTransactionsTable::class,
+            ];
+        }
+
+        if ($user->hasRole('nibret_hisab_head')) {
+            return [
+                TotalIncomeWidget::class,
+                TotalExpensesWidget::class,
+                LowStockItemsWidget::class,
+                TotalInventoryItemsWidget::class,
+
+                RevenueTrendChart::class,
+                ExpenseBreakdownChart::class,
+
+                RecentStockMovementsTable::class,
+            ];
+        }
+
+        if ($user->hasRole('hr_head')) {
+            return [
+                TotalMembersWidget::class,
+                ActiveMembersWidget::class,
+
+                MemberTypeChart::class,
+                GenderDistributionChart::class,
+
+                RecentMembersTable::class,
+            ];
+        }
+
+        if ($user->hasRole('education_head')) {
+            return [
+                ActiveEnrollmentsWidget::class,
+                ActiveTeachersWidget::class,
+                AttendanceRateWidget::class,
+
+                EnrollmentTrendChart::class,
+                AttendanceTrendChart::class,
+            ];
+        }
+
+        if ($user->hasRole('education_monitor')) {
+            return [
+                AttendanceRateWidget::class,
+
+                AttendanceTrendChart::class,
+            ];
+        }
+
+        if ($user->hasRole('tour_head')) {
+            return [
+                UpcomingToursWidget::class,
+                TourPassengersWidget::class,
+
+                TourStatusChart::class,
+
+                UpcomingToursScheduleTable::class,
+            ];
+        }
+
+        if ($user->hasRole('charity_head')) {
+            return [
+                ActiveBeneficiariesWidget::class,
+                AidDistributedWidget::class,
+
+                BeneficiaryByTypeChart::class,
+                BeneficiaryByStatusChart::class,
+
+                RecentAidDistributionsTable::class,
+            ];
+        }
+
+        if ($user->hasRole('worship_monitor')) {
+            return [
+                UpcomingRehearsalsWidget::class,
+
+                SongsByCategoryChart::class,
+            ];
+        }
+
+        if ($user->hasRole('mezmur_head')) {
+            return [
+                UpcomingRehearsalsWidget::class,
+
+                SongsByCategoryChart::class,
+                RehearsalAttendanceChart::class,
+            ];
+        }
+
+        if ($user->hasRole('av_head')) {
+            return [
+                PublishedMediaWidget::class,
+                BlogPostsWidget::class,
+
+                MediaByCategoryChart::class,
+
+                RecentContentTable::class,
+            ];
+        }
+
+        if ($user->hasRole('inventory_staff')) {
+            return [
+                TotalInventoryItemsWidget::class,
+                LowStockItemsWidget::class,
+
+                InventoryByCategoryChart::class,
+
+                RecentStockMovementsTable::class,
+            ];
+        }
+
+        if ($user->hasRole('internal_relations_head')) {
+            return [
+                TotalMembersWidget::class,
+                ActiveMembersWidget::class,
+
+                MembersByGroupChart::class,
+
+                RecentMembersTable::class,
+            ];
+        }
+
+        if ($user->hasRole('department_secretary')) {
+            return [
+                DepartmentMembersWidget::class,
+                UpcomingEventsWidget::class,
+
+                RecentMembersTable::class,
+            ];
+        }
+
+        if ($user->hasRole('staff')) {
+            return [
+                DepartmentMembersWidget::class,
+                UpcomingEventsWidget::class,
+            ];
+        }
+
         return [];
+    }
+
+    public function getColumns(): int | array
+    {
+        return [
+            'lg' => 4,
+            'md' => 2,
+            'sm' => 1,
+        ];
     }
 }

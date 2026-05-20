@@ -63,31 +63,11 @@ class TourReport extends Page
 
         $tours = $query->get();
 
-        // Convert tours to arrays to avoid JSON serialization issues with Eloquent models
-        $toursArray = $tours->map(function ($tour) {
-            return [
-                'id' => $tour->id,
-                'place' => $tour->place,
-                'description' => $tour->description,
-                'image' => $tour->image,
-                'tour_date' => $tour->tour_date instanceof \Carbon\Carbon ? $tour->tour_date->format('Y-m-d') : $tour->tour_date,
-                'start_time' => $tour->start_time instanceof \Carbon\Carbon ? $tour->start_time->format('H:i') : $tour->start_time,
-                'cost_per_person' => $tour->cost_per_person,
-                'registration_deadline' => $tour->registration_deadline instanceof \Carbon\Carbon ? $tour->registration_deadline->format('Y-m-d') : $tour->registration_deadline,
-                'max_capacity' => $tour->max_capacity,
-                'status' => $tour->status,
-                'passengers_count' => $tour->passengers->count(),
-            ];
-        })->toArray();
-
-        $totalPassengers = $tours->sum(fn ($t) => $t->passengers->count());
-        $totalConfirmed = $tours->sum(fn ($t) => $t->passengers->where('status', 'Confirmed')->count());
-
         return [
-            'tours' => $toursArray,
+            'tours' => $tours,
             'totalTours' => $tours->count(),
-            'totalPassengers' => $totalPassengers,
-            'totalConfirmed' => $totalConfirmed,
+            'totalPassengers' => $tours->sum(fn ($t) => $t->passengers->count()),
+            'totalConfirmed' => $tours->sum(fn ($t) => $t->passengers->where('status', 'Confirmed')->count()),
             'byStatus' => $tours->groupBy('status')
                 ->map(fn ($group) => $group->count())
                 ->toArray(),

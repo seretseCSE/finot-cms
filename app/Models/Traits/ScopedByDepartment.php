@@ -3,7 +3,6 @@
 namespace App\Models\Traits;
 
 use App\Models\Scopes\DepartmentScope;
-use Illuminate\Database\Eloquent\Model;
 
 trait ScopedByDepartment
 {

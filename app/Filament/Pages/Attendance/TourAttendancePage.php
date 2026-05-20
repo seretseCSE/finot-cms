@@ -9,6 +9,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Url;
 
 class TourAttendancePage extends Page
 {
@@ -36,19 +37,20 @@ class TourAttendancePage extends Page
 
     protected static ?string $title = 'Tour Attendance';
 
-    public ?int $sessionId = null;
-
+    #[Url]
     public ?int $tourId = null;
 
-    public bool $isLocked = false;
+    public ?int $sessionId = null;
 
-    public array $sessions = [];
+    public bool $isLocked = false;
 
     public array $passengers = [];
 
     public array $attendance = [];
 
     public array $selectedPassengers = [];
+
+    public ?string $tourPlace = null;
 
     public static function canAccess(): bool
     {
@@ -57,44 +59,36 @@ class TourAttendancePage extends Page
 
     public function mount(): void
     {
-        $this->loadSessions();
+        if ($this->tourId) {
+            $this->loadTourAttendance();
+        }
     }
 
-    public function updatedSessionId(): void
+    public function loadTourAttendance(): void
     {
-        $this->reset(['passengers', 'attendance', 'selectedPassengers', 'isLocked']);
-        $this->loadAttendance();
-    }
+        $tour = Tour::with('confirmedPassengers', 'attendanceSessions.attendanceRecords')->find($this->tourId);
 
-    public function loadSessions(): void
-    {
-        $this->sessions = TourAttendanceSession::query()
-            ->with('tour')
-            ->orderBy('session_date', 'desc')
-            ->get()
-            ->map(fn ($s) => [
-                'id' => $s->id,
-                'label' => ($s->tour?->place ?? 'Unknown Tour')
-                    . ' — ' . $s->session_date->format('M j, Y')
-                    . ' (' . ucfirst($s->status) . ')',
-            ])
-            ->pluck('label', 'id')
-            ->toArray();
-    }
-
-    public function loadAttendance(): void
-    {
-        if (! $this->sessionId) {
+        if (! $tour) {
+            Notification::make()
+                ->title('Tour not found')
+                ->danger()
+                ->send();
             return;
         }
 
-        $session = TourAttendanceSession::with('attendanceRecords.passenger', 'tour.confirmedPassengers')->find($this->sessionId);
+        $this->tourPlace = $tour->place;
+
+        $session = $tour->attendanceSessions()->first();
 
         if (! $session) {
+            $this->passengers = [];
+            $this->attendance = [];
+            $this->sessionId = null;
+            $this->isLocked = false;
             return;
         }
 
-        $this->tourId = $session->tour_id;
+        $this->sessionId = $session->id;
         $this->isLocked = $session->status === 'Locked';
 
         $existing = $session->attendanceRecords->keyBy('passenger_id');
@@ -102,7 +96,7 @@ class TourAttendancePage extends Page
         $this->passengers = [];
         $this->attendance = [];
 
-        foreach ($session->tour->confirmedPassengers as $passenger) {
+        foreach ($tour->confirmedPassengers as $passenger) {
             $record = $existing->get($passenger->id);
 
             $this->passengers[$passenger->id] = [

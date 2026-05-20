@@ -426,9 +426,8 @@ class PermissionSeeder extends Seeder
             'permissions' => [
                 'tours.*', 'tour_attendances.*', 'tour_passengers.*',
                 'documents.*',
-                'members.view', 'members.export',
                 'dashboard.view', 'profile.update', 'sessions.manage',
-                'ethiopian_dates.*', 'reports.*',
+                'ethiopian_dates.*',
                 'help.documentation',
                 'page.report.tour',
             ],

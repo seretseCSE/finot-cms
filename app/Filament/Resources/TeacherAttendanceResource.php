@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TeacherAttendanceResource\Pages;
 use App\Models\TeacherAttendance;
 use Filament\Forms;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;

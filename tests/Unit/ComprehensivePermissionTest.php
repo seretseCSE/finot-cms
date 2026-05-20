@@ -345,7 +345,6 @@ class ComprehensivePermissionTest extends TestCase
             'tours.attendance.session.create', 'tours.attendance.record',
             'tours.call_button.use', 'tours.reports.view',
             'attendance.session.create', 'attendance.student.record',
-            'reports.view',
         ]);
 
         // Internal Relations Head
@@ -615,7 +614,6 @@ class ComprehensivePermissionTest extends TestCase
         $this->assertTrue($user->hasPermissionTo('tours.attendance.record'));
         $this->assertTrue($user->hasPermissionTo('tours.call_button.use'));
         $this->assertTrue($user->hasPermissionTo('tours.reports.view'));
-        $this->assertTrue($user->hasPermissionTo('reports.view'));
     }
 
     /**

@@ -296,7 +296,7 @@ class RolePermissionTest extends TestCase
         $tourHead->givePermissionTo([
             'tours.manage', 'tours.create', 'tours.update', 'tours.delete',
             'tours.register_passengers', 'tours.confirm_registration',
-            'tours.attendance.manage', 'tours.reports.view', 'reports.view',
+            'tours.attendance.manage', 'tours.reports.view',
             'education.attendance.create', 'education.attendance.record',
         ]);
 
