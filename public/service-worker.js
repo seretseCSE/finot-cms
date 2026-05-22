@@ -1,10 +1,10 @@
 
-const BUILD_INFO = {"timestamp":1778948883493,"hash":"gm1kucpsf","assets":["/assets/app-Buo-81ph.css","/assets/vendor-BYIAvQxD.js","/assets/admin-tour-DfrDn7OO.js","/assets/app-DUceCfHp.js","/assets/financial-charts-BbJYJBRA.js","/assets/admin-D8P_1wYs.js","/assets/app-BWSsXgQj.js"]};
-const CACHE_NAME = 'finot-cache-gm1kucpsf';
-const API_CACHE_NAME = 'finot-api-cache-gm1kucpsf';
+const BUILD_INFO = {"timestamp":1779290062114,"hash":"p70vc30o6","assets":["/assets/app-CGRnLp_K.css","/assets/vendor-BYIAvQxD.js","/assets/admin-tour-qw7r0X-M.js","/assets/app-D_IEYnof.js","/assets/financial-charts-BbJYJBRA.js","/assets/admin-B0dRGtE1.js","/assets/app-BWSsXgQj.js"]};
+const CACHE_NAME = 'finot-cache-p70vc30o6';
+const API_CACHE_NAME = 'finot-api-cache-p70vc30o6';
 
 // Dynamic assets from build
-const DYNAMIC_ASSETS = ["/assets/app-Buo-81ph.css","/assets/vendor-BYIAvQxD.js","/assets/admin-tour-DfrDn7OO.js","/assets/app-DUceCfHp.js","/assets/financial-charts-BbJYJBRA.js","/assets/admin-D8P_1wYs.js","/assets/app-BWSsXgQj.js"];
+const DYNAMIC_ASSETS = ["/assets/app-CGRnLp_K.css","/assets/vendor-BYIAvQxD.js","/assets/admin-tour-qw7r0X-M.js","/assets/app-D_IEYnof.js","/assets/financial-charts-BbJYJBRA.js","/assets/admin-B0dRGtE1.js","/assets/app-BWSsXgQj.js"];
 
 // Static assets that rarely change
 const STATIC_ASSETS = [
@@ -12,9 +12,6 @@ const STATIC_ASSETS = [
     '/manifest.json',
     '/offline',
     '/images/logo.png',
-    '/images/pwa-icon-192x192.png',
-    '/images/pwa-icon-256x256.png',
-    '/images/pwa-icon-512x512.png',
 ];
 
 self.addEventListener('install', (event) => {

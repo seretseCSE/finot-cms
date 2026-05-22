@@ -47,9 +47,9 @@ class PwaController extends Controller
         $buildInfo = $this->getBuildInfo();
 
         return response()->json([
-            'name' => 'FINOTE TSIDIK - Church Management System',
-            'short_name' => 'FINOTE',
-            'description' => 'Complete church management system for FINOTE TSIDIK',
+            'name' => 'መዝገበ ሃይማኖት - Mezgebe Haymanot',
+            'short_name' => 'መዝገበ',
+            'description' => 'Spiritual library, courses, hymns, liturgy, and teachings of the Ethiopian Orthodox Tewahedo Church',
             'start_url' => '/',
             'display' => 'standalone',
             'background_color' => '#FFFFFF',

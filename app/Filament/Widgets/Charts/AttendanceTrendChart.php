@@ -9,21 +9,22 @@ class AttendanceTrendChart extends LineChartWidget
 {
     protected int | string | array $columnSpan = 2;
 
-    protected ?string $heading = 'Student Attendance Rate (30 Days)';
+    protected ?string $heading = 'Student Attendance Rate (12 Weeks)';
 
     protected function getData(): array
     {
         $labels = [];
         $data = [];
 
-        for ($i = 29; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $labels[] = $date->format('M j');
+        for ($i = 11; $i >= 0; $i--) {
+            $startOfWeek = now()->subWeeks($i)->startOfWeek();
+            $endOfWeek = now()->subWeeks($i)->endOfWeek();
+            $labels[] = $startOfWeek->format('M j');
 
-            $total = StudentAttendance::whereHas('session', fn ($q) => $q->whereDate('session_date', $date))
+            $total = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [$startOfWeek, $endOfWeek]))
                 ->count();
 
-            $present = StudentAttendance::whereHas('session', fn ($q) => $q->whereDate('session_date', $date))
+            $present = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [$startOfWeek, $endOfWeek]))
                 ->where('status', 'Present')
                 ->count();
 

@@ -60,7 +60,9 @@
                     @foreach([
                         ['href' => '/',               'label' => __('Home')],
                         ['href' => route('about'),    'label' => __('About Us')],
-                                                ['href' => route('events'),   'label' => __('Events')],
+                        ['href' => route('events'),   'label' => __('Events')],
+                        ['href' => route('library'), 'label' => __('Spiritual Library')],
+                        ['href' => route('courses.index'),  'label' => __('Courses')],
                         ['href' => route('contact'),  'label' => __('Contact')],
                     ] as $link)
                         <a href="{{ $link['href'] }}" style="font-size:.85rem;color:var(--text-40);text-decoration:none;transition:color .2s,padding-left .2s;" onmouseover="this.style.color='var(--text-display)';this.style.paddingLeft='4px'" onmouseout="this.style.color='var(--text-40)';this.style.paddingLeft='0'">{{ $link['label'] }}</a>
@@ -75,11 +77,13 @@
                 </h4>
                 <div style="display:flex;flex-direction:column;gap:12px;">
                     @foreach([
-                        ['href' => route('media'),         'label' => __('Media')],
-                        ['href' => route('songs.index'),   'label' => __('Songs')],
-                        ['href' => route('library'),       'label' => __('Library')],
-                        ['href' => route('blog.index'),    'label' => __('Blog')],
-                        ['href' => route('tours.index'),   'label' => __('Tours')],
+                        ['href' => route('library'),   'label' => __('Spiritual Library')],
+                        ['href' => route('courses.index'),    'label' => __('Courses')],
+                        ['href' => route('media'),          'label' => __('Media')],
+                        ['href' => route('songs.index'),    'label' => __('Songs')],
+                        ['href' => route('library'),        'label' => __('Library')],
+                        ['href' => route('blog.index'),     'label' => __('Blog')],
+                        ['href' => route('tours.index'),    'label' => __('Tours')],
                         ['href' => route('fundraising.index'), 'label' => __('Fundraising')],
                     ] as $link)
                         <a href="{{ $link['href'] }}" style="font-size:.85rem;color:var(--text-40);text-decoration:none;transition:color .2s,padding-left .2s;" onmouseover="this.style.color='var(--text-display)';this.style.paddingLeft='4px'" onmouseout="this.style.color='var(--text-40)';this.style.paddingLeft='0'">{{ $link['label'] }}</a>

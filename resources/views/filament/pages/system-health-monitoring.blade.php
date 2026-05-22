@@ -1,3 +1,4 @@
+
 <x-filament-panels::page>
     <div class="space-y-6">
         <!-- Health Overview Cards -->
@@ -5,7 +6,7 @@
             @php
                 $healthData = $this->getSystemHealthData();
             @endphp
-            
+
             <!-- Storage Usage -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between">
@@ -19,7 +20,7 @@
                         </p>
                     </div>
                     <div class="{{ $healthData['storage_usage']['percentage'] > 40 ? 'text-orange-500' : 'text-green-500' }}">
-                        <x-filament::icon 
+                        <x-filament::icon
                             icon="{{ $healthData['storage_usage']['percentage'] > 40 ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-server' }}"
                             class="h-8 w-8"
                         />
@@ -40,7 +41,7 @@
                         </p>
                     </div>
                     <div class="{{ $healthData['db_query_time'] > 2 ? 'text-red-500' : 'text-green-500' }}">
-                        <x-filament::icon 
+                        <x-filament::icon
                             icon="{{ $healthData['db_query_time'] > 2 ? 'heroicon-o-x-circle' : 'heroicon-o-database' }}"
                             class="h-8 w-8"
                         />
@@ -61,7 +62,7 @@
                         </p>
                     </div>
                     <div class="{{ $healthData['error_rate'] > 10 ? 'text-red-500' : 'text-green-500' }}">
-                        <x-filament::icon 
+                        <x-filament::icon
                             icon="{{ $healthData['error_rate'] > 10 ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle' }}"
                             class="h-8 w-8"
                         />
@@ -82,7 +83,7 @@
                         </p>
                     </div>
                     <div class="text-blue-500">
-                        <x-filament::icon 
+                        <x-filament::icon
                             icon="heroicon-o-users"
                             class="h-8 w-8"
                         />

@@ -38,6 +38,9 @@ class DatabaseSeeder extends Seeder
 
             ContactMessageSeeder::class,
 
+            // Library Data
+            LibrarySampleDataSeeder::class,
+
             // Specialized Data
             EthiopianOrthodoxSampleDataSeeder::class,
             PredefinedReportSeeder::class,

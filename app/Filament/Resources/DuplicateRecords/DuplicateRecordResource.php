@@ -10,6 +10,7 @@ use App\Models\DuplicateRecord;
 use App\Services\DuplicateMergeService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -252,7 +253,7 @@ class DuplicateRecordResource extends BaseResource
                             ->send();
                     }),
 
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkAction::make('ignore_selected')

@@ -39,6 +39,32 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SongController;
 
+// Courses routes (higher rate limit for reading)
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/{id}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show')
+        ->where('id', '[0-9]+');
+    Route::get('/courses/{slug}', [\App\Http\Controllers\CourseController::class, 'browse'])->name('courses.browse')
+        ->where('slug', '[a-z0-9\-]+');
+    Route::get('/courses/{course}/lesson/{lesson}', [\App\Http\Controllers\CourseController::class, 'lesson'])->name('courses.lesson');
+
+    // Legacy redirects
+    Route::redirect('/study', '/courses', 301);
+    Route::get('/study/{path}', function ($path) {
+        return redirect('/courses/' . $path, 301);
+    })->where('path', '.*');
+    Route::redirect('/course', '/courses', 301);
+    Route::get('/course/{path}', function ($path) {
+        return redirect('/courses/' . $path, 301);
+    })->where('path', '.*');
+
+    Route::get('/favorites', [\App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/toggle', [\App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::get('/favorites/status', [\App\Http\Controllers\FavoriteController::class, 'status'])->name('favorites.status');
+
+    Route::get('/search', \App\Http\Controllers\SearchController::class)->name('search');
+});
+
 // Apply rate limiting to all public routes (10 requests per minute)
 Route::middleware('throttle:10,1')->group(function () {
     Route::get('/', [HomeController::class, 'index']);

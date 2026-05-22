@@ -83,6 +83,7 @@ class Dashboard extends BaseDashboard
                 FailedLoginsWidget::class,
 
                 UserRegistrationChart::class,
+                AttendanceTrendChart::class,
 
                 RecentAuditLogTable::class,
             ];
@@ -101,6 +102,7 @@ class Dashboard extends BaseDashboard
 
                 RevenueTrendChart::class,
                 ExpenseBreakdownChart::class,
+                AttendanceTrendChart::class,
 
                 RecentTransactionsTable::class,
             ];

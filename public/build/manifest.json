@@ -4,7 +4,7 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Buo-81ph.css",
+    "file": "assets/app-CGRnLp_K.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -13,7 +13,7 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-D8P_1wYs.js",
+    "file": "assets/admin-B0dRGtE1.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
@@ -44,7 +44,7 @@
     ]
   },
   "resources/js/pwa-tour.js": {
-    "file": "assets/admin-tour-DfrDn7OO.js",
+    "file": "assets/admin-tour-qw7r0X-M.js",
     "name": "admin-tour",
     "src": "resources/js/pwa-tour.js",
     "isDynamicEntry": true

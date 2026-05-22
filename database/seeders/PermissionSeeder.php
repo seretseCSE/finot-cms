@@ -47,6 +47,9 @@ class PermissionSeeder extends Seeder
         'academic_years' => ['activate', 'deactivate'],
         'classes' => [],
         'subjects' => [],
+        'courses' => [],
+        'course_categories' => [],
+        'course_lessons' => [],
         'enrollments' => [],
         'promotions' => [],
         'students' => ['enroll', 'remove', 'promote', 'bulk_promote'],
@@ -215,7 +218,9 @@ class PermissionSeeder extends Seeder
                 // Reports
                 'reports.*',
                 // Education (limited)
-                'academic_years.*', 'classes.*', 'subjects.*', 'enrollments.*', 'promotions.*',
+                'academic_years.*', 'classes.*', 'subjects.*',
+                'courses.*', 'course_categories.*', 'course_lessons.*',
+                'enrollments.*', 'promotions.*',
                 'students.enroll', 'students.remove', 'students.promote', 'students.bulk_promote',
                 'attendance_sessions.view', 'library_resources.upload', 'library_categories.*',
                 'library_subcategories.*',
@@ -325,7 +330,9 @@ class PermissionSeeder extends Seeder
             'label' => 'Education Head',
             'description' => 'Complete education management',
             'permissions' => [
-                'academic_years.*', 'classes.*', 'subjects.*', 'enrollments.*', 'promotions.*',
+                'academic_years.*', 'classes.*', 'subjects.*', 'courses.*', 'course_categories.*',
+                'course_lessons.*',
+                'enrollments.*', 'promotions.*',
                 'students.*', 'teachers.*', 'teacher_assignments.*', 'teacher_attendances.*',
                 'school_classes.*', 'student_enrollments.*',
                 'attendance_sessions.*', 'attendance_records.*',

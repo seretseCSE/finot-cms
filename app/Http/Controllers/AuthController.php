@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Favorite;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +57,8 @@ class AuthController extends Controller
             Auth::login($user);
             $request->session()->regenerate();
 
+            $this->mergeGuestFavorites($request, $user);
+
             return redirect('/change-initial-password');
         }
 
@@ -63,6 +66,8 @@ class AuthController extends Controller
         Auth::login($user);
         $user->resetFailedAttempts();
         $request->session()->regenerate();
+
+        $this->mergeGuestFavorites($request, $user);
 
         return redirect()->intended('/admin');
     }
@@ -113,5 +118,45 @@ class AuthController extends Controller
         $user->update(['temp_password_changed' => true]);
 
         return redirect('/admin')->with('success', 'Password changed successfully.');
+    }
+
+    /**
+     * Merge guest cookie favorites into the user's database favorites on login.
+     * DB wins: only inserts favorites not already present for this user.
+     */
+    private function mergeGuestFavorites(Request $request, User $user): void
+    {
+        $types = [
+            'App\Models\LibraryResource',
+            'App\Models\Course',
+        ];
+
+        foreach ($types as $type) {
+            $cookieKey = 'favorites_' . str_replace('\\', '_', $type);
+            $guestIds = json_decode($request->cookie($cookieKey, '[]'), true) ?? [];
+
+            if (empty($guestIds)) {
+                continue;
+            }
+
+            $existingIds = Favorite::where('user_id', $user->id)
+                ->where('favorable_type', $type)
+                ->whereIn('favorable_id', $guestIds)
+                ->pluck('favorable_id')
+                ->toArray();
+
+            $newIds = array_diff($guestIds, $existingIds);
+
+            foreach ($newIds as $id) {
+                Favorite::create([
+                    'user_id' => $user->id,
+                    'favorable_type' => $type,
+                    'favorable_id' => (int) $id,
+                ]);
+            }
+
+            // Clear the cookie
+            cookie()->queue($cookieKey, '', -1);
+        }
     }
 }

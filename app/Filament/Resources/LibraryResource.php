@@ -158,6 +158,26 @@ class LibraryResource extends BaseResource
                             }),
                     ]),
 
+                Section::make('Content (for inline reading)')
+                    ->schema([
+                        Forms\Components\RichEditor::make('content')
+                            ->label('Content (English)')
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('library-content'),
+                        Forms\Components\RichEditor::make('content_am')
+                            ->label('Content (አማርኛ)')
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('library-content'),
+                        Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('icon')
+                                    ->label('Icon (emoji or SVG class)')
+                                    ->helperText('e.g. 📖, 🎵, 🕯️'),
+                                Forms\Components\TextInput::make('featured_image')
+                                    ->label('Featured Image URL'),
+                            ]),
+                    ]),
+
                 Section::make('Settings')
                     ->schema([
                         Grid::make(2)

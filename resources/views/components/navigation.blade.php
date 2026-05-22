@@ -1,4 +1,4 @@
-@props(['currentPage' => ''])
+vs@props(['currentPage' => ''])
 
 @php
     $resolvedPage = $currentPage;
@@ -10,6 +10,8 @@
     if (Request::is('blog*')) $resolvedPage = 'resources';
     if (Request::is('shop*')) $resolvedPage = 'tours';
     if (Request::is('tours*')) $resolvedPage = 'tours';
+    if (Request::is('courses*') || Request::is('course*')) $resolvedPage = 'courses';
+    if (Request::is('study*')) $resolvedPage = 'courses';
 @endphp
 
 <nav id="main-nav" style="
@@ -37,6 +39,7 @@
                 ['href' => '/',                          'label' => __('Home'),          'page' => 'home'],
                 ['href' => route('about'),               'label' => __('About'),         'page' => 'about'],
                 ['href' => route('news'),                'label' => __('News & Events'), 'page' => 'news'],
+                ['href' => route('courses.index'),        'label' => __('Courses'),       'page' => 'courses'],
             ] as $link)
                 <a href="{{ $link['href'] }}"
                    class="nav-link {{ $resolvedPage === $link['page'] ? 'nav-active' : '' }}"
@@ -216,6 +219,7 @@
                 ['href' => '/',                          'label' => __('Home'),          'page' => 'home'],
                 ['href' => route('about'),               'label' => __('About'),         'page' => 'about'],
                 ['href' => route('news'),                'label' => __('News & Events'), 'page' => 'news'],
+                ['href' => route('courses.index'),        'label' => __('Courses'),       'page' => 'courses'],
                 ['href' => '#',                          'label' => __('Resources'),     'page' => 'resources', 'sub' => [
                     ['href' => route('songs.index'),   'label' => __('Songs')],
                     ['href' => route('library'),       'label' => __('Library')],
