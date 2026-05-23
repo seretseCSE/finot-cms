@@ -148,16 +148,6 @@ class UserFactory extends Factory
         return $this->withRole('internal_relations_head');
     }
 
-    public function departmentSecretary(string $departmentName = 'Internal Relations'): static
-    {
-        return $this->withRole('department_secretary')->withDepartment($departmentName);
-    }
-
-    public function staff(string $departmentName = 'Internal Relations'): static
-    {
-        return $this->withRole('staff')->withDepartment($departmentName);
-    }
-
     public function needsPasswordChange(): static
     {
         return $this->state(fn (array $attributes) => [

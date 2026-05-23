@@ -22,7 +22,7 @@ class RoleDashboardAccessTest extends TestCase
         'education_monitor',
         'finance_head',
         'hr_head',
-        'staff',
+        'revenue_and_charity_head',
     ];
 
     /**
@@ -208,25 +208,6 @@ class RoleDashboardAccessTest extends TestCase
     }
 
     /**
-     * Test staff permissions.
-     */
-    public function test_staff_permissions(): void
-    {
-        $staff = User::factory()->create([
-            'is_active' => true,
-            'temp_password_changed' => true,
-        ]);
-        $staff->assignRole('staff');
-
-        // Staff should have limited permissions
-        $this->assertTrue($staff->hasPermissionTo('department_resources.view'));
-
-        // Should not have admin permissions
-        $this->assertFalse($staff->hasPermissionTo('users.view'));
-        $this->assertFalse($staff->hasPermissionTo('members.delete'));
-    }
-
-    /**
      * Test that user with unchanged temp password cannot access panel.
      */
     public function test_user_with_unchanged_temp_password_cannot_access_panel(): void
@@ -235,7 +216,7 @@ class RoleDashboardAccessTest extends TestCase
             'is_active' => true,
             'temp_password_changed' => false,
         ]);
-        $user->assignRole('staff');
+        $user->assignRole('hr_head');
 
         // The canAccessPanel method should return false
         $panel = app(\Filament\Panel::class);
@@ -251,7 +232,7 @@ class RoleDashboardAccessTest extends TestCase
             'is_active' => false,
             'temp_password_changed' => true,
         ]);
-        $user->assignRole('staff');
+        $user->assignRole('hr_head');
 
         // The canAccessPanel method should return false
         $panel = app(\Filament\Panel::class);
@@ -267,7 +248,7 @@ class RoleDashboardAccessTest extends TestCase
             'is_active' => true,
             'temp_password_changed' => true,
         ]);
-        $user->assignRole('staff');
+        $user->assignRole('hr_head');
 
         // The canAccessPanel method should return true
         $panel = app(\Filament\Panel::class);
@@ -345,7 +326,7 @@ class RoleDashboardAccessTest extends TestCase
             'education_monitor' => ['attendance.view', 'attendance.mark', 'members.view'],
             'finance_head' => ['contributions.view', 'contributions.record', 'contributions.reports'],
             'hr_head' => ['members.view', 'members.create', 'groups.view', 'users.view'],
-            'staff' => ['department_resources.view'],
+            'revenue_and_charity_head' => ['tours.view'],
         ];
 
         foreach ($rolePermissions as $roleName => $permissions) {
@@ -376,7 +357,7 @@ class RoleDashboardAccessTest extends TestCase
             'education_monitor' => 'Education Monitor',
             'finance_head' => 'Finance Head',
             'hr_head' => 'HR Head',
-            'staff' => 'Staff',
+            'revenue_and_charity_head' => 'Revenue and Charity Head',
         ];
 
         foreach ($roleLabels as $roleName => $expectedLabel) {

@@ -31,7 +31,7 @@ class ComprehensivePermissionTest extends TestCase
             'superadmin', 'admin', 'hr_head', 'finance_head', 'nibret_hisab_head',
             'inventory_staff', 'education_head', 'education_monitor', 'worship_monitor',
             'mezmur_head', 'av_head', 'charity_head', 'tour_head',
-            'internal_relations_head', 'department_secretary', 'staff',
+            'internal_relations_head', 'revenue_and_charity_head',
         ];
 
         foreach ($roles as $role) {
@@ -365,21 +365,6 @@ class ComprehensivePermissionTest extends TestCase
             'reports.view',
         ]);
 
-        // Department Secretary - limited to create/update only
-        $departmentSecretary = Role::findByName('department_secretary');
-        $departmentSecretary->givePermissionTo([
-            'members.create', 'members.update', 'members.view',
-            'groups.assign',
-            'documents.upload', 'documents.update', 'documents.view', 'documents.search',
-            'reports.view',
-        ]);
-
-        // General Staff
-        $staff = Role::findByName('staff');
-        $staff->givePermissionTo([
-            'members.view',
-            'reports.view',
-        ]);
     }
 
     // =========================================================================
@@ -712,48 +697,6 @@ class ComprehensivePermissionTest extends TestCase
     }
 
     /**
-     * Test Department Secretary permissions (no delete).
-     */
-    public function test_department_secretary_has_no_delete_permissions(): void
-    {
-        $user = $this->createDepartmentSecretaryUser();
-
-        // Create/Update/View
-        $this->assertTrue($user->hasPermissionTo('members.create'));
-        $this->assertTrue($user->hasPermissionTo('members.update'));
-        $this->assertTrue($user->hasPermissionTo('members.view'));
-        $this->assertTrue($user->hasPermissionTo('groups.assign'));
-
-        // Documents
-        $this->assertTrue($user->hasPermissionTo('documents.upload'));
-        $this->assertTrue($user->hasPermissionTo('documents.update'));
-        $this->assertTrue($user->hasPermissionTo('documents.view'));
-
-        // Should NOT have delete
-        $this->assertFalse($user->hasPermissionTo('members.delete'));
-        $this->assertFalse($user->hasPermissionTo('groups.delete'));
-        $this->assertFalse($user->hasPermissionTo('documents.delete'));
-        $this->assertFalse($user->hasPermissionTo('users.manage'));
-    }
-
-    /**
-     * Test Staff permissions (minimal).
-     */
-    public function test_staff_has_minimal_permissions(): void
-    {
-        $user = $this->createStaffUser();
-
-        $this->assertTrue($user->hasPermissionTo('members.view'));
-        $this->assertTrue($user->hasPermissionTo('reports.view'));
-
-        // Should NOT have any management permissions
-        $this->assertFalse($user->hasPermissionTo('members.create'));
-        $this->assertFalse($user->hasPermissionTo('members.update'));
-        $this->assertFalse($user->hasPermissionTo('groups.assign'));
-        $this->assertFalse($user->hasPermissionTo('users.manage'));
-    }
-
-    /**
      * Test that all roles have at least basic access.
      */
     public function test_all_roles_have_basic_access(): void
@@ -762,7 +705,7 @@ class ComprehensivePermissionTest extends TestCase
             'superadmin', 'admin', 'hr_head', 'finance_head', 'nibret_hisab_head',
             'inventory_staff', 'education_head', 'education_monitor', 'worship_monitor',
             'mezmur_head', 'av_head', 'charity_head', 'tour_head',
-            'internal_relations_head', 'department_secretary', 'staff',
+            'internal_relations_head', 'revenue_and_charity_head',
         ];
 
         foreach ($roles as $role) {

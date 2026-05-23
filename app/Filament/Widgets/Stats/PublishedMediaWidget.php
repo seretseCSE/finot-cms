@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\MediaItem;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class PublishedMediaWidget extends StatsOverviewWidget
 {
@@ -13,7 +14,7 @@ class PublishedMediaWidget extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Published Media', MediaItem::count())
+            Stat::make('Published Media', Cache::remember('dashboard_published_media', 300, fn () => MediaItem::count()))
                 ->icon('heroicon-o-photo')
                 ->color('primary'),
         ];

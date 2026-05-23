@@ -19,7 +19,7 @@
             <button
                 type="button"
                 class="text-white/90 hover:text-white"
-                @click="window.pwaTourManager?.dismissPwaPromptFor7Days(); open = false"
+                @click="window.pwaInstallManager?.dismissPwaPromptFor7Days(); open = false"
                 aria-label="Close"
             >
                 ×
@@ -30,14 +30,14 @@
             <button
                 type="button"
                 class="bg-white text-blue-700 px-3 py-1 rounded text-sm font-medium"
-                @click="window.pwaTourManager?.installPWA()"
+                @click="window.pwaInstallManager?.installPWA()"
             >
                 {{ __('Install') }}
             </button>
             <button
                 type="button"
                 class="border border-white/80 px-3 py-1 rounded text-sm"
-                @click="window.pwaTourManager?.dismissPwaPromptFor7Days(); open = false"
+                @click="window.pwaInstallManager?.dismissPwaPromptFor7Days(); open = false"
             >
                 {{ __('Not now') }}
             </button>

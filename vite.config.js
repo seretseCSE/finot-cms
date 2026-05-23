@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/admin.js',
                 'resources/js/financial-charts.js',
+                'resources/js/tours/filament-init.js',
             ],
             refresh: true,
         }),
@@ -27,13 +28,21 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks(id) {
-                    // Split admin tour logic into its own chunk
-                    if (id.includes('pwa-tour')) {
-                        return 'admin-tour';
-                    }
-                    // Split vendor libraries for better caching
                     if (id.includes('node_modules')) {
+                        if (id.includes('driver.js')) {
+                            return 'tour-vendor';
+                        }
+                        if (id.includes('chart.js')) {
+                            return 'chart-vendor';
+                        }
                         return 'vendor';
+                    }
+                    if (id.includes('/tours/')) {
+                        if (id.includes('/roles/')) return 'tour-roles';
+                        if (id.includes('/pages/')) return 'tour-pages';
+                        if (id.includes('/core/')) return 'tour-core';
+                        if (id.includes('/components/')) return 'tour-components';
+                        return 'tour-main';
                     }
                 },
             },

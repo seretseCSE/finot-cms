@@ -31,7 +31,7 @@
         {{-- Results --}}
         @if($libraryResults->isEmpty() && $courseResults->isEmpty() && $lessonResults->isEmpty())
             <div style="text-align:center;padding:80px 20px;">
-                <div style="font-size:3rem;margin-bottom:16px;opacity:.3;">🔍</div>
+                <x-tour-icon name="faith" size="48" class="" style="opacity:.3;" aria-hidden="true" />
                 <p style="color:var(--text-40);font-size:1.05rem;">{{ __('No results found for') }} "{{ $query }}"</p>
                 <p style="color:var(--text-40);font-size:.85rem;margin-top:8px;">{{ __('Try different keywords or browse categories.') }}</p>
             </div>
@@ -46,7 +46,7 @@
                     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
                         @foreach($libraryResults as $res)
                             <a href="{{ route('library') }}" class="card" style="padding:16px 20px;text-decoration:none;border-radius:10px;display:flex;align-items:center;gap:12px;">
-                                <div style="width:36px;height:36px;border-radius:8px;background:rgba(243,186,21,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">📖</div>
+                                <div style="width:36px;height:36px;border-radius:8px;background:rgba(243,186,21,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><x-tour-icon name="faith" size="18" class="" aria-hidden="true" /></div>
                                 <div style="flex:1;min-width:0;">
                                     <div style="font-size:.85rem;font-weight:500;color:var(--text-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $res->title }}</div>
                                     @if($res->category)
@@ -70,7 +70,7 @@
                     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
                         @foreach($courseResults as $course)
                             <a href="{{ route('courses.show', $course) }}" class="card" style="padding:16px 20px;text-decoration:none;border-radius:10px;display:flex;align-items:center;gap:12px;">
-                                <div style="width:36px;height:36px;border-radius:8px;background:rgba(26,68,247,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">📚</div>
+                                <div style="width:36px;height:36px;border-radius:8px;background:rgba(26,68,247,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><x-tour-icon name="education" size="18" class="" aria-hidden="true" /></div>
                                 <div style="flex:1;min-width:0;">
                                     <div style="font-size:.85rem;font-weight:500;color:var(--text-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" class="am">{{ $course->title_am ?? $course->title }}</div>
                                     <div style="font-size:.72rem;color:var(--text-40);">{{ $course->category?->name }}</div>

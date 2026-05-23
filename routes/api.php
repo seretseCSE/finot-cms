@@ -12,6 +12,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:10,1'])->group(functi
     Route::post('/offline-attendance/process', [OfflineAttendanceController::class, 'process']);
 });
 
+require __DIR__.'/product-tour.php';
+
 // Demo routes for HTTP testing demonstration (testing and local environments only)
 if (app()->environment('testing', 'local')) {
     Route::apiResource('demo/contact-messages', DemoContactMessageController::class)

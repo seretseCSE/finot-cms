@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\AidDistribution;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class AidDistributedWidget extends StatsOverviewWidget
 {
@@ -12,9 +13,11 @@ class AidDistributedWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $total = AidDistribution::whereMonth('distribution_date', now()->month)
-            ->whereYear('distribution_date', now()->year)
-            ->sum('amount');
+        $total = Cache::remember('dashboard_aid_distributed_' . now()->format('Y_m'), 300, fn () =>
+            AidDistribution::whereMonth('distribution_date', now()->month)
+                ->whereYear('distribution_date', now()->year)
+                ->sum('amount')
+        );
 
         return [
             Stat::make('Aid Distributed (MTD)', number_format($total, 2) . ' ETB')

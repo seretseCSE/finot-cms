@@ -91,7 +91,7 @@
         }
 
         [data-theme="light"] {
-            --bg-950:        #F8F9FA;
+            --bg-950:        #F8FAFC;
             --bg-900:        #FFFFFF;
             --bg-800:        #F1F3F5;
             --bg-700:        #E9ECEF;
@@ -105,9 +105,9 @@
             --text-display:  #0F172A;
             --text-hero:     #0F172A;
 
-            --glass:         rgba(0,0,0,0.07);
-            --glass-hover:   rgba(0,0,0,0.11);
-            --border-subtle: rgba(15,23,42,0.15);
+            --glass:         rgba(0,0,0,0.05);
+            --glass-hover:   rgba(0,0,0,0.08);
+            --border-subtle: rgba(15,23,42,0.12);
             --blue-glow:     rgba(26,68,247,0.15);
             --overlay-98:    rgba(248,249,250,0.98);
             --overlay-95:    rgba(248,249,250,0.95);
@@ -115,6 +115,14 @@
             --overlay-85:    rgba(248,249,250,0.85);
             --overlay-80:    rgba(248,249,250,0.80);
             --overlay-40:    rgba(248,249,250,0.30);
+        }
+
+        [data-theme="light"] .card {
+            background:#FFFFFF;
+            box-shadow:0 10px 40px rgba(15,23,42,.06);
+        }
+        [data-theme="light"] body {
+            background:linear-gradient(to bottom, #F8FAFC, #EEF2FF);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -130,6 +138,30 @@
             -webkit-font-smoothing: antialiased;
             transition: background .3s, color .3s;
         }
+
+        /* ── Section Spacing ── */
+        section { padding: clamp(80px,10vw,140px) clamp(20px,5vw,60px); }
+
+        /* ── Premium Hero ── */
+        .hero-premium {
+            position:relative; overflow:hidden;
+            background:
+                radial-gradient(circle at top left, rgba(26,68,247,.18), transparent 40%),
+                radial-gradient(circle at bottom right, rgba(243,186,21,.12), transparent 35%);
+        }
+        .hero-title {
+            font-size: clamp(3rem,8vw,7rem); line-height:.95; letter-spacing:-.04em; font-weight:800;
+        }
+        .hero-sub {
+            font-size:1.1rem; line-height:1.9; max-width:700px;
+        }
+
+        /* ── Float Animation ── */
+        @keyframes float {
+            0%,100% { transform:translateY(0px); }
+            50% { transform:translateY(-12px); }
+        }
+        .float { animation:float 6s ease-in-out infinite; }
 
         /* ── Scroll Reveal ── */
         .sr { opacity: 0; transform: translateY(32px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
@@ -185,8 +217,9 @@
             transition: background .3s, border-color .3s, transform .3s, box-shadow .3s;
         }
         .card:hover {
-            background: var(--glass-hover); border-color: rgba(26,68,247,.25);
-            transform: translateY(-5px); box-shadow: 0 12px 40px rgba(26,68,247,.15);
+            background: var(--glass-hover); border-color: rgba(26,68,247,.22);
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 50px rgba(0,0,0,.28), 0 10px 30px rgba(26,68,247,.12);
         }
 
         /* ── Tilet geometric overlay ── */
@@ -288,6 +321,8 @@
     </script>
 
     <x-navigation :currentPage="$currentPage ?? ''" />
+
+    <x-quick-nav />
 
     @if(session('success'))
         <div style="position:fixed;top:74px;right:20px;z-index:800;padding:13px 20px;background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.35);color:#6ee7b7;border-radius:10px;font-size:.85rem;backdrop-filter:blur(12px);">
@@ -482,5 +517,30 @@
     </script>
 
     @stack('scripts')
+
+    {{-- Mobile sticky contact bar --}}
+    <x-mobile-contact-bar />
+
+    {{-- Icon sprite for tour icons — loaded once, referenced via <use> --}}
+    <x-tour-icons-sprite />
+
+    <style>
+        .tour-icon {
+            display: inline-block;
+            vertical-align: middle;
+            color: #D4AF37;
+            transition: color 0.2s ease;
+            flex-shrink: 0;
+        }
+        .tour-icon:hover {
+            color: #6B1F3A;
+        }
+        .tour-icon-lg { width: 48px; height: 48px; stroke-width: 1.5; }
+        .tour-icon-md { width: 28px; height: 28px; stroke-width: 2; }
+        .tour-icon-sm { width: 20px; height: 20px; stroke-width: 2; }
+        .tour-icon-inline { width: 1.1em; height: 1.1em; stroke-width: 2; vertical-align: -0.15em; }
+        .tour-icon-hero { width: 3.5rem; height: 3.5rem; stroke-width: 1.5; }
+        .tour-icon-stat { width: 1.8rem; height: 1.8rem; stroke-width: 2; }
+    </style>
 </body>
 </html>

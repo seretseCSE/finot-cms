@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\StudentAttendance;
 use Filament\Widgets\LineChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class AttendanceTrendChart extends LineChartWidget
 {
@@ -13,35 +14,37 @@ class AttendanceTrendChart extends LineChartWidget
 
     protected function getData(): array
     {
-        $labels = [];
-        $data = [];
+        return Cache::remember('dashboard_attendance_trend', 300, function () {
+            $labels = [];
+            $data = [];
 
-        for ($i = 11; $i >= 0; $i--) {
-            $startOfWeek = now()->subWeeks($i)->startOfWeek();
-            $endOfWeek = now()->subWeeks($i)->endOfWeek();
-            $labels[] = $startOfWeek->format('M j');
+            for ($i = 11; $i >= 0; $i--) {
+                $startOfWeek = now()->subWeeks($i)->startOfWeek();
+                $endOfWeek = now()->subWeeks($i)->endOfWeek();
+                $labels[] = $startOfWeek->format('M j');
 
-            $total = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [$startOfWeek, $endOfWeek]))
-                ->count();
+                $total = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [$startOfWeek, $endOfWeek]))
+                    ->count();
 
-            $present = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [$startOfWeek, $endOfWeek]))
-                ->where('status', 'Present')
-                ->count();
+                $present = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [$startOfWeek, $endOfWeek]))
+                    ->where('status', 'Present')
+                    ->count();
 
-            $rate = $total > 0 ? round(($present / $total) * 100, 1) : 0;
-            $data[] = $rate;
-        }
+                $rate = $total > 0 ? round(($present / $total) * 100, 1) : 0;
+                $data[] = $rate;
+            }
 
-        return [
-            'datasets' => [
-                [
-                    'label' => 'Attendance %',
-                    'data' => $data,
-                    'borderColor' => '#22c55e',
-                    'backgroundColor' => '#22c55e',
+            return [
+                'datasets' => [
+                    [
+                        'label' => 'Attendance %',
+                        'data' => $data,
+                        'borderColor' => '#22c55e',
+                        'backgroundColor' => '#22c55e',
+                    ],
                 ],
-            ],
-            'labels' => $labels,
-        ];
+                'labels' => $labels,
+            ];
+        });
     }
 }

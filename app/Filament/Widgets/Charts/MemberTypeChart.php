@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\Member;
 use Filament\Widgets\DoughnutChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class MemberTypeChart extends DoughnutChartWidget
 {
@@ -13,10 +14,12 @@ class MemberTypeChart extends DoughnutChartWidget
 
     protected function getData(): array
     {
-        $data = Member::selectRaw('member_type, COUNT(*) as count')
-            ->groupBy('member_type')
-            ->pluck('count', 'member_type')
-            ->toArray();
+        $data = Cache::remember('dashboard_member_type_chart', 300, fn () =>
+            Member::selectRaw('member_type, COUNT(*) as count')
+                ->groupBy('member_type')
+                ->pluck('count', 'member_type')
+                ->toArray()
+        );
 
         return [
             'datasets' => [

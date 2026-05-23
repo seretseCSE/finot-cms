@@ -10,17 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SessionTimeoutMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Clean up expired sessions (older than 30 minutes)
-        $this->cleanupExpiredSessions();
-
-        // Update current session activity if user is authenticated
         if (Auth::check()) {
             $sessionToken = session('session_token');
 
@@ -32,7 +23,6 @@ class SessionTimeoutMiddleware
                 if ($userSession) {
                     $userSession->updateLastActivity();
                 } else {
-                    // Session not found in database, might be expired
                     Auth::logout();
                     session()->flash('session_expired', 'Your session has expired. Please login again.');
                     return redirect()->route('login');
@@ -41,14 +31,5 @@ class SessionTimeoutMiddleware
         }
 
         return $next($request);
-    }
-
-    /**
-     * Clean up expired sessions (older than 30 minutes).
-     */
-    private function cleanupExpiredSessions(): void
-    {
-        UserSession::where('last_activity', '<', now()->subMinutes(config('finot.session_timeout_minutes', 30)))
-            ->delete();
     }
 }

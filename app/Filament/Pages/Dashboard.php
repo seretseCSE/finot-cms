@@ -56,6 +56,7 @@ use App\Filament\Widgets\Tables\RecentMembersTable;
 use App\Filament\Widgets\Tables\RecentStockMovementsTable;
 use App\Filament\Widgets\Tables\RecentTransactionsTable;
 use App\Filament\Widgets\Tables\UpcomingToursScheduleTable;
+use App\Filament\Widgets\OnboardingProgressWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -78,6 +79,7 @@ class Dashboard extends BaseDashboard
 
         if ($user->hasRole('superadmin')) {
             return [
+                OnboardingProgressWidget::class,
                 TotalRegisteredUsersWidget::class,
                 ActiveSessionsWidget::class,
                 FailedLoginsWidget::class,
@@ -91,6 +93,7 @@ class Dashboard extends BaseDashboard
 
         if ($user->hasRole('admin')) {
             return [
+                OnboardingProgressWidget::class,
                 TotalMembersWidget::class,
                 KidsMembersWidget::class,
                 YouthMembersWidget::class,
@@ -191,6 +194,22 @@ class Dashboard extends BaseDashboard
             ];
         }
 
+        if ($user->hasRole('revenue_and_charity_head')) {
+            return [
+                UpcomingToursWidget::class,
+                TourPassengersWidget::class,
+                ActiveBeneficiariesWidget::class,
+                AidDistributedWidget::class,
+
+                TourStatusChart::class,
+                BeneficiaryByTypeChart::class,
+                BeneficiaryByStatusChart::class,
+
+                UpcomingToursScheduleTable::class,
+                RecentAidDistributionsTable::class,
+            ];
+        }
+
         if ($user->hasRole('worship_monitor')) {
             return [
                 UpcomingRehearsalsWidget::class,
@@ -238,22 +257,6 @@ class Dashboard extends BaseDashboard
                 MembersByGroupChart::class,
 
                 RecentMembersTable::class,
-            ];
-        }
-
-        if ($user->hasRole('department_secretary')) {
-            return [
-                DepartmentMembersWidget::class,
-                UpcomingEventsWidget::class,
-
-                RecentMembersTable::class,
-            ];
-        }
-
-        if ($user->hasRole('staff')) {
-            return [
-                DepartmentMembersWidget::class,
-                UpcomingEventsWidget::class,
             ];
         }
 

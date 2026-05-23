@@ -304,14 +304,17 @@
 <section id="stats-section" style="padding:80px 24px;background:var(--dark-950);position:relative;">
     <div style="max-width:1280px;margin:0 auto;position:relative;z-index:1;">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;">
+            @php
+                $statIcons = ['community', 'education', 'faith', 'events'];
+            @endphp
             @foreach([
-                ['count' => $stats['kids'],   'label' => __('Children'),     'icon' => '👶', 'color' => '#4ade80'],
-                ['count' => $stats['youth'],  'label' => __('Youth'),        'icon' => '🧑', 'color' => '#60a5fa'],
-                ['count' => $stats['adults'], 'label' => __('Young Adults'), 'icon' => '👨‍🎓', 'color' => 'var(--gold)'],
-                ['count' => $stats['total'],  'label' => __('Total Members'), 'icon' => '✝️', 'color' => '#fff'],
+                ['count' => $stats['kids'],   'label' => __('Children'),     'icon' => 'community', 'color' => '#4ade80'],
+                ['count' => $stats['youth'],  'label' => __('Youth'),        'icon' => 'education', 'color' => '#60a5fa'],
+                ['count' => $stats['adults'], 'label' => __('Young Adults'), 'icon' => 'leadership', 'color' => 'var(--gold)'],
+                ['count' => $stats['total'],  'label' => __('Total Members'), 'icon' => 'faith', 'color' => '#fff'],
             ] as $stat)
             <div class="card sr" style="padding:32px 24px;text-align:center;">
-                <div style="font-size:2rem;margin-bottom:12px;">{{ $stat['icon'] }}</div>
+                <x-tour-icon :name="$stat['icon']" size="28" class="" style="color:{{ $stat['color'] }}" aria-hidden="true" />
                 <div data-count="{{ $stat['count'] }}" style="font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:{{ $stat['color'] }};line-height:1;">0</div>
                 <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--parchment-40);margin-top:8px;">{{ $stat['label'] }}</div>
             </div>

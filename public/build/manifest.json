@@ -1,10 +1,46 @@
 {
-  "_vendor-BYIAvQxD.js": {
-    "file": "assets/vendor-BYIAvQxD.js",
+  "_chart-vendor-CCWw2nGx.js": {
+    "file": "assets/chart-vendor-CCWw2nGx.js",
+    "name": "chart-vendor",
+    "imports": [
+      "_vendor-Ch07e1E5.js"
+    ]
+  },
+  "_tour-core-CluoSRK2.js": {
+    "file": "assets/tour-core-CluoSRK2.js",
+    "name": "tour-core",
+    "imports": [
+      "_tour-vendor-wyFz-SqW.js",
+      "_vendor-Ch07e1E5.js"
+    ]
+  },
+  "_tour-pages-CIdMOsiM.js": {
+    "file": "assets/tour-pages-CIdMOsiM.js",
+    "name": "tour-pages",
+    "isDynamicEntry": true
+  },
+  "_tour-roles-4BezQJND.js": {
+    "file": "assets/tour-roles-4BezQJND.js",
+    "name": "tour-roles",
+    "isDynamicEntry": true
+  },
+  "_tour-vendor-DB0Q8XAf.css": {
+    "file": "assets/tour-vendor-DB0Q8XAf.css",
+    "src": "_tour-vendor-DB0Q8XAf.css"
+  },
+  "_tour-vendor-wyFz-SqW.js": {
+    "file": "assets/tour-vendor-wyFz-SqW.js",
+    "name": "tour-vendor",
+    "css": [
+      "assets/tour-vendor-DB0Q8XAf.css"
+    ]
+  },
+  "_vendor-Ch07e1E5.js": {
+    "file": "assets/vendor-Ch07e1E5.js",
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CGRnLp_K.css",
+    "file": "assets/app-BAJyIx59.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -13,40 +49,76 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-B0dRGtE1.js",
+    "file": "assets/admin-CbSRwUpv.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
     "imports": [
+      "resources/js/tours/filament-init.js",
       "resources/js/app.js",
-      "_vendor-BYIAvQxD.js"
+      "_tour-core-CluoSRK2.js",
+      "_tour-vendor-wyFz-SqW.js",
+      "_vendor-Ch07e1E5.js",
+      "_tour-roles-4BezQJND.js"
     ],
     "dynamicImports": [
-      "resources/js/pwa-tour.js"
+      "resources/js/pwa-install.js",
+      "resources/js/tours/filament-init.js"
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BWSsXgQj.js",
+    "file": "assets/app-BEfn2VuD.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_vendor-BYIAvQxD.js"
+      "_vendor-Ch07e1E5.js"
     ]
   },
   "resources/js/financial-charts.js": {
-    "file": "assets/financial-charts-BbJYJBRA.js",
+    "file": "assets/financial-charts-BiWO-mww.js",
     "name": "financial-charts",
     "src": "resources/js/financial-charts.js",
     "isEntry": true,
     "imports": [
-      "_vendor-BYIAvQxD.js"
+      "_chart-vendor-CCWw2nGx.js",
+      "_vendor-Ch07e1E5.js"
     ]
   },
-  "resources/js/pwa-tour.js": {
-    "file": "assets/admin-tour-qw7r0X-M.js",
-    "name": "admin-tour",
-    "src": "resources/js/pwa-tour.js",
+  "resources/js/pwa-install.js": {
+    "file": "assets/pwa-install-BWgOSQDS.js",
+    "name": "pwa-install",
+    "src": "resources/js/pwa-install.js",
     "isDynamicEntry": true
+  },
+  "resources/js/tours/filament-init.js": {
+    "file": "assets/filament-init-BnByl6Yh.js",
+    "name": "filament-init",
+    "src": "resources/js/tours/filament-init.js",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_tour-core-CluoSRK2.js",
+      "_tour-roles-4BezQJND.js",
+      "_tour-vendor-wyFz-SqW.js",
+      "_vendor-Ch07e1E5.js"
+    ],
+    "dynamicImports": [
+      "_tour-roles-4BezQJND.js",
+      "_tour-roles-4BezQJND.js",
+      "_tour-roles-4BezQJND.js",
+      "_tour-roles-4BezQJND.js",
+      "_tour-roles-4BezQJND.js",
+      "_tour-roles-4BezQJND.js",
+      "_tour-roles-4BezQJND.js",
+      "_tour-pages-CIdMOsiM.js",
+      "_tour-pages-CIdMOsiM.js",
+      "_tour-pages-CIdMOsiM.js",
+      "_tour-pages-CIdMOsiM.js",
+      "_tour-pages-CIdMOsiM.js"
+    ],
+    "css": [
+      "assets/filament-init-51LSC3_h.css"
+    ]
   }
 }

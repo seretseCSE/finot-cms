@@ -360,11 +360,11 @@
         $data = $this->getReportData();
 
         $statusMeta = [
-            'Draft'       => ['bg' => 'var(--tr-surface2)',  'color' => 'var(--tr-text-2)',  'pip' => 'var(--tr-text-3)',  'icon' => '✏️'],
-            'Published'   => ['bg' => 'var(--tr-blue-dim)',  'color' => 'var(--tr-blue)',    'pip' => 'var(--tr-blue)',    'icon' => '📢'],
-            'In Progress' => ['bg' => 'var(--tr-amber-dim)', 'color' => 'var(--tr-amber)',   'pip' => 'var(--tr-amber)',   'icon' => '⚙️'],
-            'Completed'   => ['bg' => 'var(--tr-accent-dim)','color' => 'var(--tr-accent)',  'pip' => 'var(--tr-accent)',  'icon' => '✅'],
-            'Cancelled'   => ['bg' => 'var(--tr-red-dim)',   'color' => 'var(--tr-red)',     'pip' => 'var(--tr-red)',     'icon' => '🚫'],
+            'Draft'       => ['bg' => 'var(--tr-surface2)',  'color' => 'var(--tr-text-2)',  'pip' => 'var(--tr-text-3)',  'icon' => 'events'],
+            'Published'   => ['bg' => 'var(--tr-blue-dim)',  'color' => 'var(--tr-blue)',    'pip' => 'var(--tr-blue)',    'icon' => 'faith'],
+            'In Progress' => ['bg' => 'var(--tr-amber-dim)', 'color' => 'var(--tr-amber)',   'pip' => 'var(--tr-amber)',   'icon' => 'community'],
+            'Completed'   => ['bg' => 'var(--tr-accent-dim)','color' => 'var(--tr-accent)',  'pip' => 'var(--tr-accent)',  'icon' => 'leadership'],
+            'Cancelled'   => ['bg' => 'var(--tr-red-dim)',   'color' => 'var(--tr-red)',     'pip' => 'var(--tr-red)',     'icon' => 'giving'],
         ];
 
         $confirmedRate = ($data['totalPassengers'] ?? 0) > 0
@@ -411,7 +411,7 @@
 
         @if(empty($data['tours']))
             <div class="tr-empty">
-                <span class="tr-empty-icon">🗺️</span>
+                <span class="tr-empty-icon"><x-tour-icon name="events" size="48" class="" aria-hidden="true" /></span>
                 No tours match the selected filters.
             </div>
         @else
@@ -437,7 +437,7 @@
                             <tr>
                                 <td>
                                     <div class="tr-place">
-                                        <div class="tr-place-icon">{{ $meta['icon'] }}</div>
+                                        <div class="tr-place-icon"><x-tour-icon :name="$meta['icon']" size="18" class="" aria-hidden="true" /></div>
                                         <span class="tr-place-name">{{ $tour->place }}</span>
                                     </div>
                                 </td>

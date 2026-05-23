@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\Beneficiary;
 use Filament\Widgets\DoughnutChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class BeneficiaryByStatusChart extends DoughnutChartWidget
 {
@@ -13,10 +14,12 @@ class BeneficiaryByStatusChart extends DoughnutChartWidget
 
     protected function getData(): array
     {
-        $data = Beneficiary::selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
+        $data = Cache::remember('dashboard_beneficiary_status_chart', 300, fn () =>
+            Beneficiary::selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray()
+        );
 
         return [
             'datasets' => [

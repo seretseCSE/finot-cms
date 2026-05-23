@@ -46,12 +46,12 @@ trait ScopedByDepartment
             return $query;
         }
 
-        // Bypass scope for users with direct view permission on members/groups
+        // Bypass scope for users with cross-department view permission
         $modelTable = $query->getModel()->getTable();
         if (in_array($modelTable, ['members', 'member_groups'])) {
             $permissionMap = [
-                'members' => 'members.view',
-                'member_groups' => 'member_groups.view',
+                'members' => 'members.view_all',
+                'member_groups' => 'member_groups.view_all',
             ];
             if ($user->can($permissionMap[$modelTable])) {
                 return $query;
@@ -82,12 +82,12 @@ trait ScopedByDepartment
             return true;
         }
 
-        // Bypass for users with view permission on members/groups
+        // Bypass for users with cross-department view permission
         $table = $this->getTable();
         if (in_array($table, ['members', 'member_groups'])) {
             $permissionMap = [
-                'members' => 'members.view',
-                'member_groups' => 'member_groups.view',
+                'members' => 'members.view_all',
+                'member_groups' => 'member_groups.view_all',
             ];
             if ($user->can($permissionMap[$table])) {
                 return true;

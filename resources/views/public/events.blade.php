@@ -100,10 +100,8 @@
         <h3 class="display sr" style="font-size:2.2rem;margin-bottom:40px;text-align:center;">{{ __('Event Details') }}</h3>
 
         @if($upcomingEvents->isEmpty())
-            <div class="card sr" style="padding:60px;text-align:center;">
-                <div style="font-size:3rem;margin-bottom:20px;">📅</div>
-                <h4 class="display" style="font-size:1.4rem;margin-bottom:12px;">{{ __('No Upcoming Events') }}</h4>
-                <p style="color:var(--text-60);">{{ __('Check back later for new events.') }}</p>
+            <div class="sr" style="max-width:480px;margin:0 auto;">
+                <x-empty-state-card type="events" />
             </div>
         @else
             <div style="display:grid;gap:24px;">

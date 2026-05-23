@@ -44,7 +44,7 @@ class FinancialAuditTrailPageTest extends TestCase
             'is_active' => true,
             'temp_password_changed' => true,
         ]);
-        $user->assignRole('staff'); // Staff doesn't have access
+        $user->assignRole('hr_head'); // hr_head doesn't have finance access
 
         $response = $this->actingAs($user)
             ->get('/admin/financial-audit-trail-page');

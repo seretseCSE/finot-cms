@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\MediaItem;
 use Filament\Widgets\DoughnutChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class MediaByCategoryChart extends DoughnutChartWidget
 {
@@ -13,12 +14,14 @@ class MediaByCategoryChart extends DoughnutChartWidget
 
     protected function getData(): array
     {
-        $data = MediaItem::selectRaw('category_id, COUNT(*) as count')
-            ->groupBy('category_id')
-            ->with('category')
-            ->get()
-            ->mapWithKeys(fn ($item) => [$item->category?->name ?? 'Uncategorized' => $item->count])
-            ->toArray();
+        $data = Cache::remember('dashboard_media_by_category_chart', 300, fn () =>
+            MediaItem::selectRaw('category_id, COUNT(*) as count')
+                ->groupBy('category_id')
+                ->with('category')
+                ->get()
+                ->mapWithKeys(fn ($item) => [$item->category?->name ?? 'Uncategorized' => $item->count])
+                ->toArray()
+        );
 
         return [
             'datasets' => [

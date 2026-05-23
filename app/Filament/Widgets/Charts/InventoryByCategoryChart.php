@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\InventoryItem;
 use Filament\Widgets\DoughnutChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class InventoryByCategoryChart extends DoughnutChartWidget
 {
@@ -13,10 +14,12 @@ class InventoryByCategoryChart extends DoughnutChartWidget
 
     protected function getData(): array
     {
-        $data = InventoryItem::selectRaw('category, COUNT(*) as count')
-            ->groupBy('category')
-            ->pluck('count', 'category')
-            ->toArray();
+        $data = Cache::remember('dashboard_inventory_by_category_chart', 300, fn () =>
+            InventoryItem::selectRaw('category, COUNT(*) as count')
+                ->groupBy('category')
+                ->pluck('count', 'category')
+                ->toArray()
+        );
 
         return [
             'datasets' => [

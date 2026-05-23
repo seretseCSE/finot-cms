@@ -2,8 +2,8 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\MediaResource;
 use App\Http\Middleware\ForcePasswordChange;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -19,10 +19,11 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\MenuItem;
+use Filament\Support\Facades\FilamentAsset;
+use Filament\View\View;
 use App\Filament\Pages\EditProfile;
 use App\Filament\Pages\ManageActiveSessions;
-use App\Http\Middleware\TrackUserSessions;
-use App\Http\Middleware\SessionTimeoutMiddleware;
+use App\Services\ProductTour\ProductTourService;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -41,7 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => '#1E8449',
                 'warning' => '#D4AC0D',
             ])
-            ->font('Noto Sans Ethiopic', 'Noto Sans')
+            ->font('Inter', provider: LocalFontProvider::class)
             ->topNavigation(false)
             ->collapsibleNavigationGroups(true)
             ->navigationGroups([
@@ -73,6 +74,11 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => ManageActiveSessions::getUrl())
                     ->icon('heroicon-o-clock')
                     ->visible(fn (): bool => auth()->user()?->hasAnyRole(['superadmin', 'admin'])),
+                'restart_tour' => MenuItem::make()
+                    ->label('Restart Tour')
+                    ->icon('heroicon-o-question-mark-circle')
+                    ->url('#')
+                    ->visible(fn (): bool => ProductTourService::isAvailableStatic()),
             ])
             ->widgets([])
             ->databaseNotifications()
@@ -89,8 +95,6 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                TrackUserSessions::class,
-                SessionTimeoutMiddleware::class,
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
@@ -99,6 +103,10 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn (): string => view('filament.components.pwa-admin-scripts'),
+            )
+            ->renderHook(
+                PanelsRenderHook::BODY_START,
+                fn (): string => view('filament.components.tour-init'),
             )
             ->authMiddleware([
                 Authenticate::class,

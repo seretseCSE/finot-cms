@@ -62,7 +62,7 @@
         
         @if($campaigns->isEmpty())
             <div class="card sr" style="padding:80px;text-align:center;max-width:600px;margin:0 auto;">
-                <div style="font-size:3rem;margin-bottom:24px;">💰</div>
+                <x-tour-icon name="giving" size="48" class="" aria-hidden="true" />
                 <h3 class="display" style="font-size:1.8rem;margin-bottom:12px;">{{ __('No Active Campaigns') }}</h3>
                 <p style="color:var(--text-60);">{{ __('We don\'t have any active campaigns at the moment. Please check back later.') }}</p>
             </div>

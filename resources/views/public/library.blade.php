@@ -168,10 +168,8 @@
                 {{ $resources->links() }}
             </div>
         @else
-            <div class="card sr" style="padding:80px;text-align:center;max-width:600px;margin:0 auto;">
-                <div style="font-size:3rem;margin-bottom:24px;">📚</div>
-                <h3 class="display" style="font-size:1.8rem;margin-bottom:12px;">{{ __('No Resources Found') }}</h3>
-                <p style="color:var(--text-60);">{{ __('Try adjusting your filters or check back later for new content.') }}</p>
+            <div class="sr" style="max-width:480px;margin:0 auto;">
+                <x-empty-state-card type="library" />
             </div>
         @endif
     </div>

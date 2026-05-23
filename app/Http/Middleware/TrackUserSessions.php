@@ -28,37 +28,46 @@ class TrackUserSessions
             // Store session token in session for current session identification
             session(['session_token' => $sessionToken]);
 
-            // Get or create user session record
-            $userSession = UserSession::where('session_token', $sessionToken)
-                ->where('user_id', $user->id)
-                ->first();
+            // Use cache to reduce database queries - only update if last update was more than 30 seconds ago
+            $cacheKey = "user_session_{$user->id}_{$sessionToken}";
+            $lastUpdate = cache()->get($cacheKey);
 
-            if (! $userSession) {
-                // Check if token already exists globally (prevents unique constraint violation)
-                $existingByToken = UserSession::where('session_token', $sessionToken)->first();
-                if ($existingByToken) {
-                    $existingByToken->update([
-                        'user_id' => $user->id,
-                        'device_info' => $this->getDeviceInfo($request),
-                        'ip_address' => $request->ip(),
-                        'last_activity' => now(),
-                    ]);
+            if (!$lastUpdate || now()->diffInSeconds($lastUpdate) > 30) {
+                // Get or create user session record
+                $userSession = UserSession::where('session_token', $sessionToken)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if (! $userSession) {
+                    // Check if token already exists globally (prevents unique constraint violation)
+                    $existingByToken = UserSession::where('session_token', $sessionToken)->first();
+                    if ($existingByToken) {
+                        $existingByToken->update([
+                            'user_id' => $user->id,
+                            'device_info' => $this->getDeviceInfo($request),
+                            'ip_address' => $request->ip(),
+                            'last_activity' => now(),
+                        ]);
+                    } else {
+                        // Create new session record
+                        // Session limiting is handled by RecordUserSession listener
+                        UserSession::create([
+                            'user_id' => $user->id,
+                            'session_token' => $sessionToken,
+                            'device_info' => $this->getDeviceInfo($request),
+                            'ip_address' => $request->ip(),
+                            'last_activity' => now(),
+                        ]);
+                    }
                 } else {
-                    // Create new session record
-                    // Session limiting is handled by RecordUserSession listener
-                    UserSession::create([
-                        'user_id' => $user->id,
-                        'session_token' => $sessionToken,
-                        'device_info' => $this->getDeviceInfo($request),
-                        'ip_address' => $request->ip(),
+                    // Update existing session
+                    $userSession->update([
                         'last_activity' => now(),
                     ]);
                 }
-            } else {
-                // Update existing session
-                $userSession->update([
-                    'last_activity' => now(),
-                ]);
+
+                // Cache the last update time
+                cache()->put($cacheKey, now(), 60);
             }
         }
 

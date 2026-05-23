@@ -109,7 +109,7 @@
             </div>
         @elseif(!$search)
             <div style="text-align:center;padding:80px 20px;">
-                <div style="font-size:3rem;margin-bottom:16px;opacity:.3;">📚</div>
+                <x-tour-icon name="education" size="48" class="" style="opacity:.3;" aria-hidden="true" />
                 <p style="color:var(--text-40);font-size:1.05rem;">{{ __('No courses available yet.') }}</p>
             </div>
         @else

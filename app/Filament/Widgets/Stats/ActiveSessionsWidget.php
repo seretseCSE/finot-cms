@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Stats;
 
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ActiveSessionsWidget extends StatsOverviewWidget
@@ -12,7 +13,7 @@ class ActiveSessionsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $count = DB::table('sessions')->count();
+        $count = Cache::remember('dashboard_active_sessions', 60, fn () => DB::table('sessions')->count());
 
         return [
             Stat::make('Active Sessions', $count)

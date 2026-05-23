@@ -58,12 +58,12 @@ class UserManual extends Page
             if (in_array($role, ['superadmin', 'admin', 'hr_head', 'finance_head',
                 'nibret_hisab_head', 'inventory_staff', 'education_head', 'education_monitor',
                 'worship_monitor', 'mezmur_head', 'av_head', 'charity_head', 'tour_head',
-                'internal_relations_head', 'department_secretary', 'staff', ], true)) {
+                'internal_relations_head', 'revenue_and_charity_head', ], true)) {
                 return $role;
             }
         }
 
-        return 'staff';
+        return 'superadmin';
     }
 
     public function getTabs(): array
@@ -166,11 +166,11 @@ class UserManual extends Page
             ];
         }
 
-        if (Auth::user()?->can('members.view')) {
-            $tabs['department_secretary'] = [
-                'label' => 'Secretary / Staff',
-                'icon' => 'heroicon-o-clipboard-document',
-                'color' => 'gray',
+        if (Auth::user()?->can('tours.view') && Auth::user()?->can('beneficiaries.view')) {
+            $tabs['revenue_and_charity_head'] = [
+                'label' => 'Revenue & Charity',
+                'icon' => 'heroicon-o-currency-dollar',
+                'color' => 'success',
             ];
         }
 

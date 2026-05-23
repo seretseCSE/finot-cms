@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\Song;
 use Filament\Widgets\DoughnutChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class SongsByCategoryChart extends DoughnutChartWidget
 {
@@ -13,12 +14,14 @@ class SongsByCategoryChart extends DoughnutChartWidget
 
     protected function getData(): array
     {
-        $data = Song::selectRaw('category_id, COUNT(*) as count')
-            ->groupBy('category_id')
-            ->with('category')
-            ->get()
-            ->mapWithKeys(fn ($item) => [$item->category?->name ?? 'Uncategorized' => $item->count])
-            ->toArray();
+        $data = Cache::remember('dashboard_songs_by_category_chart', 300, fn () =>
+            Song::selectRaw('category_id, COUNT(*) as count')
+                ->groupBy('category_id')
+                ->with('category')
+                ->get()
+                ->mapWithKeys(fn ($item) => [$item->category?->name ?? 'Uncategorized' => $item->count])
+                ->toArray()
+        );
 
         return [
             'datasets' => [

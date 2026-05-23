@@ -189,6 +189,10 @@ class PermissionSeeder extends Seeder
         'page.addon-marketplace',
         'page.user-manual',
 
+        // Cross-department view permissions
+        'members.view_all',
+        'member_groups.view_all',
+
         // Timeline view permissions (category-specific)
         'members.timeline.all',
         'members.timeline.education',
@@ -305,7 +309,7 @@ class PermissionSeeder extends Seeder
                 'beneficiaries.view', 'charity.reports',
                 'tours.reports',
                 'fundraising.update_total',
-                'members.view', 'members.export',
+                'members.view',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*',
                 'help.documentation',
@@ -339,7 +343,7 @@ class PermissionSeeder extends Seeder
                 'documents.*',
                 'library_resources.upload', 'library_categories.*', 'library_subcategories.*',
                 'reports.teacher_reports',
-                'members.view', 'members.export',
+                'members.view',
                 'members.timeline.education',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
@@ -439,11 +443,29 @@ class PermissionSeeder extends Seeder
                 'page.report.tour',
             ],
         ],
+        'revenue_and_charity_head' => [
+            'label' => 'Revenue and Charity Head',
+            'description' => 'Combined tour and charity management',
+            'permissions' => [
+                'tours.*', 'tour_attendances.*', 'tour_passengers.*',
+                'beneficiaries.*', 'aid_distributions.*', 'charity.*',
+                'documents.*',
+                'contributions.view', 'contributions.create',
+                'donations.*',
+                'tours.reports',
+                'members.view',
+                'dashboard.view', 'profile.update', 'sessions.manage',
+                'ethiopian_dates.*', 'reports.*',
+                'help.documentation',
+                'page.report.tour', 'page.report.donation',
+                'page.report.charity', 'page.report.beneficiary',
+            ],
+        ],
         'internal_relations_head' => [
             'label' => 'Internal Relations Head',
             'description' => 'Member relations and document management',
             'permissions' => [
-                'members.*', 'group_assignments.*',
+                'members.view', 'group_assignments.*',
                 'member_groups.view', 'member_groups.create', 'member_groups.update',
                 'parents.view', 'parents.create', 'parents.update', 'parents.delete',
                 'media_items.delete',
@@ -455,34 +477,6 @@ class PermissionSeeder extends Seeder
                 'help.documentation',
                 'page.report.attendance-summary',
                 'page.report.teacher-attendance',
-            ],
-        ],
-        'department_secretary' => [
-            'label' => 'Department Secretary',
-            'description' => 'Department-level resource management (no delete)',
-            'permissions' => [
-                'department_resources.view', 'department_resources.create', 'department_resources.update',
-                'documents.*',
-                'members.view', 'members.create', 'members.update',
-                'members.export',
-                'events.view', 'events.create', 'events.update',
-                'contributions.view', 'contributions.create', 'contributions.update',
-                'inventory_items.view', 'inventory_items.create', 'inventory_items.update',
-                'dashboard.view', 'profile.update', 'sessions.manage',
-                'ethiopian_dates.*', 'reports.*',
-                'help.documentation',
-            ],
-        ],
-        'staff' => [
-            'label' => 'Staff',
-            'description' => 'Read-only access to department resources',
-            'permissions' => [
-                'department_resources.view',
-                'members.view', 'events.view', 'contributions.view',
-                'inventory_items.view', 'beneficiaries.view', 'documents.*',
-                'dashboard.view', 'profile.update', 'sessions.manage',
-                'ethiopian_dates.*', 'reports.*',
-                'help.documentation',
             ],
         ],
     ];
@@ -581,6 +575,18 @@ class PermissionSeeder extends Seeder
             $role->syncPermissions($rolePermissions);
 
             $this->command->info("Role [{$roleName}] => {$rolePermissions->count()} permissions");
+        }
+
+        // Remove deprecated roles
+        $deprecatedRoles = ['department_secretary', 'staff'];
+        foreach ($deprecatedRoles as $deprecated) {
+            $role = Role::where('name', $deprecated)->first();
+            if ($role) {
+                $role->users()->detach();
+                $role->syncPermissions([]);
+                $role->delete();
+                $this->command->info("Removed deprecated role [{$deprecated}]");
+            }
         }
     }
 

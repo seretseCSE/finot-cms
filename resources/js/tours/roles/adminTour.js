@@ -1,0 +1,47 @@
+export default {
+    key: 'onboarding',
+    label: 'Welcome to FINOTE',
+    description: 'Get started with your administrative access to the FINOTE CMS.',
+    steps: [
+        {
+            key: 'sidebar-welcome',
+            selector: '[data-tour="sidebar"]',
+            title: 'Navigation Sidebar',
+            description: 'Your main navigation panel. All sections you have access to are organized in collapsible groups.',
+            side: 'right',
+            align: 'center',
+        },
+        {
+            key: 'dashboard-link',
+            selector: '[data-tour="dashboard-link"]',
+            title: 'Dashboard',
+            description: 'View key metrics, charts, and insights at a glance.',
+            side: 'right',
+            align: 'start',
+        },
+        {
+            key: 'members-section',
+            selector: '[data-tour="members-section"]',
+            title: 'Members',
+            description: 'Manage member profiles, family information, and enrollments.',
+            side: 'right',
+            align: 'start',
+        },
+        {
+            key: 'education-section',
+            selector: '[data-tour="education-section"]',
+            title: 'Education',
+            description: 'Manage classes, attendance, and teacher assignments.',
+            side: 'right',
+            align: 'start',
+        },
+        {
+            key: 'completion',
+            selector: '[data-tour="dashboard-content"]',
+            title: 'Ready to Go!',
+            description: 'You\'re all set. Explore the sections available to you and manage your church operations efficiently.',
+            side: 'bottom',
+            align: 'center',
+        },
+    ],
+};

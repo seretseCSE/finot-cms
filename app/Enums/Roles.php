@@ -36,6 +36,9 @@ class Roles
     public const TOUR_HEAD = 'tour_head';
     public const TOUR_MANAGER = 'tour_manager';
 
+    // Revenue & Charity
+    public const REVENUE_AND_CHARITY_HEAD = 'revenue_and_charity_head';
+
     // Department roles
     public const SECRETARY = 'secretary';
     public const AV_HEAD = 'av_head';
@@ -88,6 +91,7 @@ class Roles
 
     public const CHARITY_MANAGERS = [
         self::CHARITY_HEAD,
+        self::REVENUE_AND_CHARITY_HEAD,
         self::ADMIN,
         self::SUPERADMIN,
     ];
@@ -95,6 +99,7 @@ class Roles
     public const TOUR_MANAGERS = [
         self::TOUR_HEAD,
         self::TOUR_MANAGER,
+        self::REVENUE_AND_CHARITY_HEAD,
         self::ADMIN,
         self::SUPERADMIN,
     ];
@@ -114,6 +119,7 @@ class Roles
         self::HR_HEAD,
         self::INTERNAL_RELATIONS_HEAD,
         self::CHARITY_HEAD,
+        self::REVENUE_AND_CHARITY_HEAD,
         self::TOUR_HEAD,
         self::TOUR_MANAGER,
         self::SECRETARY,

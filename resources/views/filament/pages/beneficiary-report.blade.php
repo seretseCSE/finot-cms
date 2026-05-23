@@ -200,7 +200,7 @@
 
         @if(empty($reportData['beneficiaries']))
             <div class="br-empty">
-                <div class="br-empty-icon">👥</div>
+                <div class="br-empty-icon"><x-tour-icon name="community" size="48" class="" aria-hidden="true" /></div>
                 <div class="br-empty-title">No Beneficiaries Found</div>
                 No beneficiaries match the selected criteria.
             </div>
@@ -279,7 +279,7 @@
 
         @if(empty($reportData['aidDistributions']))
             <div class="br-empty">
-                <div class="br-empty-icon">🤲</div>
+                <div class="br-empty-icon"><x-tour-icon name="giving" size="48" class="" aria-hidden="true" /></div>
                 <div class="br-empty-title">No Distributions Found</div>
                 No aid distributions match the selected criteria.
             </div>

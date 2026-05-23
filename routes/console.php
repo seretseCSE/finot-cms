@@ -61,3 +61,15 @@ Schedule::command('system:check-health')
     ->dailyAt('07:00')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/scheduler.log'));
+
+// Session Cleanup: Purge expired sessions every 5 minutes (removed from request lifecycle)
+Schedule::command('session:cleanup')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/scheduler.log'));
+
+// Dashboard Cache Warm: Pre-warm widget caches every 5 minutes for faster page loads
+Schedule::command('dashboard:cache-warm')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/scheduler.log'));

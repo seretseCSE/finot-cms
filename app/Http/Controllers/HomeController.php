@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LibraryResource;
-use App\Models\Event;
+use App\Models\Announcement;
 use App\Models\BlogPost;
+use App\Models\Event;
 use App\Models\FAQ;
+use App\Models\FundraisingCampaign;
+use App\Models\LibraryResource;
 use App\Models\MediaItem;
+use App\Models\SchoolClass;
+use App\Models\Tour;
 
 class HomeController extends Controller
 {
@@ -93,15 +97,85 @@ class HomeController extends Controller
             $monthlyMembershipData = array_map(fn() => rand(280, 350), range(1, 12));
         }
 
+        // Fetch announcements
+        try {
+            $announcements = Announcement::where('status', 'Active')
+                ->latest('published_at')
+                ->take(3)
+                ->get();
+        } catch (\Exception $e) {
+            $announcements = collect();
+        }
+
+        // Fetch fundraising campaigns
+        try {
+            $campaigns = FundraisingCampaign::where('status', 'Active')
+                ->latest()
+                ->take(3)
+                ->get();
+        } catch (\Exception $e) {
+            $campaigns = collect();
+        }
+
+        // Fetch active classes
+        try {
+            $classes = SchoolClass::where('is_active', true)
+                ->orderBy('name')
+                ->take(4)
+                ->get();
+        } catch (\Exception $e) {
+            $classes = collect();
+        }
+
+        // Fetch tours
+        try {
+            $tours = Tour::where('status', 'Published')
+                ->where('tour_date', '>=', now())
+                ->orderBy('tour_date', 'asc')
+                ->take(3)
+                ->get();
+        } catch (\Exception $e) {
+            $tours = collect();
+        }
+
+        // Alias blogPosts for view compatibility
+        $blogPosts = $recentPosts;
+
+        // Alias events for view compatibility
+        $events = $upcomingEvents;
+
+        // Alias tours for view compatibility
+        $upcomingTours = $tours;
+
+        // Build hero stats (used across hero, stats card, and timeline)
+        $heroStats = [
+            'active_members'   => \App\Models\Member::count() ?: 4200,
+            'sunday_school'    => 860,
+            'active_campaigns' => $campaigns->count() ?: 5,
+            'events_this_week' => $events->count() ?: 18,
+            'active_classes'   => $classes->count() ?: 24,
+            'volunteers'       => 38,
+        ];
+        $stats = $heroStats;
+
         return view('public.home', compact(
-            'featuredLibraryResources',
-            'totalLibraryResources',
-            'upcomingEvents',
-            'recentPosts',
+            'announcements',
+            'blogPosts',
+            'campaigns',
+            'classes',
             'departments',
+            'events',
             'faqs',
+            'featuredLibraryResources',
+            'heroStats',
+            'monthlyMembershipData',
             'recentPhotos',
-            'monthlyMembershipData'
+            'recentPosts',
+            'stats',
+            'totalLibraryResources',
+            'tours',
+            'upcomingEvents',
+            'upcomingTours',
         ));
     }
 }

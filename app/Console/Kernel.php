@@ -24,6 +24,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\BroadcastGlobalAnnouncementsCommand::class,
         \App\Console\Commands\SystemAutoArchiveCommand::class,
         \App\Console\Commands\TourUpdateStatusCommand::class,
+        \App\Console\Commands\SessionCleanupCommand::class,
+        \App\Console\Commands\DashboardCacheWarmCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -75,5 +77,12 @@ class Kernel extends ConsoleKernel
         // Monthly
         $schedule->command('system:auto-archive')->monthly()
             ->description('Auto-archive old contributions, blog posts, and announcements');
+
+        // Every 5 minutes - Performance optimization
+        $schedule->command('session:cleanup')->everyFiveMinutes()
+            ->description('Clean up expired user sessions');
+
+        $schedule->command('dashboard:cache-warm')->everyFiveMinutes()
+            ->description('Pre-warm dashboard widget caches');
     }
 }

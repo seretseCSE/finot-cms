@@ -31,13 +31,13 @@ class DepartmentScope implements Scope
             return;
         }
 
-        // Bypass scope for users with direct view permission on members/groups
+        // Bypass scope for users with cross-department view permission
         $modelTable = $model->getTable();
         if (in_array($modelTable, ['members', 'member_groups', 'groups'])) {
             $permissionMap = [
-                'members' => 'members.view',
-                'member_groups' => 'member_groups.view',
-                'groups' => 'member_groups.view',
+                'members' => 'members.view_all',
+                'member_groups' => 'member_groups.view_all',
+                'groups' => 'member_groups.view_all',
             ];
             if ($user->can($permissionMap[$modelTable])) {
                 return;

@@ -59,7 +59,7 @@
         
         @if($tours->isEmpty())
             <div class="card sr" style="padding:80px;text-align:center;max-width:600px;margin:0 auto;">
-                <div style="font-size:3.5rem;margin-bottom:24px;">⛪</div>
+                <x-tour-icon name="events" size="56" class="" aria-hidden="true" />
                 <h3 class="display" style="font-size:1.8rem;margin-bottom:12px;">{{ __('No Tours Scheduled') }}</h3>
                 <p style="color:var(--text-60);">{{ __('We are currently planning our next spiritual journeys. Please check back later.') }}</p>
             </div>
@@ -275,7 +275,7 @@
             </div>
         @else
             <div class="card sr" style="padding:80px;text-align:center;max-width:600px;margin:0 auto;">
-                <div style="font-size:3rem;margin-bottom:24px;">🛒</div>
+                <x-tour-icon name="giving" size="48" class="" aria-hidden="true" />
                 <h3 class="display" style="font-size:1.8rem;margin-bottom:12px;">{{ __('No Products Found') }}</h3>
                 <p style="color:var(--text-60);">{{ __('Try adjusting your filters or check back later for new items.') }}</p>
             </div>

@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\InventoryItem;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class LowStockItemsWidget extends StatsOverviewWidget
 {
@@ -12,8 +13,9 @@ class LowStockItemsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $count = InventoryItem::where('quantity', '<=', 5)
-            ->count();
+        $count = Cache::remember('dashboard_low_stock_items', 300, fn () =>
+            InventoryItem::where('quantity', '<=', 5)->count()
+        );
 
         return [
             Stat::make('Low Stock Items', $count)

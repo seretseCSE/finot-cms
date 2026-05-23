@@ -1,0 +1,137 @@
+@layer components {
+    @media (max-width: 768px) {
+        .tour-tooltip {
+            max-width: calc(100vw - 24px);
+            border-radius: 10px;
+        }
+
+        .tour-tooltip-header {
+            padding: 14px 16px 0;
+        }
+
+        .tour-tooltip-body {
+            padding: 10px 16px 14px;
+        }
+
+        .tour-tooltip-footer {
+            padding: 0 16px 14px;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tour-tooltip-nav {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .tour-tooltip-title {
+            font-size: 15px;
+        }
+
+        .tour-tooltip-description {
+            font-size: 13px;
+        }
+
+        .tour-btn {
+            font-size: 12px;
+            padding: 10px 20px;
+            min-height: 40px;
+        }
+
+        .tour-btn-ghost {
+            width: 100%;
+            text-align: center;
+        }
+
+        .tour-controls {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tour-controls-nav {
+            width: 100%;
+            justify-content: stretch;
+        }
+
+        .tour-controls-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px 12px;
+            min-height: 40px;
+        }
+
+        .tour-controls-skip {
+            width: 100%;
+        }
+
+        .tour-progress-component {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+
+        .tour-badge {
+            min-width: 16px;
+            height: 16px;
+            font-size: 9px;
+        }
+
+        .driver-popover-custom.driver-mobile {
+            max-width: calc(100vw - 24px) !important;
+            margin: 0 12px;
+        }
+
+        .driver-popover-custom.driver-mobile .driver-popover-title {
+            font-size: 15px;
+        }
+
+        .driver-popover-custom.driver-mobile .driver-popover-description {
+            font-size: 13px;
+        }
+
+        .driver-popover-custom.driver-mobile .driver-popover-footer {
+            flex-direction: column;
+        }
+
+        .driver-popover-custom.driver-mobile .driver-popover-footer button {
+            min-height: 40px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tour-tooltip {
+            max-width: calc(100vw - 16px);
+            border-radius: 8px;
+        }
+
+        .tour-tooltip-header {
+            padding: 12px 12px 0;
+        }
+
+        .tour-tooltip-body {
+            padding: 8px 12px 12px;
+        }
+
+        .tour-tooltip-footer {
+            padding: 0 12px 12px;
+        }
+
+        .tour-tooltip-title {
+            font-size: 14px;
+        }
+
+        .tour-tooltip-description {
+            font-size: 12px;
+        }
+
+        .tour-step-indicator {
+            font-size: 11px;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .tour-tooltip {
+            max-width: 360px;
+        }
+    }
+}

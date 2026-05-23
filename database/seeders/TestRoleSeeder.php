@@ -25,8 +25,7 @@ class TestRoleSeeder extends Seeder
         'charity_head',
         'tour_head',
         'internal_relations_head',
-        'department_secretary',
-        'staff',
+        'revenue_and_charity_head',
     ];
 
     public function run(): void

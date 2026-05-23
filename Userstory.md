@@ -5,7 +5,6 @@
 
 Laravel 12 and filament 5
 is the versions that I will use
-Driver.js for product tour 
 light glassy 
 
 # FINOT CHURCH MANAGEMENT SYSTEM - IMPLEMENTATION STATUS

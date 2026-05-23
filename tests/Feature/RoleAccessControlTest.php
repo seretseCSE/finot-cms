@@ -175,23 +175,6 @@ class RoleAccessControlTest extends TestCase
     }
 
     /**
-     * Test department secretary has limited access (no delete).
-     */
-    public function test_department_secretary_limited_access(): void
-    {
-        $user = $this->createDepartmentSecretaryUser();
-
-        // Should have create/update access
-        $this->assertTrue($user->hasPermissionTo('members.create'));
-        $this->assertTrue($user->hasPermissionTo('members.update'));
-
-        // Should not have delete or management access
-        $this->assertFalse($user->hasPermissionTo('members.delete'));
-        $this->assertFalse($user->hasPermissionTo('groups.manage'));
-        $this->assertFalse($user->hasPermissionTo('users.manage'));
-    }
-
-    /**
      * Test general staff has minimal access.
      */
     public function test_general_staff_minimal_access(): void
@@ -334,19 +317,6 @@ class RoleAccessControlTest extends TestCase
 
         // Finance user should not have education permissions
         $this->assertFalse($financeUser->hasPermissionTo('education.manage'));
-    }
-
-    /**
-     * Test department secretary cannot delete.
-     */
-    public function test_department_secretary_cannot_delete(): void
-    {
-        $secretary = $this->createDepartmentSecretaryUser();
-
-        // Should not have any delete permissions
-        $this->assertFalse($secretary->hasPermissionTo('members.delete'));
-        $this->assertFalse($secretary->hasPermissionTo('groups.manage'));
-        $this->assertFalse($secretary->hasPermissionTo('documents.delete'));
     }
 
     /**

@@ -116,9 +116,9 @@ class AuthorizationTest extends TestCase
     }
 
     #[Test]
-    public function department_secretary_can_access_limited_resources(): void
+    public function revenue_and_charity_head_can_access_resources(): void
     {
-        $user = $this->createDepartmentSecretaryUser();
+        $user = $this->createUserWithRole('revenue_and_charity_head');
         $this->actingAs($user);
 
         $this->get('/admin/documents')->assertStatus(200);

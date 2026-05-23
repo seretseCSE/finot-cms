@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\TourPassenger;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class TourPassengersWidget extends StatsOverviewWidget
 {
@@ -12,7 +13,9 @@ class TourPassengersWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $count = TourPassenger::whereYear('created_at', now()->year)->count();
+        $count = Cache::remember('dashboard_tour_passengers', 300, fn () =>
+            TourPassenger::whereYear('created_at', now()->year)->count()
+        );
 
         return [
             Stat::make('Passengers (YTD)', $count)

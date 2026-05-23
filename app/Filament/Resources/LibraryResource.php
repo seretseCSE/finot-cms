@@ -172,7 +172,7 @@ class LibraryResource extends BaseResource
                             ->schema([
                                 Forms\Components\TextInput::make('icon')
                                     ->label('Icon (emoji or SVG class)')
-                                    ->helperText('e.g. 📖, 🎵, 🕯️'),
+                                    ->helperText('Use an icon name or SVG class'),
                                 Forms\Components\TextInput::make('featured_image')
                                     ->label('Featured Image URL'),
                             ]),

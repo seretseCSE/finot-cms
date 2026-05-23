@@ -1,10 +1,10 @@
 
-const BUILD_INFO = {"timestamp":1779290062114,"hash":"p70vc30o6","assets":["/assets/app-CGRnLp_K.css","/assets/vendor-BYIAvQxD.js","/assets/admin-tour-qw7r0X-M.js","/assets/app-D_IEYnof.js","/assets/financial-charts-BbJYJBRA.js","/assets/admin-B0dRGtE1.js","/assets/app-BWSsXgQj.js"]};
-const CACHE_NAME = 'finot-cache-p70vc30o6';
-const API_CACHE_NAME = 'finot-api-cache-p70vc30o6';
+const BUILD_INFO = {"timestamp":1779564986989,"hash":"z8rjqdijk","assets":["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-BAJyIx59.css","/assets/vendor-Ch07e1E5.js","/assets/chart-vendor-CCWw2nGx.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CluoSRK2.js","/assets/tour-roles-4BezQJND.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-BnByl6Yh.js","/assets/app-Cgh6twH3.js","/assets/admin-CbSRwUpv.js","/assets/financial-charts-BiWO-mww.js","/assets/pwa-install-BWgOSQDS.js","/assets/app-BEfn2VuD.js"]};
+const CACHE_NAME = 'finot-cache-z8rjqdijk';
+const API_CACHE_NAME = 'finot-api-cache-z8rjqdijk';
 
 // Dynamic assets from build
-const DYNAMIC_ASSETS = ["/assets/app-CGRnLp_K.css","/assets/vendor-BYIAvQxD.js","/assets/admin-tour-qw7r0X-M.js","/assets/app-D_IEYnof.js","/assets/financial-charts-BbJYJBRA.js","/assets/admin-B0dRGtE1.js","/assets/app-BWSsXgQj.js"];
+const DYNAMIC_ASSETS = ["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-BAJyIx59.css","/assets/vendor-Ch07e1E5.js","/assets/chart-vendor-CCWw2nGx.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CluoSRK2.js","/assets/tour-roles-4BezQJND.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-BnByl6Yh.js","/assets/app-Cgh6twH3.js","/assets/admin-CbSRwUpv.js","/assets/financial-charts-BiWO-mww.js","/assets/pwa-install-BWgOSQDS.js","/assets/app-BEfn2VuD.js"];
 
 // Static assets that rarely change
 const STATIC_ASSETS = [

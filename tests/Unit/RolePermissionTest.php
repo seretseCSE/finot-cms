@@ -42,8 +42,7 @@ class RolePermissionTest extends TestCase
             'charity_head',
             'tour_head',
             'internal_relations_head',
-            'department_secretary',
-            'staff',
+            'revenue_and_charity_head',
         ];
 
         foreach ($roles as $role) {
@@ -311,20 +310,6 @@ class RolePermissionTest extends TestCase
             'reports.view',
         ]);
 
-        // Department Secretary - Create/Update only (NO Delete)
-        $departmentSecretary = Role::findByName('department_secretary');
-        $departmentSecretary->givePermissionTo([
-            'members.create', 'members.update', 'members.view',
-            'groups.assign',
-            'documents.upload', 'documents.view',
-            'reports.view',
-        ]);
-
-        // General Staff - Basic access
-        $staff = Role::findByName('staff');
-        $staff->givePermissionTo([
-            'members.view', 'reports.view',
-        ]);
     }
 
     /**
@@ -511,41 +496,6 @@ class RolePermissionTest extends TestCase
     }
 
     /**
-     * Test Department Secretary has limited permissions (no delete).
-     */
-    public function test_department_secretary_has_limited_permissions(): void
-    {
-        $user = $this->createDepartmentSecretaryUser();
-
-        $this->assertTrue($user->hasPermissionTo('members.create'));
-        $this->assertTrue($user->hasPermissionTo('members.update'));
-        $this->assertTrue($user->hasPermissionTo('members.view'));
-        $this->assertTrue($user->hasPermissionTo('groups.assign'));
-
-        // Should not have delete permissions
-        $this->assertFalse($user->hasPermissionTo('members.delete'));
-        $this->assertFalse($user->hasPermissionTo('groups.manage'));
-        $this->assertFalse($user->hasPermissionTo('users.manage'));
-    }
-
-    /**
-     * Test General Staff has minimal permissions.
-     */
-    public function test_staff_has_minimal_permissions(): void
-    {
-        $user = $this->createStaffUser();
-
-        $this->assertTrue($user->hasPermissionTo('members.view'));
-        $this->assertTrue($user->hasPermissionTo('reports.view'));
-
-        // Should not have create, update, or management permissions
-        $this->assertFalse($user->hasPermissionTo('members.create'));
-        $this->assertFalse($user->hasPermissionTo('members.update'));
-        $this->assertFalse($user->hasPermissionTo('groups.manage'));
-        $this->assertFalse($user->hasPermissionTo('users.manage'));
-    }
-
-    /**
      * Test all roles can be created.
      */
     public function test_all_roles_can_be_created(): void
@@ -608,10 +558,10 @@ class RolePermissionTest extends TestCase
         $user = User::factory()->create();
 
         $user->assignRole('hr_head');
-        $user->assignRole('staff');
+        $user->assignRole('finance_head');
 
         $this->assertTrue($user->hasRole('hr_head'));
-        $this->assertTrue($user->hasRole('staff'));
+        $this->assertTrue($user->hasRole('finance_head'));
     }
 
     /**
@@ -639,6 +589,6 @@ class RolePermissionTest extends TestCase
 
         $this->assertTrue($user->hasRole('admin'));
         $this->assertTrue($user->hasRole('hr_head'));
-        $this->assertFalse($user->hasRole('staff'));
+        $this->assertFalse($user->hasRole('finance_head'));
     }
 }

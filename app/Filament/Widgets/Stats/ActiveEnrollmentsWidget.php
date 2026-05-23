@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\StudentEnrollment;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class ActiveEnrollmentsWidget extends StatsOverviewWidget
 {
@@ -12,8 +13,9 @@ class ActiveEnrollmentsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $count = StudentEnrollment::whereHas('academicYear', fn ($q) => $q->where('status', 'Active'))
-            ->count();
+        $count = Cache::remember('dashboard_active_enrollments', 300, fn () =>
+            StudentEnrollment::whereHas('academicYear', fn ($q) => $q->where('status', 'Active'))->count()
+        );
 
         return [
             Stat::make('Active Enrollments', $count)

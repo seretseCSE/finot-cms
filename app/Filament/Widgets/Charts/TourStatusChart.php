@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\Tour;
 use Filament\Widgets\DoughnutChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class TourStatusChart extends DoughnutChartWidget
 {
@@ -13,10 +14,12 @@ class TourStatusChart extends DoughnutChartWidget
 
     protected function getData(): array
     {
-        $data = Tour::selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
+        $data = Cache::remember('dashboard_tour_status_chart', 300, fn () =>
+            Tour::selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray()
+        );
 
         return [
             'datasets' => [

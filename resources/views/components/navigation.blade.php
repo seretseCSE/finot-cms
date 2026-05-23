@@ -100,29 +100,8 @@ vs@props(['currentPage' => ''])
                 >{{ $link['label'] }}</a>
             @endforeach
 
-            {{-- Desktop Language Switcher --}}
-            <div style="display:flex;align-items:center;gap:2px;margin-left:4px;">
-                <form method="POST" action="{{ route('language.switch', ['locale' => 'en']) }}" style="display:inline;">
-                    @csrf
-                    <button type="submit" title="English" style="
-                        padding:6px 10px;border-radius:6px;font-size:.75rem;font-weight:700;
-                        background:{{ app()->getLocale() === 'en' ? 'rgba(26,68,247,.2)' : 'transparent' }};
-                        border:1px solid {{ app()->getLocale() === 'en' ? 'var(--blue-primary)' : 'var(--border-subtle)' }};
-                        color:{{ app()->getLocale() === 'en' ? 'var(--text-display)' : 'var(--text-40)' }};
-                        cursor:pointer;transition:all .2s;
-                    ">EN</button>
-                </form>
-                <form method="POST" action="{{ route('language.switch', ['locale' => 'am']) }}" style="display:inline;">
-                    @csrf
-                    <button type="submit" title="አማርኛ" style="
-                        padding:6px 10px;border-radius:6px;font-size:.75rem;font-weight:700;
-                        background:{{ app()->getLocale() === 'am' ? 'rgba(26,68,247,.2)' : 'transparent' }};
-                        border:1px solid {{ app()->getLocale() === 'am' ? 'var(--blue-primary)' : 'var(--border-subtle)' }};
-                        color:{{ app()->getLocale() === 'am' ? 'var(--text-display)' : 'var(--text-40)' }};
-                        cursor:pointer;transition:all .2s;
-                    ">አማ</button>
-                </form>
-            </div>
+            {{-- Desktop Language Toggle --}}
+            <x-language-toggle />
 
             {{-- Desktop Theme Button --}}
             <button id="theme-btn-desktop" title="Toggle Mode" style="
@@ -158,28 +137,8 @@ vs@props(['currentPage' => ''])
         {{-- Mobile Actions: Language + Theme + Burger (hidden/shown via JS) --}}
         <div id="mobile-actions" style="display:none;align-items:center;gap:8px;">
 
-            <div style="display:flex;align-items:center;gap:2px;">
-                <form method="POST" action="{{ route('language.switch', ['locale' => 'en']) }}" style="display:inline;">
-                    @csrf
-                    <button type="submit" title="English" style="
-                        padding:6px 8px;border-radius:6px;font-size:.7rem;font-weight:700;
-                        background:{{ app()->getLocale() === 'en' ? 'rgba(26,68,247,.2)' : 'transparent' }};
-                        border:1px solid {{ app()->getLocale() === 'en' ? 'var(--blue-primary)' : 'var(--border-subtle)' }};
-                        color:{{ app()->getLocale() === 'en' ? 'var(--text-display)' : 'var(--text-40)' }};
-                        cursor:pointer;transition:all .2s;
-                    ">EN</button>
-                </form>
-                <form method="POST" action="{{ route('language.switch', ['locale' => 'am']) }}" style="display:inline;">
-                    @csrf
-                    <button type="submit" title="አማርኛ" style="
-                        padding:6px 8px;border-radius:6px;font-size:.7rem;font-weight:700;
-                        background:{{ app()->getLocale() === 'am' ? 'rgba(26,68,247,.2)' : 'transparent' }};
-                        border:1px solid {{ app()->getLocale() === 'am' ? 'var(--blue-primary)' : 'var(--border-subtle)' }};
-                        color:{{ app()->getLocale() === 'am' ? 'var(--text-display)' : 'var(--text-40)' }};
-                        cursor:pointer;transition:all .2s;
-                    ">አማ</button>
-                </form>
-            </div>
+            {{-- Mobile Language Toggle --}}
+            <x-language-toggle />
 
             <button id="theme-btn-mobile" title="Toggle Mode" style="
                 width:38px;height:38px;border-radius:10px;flex-shrink:0;

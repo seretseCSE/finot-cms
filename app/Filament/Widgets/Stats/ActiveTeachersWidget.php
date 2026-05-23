@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\Teacher;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class ActiveTeachersWidget extends StatsOverviewWidget
 {
@@ -13,7 +14,7 @@ class ActiveTeachersWidget extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Active Teachers', Teacher::count())
+            Stat::make('Active Teachers', Cache::remember('dashboard_active_teachers', 300, fn () => Teacher::count()))
                 ->icon('heroicon-o-users')
                 ->color('primary'),
         ];

@@ -1,0 +1,39 @@
+export default {
+    key: 'members_management',
+    label: 'Members Management',
+    description: 'Manage church members and their information.',
+    steps: [
+        {
+            key: 'members-list',
+            selector: '[data-tour="members-list"]',
+            title: 'Member Directory',
+            description: 'Browse all registered members. Use the search bar and filters to find specific members quickly.',
+            side: 'bottom',
+            align: 'center',
+        },
+        {
+            key: 'create-member',
+            selector: '[data-tour="create-member"]',
+            title: 'Add New Member',
+            description: 'Click here to register a new member. Fill in their personal details, contact info, and family relationships.',
+            side: 'bottom',
+            align: 'end',
+        },
+        {
+            key: 'member-actions',
+            selector: '[data-tour="member-actions"]',
+            title: 'Member Actions',
+            description: 'Each member record has actions for viewing details, editing, enrolling in classes, and more.',
+            side: 'left',
+            align: 'center',
+        },
+        {
+            key: 'member-filters',
+            selector: '[data-tour="member-filters"]',
+            title: 'Advanced Filters',
+            description: 'Filter members by department, status, group membership, or enrollment status.',
+            side: 'bottom',
+            align: 'center',
+        },
+    ],
+};

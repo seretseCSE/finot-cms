@@ -1041,84 +1041,51 @@
             @endif
 
             {{-- ================================================================ --}}
-            {{-- DEPARTMENT SECRETARY / STAFF TAB --}}
+            {{-- REVENUE & CHARITY HEAD TAB --}}
             {{-- ================================================================ --}}
-            @if(isset($tabs['department_secretary']))
-                <div x-show="activeTab === 'department_secretary'" x-cloak>
+            @if(isset($tabs['revenue_and_charity_head']))
+                <div x-show="activeTab === 'revenue_and_charity_head'" x-cloak>
                     <div class="space-y-6">
 
                         <x-filament::section>
-                            <x-slot name="heading">Department Secretary & Staff Overview</x-slot>
+                            <x-slot name="heading">Revenue & Charity Head Overview</x-slot>
                             <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                                <strong>Department Secretaries</strong> can create, view, and update department-scoped
-                                resources but cannot delete. <strong>Staff</strong> members have read-only access
-                                to department resources. Both roles are scoped to their assigned department.
+                                The <strong>Revenue and Charity Head</strong> role combines the responsibilities
+                                of tour management and charity/beneficiary management. You oversee both
+                                revenue-generating tours and aid distribution to beneficiaries.
                             </p>
                         </x-filament::section>
 
                         <x-filament::section>
-                            <x-slot name="heading">Department Secretary Guide</x-slot>
+                            <x-slot name="heading">Tour Management</x-slot>
                             <div class="space-y-4">
                                 <div>
                                     <h3 class="font-semibold text-base text-gray-900 dark:text-white">What You Can Do</h3>
                                     <ul class="list-disc ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-1">
-                                        <li><strong>View, Create, Update</strong> department resources</li>
-                                        <li><strong>View, Create, Update</strong> members in your department</li>
-                                        <li><strong>View, Create, Update</strong> events</li>
-                                        <li><strong>View, Create, Update</strong> contributions</li>
-                                        <li><strong>View, Create, Update</strong> inventory items</li>
-                                        <li><strong>Upload and search</strong> documents</li>
-                                        <li><strong>Cannot delete</strong> any resource</li>
+                                        <li><strong>Create, manage, and schedule</strong> church tours and trips</li>
+                                        <li><strong>Manage tour registrations</strong> and passenger lists</li>
+                                        <li><strong>Track tour attendance</strong> and generate tour reports</li>
+                                        <li><strong>Upload and manage</strong> documents</li>
                                     </ul>
-                                </div>
-
-                                <div>
-                                    <h3 class="font-semibold text-base text-gray-900 dark:text-white">Department Scoping</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                        You will only see records that belong to your assigned department.
-                                        For example, if you are in the "Sunday School" department, you will only see
-                                        members, events, and resources linked to Sunday School.
-                                    </p>
                                 </div>
                             </div>
                         </x-filament::section>
 
                         <x-filament::section>
-                            <x-slot name="heading">Staff Guide (Read-Only)</x-slot>
+                            <x-slot name="heading">Charity Management</x-slot>
                             <div class="space-y-4">
                                 <div>
                                     <h3 class="font-semibold text-base text-gray-900 dark:text-white">What You Can Do</h3>
                                     <ul class="list-disc ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-1">
-                                        <li><strong>View only</strong> access to department resources</li>
-                                        <li>View members in your department</li>
-                                        <li>View events and contributions</li>
-                                        <li>View inventory items and beneficiaries</li>
-                                        <li>View and download documents</li>
-                                        <li>Access reports (view only)</li>
+                                        <li><strong>Manage beneficiaries</strong> and their needs</li>
+                                        <li><strong>Record and track</strong> aid distribution activities</li>
+                                        <li><strong>View charity reports</strong> and aid distribution analytics</li>
+                                        <li><strong>Manage donations</strong> and contributions</li>
+                                        <li><strong>Upload and manage</strong> documents</li>
                                     </ul>
-                                </div>
-
-                                <div>
-                                    <h3 class="font-semibold text-base text-gray-900 dark:text-white">Requesting Changes</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                        If you need to update or create a record, contact your <strong>Department Secretary</strong>,
-                                        <strong>HR Head</strong>, or <strong>Admin</strong>. They have the necessary permissions
-                                        to make changes on your behalf.
-                                    </p>
                                 </div>
                             </div>
                         </x-filament::section>
-
-                        <x-filament::section>
-                            <x-slot name="heading">Common Tasks for Both Roles</x-slot>
-                            <ul class="list-disc ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                                <li><strong>Update your profile</strong> -- Click your name (top-right) > Edit Profile</li>
-                                <li><strong>Search members</strong> -- Use the Members list with filters</li>
-                                <li><strong>View reports</strong> -- Access Reports in the sidebar (read-only)</li>
-                                <li><strong>Download documents</strong> -- Open Documents and click download</li>
-                            </ul>
-                        </x-filament::section>
-
                     </div>
                 </div>
             @endif

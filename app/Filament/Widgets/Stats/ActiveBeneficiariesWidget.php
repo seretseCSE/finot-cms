@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\Beneficiary;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class ActiveBeneficiariesWidget extends StatsOverviewWidget
 {
@@ -12,7 +13,9 @@ class ActiveBeneficiariesWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $count = Beneficiary::where('status', 'Active')->count();
+        $count = Cache::remember('dashboard_active_beneficiaries', 300, fn () =>
+            Beneficiary::where('status', 'Active')->count()
+        );
 
         return [
             Stat::make('Active Beneficiaries', $count)

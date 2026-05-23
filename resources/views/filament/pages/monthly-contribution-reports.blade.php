@@ -159,7 +159,7 @@
             <x-filament::card class="shadow-xl border border-gray-100 dark:border-gray-700">
                 <div class="py-24 text-center">
                     <div class="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-6">
-                        <span class="text-lg text-gray-300 dark:text-gray-600">📊</span>
+                        <x-tour-icon name="education" size="24" class="" style="color:#9ca3af" aria-hidden="true" />
                     </div>
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
                         No Contribution Reports Found

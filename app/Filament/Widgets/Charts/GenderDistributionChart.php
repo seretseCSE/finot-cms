@@ -4,6 +4,7 @@ namespace App\Filament\Widgets\Charts;
 
 use App\Models\Member;
 use Filament\Widgets\DoughnutChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class GenderDistributionChart extends DoughnutChartWidget
 {
@@ -13,10 +14,12 @@ class GenderDistributionChart extends DoughnutChartWidget
 
     protected function getData(): array
     {
-        $data = Member::selectRaw('gender, COUNT(*) as count')
-            ->groupBy('gender')
-            ->pluck('count', 'gender')
-            ->toArray();
+        $data = Cache::remember('dashboard_gender_distribution_chart', 300, fn () =>
+            Member::selectRaw('gender, COUNT(*) as count')
+                ->groupBy('gender')
+                ->pluck('count', 'gender')
+                ->toArray()
+        );
 
         return [
             'datasets' => [

@@ -308,8 +308,7 @@ class UserSeeder extends Seeder
             'charity_head@finot.org' => 'charity_head',        // Charity Head User
             'tour_head@finot.org' => 'tour_head',          // Tour Head User
             'internal_relations_head@finot.org' => 'internal_relations_head', // Internal Relations Head User
-            'department_secretary@finot.org' => 'department_secretary', // Department Secretary User
-            'staff@finot.org' => 'staff',              // Staff User
+            'revenue_and_charity_head@finot.org' => 'revenue_and_charity_head', // Revenue and Charity Head User
         ];
 
         foreach ($roleAssignments as $email => $roleName) {

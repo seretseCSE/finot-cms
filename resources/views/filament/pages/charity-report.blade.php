@@ -191,14 +191,14 @@
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-text-2);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-surface2);">👥</div>
+            <div class="aid-card-icon" style="background:var(--aid-surface2);"><x-tour-icon name="community" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Total Beneficiaries</div>
             <div class="aid-card-value">{{ number_format($beneficiaryData['total'] ?? 0) }}</div>
         </div>
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-accent);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-accent-light);">✅</div>
+            <div class="aid-card-icon" style="background:var(--aid-accent-light);"><x-tour-icon name="faith" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Active</div>
             <div class="aid-card-value" style="color:var(--aid-accent);">{{ number_format($beneficiaryData['active'] ?? 0) }}</div>
             @php $activeRate = ($beneficiaryData['total'] ?? 0) > 0 ? round(($beneficiaryData['active'] / $beneficiaryData['total']) * 100) : 0; @endphp
@@ -207,14 +207,14 @@
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-text-3);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-surface2);">⏸</div>
+            <div class="aid-card-icon" style="background:var(--aid-surface2);"><x-tour-icon name="events" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Inactive</div>
             <div class="aid-card-value" style="color:var(--aid-text-2);">{{ number_format($beneficiaryData['inactive'] ?? 0) }}</div>
         </div>
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-blue);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-blue-light);">🏁</div>
+            <div class="aid-card-icon" style="background:var(--aid-blue-light);"><x-tour-icon name="leadership" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Completed</div>
             <div class="aid-card-value" style="color:var(--aid-blue);">{{ number_format($beneficiaryData['completed'] ?? 0) }}</div>
         </div>
@@ -226,28 +226,28 @@
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-text-2);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-surface2);">📦</div>
+            <div class="aid-card-icon" style="background:var(--aid-surface2);"><x-tour-icon name="events" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Total Distributions</div>
             <div class="aid-card-value">{{ number_format($distributionData['total_distributions'] ?? 0) }}</div>
         </div>
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-accent);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-accent-light);">💵</div>
+            <div class="aid-card-icon" style="background:var(--aid-accent-light);"><x-tour-icon name="giving" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Monetary</div>
             <div class="aid-card-value" style="color:var(--aid-accent);">{{ number_format($distributionData['monetary_distributions'] ?? 0) }}</div>
         </div>
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-purple);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-purple-light);">🎁</div>
+            <div class="aid-card-icon" style="background:var(--aid-purple-light);"><x-tour-icon name="giving" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Non-Monetary</div>
             <div class="aid-card-value" style="color:var(--aid-purple);">{{ number_format($distributionData['non_monetary_distributions'] ?? 0) }}</div>
         </div>
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-blue);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-blue-light);">💰</div>
+            <div class="aid-card-icon" style="background:var(--aid-blue-light);"><x-tour-icon name="giving" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Total Amount</div>
             <div class="aid-card-value" style="font-size:18px;color:var(--aid-blue);">{{ number_format($distributionData['total_amount'] ?? 0, 0) }}</div>
             <div class="aid-card-sub">ETB</div>
@@ -255,7 +255,7 @@
 
         <div class="aid-card">
             <div class="aid-card-accent" style="background:var(--aid-amber);"></div>
-            <div class="aid-card-icon" style="background:var(--aid-amber-light);">📊</div>
+            <div class="aid-card-icon" style="background:var(--aid-amber-light);"><x-tour-icon name="education" size="20" class="" aria-hidden="true" /></div>
             <div class="aid-card-label">Avg per Distribution</div>
             <div class="aid-card-value" style="font-size:18px;color:var(--aid-amber);">{{ number_format($distributionData['average_amount'] ?? 0, 0) }}</div>
             <div class="aid-card-sub">ETB</div>

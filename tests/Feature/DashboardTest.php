@@ -43,17 +43,9 @@ class DashboardTest extends TestCase
     }
 
     #[Test]
-    public function department_secretary_sees_department_widgets(): void
+    public function revenue_and_charity_head_sees_dashboard(): void
     {
-        $user = $this->createDepartmentSecretaryUser();
-        $response = $this->actingAs($user)->get('/admin');
-        $response->assertStatus(200);
-    }
-
-    #[Test]
-    public function staff_sees_staff_widgets(): void
-    {
-        $user = $this->createStaffUser();
+        $user = $this->createUserWithRole('revenue_and_charity_head');
         $response = $this->actingAs($user)->get('/admin');
         $response->assertStatus(200);
     }

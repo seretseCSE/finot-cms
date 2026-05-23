@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\Rehearsal;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class UpcomingRehearsalsWidget extends StatsOverviewWidget
 {
@@ -12,8 +13,9 @@ class UpcomingRehearsalsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $count = Rehearsal::where('date_time', '>=', today())
-            ->count();
+        $count = Cache::remember('dashboard_upcoming_rehearsals', 300, fn () =>
+            Rehearsal::where('date_time', '>=', today())->count()
+        );
 
         return [
             Stat::make('Upcoming Rehearsals', $count)

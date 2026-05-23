@@ -71,7 +71,7 @@
         
         @if($songs->isEmpty())
             <div class="card sr" style="padding:80px;text-align:center;max-width:600px;margin:0 auto;">
-                <div style="font-size:3rem;margin-bottom:24px;">🎵</div>
+                <x-tour-icon name="faith" size="48" class="" aria-hidden="true" />
                 <h3 class="display" style="font-size:1.8rem;margin-bottom:12px;">{{ __('No Songs Found') }}</h3>
                 <p style="color:var(--text-60);">{{ __('Try adjusting your filters or search terms.') }}</p>
             </div>

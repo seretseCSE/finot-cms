@@ -6,7 +6,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PasswordChangeController;
-use App\Http\Controllers\ProductTourController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TourController;
@@ -140,13 +139,6 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'throttle:10,1'])->group(function () {
     Route::post('/api/session/extend', [SessionController::class, 'extendSession'])->name('session.extend');
     Route::get('/api/session/status', [SessionController::class, 'getSessionStatus'])->name('session.status');
-});
-
-// Product tour routes
-Route::middleware(['auth', 'web', 'throttle:10,1'])->group(function () {
-    Route::post('/api/tour/restart', [ProductTourController::class, 'restart'])->name('tour.restart');
-    Route::post('/api/tour/complete', [ProductTourController::class, 'complete'])->name('tour.complete');
-    Route::get('/api/tour/status', [ProductTourController::class, 'status'])->name('tour.status');
 });
 
 Route::get('/login', function () {
