@@ -64,17 +64,17 @@
                 <form action="{{ route('contact.store') }}" method="POST" style="display:grid;gap:24px;">
                     @csrf
                     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:20px;">
-                    <div class="input-group">
+                    <div>
                         <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Full Name') }}</label>
                         <input type="text" name="name" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'">
                     </div>
-                    <div class="input-group">
+                    <div>
                         <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Email Address') }}</label>
                         <input type="email" name="email" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'">
                     </div>
                 </div>
                 
-                <div class="input-group">
+                <div>
                     <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Subject') }}</label>
                     <select name="subject" style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;cursor:pointer;font-size:16px;">
                         <option value="General Inquiry">{{ __('General Inquiry') }}</option>
@@ -84,7 +84,7 @@
                     </select>
                 </div>
 
-                <div class="input-group">
+                <div>
                     <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Message') }}</label>
                     <textarea name="message" rows="5" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;resize:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'"></textarea>
                 </div>

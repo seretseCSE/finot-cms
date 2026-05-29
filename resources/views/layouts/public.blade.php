@@ -7,11 +7,7 @@
     @php
         $isResourcePage = Request::is('songs*') || Request::is('library*') || Request::is('media*');
     @endphp
-    <!-- Disable caching for development -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <title>@yield('title', 'Finote Tsidik') | {{ config('app.name') }}</title>
+    <title>@yield('title', config('app.name'))</title>
     <meta name="description" content="@yield('meta_description', __('Finot-Tsidik Sunday School — Faith, service, and fellowship since 1984 E.C.'))">
 
     <!-- PWA -->
@@ -60,13 +56,13 @@
             --bg-900:        #0A1230;
             --bg-800:        #101B48;
             --bg-700:        #182660;
-            
+
             --text-main:     #E8E4DC;
             --text-60:       rgba(232,228,220,0.60);
             --text-40:       rgba(232,228,220,0.40);
             --text-display:  #FFFFFF;
             --text-hero:     #FFFFFF;
-            
+
             --glass:         rgba(255,255,255,0.04);
             --glass-hover:   rgba(255,255,255,0.08);
             --border-subtle: rgba(255,255,255,0.08);
@@ -269,32 +265,32 @@
         @media(max-width:768px) {
             .hide-mobile { display: none !important; }
             .show-mobile { display: block !important; }
-            
+
             /* Mobile typography adjustments */
             .display { font-size: clamp(1.8rem, 6vw, 2.5rem) !important; }
             .sec-label { font-size: .65rem !important; margin-bottom: 8px !important; }
-            
+
             /* Mobile spacing */
             section { padding: 60px 20px !important; }
             .card { padding: 24px 20px !important; }
-            
+
             /* Mobile grid adjustments */
             .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; gap: 24px !important; }
-            
+
             /* Mobile button adjustments */
             .btn { padding: 10px 20px !important; font-size: .8rem !important; }
             .btn-mobile-full { width: 100% !important; justify-content: center !important; }
-            
+
             /* Mobile text adjustments */
             h1 { font-size: clamp(2rem, 8vw, 3rem) !important; line-height: 1.2 !important; }
             h2 { font-size: clamp(1.6rem, 6vw, 2.2rem) !important; line-height: 1.3 !important; }
             h3 { font-size: clamp(1.3rem, 5vw, 1.7rem) !important; line-height: 1.4 !important; }
             p { font-size: .95rem !important; line-height: 1.6 !important; }
-            
+
             /* Disable parallax on mobile for performance */
             .hero-parallax { transform: none !important; transition: none !important; }
         }
-        
+
         @media(max-width:480px) {
             section { padding: 48px 16px !important; }
             .card { padding: 20px 16px !important; }
@@ -312,6 +308,7 @@
 
     @stack('styles')
 </head>
+<body>
     <script>
         // Critical: Apply theme before paint
         (function() {
@@ -424,7 +421,7 @@
     /* ─── PWA ─── */
     if('serviceWorker' in navigator){
         let currentVersion = null;
-        
+
         // Check current build version
         fetch('/build-info.json')
             .then(response => response.json())
@@ -433,16 +430,16 @@
                 console.log('Current build version:', currentVersion);
             })
             .catch(() => console.log('Could not fetch build info'));
-        
+
         navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
                 console.log('Service Worker registered');
-                
+
                 // Check for updates every 30 seconds
                 setInterval(() => {
                     registration.update();
                 }, 30000);
-                
+
                 // Listen for updates — show toast instead of confirm
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
@@ -480,7 +477,7 @@
                 };
             })
             .catch(error => console.error('Service Worker registration failed:', error));
-        
+
         // Handle PWA install prompt
         let dp;
         window.addEventListener('beforeinstallprompt',e=>{
@@ -490,23 +487,23 @@
             const d=localStorage.getItem('pwaDismiss');
             if(!d||new Date(d)<=new Date()) document.getElementById('pwa-banner').style.display='block';
         });
-        
-        window.installPWA=()=>{ 
-            if(dp){ 
-                dp.prompt(); 
-                dp.userChoice.then(()=>{ 
-                    dp=null; 
-                    document.getElementById('pwa-banner').style.display='none'; 
-                }); 
-            } 
+
+        window.installPWA=()=>{
+            if(dp){
+                dp.prompt();
+                dp.userChoice.then(()=>{
+                    dp=null;
+                    document.getElementById('pwa-banner').style.display='none';
+                });
+            }
         };
-        
-        window.dismissPWA=()=>{ 
-            const d=new Date(); 
-            d.setDate(d.getDate()+7); 
-            localStorage.setItem('pwaDismiss',d.toISOString()); 
+
+        window.dismissPWA=()=>{
+            const d=new Date();
+            d.setDate(d.getDate()+7);
+            localStorage.setItem('pwaDismiss',d.toISOString());
         };
-        
+
         // Listen for service worker messages
         navigator.serviceWorker.addEventListener('message', event => {
             if (event.data && event.data.type === 'RELOAD') {

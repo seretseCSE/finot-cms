@@ -7,7 +7,232 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* ═══════════════════════════════════════════════════
+   FINOT × SPACEX-INSPIRED DESIGN SYSTEM
+   Monochromatic dark · Blue + Gold accents · Clean typography
+   ═══════════════════════════════════════════════════ */
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    /* Monochromatic near-black palette */
+    --color-base: #050505;
+    --color-surface: #0a0a0a;
+    --color-muted: #111111;
+    --color-elevated: #181818;
+    --color-border: #1f1f1f;
+    --color-border-light: #2a2a2a;
+
+    /* Text */
+    --color-white: #ffffff;
+    --color-gray-50: #f5f5f5;
+    --color-gray-100: #e5e5e5;
+    --color-gray-200: #c7c7c7;
+    --color-gray-300: #a3a3a3;
+    --color-gray-400: #737373;
+    --color-gray-500: #525252;
+    --color-gray-600: #404040;
+    --color-gray-700: #2e2e2e;
+    --color-gray-800: #1a1a1a;
+    --color-gray-900: #0f0f0f;
+    --color-gray-950: #080808;
+
+    /* Brand accent — Finot Blue (#1A44F7) */
+    --color-accent: #1A44F7;
+    --color-accent-hover: #2952FF;
+    --color-accent-dim: rgba(26, 68, 247, 0.12);
+    --color-accent-glow: rgba(26, 68, 247, 0.30);
+
+    /* Brand secondary — Gold (#F3BA15) */
+    --color-gold: #F3BA15;
+    --color-gold-light: #FFCF42;
+    --color-gold-dim: rgba(243, 186, 21, 0.10);
+
+    /* Keep existing app name refs working */
+    --color-primary: #1A44F7;
+    --color-primary-hover: #2952FF;
+}
+
+/* ── Base Layer ── */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-base text-white antialiased;
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    ::selection {
+        background-color: rgba(26, 68, 247, 0.3);
+        color: #ffffff;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #050505;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #404040;
+    }
+}
+
+/* ── Typography Utilities ── */
+@layer utilities {
+    .heading-xl {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .heading-lg {
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        line-height: 1.1;
+        text-transform: uppercase;
+    }
+
+    .heading-md {
+        font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        line-height: 1.2;
+        text-transform: uppercase;
+    }
+
+    .heading-sm {
+        font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        line-height: 1.3;
+        text-transform: uppercase;
+    }
+
+    .label-upper {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+    }
+
+    /* Text readability over dark/video backgrounds */
+    .text-readable {
+        text-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.7),
+            0 0 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .text-readable-soft {
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Glass card */
+    .card-glass {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .card-glass-hover:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Blue accent glow */
+    .glow-blue {
+        box-shadow:
+            0 0 20px rgba(26, 68, 247, 0.15),
+            0 0 40px rgba(26, 68, 247, 0.05);
+    }
+
+    .glow-blue-sm {
+        box-shadow: 0 0 12px rgba(26, 68, 247, 0.2);
+    }
+
+    /* Section padding */
+    .section-pad {
+        padding: clamp(60px, 10vw, 120px) clamp(20px, 5vw, 40px);
+    }
+
+    .section-pad-sm {
+        padding: clamp(40px, 6vw, 80px) clamp(20px, 5vw, 40px);
+    }
+
+    /* Dividers — blue accent */
+    .divider-accent {
+        width: 40px;
+        height: 3px;
+        background: #1A44F7;
+    }
+
+    .divider-accent-center {
+        width: 60px;
+        height: 2px;
+        background: #1A44F7;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Link underline animation */
+    .link-underline {
+        position: relative;
+        text-decoration: none;
+    }
+
+    .link-underline::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: #1A44F7;
+        transition: width 0.3s ease;
+    }
+
+    .link-underline:hover::after {
+        width: 100%;
+    }
+
+    /* Scroll reveal */
+    @keyframes reveal-up {
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-reveal {
+        animation: reveal-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Staggered delay utility */
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
 }

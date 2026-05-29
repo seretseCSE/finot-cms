@@ -84,7 +84,7 @@
                     <a href="{{ route('media.show', $item) }}" class="card sr" style="padding:0;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;" data-delay="{{ $loop->index * 50 }}">
                         <div style="aspect-ratio:4/3;overflow:hidden;position:relative;background:var(--dark-800);">
                             @if($item->type === 'Photo')
-                                <img src="{{ $item->file_url }}" alt="{{ $item->title }}" style="width:100%;height:100%;object-fit:cover;transition:transform .5s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <img src="{{ $item->file_url }}" alt="{{ $item->title }}" style="width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.22,1,.36,1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                             @else
                                 <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--dark-800),var(--blue-primary));display:flex;align-items:center;justify-content:center;">
                                     <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:#fff;">

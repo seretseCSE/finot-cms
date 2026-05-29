@@ -37,6 +37,7 @@ use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SongController;
+use App\Http\Controllers\SundaySchoolController;
 
 // Courses routes (higher rate limit for reading)
 Route::middleware('throttle:60,1')->group(function () {
@@ -67,6 +68,7 @@ Route::middleware('throttle:60,1')->group(function () {
 // Apply rate limiting to all public routes (10 requests per minute)
 Route::middleware('throttle:10,1')->group(function () {
     Route::get('/', [HomeController::class, 'index']);
+    Route::get('/sunday-school', [SundaySchoolController::class, 'index']);
 
     // Public page routes
     Route::get('/about', [AboutController::class, 'index'])->name('about');

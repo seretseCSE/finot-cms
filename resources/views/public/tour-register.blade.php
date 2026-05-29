@@ -86,8 +86,8 @@
                         <p style="font-size:.7rem;color:var(--parchment-40);margin-top:6px;">{{ __('PDF, JPG, PNG files only (Max 5MB)') }}</p>
                     </div>
 
-                    <div style="display:none;">
-                        <input type="text" name="honeypot" value="{{ old('honeypot') }}">
+                    <div style="position:absolute;left:-9999px;visibility:hidden;" aria-hidden="true">
+                        <input type="text" name="honeypot" value="{{ old('honeypot') }}" tabindex="-1" autocomplete="off">
                     </div>
 
                     <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;">

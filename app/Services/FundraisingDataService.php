@@ -49,6 +49,7 @@ class FundraisingDataService
     private function getVisibleCampaigns()
     {
         return FundraisingCampaign::visible()
+            ->with('donations')
             ->orderBy('status', 'asc')
             ->orderBy('created_at', 'desc')
             ->get();

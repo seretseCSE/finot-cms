@@ -40,12 +40,21 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BAJyIx59.css",
+    "file": "assets/app-DwSfKos0.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
     "names": [
       "app.css"
+    ]
+  },
+  "resources/css/sunday-school.css": {
+    "file": "assets/sunday-school-CvmEc6l3.css",
+    "src": "resources/css/sunday-school.css",
+    "isEntry": true,
+    "name": "sunday-school",
+    "names": [
+      "sunday-school.css"
     ]
   },
   "resources/js/admin.js": {
@@ -90,6 +99,16 @@
     "name": "pwa-install",
     "src": "resources/js/pwa-install.js",
     "isDynamicEntry": true
+  },
+  "resources/js/sunday-school.js": {
+    "file": "assets/sunday-school-4DLte2Pz.js",
+    "name": "sunday-school",
+    "src": "resources/js/sunday-school.js",
+    "isEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_vendor-Ch07e1E5.js"
+    ]
   },
   "resources/js/tours/filament-init.js": {
     "file": "assets/filament-init-BnByl6Yh.js",

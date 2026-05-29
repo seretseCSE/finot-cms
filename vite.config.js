@@ -13,6 +13,8 @@ export default defineConfig({
                 'resources/js/admin.js',
                 'resources/js/financial-charts.js',
                 'resources/js/tours/filament-init.js',
+                'resources/css/sunday-school.css',
+                'resources/js/sunday-school.js',
             ],
             refresh: true,
         }),

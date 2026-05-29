@@ -14,7 +14,9 @@
 
         @if($resources->isEmpty() && $courses->isEmpty())
             <div style="text-align:center;padding:80px 20px;">
-                <div style="font-size:4rem;margin-bottom:20px;opacity:.2;">❤️</div>
+                <div style="margin-bottom:20px;opacity:.2;">
+                    <svg width="64" height="64" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                </div>
                 <p style="color:var(--text-40);font-size:1.1rem;margin-bottom:8px;">{{ __('No favorites yet.') }}</p>
                 <p style="color:var(--text-40);font-size:.9rem;">{{ __('Browse the spiritual library or courses and tap the heart to save items here.') }}</p>
                 <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">

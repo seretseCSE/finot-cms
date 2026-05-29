@@ -115,14 +115,18 @@
                                 <div style="padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;">
                                     <div style="font-size:.7rem;text-transform:uppercase;color:var(--parchment-40);margin-bottom:6px;font-weight:700;">{{ __('Donors') }}: {{ $campaign->donations->count() }}</div>
                                     @php
-                                        $topDonors = $campaign->donations()
+                                        $topDonors = $campaign->donations
                                             ->where('donor_name', '!=', 'Campaign Update')
                                             ->whereNotNull('donor_name')
                                             ->groupBy('donor_name')
-                                            ->selectRaw('donor_name, SUM(amount) as total')
-                                            ->orderByDesc('total')
-                                            ->limit(3)
-                                            ->get();
+                                            ->map(function ($donations, $name) {
+                                                return (object) [
+                                                    'donor_name' => $name,
+                                                    'total' => $donations->sum('amount'),
+                                                ];
+                                            })
+                                            ->sortByDesc('total')
+                                            ->take(3);
                                     @endphp
                                     @if($topDonors->count() > 0)
                                         <div style="font-size:.75rem;color:var(--text-60);margin-bottom:8px;">{{ __('Top Contributors') }}:</div>

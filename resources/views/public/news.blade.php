@@ -146,6 +146,7 @@
                 @endforeach
 
                 @php
+                    $calendarEvents ??= collect();
                     $firstDayOfMonth = $startOfMonth->copy()->startOfMonth();
                     $daysInMonth = $startOfMonth->daysInMonth;
                     $startDayOfWeek = $firstDayOfMonth->dayOfWeek;
