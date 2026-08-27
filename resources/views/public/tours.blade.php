@@ -4,31 +4,17 @@
 
 @section('content')
 
-{{-- ═══════════════════════════════════════════════════════
-     1.  HERO — Adapts based on active tab
-     ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:120px 24px 80px;background:var(--dark-950);overflow:hidden;">
-    <div class="hero-parallax" style="position:absolute;inset:-10% 0;background:url('{{ asset('images/stats-bg.jpg') }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--overlay-95) 0%,rgba(26,68,247,.1) 50%,var(--overlay-98) 100%);"></div>
-    <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
-
-    <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
-        <div class="sec-label sr" style="justify-content:center;">{{ __('Journeys & Store') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;color:var(--text-hero);">
-            {{ __('Tours') }}
-            <span style="color:var(--gold);">&</span>
-            {{ __('Shop') }}
-        </h1>
-        <p class="sr" style="color:var(--text-60);max-width:600px;margin:0 auto;font-size:1.1rem;line-height:1.7;">
-            {{ __('Explore sacred pilgrimages across Ethiopia and browse our collection of spiritual resources.') }}
-        </p>
-    </div>
-</section>
+<x-public.page-hero
+    :title="__('Tours & Shop')"
+    :subtitle="__('Explore sacred pilgrimages across Ethiopia and browse our collection of spiritual resources.')"
+    :eyebrow="__('Journeys & Store')"
+    :image="asset('images/unsplash/mountain-faith.jpg')"
+/>
 
 {{-- ═══════════════════════════════════════════════════════
      2.  TAB BUTTONS
      ═══════════════════════════════════════════════════════ --}}
-<section style="padding:40px 24px 0;background:var(--dark-900);">
+<section class="ft-section pt-10" style="padding-bottom:0;">
     <div style="max-width:1280px;margin:0 auto;">
         <div class="sr" style="display:flex;gap:4px;margin-bottom:0;">
             <button class="tours-tab active" data-tab="tours" style="

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Models\Department;
+use App\Models\User;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -9,25 +11,63 @@ use Illuminate\Support\Facades\Auth;
 abstract class BaseResource extends Resource
 {
     /**
-     * Determine if the current user can view any resources of this type.
+     * Authenticated user, or null when the request is a guest.
      */
-    public static function canViewAny(): bool
+    protected static function authUser(): ?User
     {
         $user = Auth::user();
 
-        // Superadmin can view everything
+        return $user instanceof User ? $user : null;
+    }
+
+    /**
+     * Superadmin always passes; otherwise require the model's permission for $action.
+     */
+    protected static function userHasPermission(string $action): bool
+    {
+        $user = static::authUser();
+
+        if (! $user) {
+            return false;
+        }
+
         if ($user->hasRole('superadmin')) {
             return true;
         }
 
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('view');
-            return $user->can($permission);
+        if (! method_exists(static::getModel(), 'getPermissionName')) {
+            return false;
         }
 
-        // Fallback to superadmin only for models without permission system
-        return false;
+        return $user->can(static::getModel()::getPermissionName($action));
+    }
+
+    /**
+     * Permission check plus department scoping for a single record.
+     */
+    protected static function userCanAccessRecord(Model $record, string $action): bool
+    {
+        if (! static::userHasPermission($action)) {
+            return false;
+        }
+
+        if (static::authUser()?->hasRole('superadmin')) {
+            return true;
+        }
+
+        if (method_exists($record, 'canCurrentUserAccess')) {
+            return $record->canCurrentUserAccess();
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if the current user can view any resources of this type.
+     */
+    public static function canViewAny(): bool
+    {
+        return static::userHasPermission('view');
     }
 
     /**
@@ -35,21 +75,7 @@ abstract class BaseResource extends Resource
      */
     public static function canCreate(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can create everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('create');
-            return $user->can($permission);
-        }
-
-        // Fallback to superadmin only for models without permission system
-        return false;
+        return static::userHasPermission('create');
     }
 
     /**
@@ -57,32 +83,7 @@ abstract class BaseResource extends Resource
      */
     public static function canEdit(Model $record): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can edit everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('update');
-
-            // Check permission and department access
-            if (!$user->can($permission)) {
-                return false;
-            }
-        } else {
-            // Fallback to superadmin only for models without permission system
-            return false;
-        }
-
-        // Check department access if model has department trait
-        if (method_exists($record, 'canCurrentUserAccess')) {
-            return $record->canCurrentUserAccess();
-        }
-
-        return true;
+        return static::userCanAccessRecord($record, 'update');
     }
 
     /**
@@ -90,32 +91,7 @@ abstract class BaseResource extends Resource
      */
     public static function canDelete(Model $record): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can delete everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('delete');
-
-            // Check permission and department access
-            if (!$user->can($permission)) {
-                return false;
-            }
-        } else {
-            // Fallback to superadmin only for models without permission system
-            return false;
-        }
-
-        // Check department access if model has department trait
-        if (method_exists($record, 'canCurrentUserAccess')) {
-            return $record->canCurrentUserAccess();
-        }
-
-        return true;
+        return static::userCanAccessRecord($record, 'delete');
     }
 
     /**
@@ -123,32 +99,7 @@ abstract class BaseResource extends Resource
      */
     public static function canView(Model $record): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can view everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission if model supports it
-        if (method_exists(static::getModel(), 'getPermissionName')) {
-            $permission = static::getModel()::getPermissionName('view');
-
-            // Check permission and department access
-            if (! $user->can($permission)) {
-                return false;
-            }
-        } else {
-            // Fallback to superadmin only for models without permission system
-            return false;
-        }
-
-        // Check department access if model has department trait
-        if (method_exists($record, 'canCurrentUserAccess')) {
-            return $record->canCurrentUserAccess();
-        }
-
-        return true;
+        return static::userCanAccessRecord($record, 'view');
     }
 
     /**
@@ -156,27 +107,7 @@ abstract class BaseResource extends Resource
      */
     public static function canRestore(Model $record): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can restore everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission
-        $permission = static::getModel()::getPermissionName('restore');
-
-        // Check permission and department access
-        if (! $user->can($permission)) {
-            return false;
-        }
-
-        // Check department access if model has department trait
-        if (method_exists($record, 'canCurrentUserAccess')) {
-            return $record->canCurrentUserAccess();
-        }
-
-        return true;
+        return static::userCanAccessRecord($record, 'restore');
     }
 
     /**
@@ -184,27 +115,7 @@ abstract class BaseResource extends Resource
      */
     public static function canForceDelete(Model $record): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can force delete everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission
-        $permission = static::getModel()::getPermissionName('force_delete');
-
-        // Check permission and department access
-        if (! $user->can($permission)) {
-            return false;
-        }
-
-        // Check department access if model has department trait
-        if (method_exists($record, 'canCurrentUserAccess')) {
-            return $record->canCurrentUserAccess();
-        }
-
-        return true;
+        return static::userCanAccessRecord($record, 'force_delete');
     }
 
     /**
@@ -212,17 +123,7 @@ abstract class BaseResource extends Resource
      */
     public static function canDeleteAny(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can delete everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check bulk delete permission
-        $permission = static::getModel()::getPermissionName('delete_any');
-
-        return $user->can($permission);
+        return static::userHasPermission('delete_any');
     }
 
     /**
@@ -230,17 +131,7 @@ abstract class BaseResource extends Resource
      */
     public static function canForceDeleteAny(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can force delete everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check bulk force delete permission
-        $permission = static::getModel()::getPermissionName('force_delete_any');
-
-        return $user->can($permission);
+        return static::userHasPermission('force_delete_any');
     }
 
     /**
@@ -248,17 +139,7 @@ abstract class BaseResource extends Resource
      */
     public static function canReorder(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can reorder everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check reorder permission
-        $permission = static::getModel()::getPermissionName('reorder');
-
-        return $user->can($permission);
+        return static::userHasPermission('reorder');
     }
 
     /**
@@ -266,27 +147,7 @@ abstract class BaseResource extends Resource
      */
     public static function canReplicate(Model $record): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can replicate everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check specific permission
-        $permission = static::getModel()::getPermissionName('replicate');
-
-        // Check permission and department access
-        if (! $user->can($permission)) {
-            return false;
-        }
-
-        // Check department access if model has department trait
-        if (method_exists($record, 'canCurrentUserAccess')) {
-            return $record->canCurrentUserAccess();
-        }
-
-        return true;
+        return static::userCanAccessRecord($record, 'replicate');
     }
 
     /**
@@ -294,17 +155,7 @@ abstract class BaseResource extends Resource
      */
     public static function canRestoreAny(): bool
     {
-        $user = Auth::user();
-
-        // Superadmin can restore everything
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        // Check bulk restore permission
-        $permission = static::getModel()::getPermissionName('restore_any');
-
-        return $user->can($permission);
+        return static::userHasPermission('restore_any');
     }
 
     /**
@@ -314,9 +165,8 @@ abstract class BaseResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        // Apply department scope if model has the trait
-        $modelTraits = class_uses(static::getModel());
-        if (in_array('App\Models\Traits\HasDepartmentTrait', $modelTraits) || in_array('App\Models\Traits\ScopedByDepartment', $modelTraits)) {
+        $traits = class_uses_recursive(static::getModel());
+        if (isset($traits[\App\Models\Traits\ScopedByDepartment::class])) {
             return $query->accessibleByCurrentUser();
         }
 
@@ -352,9 +202,9 @@ abstract class BaseResource extends Resource
      */
     protected static function isDepartmentHead(?Model $record = null): bool
     {
-        $user = Auth::user();
+        $user = static::authUser();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -373,9 +223,9 @@ abstract class BaseResource extends Resource
      */
     protected static function isDepartmentSecretary(?Model $record = null): bool
     {
-        $user = Auth::user();
+        $user = static::authUser();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 

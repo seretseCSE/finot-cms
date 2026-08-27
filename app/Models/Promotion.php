@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasAuditLog;
 use App\Models\Traits\GeneratesAutoId;
+use App\Models\Traits\ScopedByDepartment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Promotion extends BaseModel

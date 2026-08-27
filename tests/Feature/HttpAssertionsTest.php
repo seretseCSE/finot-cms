@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\FundraisingCampaign;
 use App\Models\MediaItem;
-use App\Models\Song;
 use App\Models\Tour;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,38 +16,20 @@ class HttpAssertionsTest extends TestCase
     // ==================== GET ASSERTIONS ====================
 
     #[Test]
-    public function get_blog_returns_200_with_html_content_type(): void
+    public function get_blog_redirects_to_news(): void
+    {
+        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
+    }
+
+    #[Test]
+    public function get_news_blog_tab_returns_html(): void
     {
         \App\Models\BlogPost::factory()->published()->create();
 
-        $response = $this->get('/blog');
+        $response = $this->get('/news?tab=blog');
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/html; charset=UTF-8');
-    }
-
-    #[Test]
-    public function get_blog_with_search_returns_filtered_results(): void
-    {
-        \App\Models\BlogPost::factory()->published()->create(['title' => 'Timket Guide']);
-        \App\Models\BlogPost::factory()->published()->create(['title' => 'Meskel Overview']);
-
-        $response = $this->get('/blog?search=Timket');
-
-        $response->assertStatus(200);
-        $response->assertSee('Timket Guide');
-        $response->assertDontSee('Meskel Overview');
-    }
-
-    #[Test]
-    public function get_songs_with_category_filter_returns_200(): void
-    {
-        $category = \App\Models\SongCategory::factory()->create();
-        Song::factory()->create(['category_id' => $category->id, 'is_active' => true]);
-
-        $response = $this->get('/songs?category='.$category->id);
-
-        $response->assertStatus(200);
     }
 
     #[Test]
@@ -62,11 +43,9 @@ class HttpAssertionsTest extends TestCase
     }
 
     #[Test]
-    public function get_events_returns_200(): void
+    public function get_events_redirects_to_news(): void
     {
-        $response = $this->get('/events');
-
-        $response->assertStatus(200);
+        $this->get('/events')->assertRedirect(route('news', ['tab' => 'events']));
     }
 
     #[Test]

@@ -35,7 +35,7 @@ class AutoPurgeSettings extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()->can('page.settings.auto-purge');
+        return Auth::user()?->can('page.settings.auto-purge') ?? false;
     }
 
     public function mount(): void

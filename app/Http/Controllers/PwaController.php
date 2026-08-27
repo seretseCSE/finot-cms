@@ -101,7 +101,7 @@ class PwaController extends Controller
     public function offline(): Response
     {
         $appName = config('app.name', 'FINOTE TSIDIK');
-        $logoUrl = asset('images/logo.png');
+        $logoUrl = asset('images/logo2.png');
 
         $html = <<<HTML
 <!DOCTYPE html>

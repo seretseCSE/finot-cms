@@ -1,0 +1,277 @@
+{
+  "title": "Meeshaalee fi Kaardii eenyummaa",
+  "subtitle": "Meeshaalee argamaa RFID, galmee kaardii, iskaaniiwwan fi beeksisa maatii.",
+  "tabs": {
+    "devices": "Meeshaalee",
+    "cards": "Kaardii",
+    "scans": "Galmee iskaanii",
+    "messages": "Beeksisa ergame",
+    "requests": "Gaaffii kaardii",
+    "api": "API walitti hidhamiinsaa"
+  },
+  "device": {
+    "add": "Meeshaa galmeessi",
+    "edit": "Meeshaa gulaali",
+    "register": "Galmeessi",
+    "sheetHint": "Terminaalii balbala ykn kutaa hojjettootaa jiru. Erga galmeessitee booda toohannoo isaa ni argatta.",
+    "empty": "Ammatti meeshaan galmaa'e hin jiru.",
+    "updated": "Meeshaan fooyya'eera.",
+    "removed": "Meeshaan haqameera.",
+    "removeWarning": "\"{name}\" battalumatti wal-simsiisuu ni dhaaba. Iskaaniiwwan darban ni kaa'amu.",
+    "rotate": "Toohannoo haaraa",
+    "online": "Sarara irra",
+    "disabled": "Dhaabbateera",
+    "neverSeen": "Takkaa hin qunnamne",
+    "justNow": "Amma",
+    "minutesAgo": "daqiiqaa {count} dura",
+    "hoursAgo": "sa'aatii {count} dura",
+    "daysAgo": "guyyaa {count} dura",
+    "pending": "{count} eegaa jira",
+    "columns": {
+      "device": "Meeshaa",
+      "audience": "Kan tajaajilu",
+      "status": "Haala",
+      "scansToday": "Iskaanii har'aa",
+      "enabled": "Banaa"
+    },
+    "audiences": {
+      "students": "Barattoota",
+      "employees": "Hojjettoota",
+      "both": "Barattootaa fi hojjettoota"
+    },
+    "fields": {
+      "name": "Maqaa",
+      "namePlaceholder": "fkn. Balbala guddaa",
+      "location": "Bakka",
+      "locationPlaceholder": "fkn. Seensa duraa",
+      "serial": "Lakkoofsa addaa",
+      "audience": "Kan tajaajilu",
+      "audienceHelp": "Terminaaliin tokko barattoota, hojjettoota ykn lamaan tajaajiluu danda'a — eenyu eenyu akka ta'e kaardiitu adda baasa.",
+      "active": "Hojii irra",
+      "activeHelp": "Meeshaaleen dhaabbatan yeroo wal-simsiisuu yaalan ni didamu."
+    },
+    "tokenTitle": "Toohannoo seensaa — {name}",
+    "tokenHint": "Amma gara terminaalichaatti garagalchi. Nageenyaaf al tokko qofa mul'ata — haaraa argachuuf naanneessi.",
+    "tokenDone": "Olkaa'eera",
+    "enabledShort": "Banaa",
+    "enabledDone": "Meeshaan banameera — ammas wal-simsiisuu danda'a.",
+    "disabledDone": "Meeshaan dhaabbateera — wal-simsiisuun isaa ni didama.",
+    "enableTitle": "“{name}” banuu?",
+    "enableHint": "Terminaalichi iskaaniiwwan ammas wal-simsiisuu danda'a.",
+    "disableTitle": "“{name}” dhaabuu?",
+    "disableHint": "Terminaalichi naannootti iskaanii itti fufa garuu hanga banamutti wal-simsiisuun hundi ni didama — manni barumsaa gara argama harkaatti deebi'a. Iskaaniin kuufame yeroo banamu ni ergama."
+  },
+  "cards": {
+    "issue": "Kaardii kenni",
+    "issueAction": "Kenni",
+    "issued": "Kaardiin kennameera.",
+    "issueHint": "Nama filadhu, itti aansuudhaan kaardii haaraa dubbistuu irra tuqi (ykn UID galchi).",
+    "empty": "Ammatti kaardiin kenname hin jiru.",
+    "markLost": "Akka bade mallatteessi",
+    "markedLost": "Kaardiin akka bade galmaa'eera — iskaaniin amma ni didama.",
+    "revokedDone": "Kaardiin haqameera.",
+    "replace": "Bakka buusi",
+    "issueReplacement": "Bakka buusaa kenni",
+    "replaced": "Kaardiin bakka buusaa kennameera.",
+    "replaceTitle": "Kaardii haaraa {name}f",
+    "replaceHint": "UID kaardii HAARAA tuqi ykn galchi. Inni moofaan didamee itti fufa.",
+    "deactivateWarning": "Hanga bakka buusaan kennamutti iskaaniin kaardii {name} ni didama. Hanga sanatti argama harkaan galmeessi.",
+    "columns": {
+      "holder": "Abbaa",
+      "uid": "UID kaardii",
+      "status": "Haala",
+      "issued": "Guyyaa kenname"
+    },
+    "holderTypes": {
+      "student": "Barataa",
+      "employee": "Hojjetaa"
+    },
+    "statuses": {
+      "active": "Hojii irra",
+      "lost": "Bade",
+      "revoked": "Haqame",
+      "replaced": "Bakka bu'e"
+    },
+    "fields": {
+      "holderType": "Kaardiin kan",
+      "personPlaceholder": "Maqaadhaan barbaadi…",
+      "noMatches": "Homtuu hin argamne.",
+      "uid": "UID kaardii",
+      "uidPlaceholder": "Kaardii dubbistuu irra tuqi…",
+      "uidHelp": "Dubbistuun kaardii USB UID ofumaan galcha — dirree kana irratti xiyyeeffadhuu kaardii tuqi.",
+      "issuedOn": "Guyyaa kennamu",
+      "reason": "Maal ta'e?",
+      "note": "Yaadannoo",
+      "notePlaceholder": "Yaadannoo filannoo…",
+      "reportNotePlaceholder": "Waan Temari.et beekuu qabu (fkn. tuuta itti aanu waliin geessi)…"
+    },
+    "loadFailed": "Galmee kaardii fe'uun hin danda'amne.",
+    "searchPlaceholder": "Maqaa ykn UID kaardiitiin barbaadi…",
+    "bulkIssue": "Walitti qabaa kenni",
+    "reportLost": "Akka bade beeksisi",
+    "reported": "Kaardiin beeksifameera — Temari.et bakka buusaa ni geessa.",
+    "reportTitle": "Kaardii {name} beeksisi",
+    "reportHint": "Kaardiin battalumatti ni cufama; gaaffiin bakka buusaa gara Temari.et ergama. Hanga kaardiin haaraan dhufutti galmee harkaan fayyadami.",
+    "reportAction": "Beeksisiitii bakka buusaa gaafadhu",
+    "revoke": "Haqi",
+    "revokeWarning": "Kaardiin {name} battalumatti hojii dhaaba. Gaaffiin bakka buusaa hin banamu."
+  },
+  "scans": {
+    "allDevices": "Meeshaalee hunda",
+    "allOutcomes": "Bu'aa hunda",
+    "total": "iskaanii {count}",
+    "empty": "Iskaaniin galmaa'e hin jiru.",
+    "columns": {
+      "time": "Sa'aatii",
+      "person": "Nama",
+      "card": "Kaardii",
+      "device": "Meeshaa",
+      "outcome": "Bu'aa"
+    },
+    "statuses": {
+      "processed": "Galmaa'eera",
+      "pending": "Adeemsa irra",
+      "unknown_card": "Kaardii hin beekamne",
+      "inactive_card": "Kaardii bade/haqame",
+      "no_enrollment": "Galmee hojii irra hin jiru",
+      "closed_term": "Seemistera cufame"
+    }
+  },
+  "messages": {
+    "meter": "SMS {count} ji'a kana",
+    "allChannels": "Karaa hunda",
+    "email": "Imeelii",
+    "failed": "Hin milkoofne",
+    "empty": "Ammatti beeksisni ergame hin jiru.",
+    "about": {
+      "absent": "Hin argamne",
+      "late": "Ture"
+    },
+    "columns": {
+      "date": "Guyyaa",
+      "student": "Barataa",
+      "guardian": "Maatii",
+      "about": "Waa'ee",
+      "channel": "Karaa"
+    }
+  },
+  "requests": {
+    "openOnly": "Gaaffii banaa",
+    "all": "Gaaffii hunda",
+    "openCount": "{count} banaa",
+    "empty": "Gaaffiin kaardii hin jiru.",
+    "updated": "Gaaffiin fooyya'eera.",
+    "by": "{name}tiin",
+    "awaitingChip": "kaardii haaraa eegaa",
+    "statuses": {
+      "requested": "Gaafatameera",
+      "accepted": "Fudhatameera",
+      "preparing": "Kaardii qopheessaa",
+      "delivering": "Geessaa jira",
+      "delivered": "Ga'eera",
+      "rejected": "Didameera"
+    },
+    "reasons": {
+      "lost": "Kaardii bade",
+      "damaged": "Kaardii miidhame",
+      "new": "Kaardii haaraa"
+    },
+    "actions": {
+      "accept": "Fudhadhu",
+      "issueChip": "Kaardii kenni",
+      "startDelivery": "Geessuu jalqabi",
+      "markDelivered": "Akka ga'e mallatteessi",
+      "reject": "Didi"
+    }
+  },
+  "api": {
+    "title": "Qajeelfama walitti hidhamiinsa meeshaa",
+    "intro": "Terminaalli hordoffii Temari.et wajjin akkamitti akka dubbatu — iddoo tajaajilaa sadii, tokenii tokko, offline-dursa. Terminaalli tarree kaardii damee isaa ofuma isaatti qabata, tuttuqaa hunda network malee battalumatti murteessa, duubaanis walsimsiisa. Kaardiiwwan chiippii NFC F08 dha: UID baayitii-4, qubee hex gurguddaa 8'n barreeffamu, eenyummaa meeshichi qabatu isa qofa dha. Yeroon armaan gadii hundi sirrii dha — akkuma barreeffametti hojiirra oolchi.",
+    "baseUrl": "URL bu'uuraa",
+    "tokenHeader": "Header gaaffii hunda irra jiru",
+    "authNote": "Gaaffiin kamiyyuu eenyummeessaa meeshaa (device ID) hin qabatu — tokenichi mataan isaa eenyummaa meeshichaa ti; terminaalii hundaaf adda waan ta'eef serverichi meeshaa kam (fi damee kam) akka waamaa jiru yeroo hunda beeka. Meeshaan damee isaatiin alatti dubbisuus barreessuus hin danda'u; maqaa, bilbila yookiin odeeffannoo dhuunfaa kamiyyuu gonkumaa hin argu.",
+    "request": "Gaaffii",
+    "response": "Deebii",
+    "example": "Fakkeenya",
+    "copy": "Garagalchi",
+    "copied": "Garagalfameera",
+    "steps": {
+      "provision": {
+        "when": "Terminaalii tokkoof al tokko",
+        "title": "Galmeessuu fi qopheessuu",
+        "body": "Terminaalicha caancala Meeshaalee irratti galmeessi — tokeniin seensaa isaa al tokko qofa mul'ata. Tokenichaa fi URL bu'uuraa kuusaa flash mataa meeshichaatti barreessi; irra deebi'anii ka'uu fi fooyya'iinsa firmware keessa akka darbaniif. LILYGO T-SIM7670G-S3 irratti konsoolii qophii serial tiin NVS keessa kaa'i: USB-C suuqi, terminaalii serial 115200 baud tiin bani, ajajawwan sadan barreessi, xumurte.",
+        "note": "Tokenii suuraa firmware keessatti gonkumaa hin awwaalin: terminaalli hundi firmware walfakkaataa irratti hojjeta garuu tokenii MATAA ISAA qabata. Tokeniin yoo bahe caancala Meeshaalee irraa jijjiiri — inni duraa battalumatti du'a. Dameen tokko terminaalota hedduu (balbala tokkoof tokko) qabaachuu danda'a; namni damee kamiyyuu isaan kamirrattuu iskaanuu danda'a."
+      },
+      "heartbeat": {
+        "when": "Yeroo ka'u, achii daqiiqaa 5 hundatti",
+        "title": "Gara manaa bilbiluu",
+        "body": "Yeroo ka'u al tokko, achiis daqiiqaa 5 hundatti heartbeat ergi. Meeshichi galmaa'uu fi hojjechaa jiraachuu mirkaneessa, agarsiistuu Online paneelii keessaa soora, waan lamas deebisa: server_time — dha'annaa hundatti sa'aatii meeshichaa isaan sirreessi; sa'aatiin micciiramu \"argame\" calluma jedhee gara \"ture\" tti jijjiira — fi roster_version.",
+        "note": "roster_version walsimsiisa tarree isa dhumaa irratti kuufame wajjin walbira qabi. Adda ta'e → tarkaanfii 3 battalumatti raawwadhu. Walfakkaate → homaa hin godhin. Guyyaan calʼisaa baayitii tarree zeeroo baasa; kaardiin haaraa kennames daqiiqaa 5 keessatti hojjechuu jalqaba."
+      },
+      "roster": {
+        "when": "Yeroo roster_version jijjiiramu",
+        "title": "Tarree kaardii walsimsiisuu",
+        "body": "Tarree guutuu terminaalli kun fudhachuu qabu buusi: tarree UID kaardii diriiraa lama — barattootaa fi hojjettoota — damee fi hirmaattota meeshichaatiin daanga'an. Kaardiin kan tarreeffamu yoo hojiirra jiruu fi abbaan isaa amma iyyuu nama mana barumsichaa ta'e qofa: kaardiin bade, barataan bahe yookiin hojjetaan duraanii walsimsiisa itti aanutti ni bada. Gabatee naannoo bakka buusi, meta.version kuusi, xumurte.",
+        "note": "Haalota sadii qofa keessatti buusi: ka'umsa jalqabaa irratti, yeroo roster_version heartbeat isa kuufame irraa adda ta'u battalumatti, fi verzhiniin walfakkaatus sa'aatii 24 hundatti buufata guutuu dirqamaa tokko. UID qofa — maqaan hin jiru, bilbilli hin jiru, wanti dhuunfaa tokkollee meeshicha hin ga'u."
+      },
+      "gate": {
+        "when": "Tuttuqaa hundatti",
+        "title": "Balbala irratti mirkaneessuu — offline",
+        "body": "Tuttuqaan hundi naannootti murtaa'a: UID baayitii-4 kaardii F08 qubee hex gurguddaa 8'n bocii, tarree kuufame keessa barbaadi, battalumatti fudhadhu yookiin didaa. Tuttuqaa hunda karaa lamaanuu akka {uid, scanned_at} tti tarree eeggattuu galchi — tuttuqaan didames barbaachisaa dha: serverichi akka yaalii kaardii-hin-beekamnee yookiin kaardii-badee galmee iskaanii keessatti galmeessa; kaardiin hatame kanaan hubatama.",
+        "note": "scanned_at ISO 8601 offset sa'aatii wajjin ta'uu qaba (fkn. 2026-07-25T08:02:11+03:00). Tuttuqaa tokkoof galmee tokko — seensa/ba'iinsa fi argame/ture serverichi mataan isaa adda baasa."
+      },
+      "upload": {
+        "when": "Daqiiqaa 5 hundatti",
+        "title": "Tarree iskaanii erguu",
+        "body": "Daqiiqaa 5 hundatti iskaanii kuufame keessaa isaan moofaa 500 gaaffii tokkoon ergi (tarreen yoo gabaabbate hanga jiru; duwwaa yoo ta'e marsaa dhiisi). Taateen tokkoon tokkoon uid + scanned_at qofa — serverichi isaan irraa eenyummeessaa irra-deebii-ittisu mataa isaa uuma; kanaafuu meeshichi homaa hin lakkaa'u; erga yeroo offline turee booda kuusaa guutuu irra deebi'anii erguunis yeroo hunda nagaa dha. Galmeewwan ergaman kan haqxu yoo deebiin 200 ta'e qofa; haala biraa kamiyyuu irratti tarree osoo hin tuqin marsaa daqiiqaa 5 itti aanutti irra deebi'i.",
+        "note": "Tuttuqaan kaardii tokkoo lama sekondii tokko keessatti taatee tokkotti walitti makamu — debounce bilisaa. Hordoffiin booda shallagama; bu'aan iskaanii tokkoo tokkoo caancala Galmee iskaanii irratti mul'ata."
+      },
+      "recover": {
+        "when": "Yeroo rakkoon uumamu",
+        "title": "Dogoggoraa fi deebi'anii dandamachuu",
+        "e401": "401 — tokeniin hin beekamu, jijjiirameera yookiin meeshichi paneelii irraa dhaabbateera. Naannootti mirkaneessuu fi iskaanii kuusuu itti fufi; erguu daqiiqaa muraasa hundatti irra deebi'i.",
+        "e422": "422 — ba'aa dogoggoraa: uid yookiin scanned_at hin jiru, yookiin ergaa tokko keessatti taateewwan 500 ol. Gaafficha sirreessi; tarree eeggattuu gonkumaa hin gatin.",
+        "queue": "Iskaanii hin ergamin gonkumaa hin haqin. Iddoon tajaajilaa events irra-deebii waan liqimsuuf, erga walqunnamtiin deebi'ee booda tarree naannoo guutuu irra deebi'anii erguun yeroo hunda nagaa dha."
+      }
+    },
+    "storage": {
+      "title": "Terminaalota xixiqqaa (kuusaa 8–16 MB): sirriitti yoo kuufame ga'aa dha",
+      "t1": "Tarree akka gabatee binary tartiibaan kaa'ame (~baayitii 8 kaardii tokkoof) kuusiitii binary search tiin barbaadi — kaardiiwwan 15,000 ~120 KB dha; barbaachi hundis battalumaa dha. JSON yeroo walsimsiisaa al tokko hiikii achumaan gati.",
+      "t2": "Tarree iskaanii akka galmeewwan hamma-dhaabbataa faayilii geengoo keessatti qabadhu; erga erguun mirkanaa'ee booda qofa haqi — guyyaan guutuun iskaanii 30,000 gara 1 MB ti.",
+      "t3": "Accept-Encoding: gzip ergi — tarreen ~10× cuunfama; dameen nama 10,000 iyyuu daataa mobaayilaa 100 KB gadiin walsimsiisa."
+    },
+    "share": {
+      "title": "Liinkii qooddii ummataa",
+      "hint": "Qajeelfama kana nama paneelii alaa jiruuf qoodi — injinera firmware, dhiyeessaa. Liinkichi sanadoota qofa agarsiisa: daataan hin jiru, herregni hin jiru, seensi API hin jiru. Liinkii haaraa uumuun isa duraa battalumatti ajjeesa; «Dhaabbi» qooduu guutumaan guutuutti cufa.",
+      "active": "Hojii irra",
+      "off": "Cufaa",
+      "generate": "Liinkii uumi",
+      "rotate": "Liinkii haaraa",
+      "disable": "Dhaabbi",
+      "rotated": "Liinkiin haaraan uumameera — inni duraa du'eera.",
+      "disabledDone": "Liinkiin qooddii dhaabbateera.",
+      "invalidTitle": "Liinkiin kun kana booda hojii irra hin jiru",
+      "invalidHint": "Liinkichi jijjiirameera yookiin dhaabbateera. Temari.et irraa haaraa gaafadhu.",
+      "disableWarning": "Liinkichi nama isa qabu hundaaf battalumatti hojii dhaaba. Yeroo barbaaddetti haaraa uumuu dandeessa."
+    }
+  },
+  "bulk": {
+    "title": "Kaardii walitti qabaan kennuu",
+    "subtitle": "Damee filadhu, itti aansuudhaan tarree hordofii kaardii tuqi — kanneen mul'atan hundi kaardii hojii irra jiru hin qaban.",
+    "pickBranch": "Tarree hojii fe'uuf mana barumsaa fi damee filadhu.",
+    "allCarded": "Namoonni asii hundi duraanuu kaardii hojii irra jiru qabu.",
+    "scanMode": "Haala iskaanii",
+    "tapNow": "Kaardii amma tuqi…",
+    "readyCount": "{total} keessaa {ready} qophii",
+    "issueAll": "Kaardii {count} kenni",
+    "issued": "Kaardiin {count} kennameera.",
+    "types": {
+      "student": "Barattoota",
+      "employee": "Hojjettoota"
+    },
+    "allGrades": "Sadarkaa hunda",
+    "allSections": "Kutaa hunda",
+    "classColumn": "Kutaa",
+    "emptyFilter": "Kutaa kana keessa namni kaardii hin qabne hin jiru."
+  }
+}

@@ -31,7 +31,7 @@ class SystemHealthMonitoring extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()->can('page.system.health');
+        return Auth::user()?->can('page.system.health') ?? false;
     }
 
     protected function getHeaderActions(): array

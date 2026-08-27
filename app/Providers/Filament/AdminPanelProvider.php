@@ -32,10 +32,12 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
+            ->default()
             ->login(\App\Filament\Pages\Auth\Login::class)
             ->brandName('FINOTE TSIDIK')
-            ->brandLogo(fn () => asset('storage/logo.png'))
-            ->brandLogoHeight('80px')
+            ->brandLogo(fn () => asset('images/logow.PNG'))
+            ->darkModeBrandLogo(fn () => asset('images/logo2.png'))
+            ->brandLogoHeight('2.75rem')
             ->colors([
                 'primary' => '#1941F5',
                 'danger' => '#C0392B',
@@ -59,7 +61,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->favicon(asset('storage/logo.png'))
+            ->favicon(asset('images/logo2.png'))
             ->pages([
                 Dashboard::class,
                 \App\Filament\Pages\Auth\ChangeInitialPassword::class,
@@ -102,11 +104,11 @@ class AdminPanelProvider extends PanelProvider
             )
             ->renderHook(
                 PanelsRenderHook::BODY_END,
-                fn (): string => view('filament.components.pwa-admin-scripts'),
+                fn (): string => (string) view('filament.components.pwa-admin-scripts')->render(),
             )
             ->renderHook(
                 PanelsRenderHook::BODY_START,
-                fn (): string => view('filament.components.tour-init'),
+                fn (): string => (string) view('filament.components.tour-init')->render(),
             )
             ->authMiddleware([
                 Authenticate::class,

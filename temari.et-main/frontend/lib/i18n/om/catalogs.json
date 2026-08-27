@@ -1,0 +1,203 @@
+{
+  "title": "Kataloogota pilaatfoormii",
+  "subtitle": "Ragaa bu'uuraa manneen barnootaa hundi irratti ijaaraman — hojjettoota Temari.et'n kan qindaa'u.",
+  "navLabel": "Kataloogota",
+  "loadFailed": "Kataloogii fe'uun hin danda'amne.",
+  "fields": {
+    "code": "Koodii",
+    "name": "Maqaa"
+  },
+  "columns": {
+    "usage": "Tajaajila irra"
+  },
+  "items": {
+    "subjects": {
+      "title": "Gosoota barnootaa",
+      "description": "Kaarikulamii biyyaalessaa fi gosoota barnootaa dabalataa mana barumsaa tokkoo tokkoo.",
+      "attention": "{count} hin sochoone"
+    },
+    "gradeLevels": {
+      "title": "Sadarkaalee kutaa",
+      "description": "Gulantaa biyyaalessaa murtaa'e: KG-1 hanga Kutaa 12.",
+      "attention": ""
+    },
+    "banks": {
+      "title": "Baankotaa fi waaleetota",
+      "description": "Baankota Itoophiyaa fi waaleetota mobaayilii manneen barnootaa kaffaltii ittiin sassaaban.",
+      "attention": "{count} hin sochoone"
+    },
+    "healthConditions": {
+      "title": "Haala fayyaa",
+      "description": "Tarree haalota galmeessitoonni yeroo galmee keessaa filatan.",
+      "attention": "{count} hin sochoone"
+    },
+    "directory": {
+      "title": "Kuusaa manneen barnootaa",
+      "description": "Manneen barnootaa Itoophiyaa hundi — Temari irra jiranis ta'e kan hin jirre — akka \"mana barumsaa duraa\" itti fayyadamu.",
+      "attention": "{count} gamaaggama barbaadu"
+    },
+    "notifications": {
+      "title": "Taateewwan beeksisaa",
+      "description": "Beeksisawwan pilaatfoormichi erguu danda'u hundaa fi kamtu SMS fayyadamuu danda'u."
+    }
+  },
+  "subjects": {
+    "create": "Barnoota dabali",
+    "createTitle": "Barnoota kaarikulamii dabali",
+    "editTitle": "Barnoota gulaali",
+    "created": "Barnoonni dabalameera.",
+    "updated": "Barnoonni haaromfameera.",
+    "deleted": "Barnoonni haqameera.",
+    "namePlaceholder": "fkn. Herrega",
+    "searchPlaceholder": "Maqaa ykn koodiidhaan barbaadi…",
+    "empty": "Barnoonni wal hin simne. Gingilchaa sirreessi ykn dabali.",
+    "category": "Ramaddii",
+    "noCategory": "Ramaddii hin qabu",
+    "categories": {
+      "language": "Afaan",
+      "mathematics": "Herrega",
+      "natural_science": "Saayinsii uumamaa",
+      "social_science": "Saayinsii hawaasaa",
+      "technology": "Teeknooloojii",
+      "arts_pe": "Aartii fi ispoortii",
+      "vocational": "Ogummaa"
+    },
+    "gradeWindow": "Kutaalee",
+    "grades": "Kutaalee itti kennamu",
+    "gradesSelected": "{count} filatamaniiru",
+    "gradesHint": "Kutaalee sirrii filadhu — addaan cituun ni danda'ama. Maqaa marsaa tuquun hunda jijjiira. Duwwaa yoo ta'e kutaalee hundatti kennama. Gabatee barsiisuu seemisteraa qajeelcha.",
+    "allGrades": "Kutaalee hunda",
+    "weight": "Ulfaatina",
+    "weights": {
+      "1": "baay'ee salphaa",
+      "2": "salphaa",
+      "3": "giddu-galeessa",
+      "4": "ulfaataa",
+      "5": "baay'ee ulfaataa"
+    },
+    "weightHint": "Ba'aa sammuu — sagantaan yeroo barnoota ulfaataa yeroo ganamaa dursisa.",
+    "roomType": "Kutaa",
+    "roomTypes": {
+      "lab": "Laaboraatorii",
+      "library": "Mana kitaabaa",
+      "ict": "Kutaa ICT",
+      "gym": "Jiimii / dirree",
+      "music": "Kutaa muuziqaa",
+      "art": "Kutaa aartii",
+      "hall": "Galma"
+    },
+    "roomTypeHint": "Sagantaan yeroo kutaa duwwaa gosa kanaa ofumaan qabata.",
+    "ownClassroom": "Kutaa barnootaa mataa isaa",
+    "origin": "Madda",
+    "platform": "Pilaatfoormii",
+    "custom": "Dabalata mana barumsaa",
+    "usageCount": "ramaddii {count}"
+  },
+  "gradeLevels": {
+    "create": "Sadarkaa dabali",
+    "createTitle": "Sadarkaa kutaa dabali",
+    "editTitle": "Sadarkaa kutaa gulaali",
+    "created": "Sadarkaan kutaa uumameera.",
+    "updated": "Sadarkaan kutaa haaromfameera.",
+    "deleted": "Sadarkaan kutaa haqameera.",
+    "namePlaceholder": "fkn. Kutaa 9",
+    "cycle": "Marsaa",
+    "cycles": {
+      "kindergarten": "Mana barnoota daa'immanii",
+      "lower_primary": "Sadarkaa 1ffaa (gadi)",
+      "upper_primary": "Sadarkaa 1ffaa (oli)",
+      "secondary": "Sadarkaa 2ffaa",
+      "preparatory": "Qophaa'ina"
+    },
+    "sortOrder": "Iddoo gulantaa irra",
+    "sortOrderHint": "Foddaa kutaa barnootaas hidhata — of eeggannoodhaan jijjiiri.",
+    "nationalExam": "Waggaa qormaata biyyaalessaa",
+    "nationalExamHint": "Kutaan 6, 8 fi 12 qormaata biyyaalessaa fudhatu.",
+    "nationalExamBadge": "Qormaata biyyaalessaa",
+    "sectionsCount": "manneen barnootaa hunda keessatti daree {count}",
+    "emptyTitle": "Sadarkaan kutaa hin jiru",
+    "emptyDescription": "Gulantaan biyyaalessaa duraan facaafama — sadarkaalee isaa asitti dabali.",
+    "reordered": "Tartiibni haaromfameera.",
+    "gridHint": "Sadarkaa jijjiiruuf tarree qabduu isaatiin harkisi. Koodii fi maqaa achuma keessatti gulaali, marsaa filadhu, yookiin qabduu qormaata biyyaalessaa jijjiiri — jijjiirraan hundi ofuma isaatiin ni kuufama.",
+    "nationalExamShort": "Qormaata biyyaa",
+    "dragHandle": "Tartiibuuf harkisi"
+  },
+  "banks": {
+    "create": "Baankii dabali",
+    "createTitle": "Baankii ykn waaleetii dabali",
+    "editTitle": "Baankii gulaali",
+    "created": "Baankiin gara kataloogiitti dabalameera.",
+    "updated": "Baankiin haaromfameera.",
+    "deleted": "Baankiin haqameera.",
+    "namePlaceholder": "fkn. Awash Bank",
+    "codeHint": "Furtuu maashinii dhaabbataa — faayilii asxaa /images/banks jala jirus moggaasa.",
+    "type": "Gosa",
+    "types": {
+      "bank": "Baankii",
+      "wallet": "Waaleetii mobaayilii"
+    },
+    "activeHint": "Baankonni hin sochoone filannoo manneen barnootaa keessaa dhokatu.",
+    "searchPlaceholder": "Maqaa ykn koodiidhaan barbaadi…",
+    "empty": "Baankiin wal hin simne. Gingilchaa sirreessi ykn dabali.",
+    "accountsCount": "herrega {count}"
+  },
+  "health": {
+    "create": "Haala dabali",
+    "createTitle": "Haala fayyaa dabali",
+    "editTitle": "Haala fayyaa gulaali",
+    "created": "Haalli fayyaa dabalameera.",
+    "updated": "Haalli fayyaa haaromfameera.",
+    "deleted": "Haalli fayyaa haqameera.",
+    "namePlaceholder": "fkn. Asmii",
+    "category": "Ramaddii",
+    "categories": {
+      "allergy": "Alarjii",
+      "chronic": "Dhukkuba yeroo dheeraa",
+      "neurological": "Kan narvii",
+      "physical": "Kan qaamaa",
+      "sensory": "Argaa / dhaga'uu",
+      "mental_health": "Fayyaa sammuu fi guddina",
+      "blood": "Rakkoo dhiigaa",
+      "other": "Kan biraa"
+    },
+    "activeHint": "Haalonni hin sochoone filannoo galmee keessaa dhokatu.",
+    "searchPlaceholder": "Haalota barbaadi…",
+    "empty": "Haalli wal hin simne. Gingilchaa sirreessi ykn dabali.",
+    "studentsCount": "barattoota {count}"
+  },
+  "directory": {
+    "create": "Mana barumsaa dabali",
+    "createTitle": "Mana barumsaa gara kuusaatti dabali",
+    "editTitle": "Galmee kuusaa gulaali",
+    "created": "Manni barumsaa gara kuusaatti dabalameera.",
+    "updated": "Galmeen kuusaa haaromfameera.",
+    "deleted": "Galmeen kuusaa haqameera.",
+    "namePlaceholder": "fkn. Mana Barumsaa Qulqulluu Yoseef",
+    "region": "Naannoo",
+    "regionPlaceholder": "fkn. Finfinnee",
+    "zone": "Godina",
+    "city": "Magaalaa",
+    "cityPlaceholder": "fkn. Adaamaa",
+    "verified": "Mirkanaa'e",
+    "verifiedHint": "Galmeewwan mirkanaa'an filannoo \"mana barumsaa duraa\" keessatti dursanii mul'atu.",
+    "verifiedBadge": "Mirkanaa'e",
+    "verifiedToast": "Galmeen kuusaa mirkanaa'eera.",
+    "needsReview": "Gamaaggama barbaada",
+    "verify": "Mirkaneessi",
+    "location": "Iddoo",
+    "onPlatform": "Argama",
+    "onTemari": "Temari irra",
+    "offPlatform": "Pilaatfoormii ala",
+    "addedBy": "{school}'n kan dabalame",
+    "searchPlaceholder": "Mana barumsaa, magaalaa ykn godinaan barbaadi…",
+    "empty": "Manni barumsaa wal hin simne. Gingilchaa sirreessi ykn dabali."
+  },
+  "notifications": {
+    "title": "Taateewwan beeksisaa",
+    "subtitle": "Taateewwan kamtu SMS erguu akka danda'an to'adhu — ergaan tokkoon tokkoon qarshii baasisa",
+    "costNote": "SMSn tokkoon tokkoon qarshii baasisa. Beeksisawwan keessoo appii bilisaa fi yeroo hunda banaa dha; taateewwan armaan gadii hayyamaman qofatu SMS erguu danda'a.",
+    "enabledCount": "Taateewwan {count} SMS erguu danda'u.",
+    "critical": "Murteessaa",
+    "saved": "Tarreen haaromfameera."
+  }
+}

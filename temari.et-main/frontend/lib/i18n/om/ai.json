@@ -1,0 +1,218 @@
+{
+  "title": "Temari AI",
+  "navLabel": "Temari AI",
+  "newChat": "Haasawa haaraa",
+  "history": "Haasawwan",
+  "greeting": "Akkam {name}, maaliin si gargaaru?",
+  "greetingHints": {
+    "school": "Gargaaraa mana barumsaa keetii — qabxii, argamuu, galmee, kaffaltii fi kanneen biroo. Asii gaditti waan fedhe gaafadhu.",
+    "family": "Gargaaraa barnootaa keetii — qabxii, argamuu, hojii manaa fi akkaataa fooyya'uu. Asii gaditti waan fedhe gaafadhu.",
+    "platform": "Gargaaraa keessoo Temari.et. Asii gaditti waan fedhe gaafadhu."
+  },
+  "searchPlaceholder": "Haasawa barbaadi…",
+  "pickTitle": "Haasawa filadhu yookiin haaraa jalqabi",
+  "pickBody": "Haasawaan AI kee siif qofa dhuunfaadha.",
+  "noAccess": {
+    "title": "Temari AI asitti hin argamu",
+    "description": "Herrega kana yookiin iddoo hojii kanaaf gargaaraan AI ammallee hin bananne."
+  },
+  "groups": {
+    "pinned": "Kan maxxanfaman",
+    "today": "Har'a",
+    "yesterday": "Kaleessa",
+    "week": "Guyyoota 7 darban",
+    "older": "Kan duraanii"
+  },
+  "lanes": {
+    "student": "Gargaaraa barnootaa",
+    "parent": "Gargaaraa maatii",
+    "teacher": "Gargaaraa barsiisaa",
+    "leadership": "Xiinxala mana barumsaa",
+    "registrar": "Gargaaraa galmeessaa",
+    "finance": "Gargaaraa faayinaansii",
+    "platform": "Gargaaraa pilaatfoormii"
+  },
+  "assistants": {
+    "school": "Gargaaraa mana barumsaa"
+  },
+  "suggestions": {
+    "student": [
+      "Gosa barnootaa kamitti dadhabaadha? Akkamittan fooyya'a?",
+      "Footosinteesisii sadarkaa kutaa kootiin naaf ibsi",
+      "Torban lamaan dhufaniif karoora qo'annoo naaf qopheessi",
+      "Qormaata darbe irratti maaliif qabxii dhabe?"
+    ],
+    "parent": [
+      "Mucaan koo semistara kana akkam jira?",
+      "Mucaan koo hojii manaa hafe qabaa?",
+      "Kaffaltiin mana barumsaa hammam natti hafa?",
+      "Argamsi mucaa kootii akkam?"
+    ],
+    "teacher": [
+      "Kutaaleen koo madaallii darbe irratti akkam hojjetan?",
+      "Mata duree torban kanaa irratti gaaffii 5 uumi",
+      "Barattoota koo keessaa eenyutu deeggarsa dabalataa barbaada?",
+      "Yaada kaardii gabaasaa barataa tokkoof qopheessi"
+    ],
+    "leadership": [
+      "Semistara kana gosti barnootaa hundarra dadhabaan kami?",
+      "Barattoonni kamtu balaa keessa jiru? Maaliif?",
+      "Kutaalee kutaa 9ffaa walbira qabi",
+      "Argamsa ji'a darbee gabaabbini"
+    ],
+    "registrar": [
+      "Xalayaa ragaa qopheessi",
+      "Bara kana barattoonni meeqa galan? Meeqa bahan?",
+      "Galmee barataa argadhu",
+      "Waamicha walga'ii maatii Afaan Oromootiin qopheessi"
+    ],
+    "finance": [
+      "Sassaabbiin kaffaltii bara kana akkam deema?",
+      "Waa'ee idaa eenyu hordofuu qabna?",
+      "Baasii akaakuudhaan gabaabbini",
+      "Umurii inbooyisii yeroon isaanii darbee natti agarsiisi"
+    ],
+    "platform": [
+      "Pilaatfoormii irra manneen barnootaa meeqa jiru?",
+      "Galmeen AI sochii qabu meeqa qabna?",
+      "Mana barumsaa haaraaf yaadannoo simannaa qopheessi",
+      "Guddina pilaatfoormii gabaabbini"
+    ]
+  },
+  "composer": {
+    "placeholder": "Waan fedhe gaafadhu…",
+    "placeholderChild": "Waa'ee {name} gaafadhu…",
+    "send": "Ergi",
+    "stop": "Dhaabi",
+    "attach": "Suuraa yookiin faayilii maxxansi",
+    "removeAttachment": "Maxxansaa balleessi",
+    "imageAlt": "maxxansaa"
+  },
+  "thread": {
+    "welcome": "Akkamittan si gargaara?",
+    "back": "Deebi'i",
+    "thinking": "Yaadaa jira…",
+    "working": "Odeeffannoo barbaadaa jira…",
+    "error": "Rakkoon uumameera. Irra deebi'ii yaali.",
+    "disclaimer": "Temari AI dogoggora hojjechuu danda'a. Odeeffannoo barbaachisaa mirkaneeffadhu.",
+    "copy": "Garagalchi",
+    "copied": "Garagalfameera",
+    "feedbackUp": "Deebii gaarii",
+    "feedbackDown": "Deebii dadhabaa",
+    "feedbackThanks": "Yaada keetiif galatoomi",
+    "regenerate": "Deebii irra deebi'ii hojjedhu",
+    "jumpToLatest": "Gara dhumaatti darbi"
+  },
+  "attachment": {
+    "download": "Faayilii buufadhu",
+    "file": "Faayilii",
+    "preview": "Duraan ilaali"
+  },
+  "session": {
+    "rename": "Maqaa jijjiiri",
+    "pin": "Maxxansi",
+    "unpin": "Buqqisi",
+    "delete": "Haqi",
+    "renameTitle": "Maqaa haasawaa jijjiiri",
+    "renameSave": "Olkaa'i",
+    "deleteConfirm": "Haasawaan kun fi seenaan isaa ni haqamu."
+  },
+  "quota": {
+    "remainingToday": "Har'a ergaawwan {count} hafan",
+    "limitReached": "Daangaa har'aa geesseetta",
+    "limitReachedFree": "Ergaawwan bilisaa har'aa fixatteetta",
+    "upgradeCta": "Temari AI argadhu",
+    "schoolPlanNote": "AI mana barumsaa guutuun School Plan mana barumsaa keetii waliin dhufa — bulchaa kee gaafadhu."
+  },
+  "upgrade": {
+    "title": "Temari AI",
+    "subtitle": "Barsiisaa AI dhuunfaa keetii fi gargaaraa maatii",
+    "price": "Qarshii {price} / guyyoota {days}",
+    "features": [
+      "Barattootaaf barsiisuu AI daangaa hin qabne",
+      "Waa'ee qabxii, argamsaa fi kaffaltii Afaan Oromoo, Amaariffaa yookiin Ingiliffaan gaafadhu",
+      "Gargaarsa suuraa hojii manaa fi sakatta'iinsa dogoggoraa",
+      "Qophii qormaata kutaa 6, 8 fi 12"
+    ],
+    "payWith": "Kaffali",
+    "subscribe": "Galmaa'i",
+    "active": "Hanga {date} sochii qaba",
+    "renew": "Galmee dheeressi"
+  },
+  "assist": {
+    "button": "Gargaarsa AI",
+    "generate": "Uumi",
+    "insert": "Wixinee fayyadami",
+    "draftNote": "Wixineewwan AI yaada qofa — osoo hin olkaa'in sakatta'i.",
+    "count": "Gaaffii meeqa",
+    "detailsLabel": "Bal'ina xalayaa (maqaa, guyyaa, kaayyoo)",
+    "titles": {
+      "quiz_questions": "Gaaffilee uumi",
+      "report_comment": "Yaada kaardii gabaasaa qopheessi",
+      "lesson_week": "Barnoota torbanii qopheessi",
+      "parent_message": "Ergaa maatii qopheessi",
+      "letter": "Xalayaa qopheessi"
+    },
+    "topicLabel": {
+      "quiz_questions": "Mata duree",
+      "lesson_week": "Boqonnaa haguugamu",
+      "parent_message": "Ergaan waa'ee maali?"
+    },
+    "subject": "Gosa barnootaa",
+    "grade": "Kutaa",
+    "types": "Gosoota gaaffii",
+    "typeOptions": {
+      "mcq_single": "Filannoo",
+      "true_false": "Dhugaa / Soba",
+      "short_answer": "Deebii gabaabaa",
+      "matching": "Walsimsiisuu",
+      "passage": "Barruu dubbisaa"
+    },
+    "difficulty": "Ulfaatina",
+    "difficultyOptions": {
+      "mixed": "Makaa",
+      "easy": "Salphaa",
+      "medium": "Giddu-galeessa",
+      "hard": "Ulfaataa"
+    },
+    "language": "Afaan",
+    "languageOptions": {
+      "en": "English",
+      "am": "አማርኛ",
+      "om": "Afaan Oromoo"
+    },
+    "topicCustom": "Yookiin mata-duree kee barreessi…",
+    "customInstructions": "Qajeelfama dabalataa",
+    "customInstructionsHint": "Wanti AI hordofuu qabu kamiyyuu — fkn. \"rakkoolee jechaan irratti xiyyeeffadhu\", \"fakkeenyota Itoophiyaa fayyadami\"…"
+  },
+  "choices": {
+    "send": "Filannoo ergi"
+  },
+  "sendCard": {
+    "kind": {
+      "family": "Maatii barataaf",
+      "staff": "Ergaa kallattii",
+      "channel": "Beeksisa"
+    },
+    "send": "Ergaa ergi",
+    "sent": "Ergameera",
+    "pending": "Hayyama eegaa jira",
+    "sentNote": "Gara Ergaalee ergameera",
+    "pendingNote": "Maatiin arguun dura hayyama mana barumsaa eegaa jira",
+    "edit": "Ergaa gulaali",
+    "cancelEdit": "Gulaallii dhiisi",
+    "reset": "Jijjiirama deebisi",
+    "bodyLabel": "Barreeffama ergaa",
+    "showMore": "Dabalata agarsiisi",
+    "showLess": "Xiqqeessi",
+    "open": "Ergaalee keessatti bani",
+    "failed": "Ergaa erguun hin danda'amne. Irra deebi'ii yaali."
+  },
+  "examCard": {
+    "loading": "Qormaatni fe'amaa jira…",
+    "failed": "Qormaata kana fe'uun hin danda'amne.",
+    "open": "Istuudiyoo qormaataa keessatti bani",
+    "minutes": "daqiiqaa {count}",
+    "partQuestions": "gaaffilee {count}"
+  }
+}

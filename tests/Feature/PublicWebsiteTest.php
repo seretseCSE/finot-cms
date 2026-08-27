@@ -34,11 +34,19 @@ class PublicWebsiteTest extends TestCase
 
 
     #[Test]
-    public function blog_index_page_loads(): void
+    public function home_page_uses_editorial_layout(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('ft-hero', false);
+        $response->assertDontSee('home-legacy');
+    }
+
+    #[Test]
+    public function blog_index_redirects_to_news(): void
     {
         BlogPost::factory()->create(['status' => 'Published', 'published_at' => now()]);
-        $response = $this->get('/blog');
-        $response->assertStatus(200);
+        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
     }
 
     #[Test]
@@ -71,10 +79,9 @@ class PublicWebsiteTest extends TestCase
     }
 
     #[Test]
-    public function events_page_loads(): void
+    public function events_page_redirects_to_news(): void
     {
-        $response = $this->get('/events');
-        $response->assertStatus(200);
+        $this->get('/events')->assertRedirect(route('news', ['tab' => 'events']));
     }
 
     #[Test]
@@ -92,10 +99,9 @@ class PublicWebsiteTest extends TestCase
     }
 
     #[Test]
-    public function songs_page_loads(): void
+    public function songs_page_redirects_to_media(): void
     {
-        $response = $this->get('/songs');
-        $response->assertStatus(200);
+        $this->get('/songs')->assertRedirect(route('media', ['tab' => 'songs']));
     }
 
     #[Test]

@@ -1,0 +1,277 @@
+{
+  "title": "Devices & ID cards",
+  "subtitle": "RFID attendance terminals, the card register, scans and parent alerts.",
+  "tabs": {
+    "devices": "Devices",
+    "cards": "ID cards",
+    "scans": "Scan log",
+    "messages": "Alerts sent",
+    "requests": "Card requests",
+    "api": "Integration API"
+  },
+  "device": {
+    "add": "Register device",
+    "edit": "Edit device",
+    "register": "Register",
+    "sheetHint": "A terminal at a gate or staff room. You will get its access token after registering.",
+    "empty": "No devices registered yet.",
+    "updated": "Device updated.",
+    "removed": "Device removed.",
+    "removeWarning": "\"{name}\" will stop syncing immediately. Its past scans are kept.",
+    "rotate": "New token",
+    "online": "Online",
+    "disabled": "Disabled",
+    "neverSeen": "Never connected",
+    "justNow": "Just now",
+    "minutesAgo": "{count} min ago",
+    "hoursAgo": "{count} h ago",
+    "daysAgo": "{count} d ago",
+    "pending": "{count} queued",
+    "columns": {
+      "device": "Device",
+      "audience": "Used for",
+      "status": "Status",
+      "scansToday": "Scans today",
+      "enabled": "Enabled"
+    },
+    "audiences": {
+      "students": "Students",
+      "employees": "Employees",
+      "both": "Students & employees"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g. Main gate",
+      "location": "Location",
+      "locationPlaceholder": "e.g. Front entrance",
+      "serial": "Serial number",
+      "audience": "Used for",
+      "audienceHelp": "One terminal can serve students, employees, or both — cards decide who is who.",
+      "active": "Active",
+      "activeHelp": "Disabled devices are rejected when they try to sync."
+    },
+    "tokenTitle": "Access token — {name}",
+    "tokenHint": "Copy this into the terminal now. For security it is shown only once — rotate to get a new one.",
+    "tokenDone": "I saved it",
+    "enabledShort": "Enabled",
+    "enabledDone": "Device enabled — it can sync again.",
+    "disabledDone": "Device disabled — its syncs are rejected.",
+    "enableTitle": "Enable “{name}”?",
+    "enableHint": "The terminal will be able to sync scans again.",
+    "disableTitle": "Disable “{name}”?",
+    "disableHint": "The terminal keeps scanning locally but every sync is rejected until re-enabled — the school falls back to manual attendance. Its queued scans upload once re-enabled."
+  },
+  "cards": {
+    "issue": "Issue card",
+    "issueAction": "Issue",
+    "issued": "Card issued.",
+    "issueHint": "Pick the person, then tap the new card on your reader (or type its UID).",
+    "empty": "No cards issued yet.",
+    "markLost": "Mark lost",
+    "markedLost": "Card marked lost — scans now reject it.",
+    "revokedDone": "Card revoked.",
+    "replace": "Replace",
+    "issueReplacement": "Issue replacement",
+    "replaced": "Replacement card issued.",
+    "replaceTitle": "New card for {name}",
+    "replaceHint": "Tap or type the NEW card's UID. The old one stays rejected.",
+    "deactivateWarning": "Scans of {name}'s card will be rejected until a replacement is issued. Use manual attendance meanwhile.",
+    "columns": {
+      "holder": "Holder",
+      "uid": "Card UID",
+      "status": "Status",
+      "issued": "Issued"
+    },
+    "holderTypes": {
+      "student": "Student",
+      "employee": "Employee"
+    },
+    "statuses": {
+      "active": "Active",
+      "lost": "Lost",
+      "revoked": "Revoked",
+      "replaced": "Replaced"
+    },
+    "fields": {
+      "holderType": "Card for",
+      "personPlaceholder": "Search by name…",
+      "noMatches": "No matches.",
+      "uid": "Card UID",
+      "uidPlaceholder": "Tap card on reader…",
+      "uidHelp": "USB card readers type the UID for you — keep this field focused and tap the card.",
+      "issuedOn": "Issue date",
+      "reason": "What happened?",
+      "note": "Note",
+      "notePlaceholder": "Optional note…",
+      "reportNotePlaceholder": "Anything Temari.et should know (e.g. deliver with next batch)…"
+    },
+    "loadFailed": "Failed to load the card register.",
+    "searchPlaceholder": "Search name or card UID…",
+    "bulkIssue": "Bulk issue",
+    "reportLost": "Report lost",
+    "reported": "Card reported — Temari.et will deliver a replacement.",
+    "reportTitle": "Report {name}'s card",
+    "reportHint": "The card is blocked immediately and a replacement request goes to Temari.et. Use the manual register until the new card arrives.",
+    "reportAction": "Report & request replacement",
+    "revoke": "Revoke",
+    "revokeWarning": "{name}'s card will stop working immediately. No replacement request is opened."
+  },
+  "scans": {
+    "allDevices": "All devices",
+    "allOutcomes": "All outcomes",
+    "total": "{count} scans",
+    "empty": "No scans recorded.",
+    "columns": {
+      "time": "Time",
+      "person": "Person",
+      "card": "Card",
+      "device": "Device",
+      "outcome": "Outcome"
+    },
+    "statuses": {
+      "processed": "Recorded",
+      "pending": "Processing",
+      "unknown_card": "Unknown card",
+      "inactive_card": "Lost/revoked card",
+      "no_enrollment": "No active enrollment",
+      "closed_term": "Closed semester"
+    }
+  },
+  "messages": {
+    "meter": "{count} SMS this month",
+    "allChannels": "All channels",
+    "email": "Email",
+    "failed": "Failed",
+    "empty": "No alerts sent yet.",
+    "about": {
+      "absent": "Absent",
+      "late": "Late"
+    },
+    "columns": {
+      "date": "Day",
+      "student": "Student",
+      "guardian": "Guardian",
+      "about": "About",
+      "channel": "Channel"
+    }
+  },
+  "requests": {
+    "openOnly": "Open requests",
+    "all": "All requests",
+    "openCount": "{count} open",
+    "empty": "No card requests.",
+    "updated": "Request updated.",
+    "by": "by {name}",
+    "awaitingChip": "awaiting new card",
+    "statuses": {
+      "requested": "Requested",
+      "accepted": "Accepted",
+      "preparing": "Preparing card",
+      "delivering": "Delivering",
+      "delivered": "Delivered",
+      "rejected": "Rejected"
+    },
+    "reasons": {
+      "lost": "Lost card",
+      "damaged": "Damaged card",
+      "new": "New card"
+    },
+    "actions": {
+      "accept": "Accept",
+      "issueChip": "Issue card",
+      "startDelivery": "Start delivery",
+      "markDelivered": "Mark delivered",
+      "reject": "Reject"
+    }
+  },
+  "api": {
+    "title": "Device integration guide",
+    "intro": "How an attendance terminal talks to Temari.et — three endpoints, one token, offline-first. The terminal keeps its branch's card list locally, decides every tap on the spot with no network, and syncs in the background. Cards are F08 NFC chips: the 4-byte UID, written as 8 uppercase hex characters, is the only identity the device ever handles. Every cadence below is exact — implement it as written.",
+    "baseUrl": "Base URL",
+    "tokenHeader": "Header on every request",
+    "authNote": "No request carries a device ID — the token itself IS the device's identity, unique per terminal, so the server always knows which device (and which branch) is calling. A device can never read or write outside its own branch, and it never sees names, phones or any personal data.",
+    "request": "Request",
+    "response": "Response",
+    "example": "Example",
+    "copy": "Copy",
+    "copied": "Copied",
+    "steps": {
+      "provision": {
+        "when": "Once per terminal",
+        "title": "Register & provision",
+        "body": "Register the terminal on the Devices tab — its access token is shown exactly once. Write the token and the base URL into the device's own flash storage so they survive reboots and firmware updates. On the LILYGO T-SIM7670G-S3 store them in NVS via the serial provisioning console: plug in USB-C, open a serial terminal at 115200 baud, type the three commands, done.",
+        "note": "Never bake a token into the firmware image: every terminal runs the same firmware but carries its OWN token. If a token leaks, rotate it from the Devices tab — the old one dies instantly. One branch can run many terminals (one per gate); anyone in the branch can scan on any of them."
+      },
+      "heartbeat": {
+        "when": "On boot, then every 5 minutes",
+        "title": "Phone home",
+        "body": "Send a heartbeat once on boot and then every 5 minutes. It confirms the device is registered and enabled, powers the Online indicator in the panel, and returns two things: server_time — set the device clock from it on every single beat, a drifting clock silently turns \"present\" into \"late\" — and roster_version.",
+        "note": "Compare roster_version with the version stored at the last roster sync. Different → run step 3 immediately. Identical → do nothing. A quiet day costs zero roster bytes, and a newly issued card starts working within 5 minutes."
+      },
+      "roster": {
+        "when": "When roster_version changes",
+        "title": "Sync the card list",
+        "body": "Pull the full list this terminal should accept: two flat arrays of card UIDs — students and employees — scoped to the device's branch and audience. A card is listed only while it is active AND its holder is still current: a lost card, a withdrawn student or a former employee disappears at the next sync. Replace the local table, store meta.version, done.",
+        "note": "Pull in exactly three cases: on first boot, immediately when a heartbeat's roster_version differs from the stored one, and one forced full pull every 24 hours even if the version matches. UIDs only — no names, no phones, nothing personal ever reaches the device."
+      },
+      "gate": {
+        "when": "On every tap",
+        "title": "Verify at the gate — offline",
+        "body": "Every tap is decided locally: format the F08 card's 4-byte UID as 8 uppercase hex characters, look it up in the stored list, and accept or reject on the spot. Queue every tap either way as {uid, scanned_at} — rejected taps matter too: the server records them as unknown-card or lost-card attempts in the scan log, which is how a stolen card gets noticed.",
+        "note": "scanned_at must be ISO 8601 with a timezone offset (e.g. 2026-07-25T08:02:11+03:00). One record per tap — the server itself works out check-in vs check-out, present vs late."
+      },
+      "upload": {
+        "when": "Every 5 minutes",
+        "title": "Upload the scan queue",
+        "body": "Every 5 minutes, send the oldest 500 queued scans in one request (fewer if the queue is shorter; skip the cycle if it is empty). Each event is just uid + scanned_at — the server derives its own duplicate-proof id from them, so the device numbers nothing and re-sending an entire backlog after an offline stretch is always safe. Delete the sent records only when the response status is 200; on any other status keep the queue untouched and retry at the next 5-minute cycle.",
+        "note": "Two taps of the same card in the same second collapse into one event — free debounce. Attendance is derived asynchronously; per-scan outcomes appear in the Scan log tab."
+      },
+      "recover": {
+        "when": "When things go wrong",
+        "title": "Errors & recovery",
+        "e401": "401 — the token is unknown, rotated, or the device was disabled from the panel. Keep verifying and queuing scans locally; retry the upload every few minutes.",
+        "e422": "422 — malformed payload: missing uid or scanned_at, or more than 500 events in one batch. Fix the request; never discard the queue.",
+        "queue": "Never delete unsent scans. The events endpoint swallows duplicates, so replaying the entire local queue after connectivity returns is always safe."
+      }
+    },
+    "storage": {
+      "title": "Small terminals (8–16 MB storage): plenty, if stored right",
+      "t1": "Store the roster as a sorted binary table (~8 bytes per card) and binary-search it — 15,000 cards is ~120 KB and every lookup is instant. Parse the JSON once on sync, then throw it away.",
+      "t2": "Keep the scan queue as fixed-size records in a ring file, deleted only after the upload is acknowledged — a full day of 30,000 scans is about 1 MB.",
+      "t3": "Send Accept-Encoding: gzip — the roster compresses ~10×, so even a 10,000-person branch syncs in under 100 KB of mobile data."
+    },
+    "share": {
+      "title": "Public share link",
+      "hint": "Share this exact guide with someone outside the panel — a firmware engineer, a vendor. The link shows the docs and nothing else: no data, no accounts, no API access. Generating a new link kills the old one instantly; Disable turns sharing off altogether.",
+      "active": "Active",
+      "off": "Off",
+      "generate": "Generate link",
+      "rotate": "New link",
+      "disable": "Disable",
+      "rotated": "New link generated — the old link is dead.",
+      "disabledDone": "Share link disabled.",
+      "invalidTitle": "This link is no longer active",
+      "invalidHint": "The link was rotated or disabled. Ask Temari.et for a fresh one.",
+      "disableWarning": "The link stops working immediately for everyone who has it. You can generate a new one anytime."
+    }
+  },
+  "bulk": {
+    "title": "Bulk card issue",
+    "subtitle": "Pick a branch, then tap chips down the list — everyone shown has no active card.",
+    "pickBranch": "Pick a school and branch to load the worklist.",
+    "allCarded": "Everyone here already has an active card.",
+    "scanMode": "Scan mode",
+    "tapNow": "Tap card now…",
+    "readyCount": "{ready} of {total} ready",
+    "issueAll": "Issue {count} cards",
+    "issued": "{count} cards issued.",
+    "types": {
+      "student": "Students",
+      "employee": "Employees"
+    },
+    "allGrades": "All grades",
+    "allSections": "All sections",
+    "classColumn": "Class",
+    "emptyFilter": "No one in this class is missing a card."
+  }
+}

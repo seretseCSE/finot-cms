@@ -4,25 +4,12 @@
 
 @section('content')
 
-{{-- ═══════════════════════════════════════════════════════
-     1.  HERO — Event Header
-     ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:140px 24px 80px;background:var(--dark-950);overflow:hidden;">
-    {{-- Parallax background image --}}
-    <div class="hero-parallax" style="position:absolute;inset:-10% 0;background:url('{{ asset('images/page-title-bg.jpg') }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--overlay-90) 0%,rgba(26,68,247,.2) 50%,var(--overlay-95) 100%);"></div>
-    <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
-
-    <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
-        <div class="sec-label sr" style="justify-content:center;">{{ __('Event Details') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;color:var(--text-hero);">
-            {{ $event->name }}
-        </h1>
-        <p class="sr" style="color:var(--text-60);max-width:600px;margin:0 auto;font-size:1.1rem;line-height:1.7;">
-            {{ $event->date_time->format('F j, Y \a\t g:i A') }} • {{ $event->location }}
-        </p>
-    </div>
-</section>
+<x-public.page-hero
+    :title="$event->name"
+    :subtitle="$event->date_time->format('F j, Y \\a\\t g:i A') . ($event->location ? ' · ' . $event->location : '')"
+    :eyebrow="__('Event Details')"
+    :image="$event->featured_image_url ?? asset('images/unsplash/event-celebration.jpg')"
+/>
 
 {{-- ═══════════════════════════════════════════════════════
      2.  EVENT DETAILS

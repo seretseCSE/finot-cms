@@ -3,21 +3,21 @@
 @section('title', __('Search') . ': ' . $query)
 
 @section('content')
-<section style="padding:80px 24px;background:var(--bg-950);min-height:100vh;">
-    <div style="max-width:960px;margin:0 auto;">
+<section class="ft-section">
+    <div class="ft-container" style="max-width:960px;">
 
         {{-- Header --}}
         <div style="margin-bottom:40px;">
-            <h1 class="display sr" style="font-size:1.6rem;margin-bottom:8px;">
-                {{ __('Search Results') }}: <span style="color:var(--gold);">"{{ $query }}"</span>
+            <h1 class="ft-title" style="font-size:1.6rem;margin-bottom:8px;">
+                {{ __('Search Results') }}: <span class="text-secondary-500">"{{ $query }}"</span>
             </h1>
 
-            <form action="{{ route('search') }}" method="GET" class="sr" style="display:flex;gap:8px;max-width:560px;">
+            <form action="{{ route('search') }}" method="GET" class="reveal" style="display:flex;gap:8px;max-width:560px;">
                 <div style="flex:1;position:relative;">
-                    <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-40);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" name="q" value="{{ $query }}" placeholder="{{ __('Search...') }}" style="width:100%;padding:10px 10px 10px 40px;border-radius:8px;border:1.5px solid var(--border-subtle);background:var(--bg-900);color:var(--text-main);font-size:.9rem;outline:none;" autofocus onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border-subtle)'">
+                    <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ft-ink-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" name="q" value="{{ $query }}" placeholder="{{ __('Search...') }}" style="width:100%;padding:10px 10px 10px 40px;border-radius:8px;border:1.5px solid var(--ft-border);background:var(--ft-surface);color:var(--ft-ink);font-size:.9rem;outline:none;" autofocus>
                 </div>
-                <button type="submit" class="btn btn-primary" style="padding:10px 20px;">{{ __('Search') }}</button>
+                <button type="submit" class="btn-primary" style="padding:10px 20px;">{{ __('Search') }}</button>
             </form>
 
             {{-- Type filter --}}

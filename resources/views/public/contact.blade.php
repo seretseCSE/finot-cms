@@ -4,31 +4,17 @@
 
 @section('content')
 
-{{-- ═══════════════════════════════════════════════════════
-     1.  HERO — Contact Header
-     ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:120px 24px 80px;background:var(--dark-950);overflow:hidden;">
-    {{-- Parallax background image --}}
-    <div class="hero-parallax" style="position:absolute;inset:-10% 0;background:url('{{ asset('images/page-title-bg.jpg') }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--overlay-90) 0%,rgba(26,68,247,.1) 50%,var(--overlay-98) 100%);"></div>
-    <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
-
-    <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
-        <div class="sec-label sr" style="justify-content:center;">{{ __('Reach Out') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;color:var(--text-hero);">
-            {{ __('Get in') }}
-            <span style="color:var(--gold);">{{ __('Touch') }}</span>
-        </h1>
-        <p class="sr" style="color:var(--text-60);max-width:600px;margin:0 auto;font-size:1.1rem;line-height:1.7;">
-            {{ __('Have questions about our programs, events, or how to get involved? We are here to listen and guide you.') }}
-        </p>
-    </div>
-</section>
+<x-public.page-hero
+    :title="__('Get in Touch')"
+    :subtitle="__('Have questions about our programs, events, or how to get involved? We are here to listen and guide you.')"
+    :eyebrow="__('Reach Out')"
+    :image="asset('images/unsplash/volunteer-helping.jpg')"
+/>
 
 {{-- ═══════════════════════════════════════════════════════
      2.  CONTACT GRID
      ═══════════════════════════════════════════════════════ --}}
-<section style="padding:80px 20px;background:var(--dark-900);position:relative;">
+<section class="ft-section">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:clamp(40px, 8vw, 64px);position:relative;z-index:1;">
         
         {{-- Contact Info --}}

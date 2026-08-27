@@ -1,0 +1,179 @@
+{
+  "title": "የክትትል መዝገብ",
+  "subtitle": "በየክፍሉ ዕለታዊ ክትትል ይያዙ",
+  "noBranch": "ክትትል ለመያዝ ከላይ ካለው መቀየሪያ ቅርንጫፍ ይምረጡ።",
+  "section": "ክፍል",
+  "selectSection": "ክፍል ይምረጡ",
+  "date": "ቀን",
+  "pickSection": "ክትትል ለመያዝ ክፍልና ቀን ይምረጡ።",
+  "empty": "በዚህ ክፍል የተመዘገበ ተማሪ የለም።",
+  "markAllPresent": "ሁሉንም እንደተገኙ ምልክት አድርግ",
+  "save": "ክትትል አስቀምጥ",
+  "saved": "ክትትል ተቀምጧል።",
+  "statuses": {
+    "present": "ተገኝቷል",
+    "absent": "ቀርቷል",
+    "late": "አርፍዷል",
+    "excused": "በፈቃድ"
+  },
+  "columns": {
+    "student": "ተማሪ",
+    "status": "ሁኔታ"
+  },
+  "loadFailed": "መዝገቡን መጫን አልተቻለም።",
+  "checkIn": "መግቢያ",
+  "checkOut": "መውጫ",
+  "note": "ማስታወሻ",
+  "notePlaceholder": "አማራጭ ማስታወሻ…",
+  "summary": "ከ{total} ውስጥ {marked} ምልክት ተደርጓል",
+  "unmarked": "ምልክት ያልተደረገ",
+  "source": {
+    "label": "ምንጭ",
+    "device": "መሣሪያ",
+    "manual": "በእጅ"
+  },
+  "live": "ቀጥታ",
+  "reports": {
+    "title": "የክትትል ሪፖርቶች",
+    "subtitle": "ከዕለታዊ መዝገብ የተገኙ ትንታኔዎች — አዝማሚያዎች፣ መቅረት እና የመመዝገቢያ መንገዶች",
+    "loadFailed": "ሪፖርቱን መጫን አልተቻለም።",
+    "noData": "በዚህ ጊዜ ውስጥ የተመዘገበ ክትትል የለም።",
+    "from": "ከ",
+    "to": "እስከ",
+    "presets": {
+      "last7": "7 ቀናት",
+      "last15": "15 ቀናት",
+      "last30": "30 ቀናት",
+      "thisMonth": "በዚህ ወር"
+    },
+    "termWindow": {
+      "placeholder": "ሴሚስተር / ሩብ ዓመት",
+      "fullYear": "ሙሉ ዓመት"
+    },
+    "tabs": {
+      "overview": "አጠቃላይ እይታ",
+      "patterns": "አዝማሚያዎች",
+      "students": "ተማሪዎች"
+    },
+    "scope": {
+      "allSchools": "ሁሉም ትምህርት ቤቶች",
+      "allBranches": "ሁሉም ቅርንጫፎች",
+      "homeroomOnly": "የክፍል ኃላፊነትዎ ክፍሎች ብቻ"
+    },
+    "filters": {
+      "allGrades": "ሁሉም ደረጃዎች",
+      "allSections": "ሁሉም ክፍሎች",
+      "allSources": "ሁሉም ምንጮች",
+      "allDevices": "ሁሉም መሣሪያዎች"
+    },
+    "cards": {
+      "rate": "የመገኘት መጠን",
+      "rateUp": "▲ ከቀዳሚው ጊዜ በ{delta} ነጥብ ጨምሯል",
+      "rateDown": "▼ ከቀዳሚው ጊዜ በ{delta} ነጥብ ቀንሷል",
+      "rateHint": "{days} የትምህርት ቀናት",
+      "students": "የተከታተሉ ተማሪዎች",
+      "studentsHint": "በ{days} ቀናት {marks} ምልክቶች",
+      "absences": "መቅረቶች",
+      "absencesHint": "{female} ሴቶች · {male} ወንዶች",
+      "late": "መዘግየቶች",
+      "lateHint": "ያረፈዱ ተማሪዎች በአማካይ {time} ይደርሳሉ",
+      "chronic": "ተደጋጋሚ ቀሪዎች",
+      "chronicHint": "ከቀናቱ 10%+ የቀሩ — ዝርዝሩን ለማየት ይንኩ",
+      "perfect": "ሙሉ መገኘት",
+      "perfectHint": "ምንም መቅረት ወይም መዘግየት የሌላቸው — ዝርዝሩን ለማየት ይንኩ",
+      "coverage": "የመዝገብ ሽፋን",
+      "coverageHint": "ከሚጠበቁ {expected} ውስጥ {recorded} ተመዝግቧል",
+      "deviceShare": "በመሣሪያ የተያዘ",
+      "deviceShareHint": "{device} በመሣሪያ · {manual} በእጅ"
+    },
+    "charts": {
+      "daily": {
+        "title": "ዕለታዊ መዝገብ",
+        "hint": "በየትምህርት ቀኑ በሁኔታ የተከፋፈሉ ምልክቶች"
+      },
+      "weekday": {
+        "title": "የሳምንት ቀን አዝማሚያ",
+        "hint": "በሳምንቱ ቀናት የመዘግየትና የመቅረት ምልክቶች"
+      },
+      "sources": {
+        "title": "የመመዝገቢያ መንገድ",
+        "hint": "በየቀኑ በRFID መሣሪያ እና በእጅ የተያዙ"
+      },
+      "arrivals": {
+        "title": "የመድረሻ ሰዓቶች",
+        "hint": "በየ30 ደቂቃው የመግቢያ ሰዓቶች",
+        "onTime": "በሰዓቱ",
+        "empty": "በዚህ ጊዜ ውስጥ የተመዘገበ የመግቢያ ሰዓት የለም።"
+      }
+    },
+    "breakdown": {
+      "titles": {
+        "school": "በትምህርት ቤት",
+        "branch": "በቅርንጫፍ",
+        "grade": "በክፍል ደረጃ",
+        "section": "በክፍል"
+      },
+      "students": "{count} ተማሪዎች"
+    },
+    "devices": {
+      "title": "በተርሚናል",
+      "hint": "እያንዳንዱ የRFID ተርሚናል የመዘገባቸው ምልክቶች",
+      "late": "{count} የዘገዩ"
+    },
+    "flags": {
+      "all": "ሁሉም ተማሪዎች",
+      "chronic": "ተደጋጋሚ ቀሪዎች",
+      "frequentLate": "በተደጋጋሚ የሚያረፍዱ",
+      "perfect": "ሙሉ መገኘት"
+    },
+    "table": {
+      "title": "ተማሪዎች",
+      "hint": "በተመረጠው ጊዜ ውስጥ ያሉ ሁሉም ተማሪዎች",
+      "student": "ተማሪ",
+      "sectionShort": "ክፍል {name}",
+      "recent": "የቅርብ ጊዜ",
+      "recorded": "ቀናት",
+      "streak": "ተከታታይ",
+      "streakDays": "{count} ቀን ቀርቷል",
+      "rate": "መጠን",
+      "searchPlaceholder": "ተማሪዎችን ፈልግ…",
+      "empty": "በዚህ ጊዜ ውስጥ ክትትል የለም።"
+    }
+  },
+  "excuses": {
+    "title": "የቀሪነት ማመልከቻዎች",
+    "subtitle": "ወላጆች ያስገቧቸው የመቅረት ምክንያቶች — ሲጸድቅ ቀናቱ በፍቃድ ቀሪ ይሆናሉ",
+    "empty": "እስካሁን የቀሪነት ማመልከቻ የለም።",
+    "columns": {
+      "student": "ተማሪ",
+      "dates": "ቀናት",
+      "reason": "ምክንያት",
+      "requester": "ያስገባው",
+      "status": "ሁኔታ"
+    },
+    "statuses": {
+      "pending": "በመጠባበቅ ላይ",
+      "approved": "ጸድቋል",
+      "rejected": "ውድቅ ተደርጓል"
+    },
+    "approve": "አጽድቅ",
+    "reject": "ውድቅ አድርግ",
+    "attachment": "ማስረጃ ክፈት",
+    "approveTitle": "ይህን ማመልከቻ ማጽደቅ ይፈልጋሉ?",
+    "rejectTitle": "ይህን ማመልከቻ ውድቅ ማድረግ ይፈልጋሉ?",
+    "decideDesc": "{student} · {from} → {to}። ሲጸድቅ በክልሉ ውስጥ ያሉ የቀሪ ቀናት በፍቃድ ቀሪ ይሆናሉ።",
+    "notePlaceholder": "ለቤተሰቡ አማራጭ ማስታወሻ…",
+    "approvedToast": "ጸድቋል — {days} የቀሪ ቀን(ናት) በፍቃድ ቀሪ ሆነዋል።",
+    "rejectedToast": "ማመልከቻው ውድቅ ተደርጓል።",
+    "note": "ለቤተሰቡ ማስታወሻ",
+    "bulk": {
+      "approveTitle": "{count} ማመልከቻዎችን ያጽድቁ?",
+      "rejectTitle": "{count} ማመልከቻዎችን ውድቅ ያድርጉ?",
+      "approveDesc": "በእያንዳንዱ የቀን ክልል ውስጥ ያለ የቀረበት ቀን ሁሉ በፈቃድ ይመዘገባል፤ ለእያንዳንዱ ቤተሰብ ይነገራል።",
+      "rejectDesc": "የክትትል መዝገቡ እንዳለ ይቆያል። ለእያንዳንዱ ቤተሰብ ስለሚነገር ምክንያቱን ከታች ይጻፉ።",
+      "approved": "{count} ማመልከቻዎች ጸድቀዋል።",
+      "rejected": "{count} ማመልከቻዎች ውድቅ ተደርገዋል።",
+      "nonePending": "ከተመረጡት ውስጥ ውሳኔ የሚጠብቅ የለም።"
+    }
+  }
+}

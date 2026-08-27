@@ -69,6 +69,10 @@ class LibraryController extends Controller
             abort(404);
         }
 
+        if ($resource->file_type === 'inline' || ! $resource->file_path) {
+            abort(404, 'This resource has no downloadable file');
+        }
+
         $disk = Storage::disk('library');
 
         if (! $disk->exists($resource->file_path)) {

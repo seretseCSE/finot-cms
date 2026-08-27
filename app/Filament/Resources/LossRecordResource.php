@@ -42,7 +42,7 @@ class LossRecordResource extends Resource
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('loss_records.view');
+        return Auth::user()?->can('loss_records.view') ?? false;
     }
 
     public static function form(Schema $schema): Schema

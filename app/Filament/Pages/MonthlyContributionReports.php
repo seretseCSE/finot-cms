@@ -237,7 +237,7 @@ class MonthlyContributionReports extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()->hasAnyRole(['super_admin', 'admin', 'finance_admin', 'treasurer']);
+        return auth()->user()?->hasAnyRole(['super_admin', 'admin', 'finance_admin', 'treasurer']) ?? false;
     }
 
     protected function getHeaderActions(): array

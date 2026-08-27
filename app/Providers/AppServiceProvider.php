@@ -36,6 +36,9 @@ use Carbon\Carbon;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse as LoginResponseContract;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -85,6 +88,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureRateLimiting();
+
         // Set default string length for MySQL compatibility
         Schema::defaultStringLength(191);
 
@@ -115,6 +120,25 @@ class AppServiceProvider extends ServiceProvider
             $helper = app(EthiopianDateHelper::class);
 
             return $helper->toString($this);
+        });
+    }
+
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('public-browse', function (Request $request) {
+            return Limit::perMinute(120)->by($request->ip());
+        });
+
+        RateLimiter::for('public-search', function (Request $request) {
+            return Limit::perMinute(60)->by($request->ip());
+        });
+
+        RateLimiter::for('public-write', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
+        RateLimiter::for('public-lookup', function (Request $request) {
+            return Limit::perMinute(20)->by($request->ip());
         });
     }
 }

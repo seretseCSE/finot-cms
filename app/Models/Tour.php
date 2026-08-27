@@ -175,11 +175,17 @@ class Tour extends BaseModel
             return null;
         }
 
+        $createdBy = auth()->id();
+
+        if ($createdBy === null) {
+            return null;
+        }
+
         $session = TourAttendanceSession::create([
             'tour_id' => $this->id,
             'session_date' => $this->tour_date,
             'status' => 'Open',
-            'created_by' => auth()->id(),
+            'created_by' => $createdBy,
         ]);
 
         $this->confirmedPassengers->each(function ($passenger) use ($session) {

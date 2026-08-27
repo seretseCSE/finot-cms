@@ -4,138 +4,97 @@
 
 @section('content')
 
-{{-- ═══════════════════════════════════════════════════════
-     1.  HERO — Media Header
-     ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:120px 24px 80px;background:var(--dark-950);overflow:hidden;">
-    {{-- Parallax background image --}}
-    <div class="hero-parallax" style="position:absolute;inset:-10% 0;background:url('{{ asset('images/features-bg.jpg') }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--overlay-90) 0%,rgba(26,68,247,.2) 50%,var(--overlay-95) 100%);"></div>
-    <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
+<x-public.page-hero
+    :title="__('Visual Gallery')"
+    :subtitle="__('Photos, videos, and songs from our spiritual life and community.')"
+    :eyebrow="__('Moments in Time')"
+    :image="asset('images/unsplash/worship-music.jpg')"
+/>
 
-    <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
-        <div class="sec-label sr" style="justify-content:center;">{{ __('Moments in Time') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;color:var(--text-hero);">
-            {{ __('Visual') }}
-            <span style="color:var(--gold);">{{ __('Gallery') }}</span>
-        </h1>
-        <p class="sr" style="color:var(--text-60);max-width:600px;margin:0 auto;font-size:1.1rem;line-height:1.7;">
-            {{ __('Experience our spiritual life, events, and community activities through our collection of photos and videos.') }}
-        </p>
-    </div>
-</section>
-
-{{-- ═══════════════════════════════════════════════════════
-     2.  FILTERS
-     ═══════════════════════════════════════════════════════ --}}
-<section style="padding:60px 24px 20px;background:var(--dark-900);">
-    <div style="max-width:1200px;margin:0 auto;">
-        <div class="card sr" style="padding:24px 32px;margin-bottom:40px;">
-            <form method="GET" action="{{ route('media') }}" style="display:flex;flex-wrap:wrap;gap:16px;">
-                <div style="flex:1;min-width:280px;position:relative;">
-                    <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-40);" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Search media...') }}" style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:10px;padding:12px 16px 12px 42px;color:var(--text-main);outline:none;">
-                </div>
-                
-                <select name="type" style="background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:10px;padding:12px 20px;color:var(--text-main);outline:none;cursor:pointer;min-width:140px;">
-                    <option value="" style="background:var(--dark-900);">{{ __('All Types') }}</option>
-                    <option value="Photo" {{ request('type') == 'Photo' ? 'selected' : '' }} style="background:var(--dark-900);">{{ __('Photos') }}</option>
-                    <option value="Video" {{ request('type') == 'Video' ? 'selected' : '' }} style="background:var(--dark-900);">{{ __('Videos') }}</option>
-                </select>
-
-                <select name="category" style="background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:10px;padding:12px 20px;color:var(--text-main);outline:none;cursor:pointer;min-width:160px;">
-                    <option value="" style="background:var(--bg-800);">{{ __('All Categories') }}</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }} style="background:var(--bg-800);">{{ $category->name }}</option>
-                    @endforeach
-                </select>
-
-                <button type="submit" class="btn btn-primary" style="padding:12px 32px;">{{ __('Filter') }}</button>
-
-                @if(request('search') || request('type') || request('category'))
-                    <a href="{{ route('media') }}" class="btn btn-ghost" style="padding:12px 24px;">{{ __('Clear') }}</a>
-                @endif
-            </form>
+<section class="ft-section pt-10">
+    <div class="ft-container">
+        <div class="flex flex-wrap gap-2 mb-8 border-b" style="border-color: var(--ft-border);">
+            @foreach([
+                'photos' => __('Photos'),
+                'videos' => __('Videos'),
+                'songs' => __('Songs'),
+            ] as $tab => $label)
+                <a href="{{ route('media', ['tab' => $tab]) }}"
+                   class="px-5 py-3 text-sm font-semibold rounded-t-xl transition-colors
+                   {{ ($activeTab ?? 'photos') === $tab
+                        ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-b-0'
+                        : 'text-slate-500 hover:text-primary-500' }}"
+                   style="{{ ($activeTab ?? 'photos') === $tab ? 'border-color: var(--ft-border);' : '' }}">
+                    {{ $label }}
+                </a>
+            @endforeach
         </div>
-    </div>
-</section>
 
-{{-- ═══════════════════════════════════════════════════════
-     3.  MEDIA GRID (grouped by album/title)
-     ═══════════════════════════════════════════════════════ --}}
-<section style="padding:0 24px 100px;background:var(--dark-900);">
-    <div style="max-width:1280px;margin:0 auto;">
-        
-        @if($mediaGroups->isEmpty())
-            <div class="card sr" style="padding:80px;text-align:center;max-width:600px;margin:0 auto;">
-                <div style="font-size:3rem;margin-bottom:24px;">📷</div>
-                <h3 class="display" style="font-size:1.8rem;margin-bottom:12px;">{{ __('No Media Found') }}</h3>
-                <p style="color:var(--text-60);">{{ __('Try adjusting your filters or check back later for new content.') }}</p>
-            </div>
+        @if(($activeTab ?? 'photos') !== 'songs')
+            <form method="GET" action="{{ route('media') }}" class="ft-surface rounded-2xl p-4 mb-8 flex flex-wrap gap-3">
+                <input type="hidden" name="tab" value="{{ $activeTab ?? 'photos' }}">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Search media...') }}"
+                       class="flex-1 min-w-[200px] rounded-xl px-4 py-2.5 text-sm border bg-transparent" style="border-color: var(--ft-border); color: var(--ft-ink);">
+                @if(($categories ?? collect())->isNotEmpty())
+                    <select name="category" class="rounded-xl px-4 py-2.5 text-sm border bg-transparent" style="border-color: var(--ft-border); color: var(--ft-ink);">
+                        <option value="">{{ __('All Categories') }}</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" @selected(request('category') == $category->id)>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                @endif
+                <button type="submit" class="btn-primary !py-2.5">{{ __('Filter') }}</button>
+            </form>
+
+            @if(!$mediaGroups || $mediaGroups->isEmpty())
+                <div class="ft-surface rounded-2xl p-16 text-center">
+                    <h3 class="text-xl font-bold ft-ink mb-2">{{ __('No Media Found') }}</h3>
+                    <p style="color: var(--ft-ink-muted);">{{ __('Try adjusting your filters or check back later for new content.') }}</p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    @foreach($mediaGroups as $group)
+                        @php $item = $group['main']; @endphp
+                        <a href="{{ route('media.show', $item) }}" class="ft-surface rounded-2xl overflow-hidden no-underline group reveal">
+                            <div class="aspect-[4/3] overflow-hidden bg-slate-200 dark:bg-slate-800">
+                                <img src="{{ $item->file_url ?? asset('images/unsplash/worship-music.jpg') }}" alt="{{ $item->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-semibold ft-ink group-hover:text-primary-500">{{ $item->title }}</h3>
+                                <p class="text-xs mt-1" style="color: var(--ft-ink-muted);">
+                                    {{ $group['count'] }} {{ __('items') }}
+                                    @if($group['photos']) · {{ $group['photos'] }} {{ __('photos') }} @endif
+                                    @if($group['videos']) · {{ $group['videos'] }} {{ __('videos') }} @endif
+                                </p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+                <div class="mt-10">{{ $mediaGroups->links() }}</div>
+            @endif
         @else
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;">
-                @foreach($mediaGroups as $group)
-                    @php
-                        $item = $group['main'];
-                        $count = $group['count'];
-                        $hasPhotos = $group['photos'] > 0;
-                        $hasVideos = $group['videos'] > 0;
-                    @endphp
-                    <a href="{{ route('media.show', $item) }}" class="card sr" style="padding:0;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;" data-delay="{{ $loop->index * 50 }}">
-                        <div style="aspect-ratio:4/3;overflow:hidden;position:relative;background:var(--dark-800);">
-                            @if($item->type === 'Photo')
-                                <img src="{{ $item->file_url }}" alt="{{ $item->title }}" style="width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.22,1,.36,1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                            @else
-                                <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--dark-800),var(--blue-primary));display:flex;align-items:center;justify-content:center;">
-                                    <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:#fff;">
-                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                    </div>
-                                </div>
-                            @endif
-
-                            {{-- Multi-item count badge --}}
-                            @if($count > 1)
-                                <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);color:#fff;padding:4px 12px;border-radius:99px;font-size:.75rem;font-weight:600;display:flex;align-items:center;gap:6px;">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                    {{ $count }}
-                                </div>
-                            @endif
-
-                            {{-- Hover Overlay --}}
-                            <div style="position:absolute;inset:0;background:var(--overlay-40);opacity:0;transition:opacity .3s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
-                                <div style="width:40px;height:40px;border-radius:50%;background:var(--gold);color:var(--dark-950);display:flex;align-items:center;justify-content:center;">
-                                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                </div>
+            @if(isset($songs) && $songs->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($songs as $song)
+                        <a href="{{ route('songs.show', $song->id) }}" class="ft-surface rounded-2xl p-5 no-underline group reveal flex gap-4 items-center">
+                            <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-primary-500/10 flex items-center justify-center">
+                                <img src="{{ asset('images/unsplash/worship-music.jpg') }}" alt="" class="w-full h-full object-cover opacity-80">
                             </div>
-                        </div>
-
-                        <div style="padding:24px;">
-                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                                @if($hasPhotos && $hasVideos)
-                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text-40);">{{ $group['photos'] }} Photo{{ $group['photos'] > 1 ? 's' : '' }} + {{ $group['videos'] }} Video{{ $group['videos'] > 1 ? 's' : '' }}</span>
-                                @elseif($hasPhotos && $count > 1)
-                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:#86efac;">{{ $count }} Photos</span>
-                                @elseif($hasVideos && $count > 1)
-                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:#fca5a5;">{{ $count }} Videos</span>
-                                @else
-                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:{{ $item->type === 'Photo' ? 'rgba(74,222,128,.1)' : 'rgba(248,113,113,.1)' }};border:1px solid {{ $item->type === 'Photo' ? 'rgba(74,222,128,.2)' : 'rgba(248,113,113,.2)' }};color:{{ $item->type === 'Photo' ? '#86efac' : '#fca5a5' }};text-transform:uppercase;letter-spacing:.05em;">{{ $item->type }}</span>
-                                @endif
-                                @if($item->category)
-                                    <span style="font-size:.65rem;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:var(--text-40);">{{ $item->category->name }}</span>
+                            <div>
+                                <h3 class="font-semibold ft-ink group-hover:text-primary-500 font-['Noto_Sans_Ethiopic']">{{ $song->title ?? $song->name }}</h3>
+                                @if(!empty($song->artist) || !empty($song->composer))
+                                    <p class="text-sm mt-1" style="color: var(--ft-ink-muted);">{{ $song->artist ?? $song->composer }}</p>
                                 @endif
                             </div>
-                            <h3 style="font-size:1rem;font-weight:600;color:var(--text-display);line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">{{ $item->title }}</h3>
-                            @if($item->description)
-                                <p style="color:var(--text-60);font-size:.78rem;line-height:1.6;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ strip_tags($item->description) }}</p>
-                            @endif
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-
-            <div style="margin-top:60px;display:flex;justify-content:center;">
-                {{ $mediaGroups->links() }}
-            </div>
+                        </a>
+                    @endforeach
+                </div>
+                <div class="mt-10">{{ $songs->withQueryString()->links() }}</div>
+            @else
+                <div class="ft-surface rounded-2xl p-16 text-center">
+                    <h3 class="text-xl font-bold ft-ink mb-2">{{ __('No songs found') }}</h3>
+                </div>
+            @endif
         @endif
     </div>
 </section>

@@ -81,10 +81,9 @@ class ContentManagementTest extends TestCase
     }
 
     #[Test]
-    public function public_blog_page_exists(): void
+    public function public_blog_redirects_to_news(): void
     {
-        $response = $this->get('/blog');
-        $response->assertStatus(200);
+        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
     }
 
     #[Test]
@@ -95,10 +94,9 @@ class ContentManagementTest extends TestCase
     }
 
     #[Test]
-    public function public_songs_page_exists(): void
+    public function public_songs_redirects_to_media(): void
     {
-        $response = $this->get('/songs');
-        $response->assertStatus(200);
+        $this->get('/songs')->assertRedirect(route('media', ['tab' => 'songs']));
     }
 
     #[Test]

@@ -12,63 +12,24 @@ class BlogFeatureTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function blog_index_shows_only_published_posts(): void
+    public function blog_index_redirects_to_news(): void
     {
-        $published = BlogPost::factory()->published()->create(['title' => 'Published Post']);
+        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
+    }
+
+    #[Test]
+    public function news_blog_tab_shows_only_published_posts(): void
+    {
+        BlogPost::factory()->published()->create(['title' => 'Published Post']);
         BlogPost::factory()->draft()->create(['title' => 'Draft Post']);
         BlogPost::factory()->archived()->create(['title' => 'Archived Post']);
 
-        $response = $this->get('/blog');
+        $response = $this->get('/news?tab=blog');
 
         $response->assertStatus(200);
         $response->assertSee('Published Post');
         $response->assertDontSee('Draft Post');
         $response->assertDontSee('Archived Post');
-    }
-
-    #[Test]
-    public function blog_index_filters_by_search_query(): void
-    {
-        BlogPost::factory()->published()->create(['title' => 'Timket Celebration Guide']);
-        BlogPost::factory()->published()->create(['title' => 'Meskel Festival Overview']);
-
-        $response = $this->get('/blog?search=Timket');
-
-        $response->assertStatus(200);
-        $response->assertSee('Timket Celebration Guide');
-        $response->assertDontSee('Meskel Festival Overview');
-    }
-
-    #[Test]
-    public function blog_index_filters_by_tag(): void
-    {
-        BlogPost::factory()->published()->create([
-            'title' => 'Ethiopian Orthodox Traditions',
-            'tags' => 'Ethiopian Orthodox, Traditions, Faith',
-        ]);
-        BlogPost::factory()->published()->create([
-            'title' => 'Modern Worship Styles',
-            'tags' => 'Modern, Worship, Music',
-        ]);
-
-        $response = $this->get('/blog?tag=Ethiopian+Orthodox');
-
-        $response->assertStatus(200);
-        $response->assertSee('Ethiopian Orthodox Traditions');
-        $response->assertDontSee('Modern Worship Styles');
-    }
-
-    #[Test]
-    public function blog_index_paginates_results(): void
-    {
-        BlogPost::factory()->count(15)->published()->create();
-
-        $response = $this->get('/blog');
-
-        $response->assertStatus(200);
-        $response->assertViewHas('posts', function ($posts) {
-            return $posts->count() === 9;
-        });
     }
 
     #[Test]

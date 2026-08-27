@@ -3,7 +3,6 @@
 namespace App\Filament\Forms\Components\MemberForms;
 
 use App\Enums\MemberStatus;
-use App\Enums\Roles;
 use Filament\Forms;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -23,7 +22,7 @@ class StatusHistoryTab
                             ->options(MemberStatus::getAll())
                             ->enum(MemberStatus::class)
                             ->required()
-                            ->disabled(fn () => ! Auth::user()->can('members.update'))
+                            ->disabled(fn () => ! Auth::user()?->can('members.update'))
                             ->live(),
                     ]),
 

@@ -4,32 +4,18 @@
 
 @section('content')
 
-{{-- ═══════════════════════════════════════════════════════
-     1.  HERO — Fundraising Header
-     ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:120px 24px 80px;background:var(--dark-950);overflow:hidden;">
-    {{-- Parallax background image --}}
-    <div class="hero-parallax" style="position:absolute;inset:-10% 0;background:url('{{ asset('images/stats-bg.jpg') }}') center/cover no-repeat;filter:brightness(.25) saturate(.8);will-change:transform;"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(135deg,var(--overlay-90) 0%,rgba(26,68,247,.1) 50%,var(--overlay-95) 100%);"></div>
-    <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
-
-    <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;text-align:center;">
-        <div class="sec-label sr" style="justify-content:center;">{{ __('Giving') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2.6rem,6vw,4rem);margin-bottom:16px;color:var(--text-hero);">
-            {{ __('Fundraising') }}
-            <span style="color:var(--gold);">{{ __('Progress') }}</span>
-        </h1>
-        <p class="sr" style="color:var(--text-60);max-width:600px;margin:0 auto;font-size:1.1rem;line-height:1.7;">
-            {{ __('Support our mission and community through various fundraising campaigns. Your generous contributions help us make a difference.') }}
-        </p>
-    </div>
-</section>
+<x-public.page-hero
+    :title="__('Fundraising Progress')"
+    :subtitle="__('Support our mission and community through various fundraising campaigns. Your generous contributions help us make a difference.')"
+    :eyebrow="__('Giving')"
+    :image="asset('images/cta-bg.webp')"
+/>
 
 {{-- ═══════════════════════════════════════════════════════
      2.  OVERALL SUMMARY
      ═══════════════════════════════════════════════════════ --}}
 @if($campaigns->count() > 0)
-<section style="padding:40px 24px;background:var(--dark-900);">
+<section class="ft-section pt-10">
     <div style="max-width:1200px;margin:0 auto;">
         <div class="card sr" style="padding:40px;background:linear-gradient(135deg,rgba(26,68,247,.1),var(--overlay-40));border-color:rgba(26,68,247,.2);">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;text-align:center;">

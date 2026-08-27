@@ -32,8 +32,8 @@ class PushNotificationService implements PushNotificationServiceInterface
             'notification' => [
                 'title' => $title,
                 'body' => $body,
-                'icon' => asset('storage/logo.png'),
-                'badge' => asset('storage/logo.png'),
+                'icon' => asset('images/logo2.png'),
+                'badge' => asset('images/logo2.png'),
                 'data' => $data,
             ],
         ]);
@@ -60,8 +60,8 @@ class PushNotificationService implements PushNotificationServiceInterface
             'notification' => [
                 'title' => $title,
                 'body' => $body,
-                'icon' => asset('storage/logo.png'),
-                'badge' => asset('storage/logo.png'),
+                'icon' => asset('images/logo2.png'),
+                'badge' => asset('images/logo2.png'),
                 'data' => $data,
             ],
         ]);

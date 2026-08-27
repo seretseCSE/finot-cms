@@ -13,8 +13,6 @@ export default defineConfig({
                 'resources/js/admin.js',
                 'resources/js/financial-charts.js',
                 'resources/js/tours/filament-init.js',
-                'resources/css/sunday-school.css',
-                'resources/js/sunday-school.js',
             ],
             refresh: true,
         }),
@@ -36,6 +34,9 @@ export default defineConfig({
                         }
                         if (id.includes('chart.js')) {
                             return 'chart-vendor';
+                        }
+                        if (id.includes('gsap')) {
+                            return 'gsap-vendor';
                         }
                         return 'vendor';
                     }

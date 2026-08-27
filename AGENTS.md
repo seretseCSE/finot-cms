@@ -8,7 +8,7 @@ The codebase uses **two complementary authorization strategies**:
 
 1. **BaseResource (permission-driven)**  
    `App\Filament\Resources\BaseResource` centralizes CRUD policy checks for Filament Resources. It first grants `superadmin` full access, then falls back to `spatie/laravel-permission` checks via the model's `getPermissionName($action)` method (e.g. `members.view`, `members.create`). If the model does not implement `getPermissionName()`, access is denied by default.  
-   BaseResource also applies department scoping in `getEloquentQuery()` when the model uses `HasDepartmentTrait` or `ScopedByDepartment`.
+   BaseResource also applies department scoping in `getEloquentQuery()` when the model uses `ScopedByDepartment`.
 
 2. **Inline role checks (page & UI-level)**  
    Filament Pages, custom form fields, and action visibility often use inline `Auth::user()?->hasRole([...])` checks. This is common for:
@@ -54,9 +54,6 @@ Provides:
 - `canCurrentUserAccess()` instance check
 - `withoutDepartmentScope()` / `withAllDepartments()` helpers
 
-### HasDepartmentTrait (legacy)
-Exists in `app/Models/Traits/HasDepartmentTrait.php` but is **not currently used by any model**. `BaseResource::getEloquentQuery()` still checks for both traits for backward compatibility.
-
 ---
 
 ## Phone-Number Formatting Convention
@@ -86,8 +83,8 @@ Raw 9-digit input (e.g. `911234567`) is stored as `+251911234567`.
 ## Build & Dev Commands
 
 - `npm run build` – Vite production build with code-splitting (vendor chunk)
-- `composer run dev` – Runs Laravel server, Horizon, Pail, and Vite dev server concurrently
-- Horizon dashboard is available at `/horizon` (middleware: `web`)
+- `composer run dev` – Runs Laravel server, queue listener, Pail, and Vite concurrently
+- Horizon is not installed; local queues use `php artisan queue:listen`. Production should run a queue worker (Supervisor/systemd), not a dashboard at `/horizon`.
 
 ## Product Tour / Onboarding System
 

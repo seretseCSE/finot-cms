@@ -41,10 +41,9 @@ class EventFundraisingTest extends TestCase
     }
 
     #[Test]
-    public function public_events_page_loads(): void
+    public function public_events_redirects_to_news(): void
     {
-        $response = $this->get('/events');
-        $response->assertStatus(200);
+        $this->get('/events')->assertRedirect(route('news', ['tab' => 'events']));
     }
 
     #[Test]

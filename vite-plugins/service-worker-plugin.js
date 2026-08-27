@@ -49,7 +49,6 @@ const DYNAMIC_ASSETS = ${JSON.stringify(buildInfo.assets)};
 
 // Static assets that rarely change
 const STATIC_ASSETS = [
-    '/',
     '/manifest.json',
     '/offline',
     '/images/logo.png',

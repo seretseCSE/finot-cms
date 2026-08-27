@@ -1,0 +1,338 @@
+{
+  "error": "Something went wrong.",
+  "attendance": {
+    "title": "Employee attendance",
+    "subtitle": "The daily register for branch employees — mark, review, save.",
+    "noBranch": "Select a branch to take employee attendance.",
+    "date": "Date",
+    "empty": "No active employees in this branch yet.",
+    "loadFailed": "Failed to load the employee register.",
+    "holiday": "{name} — holiday",
+    "weekend": "This is a weekend day.",
+    "markAllPresent": "Mark all present",
+    "save": "Save attendance",
+    "saved": "Employee attendance saved",
+    "onLeave": "On leave",
+    "onLeaveUntil": "{type} · until {date}",
+    "note": "Note",
+    "notePlaceholder": "Optional note…",
+    "checkIn": "In",
+    "checkOut": "Out",
+    "summary": "{marked} of {total} marked",
+    "statuses": {
+      "present": "Present",
+      "late": "Late",
+      "half_day": "Half day",
+      "absent": "Absent",
+      "excused": "Excused"
+    },
+    "unmarked": "Unmarked",
+    "source": {
+      "label": "Source",
+      "device": "Device",
+      "manual": "Manual"
+    },
+    "live": "Live"
+  },
+  "leave": {
+    "title": "Leave management",
+    "subtitle": "Requests, balances and the school's leave policy.",
+    "noBranch": "Select a branch to manage leave.",
+    "loadFailed": "Failed to load leave data.",
+    "empty": "No leave requests yet. Employees can submit from HR, or record one here.",
+    "newRequest": "New request",
+    "tabs": {
+      "requests": "Requests",
+      "balances": "Balances",
+      "settings": "Policy & holidays"
+    },
+    "columns": {
+      "employee": "Employee",
+      "type": "Type",
+      "window": "Dates",
+      "days": "Days",
+      "status": "Status",
+      "requestedBy": "Requested by",
+      "decidedBy": "Decided by",
+      "reason": "Reason"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "halfDay": "Half day",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "cancel": "Cancel request",
+      "delete": "Delete"
+    },
+    "approveTitle": "Approve leave",
+    "approveDesc": "{name} · {type} · {days} days",
+    "decisionNote": "Decision note",
+    "decisionNoteOptional": "Optional note for the employee…",
+    "allowExceed": "Approve even if it exceeds the remaining balance",
+    "exceedHint": "The request was blocked because it exceeds the balance. Tick the override to approve anyway.",
+    "approved": "Leave approved",
+    "rejectTitle": "Reject leave",
+    "rejectNotePlaceholder": "Tell the employee why…",
+    "rejected": "Leave rejected",
+    "cancelConfirm": "Cancel this leave request?",
+    "cancelled": "Request cancelled",
+    "deleted": "Request deleted",
+    "form": {
+      "employee": "Employee",
+      "selectEmployee": "Select employee",
+      "type": "Leave type",
+      "selectType": "Select leave type",
+      "startDate": "First day",
+      "endDate": "Last day",
+      "halfDayLabel": "Half day only",
+      "reason": "Reason / note",
+      "reasonPlaceholder": "e.g. medical certificate no., event…",
+      "noteRequired": "This leave type requires a note.",
+      "submit": "Submit request",
+      "submitted": "Leave request submitted"
+    },
+    "balances": {
+      "yearWindow": "Leave year: {start} → {end}",
+      "employee": "Employee",
+      "unlimited": "No cap",
+      "taken": "{taken} of {entitled} used",
+      "pending": "{days} pending",
+      "remaining": "{days} left",
+      "empty": "No active employees to show balances for."
+    },
+    "types": {
+      "title": "Leave types",
+      "hint": "The school-wide policy. Defaults follow the Ethiopian Labour Proclamation 1156/2019 — adjust to your school's contracts.",
+      "add": "Add type",
+      "name": "Name",
+      "daysPerYear": "Days per year",
+      "noCap": "No cap",
+      "paidLabel": "Paid leave",
+      "gender": "Applies to",
+      "genderAny": "Everyone",
+      "female": "Female employees",
+      "male": "Male employees",
+      "requiresNote": "Requires a note",
+      "active": "Active",
+      "serviceBonus": "+{days} day every {years} yrs of service",
+      "saved": "Leave type saved",
+      "deleted": "Leave type removed",
+      "deleteConfirm": "Remove this leave type?"
+    },
+    "holidays": {
+      "title": "Holiday calendar",
+      "hint": "Non-working days (public holidays, closures). Leave requests and the register skip them.",
+      "add": "Add holiday",
+      "name": "Name",
+      "namePlaceholder": "e.g. Meskel, Eid al-Fitr…",
+      "date": "Date",
+      "branch": "Branch",
+      "allBranches": "All branches",
+      "empty": "No holidays entered yet.",
+      "added": "Holiday added",
+      "deleted": "Holiday removed",
+      "deleteConfirm": "Remove this holiday?"
+    },
+    "bulk": {
+      "approveTitle": "Approve {count} requests?",
+      "rejectTitle": "Reject {count} requests?",
+      "desc": "The note below goes to every employee in the selection. Requests that were already decided are skipped.",
+      "approved": "{count} request(s) approved.",
+      "rejected": "{count} request(s) rejected.",
+      "nonePending": "None of the selected requests are still waiting for a decision.",
+      "exceedHint": "Leave this off and anyone without enough days left is skipped and named."
+    }
+  },
+  "reports": {
+    "title": "HR reports",
+    "subtitle": "Workforce, attendance, leave and pay — for the selected window.",
+    "noBranch": "Select a branch to view HR reports.",
+    "loadFailed": "Failed to load the report.",
+    "from": "From",
+    "to": "To",
+    "presets": {
+      "last7": "7 days",
+      "last15": "15 days",
+      "last30": "30 days",
+      "thisMonth": "This month"
+    },
+    "termWindow": {
+      "placeholder": "Semester / quarter",
+      "fullYear": "Full year"
+    },
+    "cards": {
+      "activeEmployees": "Active employees",
+      "activeEmployeesHint": "{female} female · {male} male",
+      "attendanceRate": "Attendance rate",
+      "attendanceRateHint": "{recorded} marks in window",
+      "leaveDays": "Approved leave days",
+      "leaveDaysHint": "{pending} requests pending",
+      "payrollCost": "Payroll cost",
+      "payrollCostHint": "{name} · gross + employer pension"
+    },
+    "composition": {
+      "byJobTitle": "Employees by job title",
+      "byEmploymentType": "Employees by employment type",
+      "unspecified": "Unspecified",
+      "total": "{count} employees"
+    },
+    "attendanceMix": {
+      "title": "Attendance mix",
+      "empty": "No marks in this window."
+    },
+    "charts": {
+      "daily": {
+        "title": "Daily register",
+        "hint": "Marks per register day in the window"
+      },
+      "weekday": {
+        "title": "Absence by weekday",
+        "hint": "Late and absent marks by day of the week — spots recurring patterns"
+      },
+      "leaveMonthly": {
+        "title": "Leave taken by month",
+        "hint": "Approved leave days — last 6 months",
+        "empty": "No approved leave in the last 6 months."
+      },
+      "payroll": {
+        "title": "Payroll cost history",
+        "hint": "Closed runs — net pay, deductions and employer pension stack to the full cost",
+        "net": "Net pay",
+        "deductions": "Deductions",
+        "employerPension": "Employer pension",
+        "empty": "No closed payroll runs yet."
+      },
+      "tenure": {
+        "title": "Years of service",
+        "hint": "Active employees by tenure",
+        "employees": "Employees",
+        "empty": "No active employees yet.",
+        "buckets": {
+          "lt1": "<1 yr",
+          "1to3": "1–3 yrs",
+          "3to5": "3–5 yrs",
+          "5to10": "5–10 yrs",
+          "gte10": "10+ yrs",
+          "unknown": "Unknown"
+        }
+      }
+    },
+    "attendanceTable": {
+      "title": "Attendance by employee",
+      "workingDays": "{days} working days in window",
+      "searchPlaceholder": "Search employees…",
+      "filters": {
+        "jobTitle": "Job title",
+        "rate": "Rate"
+      },
+      "rateBands": {
+        "high": "95% and above",
+        "mid": "80–95%",
+        "low": "Below 80%",
+        "none": "No data"
+      },
+      "employee": "Employee",
+      "present": "Present",
+      "late": "Late",
+      "halfDay": "Half",
+      "absent": "Absent",
+      "excused": "Excused",
+      "leaveDays": "Leave",
+      "rate": "Rate",
+      "empty": "No attendance recorded in this window."
+    },
+    "leaveByType": {
+      "title": "Leave by type",
+      "type": "Type",
+      "requests": "Requests",
+      "days": "Days",
+      "empty": "No approved leave in this window."
+    }
+  },
+  "me": {
+    "title": "HR",
+    "subtitle": "Your leave balances, requests and attendance.",
+    "noBranch": "Select a branch to view your HR overview.",
+    "noProfile": "No employee profile is linked to your account in this branch. Ask your director or HR officer.",
+    "loadFailed": "Failed to load your HR overview.",
+    "balancesTitle": "Leave balances",
+    "balancesEmpty": "No leave types configured for your school yet.",
+    "requestsTitle": "Leave requests",
+    "requestLeave": "Request leave",
+    "requestsEmpty": "No leave requests yet — request your first leave above.",
+    "requestsFilterAll": "All",
+    "filterEmpty": "Nothing matches this filter.",
+    "attendanceTitle": "Attendance",
+    "attendanceHint": "Last 30 days",
+    "attendanceEmpty": "No attendance recorded for you yet.",
+    "notRecorded": "Not recorded"
+  },
+  "evaluations": {
+    "title": "Teacher appraisals",
+    "subtitle": "The per-semester performance appraisal: score, share, and collect each teacher’s signature.",
+    "mineSubtitle": "Your performance appraisals — review each record and acknowledge it.",
+    "term": "Semester",
+    "noWorkspace": "Pick a school workspace and branch to continue.",
+    "new": "New appraisal",
+    "newHint": "Starts a draft from the school’s appraisal criteria. Only you see it until you share it.",
+    "pickEmployee": "Pick an employee",
+    "start": "Start appraisal",
+    "teacher": "Employee",
+    "overall": "Overall",
+    "status": "Status",
+    "evaluator": "Evaluated by",
+    "sharedOn": "Shared",
+    "open": "Open appraisal",
+    "statTotal": "Appraisals",
+    "statAverage": "Average score",
+    "awaitingSignature": "awaiting the teacher’s signature",
+    "outOf100": "out of 100",
+    "emptyRegister": "No appraisals for this semester yet.",
+    "emptyMineTitle": "No appraisals yet",
+    "emptyMineBody": "When your school shares a performance appraisal with you, it appears here.",
+    "sheetTitle": "Performance appraisal",
+    "statuses": {
+      "draft": "Draft",
+      "submitted": "Shared",
+      "acknowledged": "Acknowledged"
+    },
+    "actionNeeded": "Review & acknowledge",
+    "notePlaceholder": "Evidence / note (optional)",
+    "strengths": "Strengths",
+    "strengthsPlaceholder": "What this teacher does well…",
+    "improvements": "Areas to improve",
+    "improvementsPlaceholder": "What to work on next…",
+    "saveDraft": "Save draft",
+    "share": "Share with teacher",
+    "shareTitle": "Share this appraisal?",
+    "shareBody": "{name} will see every score and comment and be asked to acknowledge it. A shared appraisal can no longer be edited.",
+    "shareConfirm": "Share appraisal",
+    "shared": "Appraisal shared with the teacher.",
+    "acknowledge": "Acknowledge",
+    "acknowledged": "Appraisal acknowledged.",
+    "acknowledgePrompt": "Add a comment before signing (optional)",
+    "commentPlaceholder": "Your response to this appraisal…",
+    "acknowledgedOn": "Acknowledged by the teacher on {date}",
+    "signalMarklists": "Marklists approved",
+    "signalPlans": "Weekly plans approved",
+    "template": {
+      "title": "Appraisal criteria",
+      "hint": "The rubric every appraisal starts from — seeded with the Ministry of Education format. Weights must total exactly 100. Existing appraisals keep the criteria they were scored on.",
+      "name": "Template name",
+      "labelPlaceholder": "Criterion, e.g. Lesson planning & preparation",
+      "labelRequired": "Every criterion needs a label.",
+      "weight": "Weight",
+      "maxScore": "Out of",
+      "addCriterion": "Add criterion",
+      "totalWeight": "Total weight",
+      "weightRule": "Criterion weights must add up to exactly 100."
+    }
+  }
+}

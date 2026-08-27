@@ -4,34 +4,12 @@
 
 @section('content')
 
-{{-- ═══════════════════════════════════════════════════════
-     1.  HERO — Post Header
-     ═══════════════════════════════════════════════════════ --}}
-<section style="position:relative;padding:140px 24px 80px;background:var(--dark-950);overflow:hidden;">
-    <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,10,28,.98) 0%,rgba(26,68,247,.1) 50%,rgba(5,10,28,.98) 100%);"></div>
-    <div class="tilet" style="position:absolute;inset:0;opacity:.4;"></div>
-
-    <div style="position:relative;z-index:2;max-width:900px;margin:0 auto;text-align:center;">
-        <div class="sec-label sr" style="justify-content:center;">{{ __('Article') }}</div>
-        <h1 class="display sr" style="font-size:clamp(2rem,4vw,3.2rem);margin-bottom:24px;line-height:1.2;">
-            {{ $post->title }}
-        </h1>
-        
-        <div class="sr" style="display:flex;align-items:center;justify-content:center;gap:20px;font-size:.85rem;color:var(--parchment-40);">
-            <div style="display:flex;align-items:center;gap:8px;">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                {{ $post->published_at?->format('F j, Y') }}
-            </div>
-            @if($post->author)
-                <div style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.2);"></div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <div style="width:24px;height:24px;border-radius:50%;background:var(--blue-glow);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:var(--blue-400);">{{ substr($post->author->name,0,1) }}</div>
-                    {{ $post->author->name }}
-                </div>
-            @endif
-        </div>
-    </div>
-</section>
+<x-public.page-hero
+    :title="$post->title"
+    :subtitle="$post->published_at?->format('F j, Y') . ($post->author ? ' · ' . $post->author->name : '')"
+    :eyebrow="__('Article')"
+    :image="$post->featured_image_url ?? asset('images/unsplash/library-books.jpg')"
+/>
 
 {{-- ═══════════════════════════════════════════════════════
      2.  ARTICLE CONTENT

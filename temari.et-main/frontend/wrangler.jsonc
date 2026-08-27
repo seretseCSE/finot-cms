@@ -1,0 +1,20 @@
+// Cloudflare Workers config — the Next.js app is adapted via @opennextjs/cloudflare.
+// Build + deploy: pnpm deploy:cf   (local preview: pnpm preview:cf)
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "temari-frontend",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Custom domain: uncomment and adjust once temari.et DNS lives on this account.
+  // "routes": [
+  //   { "pattern": "app.temari.et", "custom_domain": true }
+  // ]
+}

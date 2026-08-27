@@ -9,6 +9,13 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "@21st-dev/magic": {
+            "type": "local",
+            "command": ["npx", "-y", "@21st-dev/magic@latest"],
+            "environment": {
+                "API_KEY": "your-api-key-here"
+            }
         }
     }
 }

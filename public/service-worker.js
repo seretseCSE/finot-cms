@@ -1,14 +1,13 @@
 
-const BUILD_INFO = {"timestamp":1780067677072,"hash":"tolij44w1","assets":["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-DwSfKos0.css","/assets/sunday-school-CvmEc6l3.css","/assets/vendor-Ch07e1E5.js","/assets/chart-vendor-CCWw2nGx.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CluoSRK2.js","/assets/tour-roles-4BezQJND.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-BnByl6Yh.js","/assets/app-vLmcb2O0.js","/assets/admin-CbSRwUpv.js","/assets/financial-charts-BiWO-mww.js","/assets/sunday-school-DtppV37B.js","/assets/sunday-school-4DLte2Pz.js","/assets/pwa-install-BWgOSQDS.js","/assets/app-BEfn2VuD.js"]};
-const CACHE_NAME = 'finot-cache-tolij44w1';
-const API_CACHE_NAME = 'finot-api-cache-tolij44w1';
+const BUILD_INFO = {"timestamp":1787807717450,"hash":"sfiezc0dx","assets":["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-Di0zENvY.css","/assets/vendor-DQIN4Xuk.js","/assets/gsap-vendor-a3sj5zmn.js","/assets/chart-vendor-BNIhJ1E0.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CPC7FGMp.js","/assets/tour-roles-4BezQJND.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-CnCXU6KM.js","/assets/app-BVIE1JRH.js","/assets/app-D67deiiy.js","/assets/admin-Z_FQIVnH.js","/assets/bootstrap-D7V-y4i6.js","/assets/financial-charts-OV3SpZ5U.js","/assets/pwa-install-BWgOSQDS.js"]};
+const CACHE_NAME = 'finot-cache-sfiezc0dx';
+const API_CACHE_NAME = 'finot-api-cache-sfiezc0dx';
 
 // Dynamic assets from build
-const DYNAMIC_ASSETS = ["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-DwSfKos0.css","/assets/sunday-school-CvmEc6l3.css","/assets/vendor-Ch07e1E5.js","/assets/chart-vendor-CCWw2nGx.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CluoSRK2.js","/assets/tour-roles-4BezQJND.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-BnByl6Yh.js","/assets/app-vLmcb2O0.js","/assets/admin-CbSRwUpv.js","/assets/financial-charts-BiWO-mww.js","/assets/sunday-school-DtppV37B.js","/assets/sunday-school-4DLte2Pz.js","/assets/pwa-install-BWgOSQDS.js","/assets/app-BEfn2VuD.js"];
+const DYNAMIC_ASSETS = ["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-Di0zENvY.css","/assets/vendor-DQIN4Xuk.js","/assets/gsap-vendor-a3sj5zmn.js","/assets/chart-vendor-BNIhJ1E0.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CPC7FGMp.js","/assets/tour-roles-4BezQJND.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-CnCXU6KM.js","/assets/app-BVIE1JRH.js","/assets/app-D67deiiy.js","/assets/admin-Z_FQIVnH.js","/assets/bootstrap-D7V-y4i6.js","/assets/financial-charts-OV3SpZ5U.js","/assets/pwa-install-BWgOSQDS.js"];
 
 // Static assets that rarely change
 const STATIC_ASSETS = [
-    '/',
     '/manifest.json',
     '/offline',
     '/images/logo.png',
