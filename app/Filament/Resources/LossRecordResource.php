@@ -42,7 +42,7 @@ class LossRecordResource extends Resource
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('loss_records.view') ?? false;
+        return \App\Support\RoleGate::can('loss_records.view');
     }
 
     public static function form(Schema $schema): Schema

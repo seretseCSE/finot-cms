@@ -6,6 +6,11 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
+    public function index()
+    {
+        return redirect()->route('tours.index', ['tab' => 'shop'], 301);
+    }
+
     public function show($slug)
     {
         $product = Product::active()

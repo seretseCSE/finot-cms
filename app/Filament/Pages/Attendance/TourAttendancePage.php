@@ -54,7 +54,7 @@ class TourAttendancePage extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('tours.view');
+        return \App\Support\RoleGate::can('tours.view');
     }
 
     public function mount(): void

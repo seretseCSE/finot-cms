@@ -40,7 +40,7 @@ class BeneficiaryReportPage extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('page.report.beneficiary');
+        return \App\Support\RoleGate::can('page.report.beneficiary');
     }
 
     public ?array $data = [];

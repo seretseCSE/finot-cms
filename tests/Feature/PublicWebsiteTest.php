@@ -39,6 +39,7 @@ class PublicWebsiteTest extends TestCase
         $response = $this->get('/');
         $response->assertStatus(200);
         $response->assertSee('ft-hero', false);
+        $response->assertSee('Skip to content', false);
         $response->assertDontSee('home-legacy');
     }
 
@@ -145,5 +146,29 @@ class PublicWebsiteTest extends TestCase
     {
         $response = $this->get('/offline');
         $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function shop_index_redirects_to_tours(): void
+    {
+        $this->get('/shop')->assertRedirect(route('tours.index', ['tab' => 'shop']));
+    }
+
+    #[Test]
+    public function gallery_redirects_to_media(): void
+    {
+        $this->get('/gallery')->assertRedirect(route('media'));
+    }
+
+    #[Test]
+    public function announcements_index_redirects_to_news(): void
+    {
+        $this->get('/announcements')->assertRedirect(route('news'));
+    }
+
+    #[Test]
+    public function songs_index_redirects_to_media(): void
+    {
+        $this->get('/songs')->assertRedirect(route('media', ['tab' => 'songs']));
     }
 }

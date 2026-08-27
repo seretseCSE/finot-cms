@@ -38,7 +38,7 @@ class TeacherAttendanceReport extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('page.report.teacher-attendance');
+        return \App\Support\RoleGate::can('page.report.teacher-attendance');
     }
 
     public function mount(): void

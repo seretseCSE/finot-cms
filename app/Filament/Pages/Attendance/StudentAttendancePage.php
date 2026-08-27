@@ -51,7 +51,7 @@ class StudentAttendancePage extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.attendance.student');
+        return \App\Support\RoleGate::can('page.attendance.student');
     }
 
     public function mount(): void

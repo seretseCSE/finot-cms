@@ -46,7 +46,7 @@ class FinancialOverviewPage extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('page.financial.statements');
+        return \App\Support\RoleGate::can('page.financial.statements');
     }
 
     public function getFinancialData(): array

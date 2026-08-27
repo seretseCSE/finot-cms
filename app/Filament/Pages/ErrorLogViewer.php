@@ -31,7 +31,7 @@ class ErrorLogViewer extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('error_logs.view') ?? false;
+        return \App\Support\RoleGate::can('error_logs.view');
     }
 
     protected function getHeaderActions(): array

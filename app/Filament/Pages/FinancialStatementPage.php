@@ -43,7 +43,7 @@ class FinancialStatementPage extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('page.financial.statement');
+        return \App\Support\RoleGate::can('page.financial.statement');
     }
 
     public string     $periodType      = 'monthly';

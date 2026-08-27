@@ -32,7 +32,7 @@ class TourReport extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.report.tour');
+        return \App\Support\RoleGate::can('page.report.tour');
     }
 
     public ?string $status = 'all';

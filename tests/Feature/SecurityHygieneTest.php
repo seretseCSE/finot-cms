@@ -72,5 +72,11 @@ class SecurityHygieneTest extends TestCase
     {
         $this->getJson('/api/product-tour/status')
             ->assertUnauthorized();
+
+        $this->postJson('/api/product-tour/start', [])
+            ->assertUnauthorized();
+
+        $this->postJson('/api/product-tour/complete', [])
+            ->assertUnauthorized();
     }
 }

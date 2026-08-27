@@ -34,6 +34,18 @@ Route::get('/offline', [PwaController::class, 'offline'])->name('offline');
 
 // Public reading — generous so browsing and assets-in-page don't 429
 Route::middleware('throttle:public-browse')->group(function () {
+    // Legacy public URLs — 301 to the combined News / Media / Learn / Tours pages
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/events', [EventController::class, 'index'])->name('events');
+    Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
+    Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+    Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
+    Route::get('/gallery', [MediaController::class, 'legacyIndex'])->name('gallery.index');
+    Route::redirect('/study', '/courses', 301);
+    Route::redirect('/course', '/courses', 301);
+    Route::get('/study/{path}', fn ($path) => redirect('/courses/'.$path, 301))->where('path', '.*');
+    Route::get('/course/{path}', fn ($path) => redirect('/courses/'.$path, 301))->where('path', '.*');
+
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/about', [AboutController::class, 'index'])->name('about');
     Route::get('/news', [NewsController::class, 'index'])->name('news');
@@ -58,16 +70,7 @@ Route::middleware('throttle:public-browse')->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::get('/favorites/status', [FavoriteController::class, 'status'])->name('favorites.status');
 
-    Route::redirect('/study', '/courses', 301);
-    Route::redirect('/course', '/courses', 301);
-    Route::get('/study/{path}', fn ($path) => redirect('/courses/'.$path, 301))->where('path', '.*');
-    Route::get('/course/{path}', fn ($path) => redirect('/courses/'.$path, 301))->where('path', '.*');
-    Route::get('/announcements', fn () => redirect()->route('news', [], 301))->name('announcements.index');
-    Route::get('/events', fn () => redirect()->route('news', ['tab' => 'events'], 301))->name('events');
-    Route::get('/shop', fn () => redirect()->route('tours.index', [], 301))->name('shop.index');
-    Route::get('/blog', fn () => redirect()->route('news', ['tab' => 'blog'], 301))->name('blog.index');
-    Route::get('/songs', fn () => redirect()->route('media', ['tab' => 'songs'], 301))->name('songs.index');
-    Route::get('/gallery', fn () => redirect()->route('media', [], 301));
+    // Legacy public URLs (keep 301s for bookmarks and search engines)
 });
 
 Route::middleware('throttle:public-search')->group(function () {

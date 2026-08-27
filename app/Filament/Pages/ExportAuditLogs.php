@@ -47,7 +47,7 @@ class ExportAuditLogs extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.system.audit-logs-export') ?? false;
+        return \App\Support\RoleGate::can('page.system.audit-logs-export');
     }
 
     public function mount(): void

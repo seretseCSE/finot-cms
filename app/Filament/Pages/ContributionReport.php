@@ -57,7 +57,7 @@ class ContributionReport extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('page.report.contribution');
+        return \App\Support\RoleGate::can('page.report.contribution');
     }
 
     public function mount(): void
@@ -198,7 +198,7 @@ class ContributionReport extends Page
                 ->label('Export')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->visible(fn () => ! auth()->user()?->hasRole('nibret_hisab_head'))
+                ->visible(fn () => ! \App\Support\RoleGate::is('nibret_hisab_head'))
                 ->form([
                     CheckboxList::make('columns')
                         ->label('Columns')

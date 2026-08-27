@@ -237,7 +237,7 @@ class MonthlyContributionReports extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasAnyRole(['super_admin', 'admin', 'finance_admin', 'treasurer']) ?? false;
+        return \App\Support\RoleGate::isAny(['super_admin', 'admin', 'finance_admin', 'treasurer', 'superadmin', 'finance_head']);
     }
 
     protected function getHeaderActions(): array
@@ -249,7 +249,7 @@ class MonthlyContributionReports extends Page
                 ->iconSize('xs')
                 ->size('xs')
                 ->color('success')
-                ->visible(fn () => ! auth()->user()?->hasRole('nibret_hisab_head'))
+                ->visible(fn () => ! \App\Support\RoleGate::is('nibret_hisab_head'))
                 ->action(function () {
                     // Export logic here
                     Notification::make()

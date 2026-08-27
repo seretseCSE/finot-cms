@@ -71,9 +71,7 @@ class OutstandingContributions extends Page
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
-
-        return $user?->can('reports.outstanding_view');
+        return \App\Support\RoleGate::can('reports.outstanding_view');
     }
 
     public function mount(): void

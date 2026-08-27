@@ -6,6 +6,11 @@ use App\Models\Event;
 
 class EventController extends Controller
 {
+    public function index()
+    {
+        return redirect()->route('news', ['tab' => 'events'], 301);
+    }
+
     public function show(Event $event)
     {
         if (! in_array($event->status, ['Published', 'Ongoing', 'Full'])) {

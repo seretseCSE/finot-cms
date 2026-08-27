@@ -4,6 +4,7 @@ import '../../css/tours/dark-mode.css';
 import '../../css/tours/mobile.css';
 
 let tourManager = null;
+let reinitTimer = null;
 
 function initTourSystem() {
     const root = document.getElementById('product-tour-root');
@@ -34,29 +35,25 @@ function initTourSystem() {
 }
 
 function reinitTourSystem() {
-    reinitializeProductTour().then(manager => {
-        tourManager = manager;
-        window.__tourManager = manager;
+    clearTimeout(reinitTimer);
+    reinitTimer = setTimeout(() => {
+        reinitializeProductTour().then(manager => {
+            tourManager = manager;
+            window.__tourManager = manager;
 
-        window.dispatchEvent(new CustomEvent('productTourReinitialized', {
-            detail: { manager },
-            bubbles: true,
-        }));
-    });
+            window.dispatchEvent(new CustomEvent('productTourReinitialized', {
+                detail: { manager },
+                bubbles: true,
+            }));
+        });
+    }, 300);
 }
 
 function setupLivewireHooks() {
-    document.addEventListener('livewire:navigated', () => {
-        setTimeout(() => reinitTourSystem(), 300);
-    });
-
-    document.addEventListener('livewire:load', () => {
-        setTimeout(() => reinitTourSystem(), 300);
-    });
-
-    document.addEventListener('render', () => {
-        reinitTourSystem();
-    });
+    document.addEventListener('livewire:navigated', () => reinitTourSystem());
+    document.addEventListener('livewire:initialized', () => reinitTourSystem());
+    document.addEventListener('livewire:load', () => reinitTourSystem());
+    window.addEventListener('popstate', () => reinitTourSystem());
 }
 
 function setupMutationObserver() {
@@ -68,6 +65,7 @@ function setupMutationObserver() {
                         node.matches?.('[data-tour]') ||
                         node.querySelector?.('[data-tour]')
                     )) {
+                        reinitTourSystem();
                         return;
                     }
                 }

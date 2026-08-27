@@ -49,7 +49,7 @@ class TeacherAttendancePage extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.attendance.teacher');
+        return \App\Support\RoleGate::can('page.attendance.teacher');
     }
 
     public function mount(): void

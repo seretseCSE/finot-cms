@@ -10,41 +10,51 @@ use Symfony\Component\HttpFoundation\Response;
 class ErrorLoggingMiddleware
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @var list<string>
      */
+    private array $sensitiveKeys = [
+        'password',
+        'password_confirmation',
+        'current_password',
+        'new_password',
+        'new_password_confirmation',
+        'token',
+        '_token',
+        'authorization',
+        'cookie',
+        'remember',
+        'remember_token',
+    ];
+
     public function handle(Request $request, Closure $next): Response
     {
         try {
             $response = $next($request);
 
-            // Log 500 errors
             if ($response->getStatusCode() === 500) {
-                Log::error('HTTP 500 Error detected', [
-                    'url' => $request->fullUrl(),
-                    'method' => $request->method(),
-                    'ip' => $request->ip(),
-                    'user_agent' => $request->userAgent(),
-                    'request_data' => $request->except(['password', 'token']),
-                    'headers' => $request->headers->all(),
-                    'response_content' => $response->getContent(),
-                ]);
+                Log::error('HTTP 500 Error detected', $this->context($request));
             }
 
             return $response;
         } catch (\Throwable $e) {
-            Log::error('Exception in ErrorLoggingMiddleware', [
-                'url' => $request->fullUrl(),
-                'method' => $request->method(),
-                'ip' => $request->ip(),
+            Log::error('Unhandled exception', array_merge($this->context($request), [
                 'exception' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            ]));
 
             throw $e;
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function context(Request $request): array
+    {
+        return [
+            'url' => $request->url(),
+            'method' => $request->method(),
+            'ip' => $request->ip(),
+            'request_data' => $request->except($this->sensitiveKeys),
+        ];
     }
 }

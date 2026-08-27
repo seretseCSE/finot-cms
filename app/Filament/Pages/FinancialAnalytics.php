@@ -48,7 +48,7 @@ class FinancialAnalytics extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('page.financial.analytics');
+        return \App\Support\RoleGate::can('page.financial.analytics');
     }
 
     public function mount(): void

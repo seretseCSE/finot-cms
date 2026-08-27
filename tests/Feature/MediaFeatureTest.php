@@ -31,7 +31,7 @@ class MediaFeatureTest extends TestCase
         MediaItem::factory()->public()->photo()->create(['title' => 'Photo Item']);
         MediaItem::factory()->public()->video()->create(['title' => 'Video Item']);
 
-        $response = $this->get('/media?type=Photo');
+        $response = $this->get('/media?tab=photos');
 
         $response->assertStatus(200);
         $response->assertSee('Photo Item');
@@ -44,7 +44,7 @@ class MediaFeatureTest extends TestCase
         MediaItem::factory()->public()->photo()->create(['title' => 'Photo Item']);
         MediaItem::factory()->public()->video()->create(['title' => 'Video Item']);
 
-        $response = $this->get('/media?type=Video');
+        $response = $this->get('/media?tab=videos');
 
         $response->assertStatus(200);
         $response->assertSee('Video Item');

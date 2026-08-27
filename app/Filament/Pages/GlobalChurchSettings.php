@@ -47,7 +47,7 @@ class GlobalChurchSettings extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.settings.global-church') ?? false;
+        return \App\Support\RoleGate::can('page.settings.global-church');
     }
 
     public function mount(): void

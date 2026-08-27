@@ -36,7 +36,7 @@ class BackupRestore extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('system.backups') ?? false;
+        return \App\Support\RoleGate::can('system.backups');
     }
 
     public function getBackups(): array

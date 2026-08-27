@@ -367,4 +367,24 @@ Keeps members and staff informed.
 
 ---
 
-*This overview is intended for product and operational planning. For detailed workflows or feature deep-dives, please reach out to the product or engineering team.*
+## Operations (production)
+
+The Laravel scheduler must run in production so session cleanup and dashboard caches stay healthy:
+
+```
+* * * * * cd /path-to-app && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Or locally: `php artisan schedule:work`.
+
+| Command | Cadence | Purpose |
+|---------|---------|---------|
+| `session:cleanup` | every 5 min | Purge stale `user_sessions` (not on each web request) |
+| `dashboard:cache-warm` | every 5 min | Pre-fill dashboard widget caches after deploy |
+| `content:publish-scheduled` | every 5 min | Publish due blog posts and announcements |
+| `system:auto-archive` | daily 02:00 | Archive old records |
+| `attendance:auto-lock` | daily 03:00 | Lock stale attendance sessions |
+
+After deploy, run in order: `php artisan filament:assets`, `config:cache`, `route:cache`, `event:cache`, `npm run build`. Do not run `view:cache` (incompatible with Filament Blade components).
+
+---

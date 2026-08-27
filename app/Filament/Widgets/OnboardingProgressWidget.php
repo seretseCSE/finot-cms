@@ -9,19 +9,30 @@ class OnboardingProgressWidget extends Widget
 {
     protected static ?int $sort = -5;
 
-    protected static string $view = 'filament.widgets.onboarding-progress';
+    protected string $view = 'filament.widgets.onboarding-progress';
 
     public static function canView(): bool
     {
-        $user = auth()->user();
-        if (!$user) return false;
+        if (! config('product-tour.enabled')) {
+            return false;
+        }
 
-        return config('product-tour.enabled') && $user->hasAnyRole(config('product-tour.supported_roles', []));
+        return \App\Support\RoleGate::isAny(config('product-tour.supported_roles', []));
     }
 
     protected function getViewData(): array
     {
-        $user = auth()->user();
+        $user = \App\Support\RoleGate::user();
+
+        if (! $user) {
+            return [
+                'stats' => [],
+                'totalTours' => 0,
+                'completedTours' => 0,
+                'overallProgress' => 0,
+            ];
+        }
+
         $role = $user->roles->first()?->name;
 
         $completions = ProductTourCompletion::where('user_id', $user->id)

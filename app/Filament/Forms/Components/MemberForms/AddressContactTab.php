@@ -15,21 +15,18 @@ class AddressContactTab
             ->icon('heroicon-o-map-pin')
             ->schema([
                 Section::make('Residential Address')
-                    ->description('Current address details')
+                    ->description('Address is optional. Phone is required for Youth and Adult members.')
                     ->schema([
                         Forms\Components\TextInput::make('city')
                             ->label('City')
-                            ->required()
                             ->maxLength(100),
 
                         Forms\Components\TextInput::make('sub_city')
                             ->label('Sub-City')
-                            ->required()
                             ->maxLength(100),
 
                         Forms\Components\TextInput::make('woreda')
                             ->label('Woreda')
-                            ->required()
                             ->maxLength(50),
 
                         Forms\Components\TextInput::make('zone')

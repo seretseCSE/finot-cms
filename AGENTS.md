@@ -15,7 +15,7 @@ The codebase uses **two complementary authorization strategies**:
    - `canAccess()` on Pages (e.g. `DonationReportPage`, `BeneficiaryReportPage`)
     - Form component `->visible()` / `->disabled()` closures (e.g. in `MemberResource`, `UserResource`)
 
-**Rule of thumb:** Resources extend `BaseResource`; Pages and one-off UI elements use inline role checks.
+**Rule of thumb:** Resources extend `BaseResource`; Pages and one-off UI elements use `App\Support\RoleGate` (`can()`, `isAny()`, `check()`).
 
 ---
 

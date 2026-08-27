@@ -31,7 +31,7 @@ class SystemHealthMonitoring extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.system.health') ?? false;
+        return \App\Support\RoleGate::can('page.system.health');
     }
 
     protected function getHeaderActions(): array

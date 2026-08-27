@@ -2,13 +2,19 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\EditProfile;
+use App\Filament\Pages\ManageActiveSessions;
+use App\Filament\Support\AdminNavigation;
 use App\Http\Middleware\ForcePasswordChange;
+use App\Services\ProductTour\ProductTourService;
+use App\Support\RoleGate;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Pages\Dashboard;
+use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
@@ -18,12 +24,6 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Navigation\MenuItem;
-use Filament\Support\Facades\FilamentAsset;
-use Filament\View\View;
-use App\Filament\Pages\EditProfile;
-use App\Filament\Pages\ManageActiveSessions;
-use App\Services\ProductTour\ProductTourService;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -47,18 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->font('Inter', provider: LocalFontProvider::class)
             ->topNavigation(false)
             ->collapsibleNavigationGroups(true)
-            ->navigationGroups([
-                'Membership Management',
-                'Education Management',
-                'Contributions',
-                'Financial Reports',
-                'Revenue & Banking',
-                'Charity Management',
-                'Inventory Management',
-                'Tour Management',
-                'Content Management',
-                'System',
-            ])
+            ->navigationGroups(AdminNavigation::groups())
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->favicon(asset('images/logo2.png'))
@@ -75,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Manage Sessions')
                     ->url(fn (): string => ManageActiveSessions::getUrl())
                     ->icon('heroicon-o-clock')
-                    ->visible(fn (): bool => auth()->user()?->hasAnyRole(['superadmin', 'admin'])),
+                    ->visible(fn (): bool => RoleGate::isAny(['superadmin', 'admin'])),
                 'restart_tour' => MenuItem::make()
                     ->label('Restart Tour')
                     ->icon('heroicon-o-question-mark-circle')

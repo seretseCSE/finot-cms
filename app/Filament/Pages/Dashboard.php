@@ -70,14 +70,18 @@ class Dashboard extends BaseDashboard
 
     public function getHeading(): string
     {
-        return __('Welcome, :name', ['name' => filament()->auth()->user()->name]);
+        return __('Welcome, :name', ['name' => \App\Support\RoleGate::user()?->name ?? __('there')]);
     }
 
     public function getWidgets(): array
     {
-        $user = auth()->user();
+        $user = \App\Support\RoleGate::user();
 
-        if ($user->hasRole('superadmin')) {
+        if (! $user) {
+            return [];
+        }
+
+        if (\App\Support\RoleGate::is('superadmin')) {
             return [
                 OnboardingProgressWidget::class,
                 TotalRegisteredUsersWidget::class,
@@ -91,7 +95,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('admin')) {
+        if (\App\Support\RoleGate::is('admin')) {
             return [
                 OnboardingProgressWidget::class,
                 TotalMembersWidget::class,
@@ -111,7 +115,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('finance_head')) {
+        if (\App\Support\RoleGate::is('finance_head')) {
             return [
                 TotalIncomeWidget::class,
                 TotalExpensesWidget::class,
@@ -126,7 +130,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('nibret_hisab_head')) {
+        if (\App\Support\RoleGate::is('nibret_hisab_head')) {
             return [
                 TotalIncomeWidget::class,
                 TotalExpensesWidget::class,
@@ -140,7 +144,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('hr_head')) {
+        if (\App\Support\RoleGate::is('hr_head')) {
             return [
                 TotalMembersWidget::class,
                 ActiveMembersWidget::class,
@@ -152,7 +156,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('education_head')) {
+        if (\App\Support\RoleGate::is('education_head')) {
             return [
                 ActiveEnrollmentsWidget::class,
                 ActiveTeachersWidget::class,
@@ -163,7 +167,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('education_monitor')) {
+        if (\App\Support\RoleGate::is('education_monitor')) {
             return [
                 AttendanceRateWidget::class,
 
@@ -171,7 +175,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('tour_head')) {
+        if (\App\Support\RoleGate::is('tour_head')) {
             return [
                 UpcomingToursWidget::class,
                 TourPassengersWidget::class,
@@ -182,7 +186,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('charity_head')) {
+        if (\App\Support\RoleGate::is('charity_head')) {
             return [
                 ActiveBeneficiariesWidget::class,
                 AidDistributedWidget::class,
@@ -194,7 +198,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('revenue_and_charity_head')) {
+        if (\App\Support\RoleGate::is('revenue_and_charity_head')) {
             return [
                 UpcomingToursWidget::class,
                 TourPassengersWidget::class,
@@ -210,7 +214,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('worship_monitor')) {
+        if (\App\Support\RoleGate::is('worship_monitor')) {
             return [
                 UpcomingRehearsalsWidget::class,
 
@@ -218,7 +222,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('mezmur_head')) {
+        if (\App\Support\RoleGate::is('mezmur_head')) {
             return [
                 UpcomingRehearsalsWidget::class,
 
@@ -227,7 +231,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('av_head')) {
+        if (\App\Support\RoleGate::is('av_head')) {
             return [
                 PublishedMediaWidget::class,
                 BlogPostsWidget::class,
@@ -238,7 +242,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('inventory_staff')) {
+        if (\App\Support\RoleGate::is('inventory_staff')) {
             return [
                 TotalInventoryItemsWidget::class,
                 LowStockItemsWidget::class,
@@ -249,7 +253,7 @@ class Dashboard extends BaseDashboard
             ];
         }
 
-        if ($user->hasRole('internal_relations_head')) {
+        if (\App\Support\RoleGate::is('internal_relations_head')) {
             return [
                 TotalMembersWidget::class,
                 ActiveMembersWidget::class,

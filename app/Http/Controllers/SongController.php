@@ -6,6 +6,11 @@ use App\Models\Song;
 
 class SongController extends Controller
 {
+    public function index()
+    {
+        return redirect()->route('media', ['tab' => 'songs'], 301);
+    }
+
     public function show($id)
     {
         $song = Song::where('is_active', true)

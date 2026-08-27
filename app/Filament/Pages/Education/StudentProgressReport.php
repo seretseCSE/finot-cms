@@ -44,7 +44,7 @@ class StudentProgressReport extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('page.report.student-progress');
+        return \App\Support\RoleGate::can('page.report.student-progress');
     }
 
     public function mount(): void

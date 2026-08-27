@@ -46,7 +46,7 @@ class ContributionMatrix extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->user()?->can('page.report.contribution-matrix');
+        return \App\Support\RoleGate::can('page.report.contribution-matrix');
     }
 
     // Filter properties
@@ -604,7 +604,7 @@ class ContributionMatrix extends Page
                 ->label('Export to Excel')
                 ->color('primary')
                 ->icon('heroicon-o-arrow-down-tray')
-                ->visible(fn () => ! auth()->user()?->hasRole('nibret_hisab_head'))
+                ->visible(fn () => ! \App\Support\RoleGate::is('nibret_hisab_head'))
                 ->action('export'),
 
             Action::make('refresh')

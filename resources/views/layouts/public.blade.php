@@ -41,7 +41,9 @@
 </head>
 <body class="min-h-screen flex flex-col ft-page transition-colors duration-300">
 
-    <div id="scroll-progress" class="fixed top-0 left-0 right-0 h-0.5 z-[200] pointer-events-none" style="transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#1A44F7,#F3BA15,#1A44F7);background-size:200% 100%;"></div>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[300] focus:px-4 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-lg focus:shadow-lg">{{ __('Skip to content') }}</a>
+
+    <div id="scroll-progress" class="fixed top-0 left-0 right-0 h-0.5 z-[200] pointer-events-none" style="transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#1A44F7,#F3BA15,#1A44F7);background-size:200% 100%;" aria-hidden="true"></div>
 
     <x-navigation :currentPage="$currentPage ?? ''" />
 
@@ -56,7 +58,7 @@
         </div>
     @endif
 
-    <main class="flex-1 relative z-10">@yield('content')</main>
+    <main id="main-content" class="flex-1 relative z-10" tabindex="-1">@yield('content')</main>
 
     <x-footer />
 

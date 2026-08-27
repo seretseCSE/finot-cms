@@ -35,7 +35,7 @@ class CharityReport extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.report.charity');
+        return \App\Support\RoleGate::can('page.report.charity');
     }
 
     public ?string $date_from = null;

@@ -13,6 +13,11 @@ class BlogController extends Controller
     ) {
     }
 
+    public function index()
+    {
+        return redirect()->route('news', ['tab' => 'blog'], 301);
+    }
+
     public function show($slug)
     {
         $post = BlogPost::where('slug', $slug)

@@ -50,7 +50,7 @@ class ManageCustomOptions extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.custom-options');
+        return \App\Support\RoleGate::can('page.custom-options');
     }
 
     public function table(Table $table): Table

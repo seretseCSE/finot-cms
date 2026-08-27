@@ -26,7 +26,7 @@ class UserManual extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::check();
+        return \App\Support\RoleGate::check();
     }
 
     public static function shouldRegisterNavigation(): bool

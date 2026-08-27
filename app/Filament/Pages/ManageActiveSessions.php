@@ -173,6 +173,6 @@ class ManageActiveSessions extends Page implements HasTable
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->check();
+        return \App\Support\RoleGate::check();
     }
 }

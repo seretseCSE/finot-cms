@@ -69,7 +69,7 @@
                 $navLink('about', route('about'), __('About')),
                 $navLink('news', route('news'), __('News')),
             ] as $link)
-                <a href="{{ $link['href'] }}" class="relative px-3 py-2 text-xs font-medium tracking-widest uppercase rounded-lg transition-all duration-300 {{ $link['class'] }}">
+                <a href="{{ $link['href'] }}" class="relative px-3 py-2 text-xs font-medium tracking-widest uppercase rounded-lg transition-all duration-300 {{ $link['class'] }}" @if($resolvedPage === $link['page']) aria-current="page" @endif>
                     {{ $link['label'] }}
                 </a>
             @endforeach
@@ -98,7 +98,7 @@
                 $navLink('media', route('media'), __('Media')),
                 $navLink('contact', route('contact'), __('Contact')),
             ] as $link)
-                <a href="{{ $link['href'] }}" class="relative px-3 py-2 text-xs font-medium tracking-widest uppercase rounded-lg transition-all duration-300 {{ $link['class'] }}">
+                <a href="{{ $link['href'] }}" class="relative px-3 py-2 text-xs font-medium tracking-widest uppercase rounded-lg transition-all duration-300 {{ $link['class'] }}" @if($resolvedPage === $link['page']) aria-current="page" @endif>
                     {{ $link['label'] }}
                 </a>
             @endforeach
@@ -147,14 +147,17 @@
 
             <button @click="mobileOpen = !mobileOpen"
                     class="md:hidden p-2 rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5 text-slate-700 dark:text-white/80"
-                    aria-label="Toggle navigation">
+                    :aria-expanded="mobileOpen"
+                    aria-controls="mobile-nav"
+                    aria-label="{{ __('Toggle navigation') }}">
                 <svg x-show="!mobileOpen" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 <svg x-show="mobileOpen" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
     </div>
 
-    <div x-show="mobileOpen"
+    <div id="mobile-nav"
+         x-show="mobileOpen"
          @click.away="mobileOpen = false"
          x-transition
          class="md:hidden absolute top-16 left-0 right-0 ft-nav-glass border-b border-black/5 dark:border-white/5 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto"
@@ -168,6 +171,7 @@
                 <a href="{{ $item['href'] }}"
                    class="flex items-center justify-between px-4 py-3 text-sm font-medium tracking-widest uppercase rounded-lg transition-all duration-200
                           {{ $resolvedPage === $item['page'] ? 'text-primary-500 bg-primary-500/10' : 'text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5' }}"
+                   @if($resolvedPage === $item['page']) aria-current="page" @endif
                    @click="mobileOpen = false">
                     <span>{{ $item['label'] }}</span>
                     <span class="text-[0.6rem] text-slate-500">{{ $item['am'] }}</span>
@@ -176,16 +180,18 @@
 
             <div>
                 <button @click="mobileLearnOpen = !mobileLearnOpen"
-                    class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium tracking-widest uppercase rounded-lg text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5">
+                    class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium tracking-widest uppercase rounded-lg text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5"
+                    :aria-expanded="mobileLearnOpen"
+                    aria-controls="mobile-learn-nav">
                     <span>{{ __('Learn') }}</span>
                     <div class="flex items-center gap-2">
                         <span class="text-[0.6rem] text-slate-500">ትምህርት</span>
                         <svg :class="mobileLearnOpen ? 'rotate-180' : ''" class="transition-transform duration-200" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                 </button>
-                <div x-show="mobileLearnOpen" class="ml-4 flex flex-col gap-1 pb-1" style="display:none;">
-                    <a href="{{ route('courses.index') }}" class="block px-4 py-2.5 text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-primary-500 rounded-lg" @click="mobileOpen = false">{{ __('Courses') }}</a>
-                    <a href="{{ route('library') }}" class="block px-4 py-2.5 text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-primary-500 rounded-lg" @click="mobileOpen = false">{{ __('Library') }}</a>
+                <div id="mobile-learn-nav" x-show="mobileLearnOpen" class="ml-4 flex flex-col gap-1 pb-1" style="display:none;">
+                    <a href="{{ route('courses.index') }}" class="block px-4 py-2.5 text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-primary-500 rounded-lg" @if(($resolvedPage ?? '') === 'courses') aria-current="page" @endif @click="mobileOpen = false">{{ __('Courses') }}</a>
+                    <a href="{{ route('library') }}" class="block px-4 py-2.5 text-xs font-medium tracking-widest uppercase text-slate-500 hover:text-primary-500 rounded-lg" @if(($resolvedPage ?? '') === 'library') aria-current="page" @endif @click="mobileOpen = false">{{ __('Library') }}</a>
                 </div>
             </div>
 
@@ -196,6 +202,7 @@
                 <a href="{{ $item['href'] }}"
                    class="flex items-center justify-between px-4 py-3 text-sm font-medium tracking-widest uppercase rounded-lg transition-all duration-200
                           {{ $resolvedPage === $item['page'] ? 'text-primary-500 bg-primary-500/10' : 'text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5' }}"
+                   @if($resolvedPage === $item['page']) aria-current="page" @endif
                    @click="mobileOpen = false">
                     <span>{{ $item['label'] }}</span>
                     <span class="text-[0.6rem] text-slate-500">{{ $item['am'] }}</span>

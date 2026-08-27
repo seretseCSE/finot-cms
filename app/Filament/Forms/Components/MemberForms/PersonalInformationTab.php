@@ -16,7 +16,7 @@ class PersonalInformationTab
             ->icon('heroicon-o-user')
             ->schema([
                 Section::make('Basic Information')
-                    ->description('Enter basic personal details')
+                    ->description('Name, type, and gender are required. Other details can be added later.')
                     ->schema([
                         Forms\Components\Select::make('title')
                             ->label('Title')
@@ -28,7 +28,6 @@ class PersonalInformationTab
                                 'Dr.' => 'Dr.',
                                 'Kesis' => 'Kesis',
                             ])
-                            ->required()
                             ->live(),
 
                         Forms\Components\Select::make('member_type')
@@ -57,17 +56,14 @@ class PersonalInformationTab
 
                         Forms\Components\TextInput::make('grandfather_name')
                             ->label("Grandfather's Name")
-                            ->required()
                             ->maxLength(100),
 
                         Forms\Components\TextInput::make('mother_name')
                             ->label("Mother's Name")
-                            ->required()
                             ->maxLength(100),
 
                         Forms\Components\DatePicker::make('date_of_birth')
                             ->label('Date of Birth')
-                            ->required()
                             ->maxDate(now()),
 
                         Forms\Components\Radio::make('gender')

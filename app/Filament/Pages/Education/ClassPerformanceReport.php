@@ -38,7 +38,7 @@ class ClassPerformanceReport extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return Auth::user()?->can('page.report.class-performance');
+        return \App\Support\RoleGate::can('page.report.class-performance');
     }
 
     public function mount(): void

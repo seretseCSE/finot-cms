@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
+    public function legacyIndex()
+    {
+        return redirect()->route('media', [], 301);
+    }
+
     public function index(Request $request)
     {
         $activeTab = $request->query('tab', 'photos');

@@ -51,7 +51,7 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Di0zENvY.css",
+    "file": "assets/app-BCMLJ9vo.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -60,7 +60,7 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-Z_FQIVnH.js",
+    "file": "assets/admin-f5XAProP.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
@@ -105,7 +105,7 @@
     "isDynamicEntry": true
   },
   "resources/js/tours/filament-init.js": {
-    "file": "assets/filament-init-CnCXU6KM.js",
+    "file": "assets/filament-init-DnqHdm8D.js",
     "name": "filament-init",
     "src": "resources/js/tours/filament-init.js",
     "isEntry": true,

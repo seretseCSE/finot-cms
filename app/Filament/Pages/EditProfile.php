@@ -159,7 +159,7 @@ class EditProfile extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return auth()->check();
+        return \App\Support\RoleGate::check();
     }
 
     public static function getLabel(): string

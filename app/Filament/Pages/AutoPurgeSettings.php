@@ -35,7 +35,7 @@ class AutoPurgeSettings extends Page
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('page.settings.auto-purge') ?? false;
+        return \App\Support\RoleGate::can('page.settings.auto-purge');
     }
 
     public function mount(): void
