@@ -20,10 +20,7 @@
 @section('content')
 
 {{-- 1. HERO --}}
-<section id="hero" class="ft-hero">
-    <video class="ft-hero__video" autoplay muted loop playsinline poster="{{ asset('images/hero-bg.webp') }}" aria-hidden="true">
-        <source src="{{ asset('videos/hero.mp4') }}" type="video/mp4">
-    </video>
+<section id="hero" class="ft-hero"> 
     <div class="ft-hero__overlay" aria-hidden="true"></div>
 
     <div class="ft-hero__content">

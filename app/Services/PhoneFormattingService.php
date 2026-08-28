@@ -68,4 +68,38 @@ class PhoneFormattingService
     {
         return 'Enter 9 digits after ' . self::prefix();
     }
+
+    /**
+     * National 9-digit number (no country code, no leading zeros).
+     */
+    public static function nationalDigits(?string $input): ?string
+    {
+        if ($input === null) {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', $input) ?? '';
+        if ($digits === '') {
+            return null;
+        }
+
+        $prefixDigits = preg_replace('/\D+/', '', self::prefix()) ?? '';
+        if ($prefixDigits !== '' && str_starts_with($digits, $prefixDigits)) {
+            $digits = substr($digits, strlen($prefixDigits));
+        }
+
+        $digits = ltrim($digits, '0');
+
+        return $digits !== '' ? $digits : null;
+    }
+
+    /**
+     * Full stored phone (+251…) for authentication lookup.
+     */
+    public static function normalizeForAuth(?string $input): ?string
+    {
+        $national = self::nationalDigits($input);
+
+        return $national ? self::prefix().$national : null;
+    }
 }

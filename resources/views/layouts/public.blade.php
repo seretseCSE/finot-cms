@@ -62,7 +62,9 @@
 
     <x-footer />
 
-    <div id="pwa-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[600] max-w-[420px] w-[calc(100%-40px)] hidden" role="region" aria-label="Install app">
+    <div id="offline-storage-meter" class="fixed bottom-20 right-5 z-[500] max-w-[280px] text-xs text-slate-400 bg-black/40 backdrop-blur px-3 py-2 rounded-lg hidden sm:block"></div>
+    <button type="button" data-offline-clear class="fixed bottom-20 right-5 translate-y-8 z-[500] text-[10px] uppercase tracking-wide text-slate-500 hover:text-white bg-transparent border-none cursor-pointer">Clear offline</button>
+
         <div class="glass-card p-4 flex items-center gap-3">
             <div class="flex-1">
                 <div class="font-semibold text-sm text-white">{{ __('Install App') }}</div>

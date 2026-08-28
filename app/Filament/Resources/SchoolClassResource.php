@@ -3,13 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SchoolClassResource\Pages;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SchoolClassResource\RelationManagers\TeachersRelationManager;
 use App\Models\ClassModel;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class SchoolClassResource extends BaseResource
 {

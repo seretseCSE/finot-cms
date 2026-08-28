@@ -61,6 +61,7 @@
                             <audio controls style="width:100%;height:40px;filter:invert(1) hue-rotate(180deg) brightness(1.5);">
                                 <source src="{{ $song->audio_url }}" type="audio/mpeg">
                             </audio>
+                            <button type="button" class="btn btn-ghost" data-offline-url="{{ $song->audio_url }}" data-offline-title="{{ $song->title }}" style="margin-top:12px;padding:8px 16px;font-size:.75rem;">{{ __('Save offline') }}</button>
                         </div>
                     @endif
                     @if($song->video_url)

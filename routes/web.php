@@ -3,6 +3,10 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InAppNotificationController;
+use App\Http\Controllers\Portal\PortalAuthController;
+use App\Http\Controllers\Portal\PortalController;
+use App\Http\Middleware\RecordPageView;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CourseController;
@@ -23,6 +27,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\TourController;
+use App\Http\Controllers\WithdrawalPrintController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/backup.php';
@@ -33,7 +38,7 @@ Route::get('/build-info.json', [PwaController::class, 'buildInfo']);
 Route::get('/offline', [PwaController::class, 'offline'])->name('offline');
 
 // Public reading — generous so browsing and assets-in-page don't 429
-Route::middleware('throttle:public-browse')->group(function () {
+Route::middleware(['throttle:public-browse', RecordPageView::class])->group(function () {
     // Legacy public URLs — 301 to the combined News / Media / Learn / Tours pages
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
     Route::get('/events', [EventController::class, 'index'])->name('events');
@@ -97,6 +102,7 @@ Route::middleware(['auth', 'throttle:5,1'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/profile', [EditProfileController::class, '__invoke'])->name('admin.edit-profile');
+    Route::get('/withdrawals/{withdrawal}/print', WithdrawalPrintController::class)->name('withdrawals.print');
     Route::get('/exports/download/{filename}', ExportDownloadController::class)
         ->where('filename', '[A-Za-z0-9._-]+')
         ->name('exports.download');
@@ -107,16 +113,39 @@ Route::middleware(['auth', 'throttle:30,1'])->group(function () {
     Route::get('/api/session/status', [SessionController::class, 'getSessionStatus'])->name('session.status');
 });
 
-Route::get('/login', function () {
-    return redirect()->route('filament.admin.auth.login');
-})->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+
+Route::get('/portal/login', [PortalAuthController::class, 'showLogin'])->name('portal.login');
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/portal/login', [PortalAuthController::class, 'login'])->name('portal.login.submit');
+});
+Route::post('/portal/logout', [PortalAuthController::class, 'logout'])->middleware('auth')->name('portal.logout');
+
+Route::middleware(['auth', 'student'])->prefix('portal')->name('portal.')->group(function () {
+    Route::get('/', [PortalController::class, 'home'])->name('home');
+    Route::get('/results', [PortalController::class, 'results'])->name('results');
+    Route::get('/attendance', [PortalController::class, 'attendance'])->name('attendance');
+    Route::get('/offline-snapshot', [PortalController::class, 'offlineSnapshot'])->name('offline-snapshot');
+    Route::get('/withdrawal', [PortalController::class, 'withdrawalForm'])->name('withdrawal');
+    Route::post('/withdrawal', [PortalController::class, 'applyWithdrawal'])->name('withdrawal.apply');
+    Route::get('/withdrawal/{withdrawal}/print', [PortalController::class, 'printWithdrawal'])->name('withdrawal.print');
+    Route::get('/profile', [PortalController::class, 'profile'])->name('profile');
+    Route::post('/profile', [PortalController::class, 'updateProfile'])->name('profile.update');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications/in-app', [InAppNotificationController::class, 'index'])->name('notifications.in-app');
+    Route::post('/notifications/in-app/{notification}/read', [InAppNotificationController::class, 'markRead'])->name('notifications.in-app.read');
+});
 
 Route::middleware('throttle:5,1')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-Route::middleware(['auth', 'throttle:5,1'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/change-initial-password', [AuthController::class, 'showChangeInitialPassword'])->name('change-initial-password');
-    Route::post('/change-initial-password', [AuthController::class, 'changeInitialPassword'])->name('change-initial-password.submit');
+    Route::post('/change-initial-password', [AuthController::class, 'changeInitialPassword'])
+        ->middleware('throttle:10,1')
+        ->name('change-initial-password.submit');
 });

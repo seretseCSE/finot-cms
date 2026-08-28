@@ -2,8 +2,8 @@
 
 namespace App\Http\Responses\Auth;
 
+use App\Models\User;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
-use Filament\Facades\Filament;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Features\SupportRedirects\Redirector;
 
@@ -13,18 +13,25 @@ class CustomLoginResponse implements LoginResponse
     {
         $user = auth()->user();
 
-        // If user needs to change temporary password, redirect to change password page
-        if ($user && ! $user->temp_password_changed) {
-            return redirect()->route('filament.admin.pages.change-password');
+        if ($user instanceof User && $user->isStudentOnly()) {
+            $redirect = redirect()->to($user->postLoginUrl());
+            if (! $user->temp_password_changed) {
+                $redirect->with('info', 'Please update your password.');
+            }
+
+            return $redirect;
         }
 
-        // Otherwise redirect to dashboard, ignoring intended if it's an API endpoint
         $intended = session()->pull('url.intended');
+
+        if ($user instanceof User && ! $user->temp_password_changed) {
+            return redirect()->to($user->postLoginUrl());
+        }
 
         if ($intended && ! str_contains($intended, '/api/')) {
             return redirect()->to($intended);
         }
 
-        return redirect(Filament::getUrl());
+        return redirect()->to($user instanceof User ? $user->postLoginUrl() : url('/admin'));
     }
 }

@@ -19,11 +19,27 @@ class ClassModel extends BaseModel
         'description',
         'is_active',
         'created_by',
+        'facility_id',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    public static function getResourceName(): string
+    {
+        return 'classes';
+    }
+
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
+
+    protected static function newFactory()
+    {
+        return \Database\Factories\SchoolClassFactory::new();
+    }
 
     public function createdBy()
     {

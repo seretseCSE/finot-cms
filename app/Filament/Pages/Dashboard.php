@@ -26,11 +26,6 @@ use App\Filament\Widgets\Stats\AdultMembersWidget;
 use App\Filament\Widgets\Stats\AidDistributedWidget;
 use App\Filament\Widgets\Stats\AttendanceRateWidget;
 use App\Filament\Widgets\Stats\BlogPostsWidget;
-use App\Filament\Widgets\Stats\DeptAdultMembersWidget;
-use App\Filament\Widgets\Stats\DeptKidsMembersWidget;
-use App\Filament\Widgets\Stats\DeptTotalMembersWidget;
-use App\Filament\Widgets\Stats\DeptYouthMembersWidget;
-use App\Filament\Widgets\Stats\DepartmentMembersWidget;
 use App\Filament\Widgets\Stats\FailedLoginsWidget;
 use App\Filament\Widgets\Stats\KidsMembersWidget;
 use App\Filament\Widgets\Stats\LowStockItemsWidget;
@@ -44,11 +39,10 @@ use App\Filament\Widgets\Stats\TotalInventoryItemsWidget;
 use App\Filament\Widgets\Stats\TotalMembersWidget;
 use App\Filament\Widgets\Stats\TotalRegisteredUsersWidget;
 use App\Filament\Widgets\Stats\TourPassengersWidget;
-use App\Filament\Widgets\Stats\UpcomingEventsWidget;
 use App\Filament\Widgets\Stats\UpcomingRehearsalsWidget;
 use App\Filament\Widgets\Stats\UpcomingToursWidget;
+use App\Filament\Widgets\Stats\VisitorStatsWidget;
 use App\Filament\Widgets\Stats\YouthMembersWidget;
-use App\Filament\Widgets\Tables\PendingApprovalsTableWidget;
 use App\Filament\Widgets\Tables\RecentAidDistributionsTable;
 use App\Filament\Widgets\Tables\RecentAuditLogTable;
 use App\Filament\Widgets\Tables\RecentContentTable;
@@ -87,6 +81,7 @@ class Dashboard extends BaseDashboard
                 TotalRegisteredUsersWidget::class,
                 ActiveSessionsWidget::class,
                 FailedLoginsWidget::class,
+                VisitorStatsWidget::class,
 
                 UserRegistrationChart::class,
                 AttendanceTrendChart::class,
@@ -102,6 +97,7 @@ class Dashboard extends BaseDashboard
                 KidsMembersWidget::class,
                 YouthMembersWidget::class,
                 AdultMembersWidget::class,
+                VisitorStatsWidget::class,
 
                 TotalIncomeWidget::class,
                 TotalExpensesWidget::class,
@@ -235,6 +231,7 @@ class Dashboard extends BaseDashboard
             return [
                 PublishedMediaWidget::class,
                 BlogPostsWidget::class,
+                VisitorStatsWidget::class,
 
                 MediaByCategoryChart::class,
 
@@ -261,6 +258,12 @@ class Dashboard extends BaseDashboard
                 MembersByGroupChart::class,
 
                 RecentMembersTable::class,
+            ];
+        }
+
+        if (\App\Support\RoleGate::is('data_encoder')) {
+            return [
+                OnboardingProgressWidget::class,
             ];
         }
 

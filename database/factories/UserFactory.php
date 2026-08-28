@@ -148,6 +148,16 @@ class UserFactory extends Factory
         return $this->withRole('internal_relations_head');
     }
 
+    public function dataEncoder(): static
+    {
+        return $this->withRole('data_encoder');
+    }
+
+    public function student(): static
+    {
+        return $this->withRole('student');
+    }
+
     public function needsPasswordChange(): static
     {
         return $this->state(fn (array $attributes) => [

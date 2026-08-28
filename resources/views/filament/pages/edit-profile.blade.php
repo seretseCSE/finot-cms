@@ -11,6 +11,9 @@
             <a href="/admin" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-gray-700 bg-white dark:border-gray-600 dark:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700">
                 Cancel
             </a>
+            <x-filament::button type="button" color="gray" data-restart-tour="onboarding">
+                Replay tour
+            </x-filament::button>
         </div>
     </form>
 </x-filament-panels::page>

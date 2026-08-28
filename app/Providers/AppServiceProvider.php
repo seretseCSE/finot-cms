@@ -13,6 +13,7 @@ use App\Models\Department;
 use App\Models\Document;
 use App\Models\Member;
 use App\Models\Rehearsal;
+use App\Models\StudentEnrollment;
 use App\Models\Tour;
 use App\Observers\AidDistributionObserver;
 use App\Observers\AttendanceSessionObserver;
@@ -21,6 +22,7 @@ use App\Observers\DepartmentObserver;
 use App\Observers\DocumentObserver;
 use App\Observers\MemberObserver;
 use App\Observers\RehearsalObserver;
+use App\Observers\StudentEnrollmentObserver;
 use App\Observers\TourObserver;
 use App\Services\BackupCreationService;
 use App\Services\BackupRestorationService;
@@ -98,6 +100,7 @@ class AppServiceProvider extends ServiceProvider
         \Event::listen(Logout::class, CleanupUserSession::class);
 
         Member::observe(MemberObserver::class);
+        StudentEnrollment::observe(StudentEnrollmentObserver::class);
         Tour::observe(TourObserver::class);
         Department::observe(DepartmentObserver::class);
         AttendanceSession::observe(AttendanceSessionObserver::class);

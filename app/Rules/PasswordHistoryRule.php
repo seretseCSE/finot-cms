@@ -26,6 +26,12 @@ class PasswordHistoryRule implements ValidationRule
             return;
         }
 
+        if (isset($this->user->password) && Hash::check($value, $this->user->password)) {
+            $fail('You cannot reuse your current password. Please choose a new one.');
+
+            return;
+        }
+
         $passwordHistory = $this->getPasswordHistory();
 
         if (empty($passwordHistory)) {

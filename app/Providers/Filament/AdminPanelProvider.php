@@ -99,6 +99,10 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::BODY_START,
                 fn (): string => (string) view('filament.components.tour-init')->render(),
             )
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+                fn (): string => auth()->check() ? (string) view('filament.components.in-app-bell')->render() : '',
+            )
             ->authMiddleware([
                 Authenticate::class,
                 ForcePasswordChange::class,

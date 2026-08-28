@@ -4,30 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Favorite;
 use App\Models\User;
+use App\Rules\PasswordHistoryRule;
+use App\Rules\PasswordStrengthRule;
+use App\Services\PhoneFormattingService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class AuthController extends Controller
 {
+    public function showLogin(): View|RedirectResponse
+    {
+        if (Auth::check()) {
+            return $this->redirectAfterLogin(Auth::user());
+        }
+
+        return view('auth.login');
+    }
+
     /**
      * Handle phone-based authentication.
      */
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
             'phone' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $prefix = config('finot.phone_prefix', '+251');
-        $fullPhone = str_starts_with($credentials['phone'], $prefix)
-            ? $credentials['phone']
-            : $prefix.$credentials['phone'];
+        $fullPhone = PhoneFormattingService::normalizeForAuth($credentials['phone']);
+        $user = $fullPhone ? User::query()->where('phone', $fullPhone)->first() : null;
 
-        $user = User::where('phone', $fullPhone)->first();
-
-        // Check if user exists and password is correct
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             if ($user) {
                 $user->incrementFailedAttempts();
@@ -38,38 +47,44 @@ class AuthController extends Controller
                 ->withInput();
         }
 
-        // Check if account is currently locked
         if ($user->isCurrentlyLocked()) {
             return back()
-                ->withErrors(['phone' => $user->getLockStatusMessage()])
+                ->withErrors(['phone' => $user->getLockoutMessage()])
                 ->withInput();
         }
 
-        // Check if user is active
         if (! $user->is_active) {
             return back()
                 ->withErrors(['phone' => 'Your account is inactive.'])
                 ->withInput();
         }
 
-        // Check if temporary password needs changing
-        if (! $user->temp_password_changed) {
-            Auth::login($user);
-            $request->session()->regenerate();
-
-            $this->mergeGuestFavorites($request, $user);
-
-            return redirect('/change-initial-password');
-        }
-
-        // Successful login
         Auth::login($user);
         $user->resetFailedAttempts();
         $request->session()->regenerate();
-
         $this->mergeGuestFavorites($request, $user);
 
-        return redirect()->intended('/admin');
+        return $this->redirectAfterLogin($user);
+    }
+
+    public function redirectAfterLogin(User $user): RedirectResponse
+    {
+        $url = $user->postLoginUrl();
+
+        if ($user->isStudentOnly()) {
+            $redirect = redirect()->to($url);
+            if (! $user->temp_password_changed) {
+                $redirect->with('info', 'Please update your password.');
+            }
+
+            return $redirect;
+        }
+
+        if (! $user->temp_password_changed) {
+            return redirect()->to($url);
+        }
+
+        return redirect()->intended($url);
     }
 
     /**
@@ -87,37 +102,57 @@ class AuthController extends Controller
     /**
      * Show the change initial password form.
      */
-    public function showChangeInitialPassword()
+    public function showChangeInitialPassword(): View|RedirectResponse
     {
-        return response('Change Initial Password');
+        $user = Auth::user();
+
+        if (! $user instanceof User) {
+            return redirect()->route('login');
+        }
+
+        if ($user->isStudentOnly()) {
+            return redirect()->to($user->postLoginUrl());
+        }
+
+        if ($user->temp_password_changed) {
+            return redirect()->to($user->postLoginUrl());
+        }
+
+        return view('auth.change-initial-password');
     }
 
     /**
      * Process the initial password change.
      */
-    public function changeInitialPassword(Request $request)
+    public function changeInitialPassword(Request $request): RedirectResponse
     {
-        $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
         $user = Auth::user();
 
-        if (! $user) {
-            return redirect('/login');
+        if (! $user instanceof User) {
+            return redirect()->route('login');
         }
 
-        if (! Hash::check($request->current_password, $user->password)) {
-            return back()
-                ->withErrors(['current_password' => 'Current password is incorrect.'])
-                ->withInput();
-        }
+        $request->validate([
+            'current_password' => ['required', 'string', 'current_password'],
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                new PasswordStrengthRule(),
+                new PasswordHistoryRule($user, 3),
+            ],
+        ], [
+            'current_password.current_password' => 'Current password is incorrect.',
+            'password.confirmed' => 'Password confirmation does not match.',
+        ]);
 
         $user->updatePassword($request->password, 3);
-        $user->update(['temp_password_changed' => true]);
+        $user = $user->fresh();
+        Auth::login($user);
+        $user->persistAuthPasswordHashInSession();
+        $request->session()->forget('url.intended');
 
-        return redirect('/admin')->with('success', 'Password changed successfully.');
+        return redirect()->to($user->postLoginUrl())->with('success', 'Password changed successfully.');
     }
 
     /**
@@ -132,7 +167,7 @@ class AuthController extends Controller
         ];
 
         foreach ($types as $type) {
-            $cookieKey = 'favorites_' . str_replace('\\', '_', $type);
+            $cookieKey = 'favorites_'.str_replace('\\', '_', $type);
             $guestIds = json_decode($request->cookie($cookieKey, '[]'), true) ?? [];
 
             if (empty($guestIds)) {
@@ -155,7 +190,6 @@ class AuthController extends Controller
                 ]);
             }
 
-            // Clear the cookie
             cookie()->queue($cookieKey, '', -1);
         }
     }

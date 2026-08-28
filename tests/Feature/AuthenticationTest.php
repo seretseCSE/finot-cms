@@ -16,7 +16,7 @@ class AuthenticationTest extends TestCase
     public function login_page_loads(): void
     {
         $response = $this->get('/admin/login');
-        $response->assertStatus(200);
+        $response->assertRedirect(route('login'));
     }
 
     #[Test]

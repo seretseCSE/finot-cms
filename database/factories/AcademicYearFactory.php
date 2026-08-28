@@ -19,7 +19,7 @@ class AcademicYearFactory extends Factory
             'name' => "{$startYear}-{$endYear}",
             'start_date' => "{$startYear}-09-01",
             'end_date' => "{$endYear}-07-31",
-            'status' => $this->faker->randomElement(['Draft', 'Active', 'Inactive']),
+            'status' => 'Draft',
             'created_by' => User::factory(),
             'created_at' => now(),
             'updated_at' => now(),

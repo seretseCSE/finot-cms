@@ -108,9 +108,9 @@
 
                 <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;">
                     <a href="{{ $mediaItem->file_url }}" download class="btn btn-primary" style="padding:12px 28px;">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         {{ __('Download') }}
                     </a>
+                    <button type="button" class="btn btn-ghost" data-offline-url="{{ $mediaItem->file_url }}" data-offline-title="{{ $mediaItem->title }}" style="padding:12px 28px;">{{ __('Save offline') }}</button>
                     <a href="{{ route('media') }}" class="btn btn-ghost" style="padding:12px 28px;">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         {{ __('Back to Gallery') }}

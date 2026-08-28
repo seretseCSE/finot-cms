@@ -69,7 +69,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames
-                    .filter((name) => !name.includes(BUILD_INFO.hash))
+                    .filter((name) => !name.includes(BUILD_INFO.hash) && name !== 'finot-media-opt-in')
                     .map((name) => {
                         console.log('Deleting old cache:', name);
                         return caches.delete(name);
@@ -83,6 +83,18 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
+    }
+    if (event.data && event.data.type === 'CACHE_URL' && event.data.url) {
+        event.waitUntil(
+            caches.open('finot-media-opt-in').then((cache) => fetch(event.data.url).then((response) => {
+                if (response.ok) {
+                    return cache.put(event.data.url, response);
+                }
+            }))
+        );
+    }
+    if (event.data && event.data.type === 'CLEAR_MEDIA') {
+        event.waitUntil(caches.delete('finot-media-opt-in'));
     }
 });
 
@@ -98,7 +110,7 @@ self.addEventListener('fetch', (event) => {
     if (request.mode === 'navigate' || url.pathname.endsWith('.html')) {
         event.respondWith(
             fetch(request).then((networkResponse) => {
-                if (networkResponse.ok) {
+                if (networkResponse.ok && url.pathname !== '/') {
                     caches.open(CACHE_NAME).then((cache) => {
                         cache.put(request, networkResponse.clone());
                     });
@@ -151,6 +163,18 @@ self.addEventListener('fetch', (event) => {
     // Network-First for API calls
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/livewire/')) {
         event.respondWith(fetch(request));
+        return;
+    }
+
+    const isLargeMedia = /\.(mp3|mp4|wav|m4a|pdf|webm)(\?|$)/i.test(url.pathname);
+    if (isLargeMedia) {
+        event.respondWith(
+            caches.open('finot-media-opt-in').then((cache) => {
+                return cache.match(request).then((cached) => {
+                    return cached || fetch(request);
+                });
+            })
+        );
         return;
     }
 

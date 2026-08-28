@@ -37,7 +37,7 @@ class AuthenticationCompleteTest extends TestCase
     {
         $response = $this->get('/login');
 
-        $response->assertRedirect('/admin/login');
+        $response->assertOk()->assertSee('Sign in');
     }
 
     /**

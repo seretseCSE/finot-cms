@@ -96,6 +96,10 @@ function setupEventListeners() {
             startTour('onboarding');
         }
     });
+
+    window.addEventListener('product-tour:replay', () => {
+        startTour('onboarding');
+    });
 }
 
 if (document.readyState === 'loading') {

@@ -131,9 +131,15 @@
             </button>
 
             @auth
-                <a href="{{ url('/admin') }}" class="hidden md:inline-flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);">
-                    {{ __('Dashboard') }}
-                </a>
+                @if(auth()->user()?->isStaff())
+                    <a href="{{ url('/admin') }}" class="hidden md:inline-flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);">
+                        {{ __('Dashboard') }}
+                    </a>
+                @elseif(auth()->user()?->hasRole('student'))
+                    <a href="{{ route('portal.home') }}" class="hidden md:inline-flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);">
+                        {{ __('Portal') }}
+                    </a>
+                @endif
             @else
                 @if (Route::has('login'))
                     <a href="{{ route('login') }}" class="hidden md:inline px-3 py-2 text-xs font-medium tracking-widest uppercase text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-white transition-colors">
@@ -211,9 +217,15 @@
 
             <div class="mt-4 pt-4 border-t border-black/5 dark:border-white/5 flex flex-col gap-2">
                 @auth
-                    <a href="{{ url('/admin') }}" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);" @click="mobileOpen = false">
-                        {{ __('Dashboard') }}
-                    </a>
+                    @if(auth()->user()?->isStaff())
+                        <a href="{{ url('/admin') }}" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);" @click="mobileOpen = false">
+                            {{ __('Dashboard') }}
+                        </a>
+                    @elseif(auth()->user()?->hasRole('student'))
+                        <a href="{{ route('portal.home') }}" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);" @click="mobileOpen = false">
+                            {{ __('Portal') }}
+                        </a>
+                    @endif
                 @else
                     @if (Route::has('login'))
                         <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold tracking-widest uppercase border border-black/10 dark:border-white/20 text-slate-700 dark:text-slate-300 rounded-xl" @click="mobileOpen = false">

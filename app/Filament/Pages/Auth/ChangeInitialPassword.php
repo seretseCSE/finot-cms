@@ -2,18 +2,24 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\User;
 use App\Rules\PasswordHistoryRule;
+use App\Rules\PasswordStrengthRule;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\EmbeddedSchema;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Schema;
-use App\Rules\PasswordStrengthRule;
-use Filament\Forms\Components\TextInput;
-use Filament\Pages\Page;
-use Illuminate\Support\Facades\Hash;
+use Filament\Support\Enums\Alignment;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class ChangeInitialPassword extends Page
 {
@@ -21,49 +27,60 @@ class ChangeInitialPassword extends Page
 
     protected static ?string $slug = 'change-password';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected string $view = 'filament-panels::pages.simple';
 
     protected static string $layout = 'filament-panels::components.layout.simple';
+
+    /**
+     * @var array<string, mixed>|null
+     */
+    public ?array $data = [];
 
     public function hasLogo(): bool
     {
         return true;
     }
 
-    public ?array $data = [];
-
     public function mount(): void
     {
-        $this->form->fill();
+        throw new HttpResponseException(new RedirectResponse(route('change-initial-password')));
     }
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema
+            ->components([
                 TextInput::make('current_password')
                     ->label('Current Password')
                     ->password()
+                    ->revealable()
                     ->required()
+                    ->currentPassword()
                     ->autocomplete('current-password')
                     ->helperText('Enter your current password to continue'),
 
                 TextInput::make('new_password')
                     ->label('New Password')
                     ->password()
+                    ->revealable()
                     ->required()
                     ->autocomplete('new-password')
+                    ->confirmed()
                     ->rules([
                         new PasswordStrengthRule(),
                         new PasswordHistoryRule(Auth::user(), 3),
                     ])
-                    ->helperText('Password must be at least 8 characters with uppercase, lowercase, and numbers'),
+                    ->helperText('At least 8 characters, with uppercase, lowercase, and a number. Must be different from your current password.'),
 
                 TextInput::make('new_password_confirmation')
                     ->label('Confirm New Password')
                     ->password()
+                    ->revealable()
                     ->required()
                     ->autocomplete('new-password')
-                    ->same('new_password')
+                    ->dehydrated(false)
                     ->helperText('Re-enter your new password to confirm'),
             ])
             ->statePath('data');
@@ -75,27 +92,35 @@ class ChangeInitialPassword extends Page
 
         $user = Auth::user();
 
-        // Verify current password
-        if (!Hash::check($data['current_password'], $user->password)) {
-            $this->addError('current_password', 'Current password is incorrect.');
+        if (! $user instanceof User) {
+            $this->redirect(route('login'), navigate: false);
+
             return;
         }
 
-        // Update password with history tracking
         $user->updatePassword($data['new_password'], 3);
+        Auth::login($user->fresh());
+        $user->persistAuthPasswordHashInSession();
 
-        // Mark temporary password as changed
-        $user->update(['temp_password_changed' => true]);
+        if (! $user->temp_password_changed) {
+            throw ValidationException::withMessages([
+                'data.new_password' => 'Password could not be updated. Please try again.',
+            ]);
+        }
 
-        // Redirect to intended page or dashboard
-        $intendedUrl = session()->pull('url.intended', route('filament.admin.pages.dashboard'));
+        session()->forget('url.intended');
 
-        $this->redirect($intendedUrl);
+        Notification::make()
+            ->title('Password changed')
+            ->body('Your password has been updated. You can now use the admin panel.')
+            ->success()
+            ->send();
+
+        $this->redirect(Filament::getUrl(), navigate: false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        // Never show in navigation - this is a forced flow page
         return false;
     }
 
@@ -114,12 +139,15 @@ class ChangeInitialPassword extends Page
             ->livewireSubmitHandler('changePassword')
             ->footer([
                 Actions::make($this->getFormActions())
-                    ->alignment(\Filament\Support\Enums\Alignment::Center)
+                    ->alignment(Alignment::Center)
                     ->fullWidth()
                     ->key('form-actions'),
             ]);
     }
 
+    /**
+     * @return array<Action>
+     */
     protected function getFormActions(): array
     {
         return [

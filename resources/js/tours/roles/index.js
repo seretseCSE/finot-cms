@@ -5,6 +5,8 @@ export { default as hrTour } from './hrTour.js';
 export { default as registrarTour } from './registrarTour.js';
 export { default as teacherTour } from './teacherTour.js';
 export { default as parentTour } from './parentTour.js';
+export { default as encoderTour } from './encoderTour.js';
+export { default as studentTour } from './studentTour.js';
 
 export const roleTourMap = {
     superadmin: 'superAdminTour',
@@ -14,4 +16,6 @@ export const roleTourMap = {
     registrar: 'registrarTour',
     teacher: 'teacherTour',
     parent: 'parentTour',
+    data_encoder: 'encoderTour',
+    student: 'studentTour',
 };

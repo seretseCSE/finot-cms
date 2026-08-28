@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'session.activity' => \App\Http\Middleware\SessionActivityMiddleware::class,
             'set.locale' => \App\Http\Middleware\SetLocaleMiddleware::class,
             'session.timeout' => \App\Http\Middleware\SessionTimeoutMiddleware::class,
+            'student' => \App\Http\Middleware\EnsureStudent::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -61,5 +61,14 @@ class ProcessExportJob implements ShouldQueue
 
         $user = User::find($this->userId);
         $user?->notify(new ExportReady($diskPath, $filename));
+
+        if ($user) {
+            app(\App\Services\Notifications\Notifier::class)->toUser(
+                $user,
+                'exports.ready',
+                ['filename' => $filename],
+                route('exports.download', $filename)
+            );
+        }
     }
 }

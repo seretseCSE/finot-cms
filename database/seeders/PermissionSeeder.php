@@ -189,6 +189,28 @@ class PermissionSeeder extends Seeder
         'page.addon-marketplace',
         'page.user-manual',
 
+        // Overlay
+        'results.view',
+        'results.record',
+        'results.manage',
+        'results.approve',
+        'results.view_own',
+        'withdrawal.apply',
+        'withdrawal.approve',
+        'withdrawal.finalize',
+        'imports.commit',
+        'messages.broadcast',
+        'messages.broadcast_global',
+        'messages.moderate',
+        'facilities.view',
+        'facilities.manage',
+        'facilities.book',
+        'attendance.view_own',
+        'exports.own',
+        'analytics.visitors.view',
+        'songs.download_offline',
+        'library.view',
+
         // Cross-department view permissions
         'members.view_all',
         'member_groups.view_all',
@@ -255,7 +277,12 @@ class PermissionSeeder extends Seeder
                 'page.report.donation', 'page.report.contribution', 'page.report.contribution-matrix',
                 'page.report.charity', 'page.report.beneficiary',
                 'page.attendance.teacher', 'page.attendance.student',
-                'page.search.archives', 'page.user-manual',
+                'page.search.archives',                 'page.user-manual',
+                'results.view', 'results.record', 'results.manage', 'results.approve',
+                'withdrawal.approve', 'imports.commit',
+                'messages.broadcast', 'messages.broadcast_global', 'messages.moderate',
+                'facilities.view', 'facilities.manage', 'facilities.book',
+                'analytics.visitors.view',
                 // Core
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'help.documentation',
@@ -273,6 +300,8 @@ class PermissionSeeder extends Seeder
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
                 'page.attendance.teacher',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
+                'imports.commit', 'withdrawal.finalize',
             ],
         ],
         'finance_head' => [
@@ -295,6 +324,7 @@ class PermissionSeeder extends Seeder
                 'page.financial.audit-trail', 'page.financial.analytics',
                 'page.report.donation', 'page.report.contribution',
                 'page.report.contribution-matrix',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
             ],
         ],
         'nibret_hisab_head' => [
@@ -317,6 +347,7 @@ class PermissionSeeder extends Seeder
                 'page.financial.audit-trail', 'page.financial.analytics',
                 'page.report.donation', 'page.report.contribution',
                 'page.report.contribution-matrix',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
             ],
         ],
         'inventory_staff' => [
@@ -351,6 +382,10 @@ class PermissionSeeder extends Seeder
                 'page.report.teacher-attendance', 'page.report.student-progress',
                 'page.report.class-performance', 'page.report.attendance-summary',
                 'page.attendance.teacher', 'page.attendance.student',
+                'results.view', 'results.record', 'results.manage', 'results.approve',
+                'withdrawal.approve', 'imports.commit',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
+                'members.create', 'members.update',
             ],
         ],
         'education_monitor' => [
@@ -369,6 +404,7 @@ class PermissionSeeder extends Seeder
                 'page.attendance.student',
                 'page.report.attendance-summary',
                 'page.report.teacher-attendance',
+                'facilities.view',
             ],
         ],
         'worship_monitor' => [
@@ -399,6 +435,7 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
             ],
         ],
         'av_head' => [
@@ -413,6 +450,8 @@ class PermissionSeeder extends Seeder
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
+                'analytics.visitors.view',
             ],
         ],
         'charity_head' => [
@@ -429,6 +468,7 @@ class PermissionSeeder extends Seeder
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
                 'page.report.donation', 'page.report.charity', 'page.report.beneficiary',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
             ],
         ],
         'tour_head' => [
@@ -441,6 +481,7 @@ class PermissionSeeder extends Seeder
                 'ethiopian_dates.*',
                 'help.documentation',
                 'page.report.tour',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
             ],
         ],
         'revenue_and_charity_head' => [
@@ -459,6 +500,7 @@ class PermissionSeeder extends Seeder
                 'help.documentation',
                 'page.report.tour', 'page.report.donation',
                 'page.report.charity', 'page.report.beneficiary',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
             ],
         ],
         'internal_relations_head' => [
@@ -477,6 +519,29 @@ class PermissionSeeder extends Seeder
                 'help.documentation',
                 'page.report.attendance-summary',
                 'page.report.teacher-attendance',
+                'messages.broadcast', 'facilities.view', 'facilities.book',
+            ],
+        ],
+        'data_encoder' => [
+            'label' => 'Data Encoder',
+            'description' => 'Encode class and subject marklists only',
+            'permissions' => [
+                'results.view', 'results.record',
+                'classes.view', 'subjects.view', 'students.view',
+                'dashboard.view', 'profile.update', 'sessions.manage',
+                'ethiopian_dates.view', 'ethiopian_dates.picker', 'ethiopian_dates.pagume',
+                'help.documentation',
+            ],
+        ],
+        'student' => [
+            'label' => 'Student',
+            'description' => 'Enrolled member with phone login',
+            'permissions' => [
+                'results.view_own', 'attendance.view_own',
+                'library.view', 'announcements.view',
+                'withdrawal.apply', 'exports.own', 'songs.download_offline',
+                'profile.update',
+                'auth.login', 'auth.logout',
             ],
         ],
     ];
@@ -578,7 +643,7 @@ class PermissionSeeder extends Seeder
         }
 
         // Remove deprecated roles
-        $deprecatedRoles = ['department_secretary', 'staff'];
+        $deprecatedRoles = ['department_secretary', 'staff', 'member', 'education_secretary', 'admin_head'];
         foreach ($deprecatedRoles as $deprecated) {
             $role = Role::where('name', $deprecated)->first();
             if ($role) {

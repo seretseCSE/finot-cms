@@ -17,7 +17,7 @@ class AdminNavigation
     {
         return [
             static::group('Membership Management', ['superadmin', 'admin', 'hr_head', 'internal_relations_head']),
-            static::group('Education Management', ['superadmin', 'admin', 'education_head', 'education_monitor']),
+            static::group('Education Management', ['superadmin', 'admin', 'education_head', 'education_monitor', 'data_encoder']),
             static::group('Contributions', ['superadmin', 'admin', 'finance_head', 'nibret_hisab_head']),
             static::group('Financial Reports', ['superadmin', 'admin', 'finance_head', 'nibret_hisab_head']),
             static::group('Revenue & Banking', ['superadmin', 'admin', 'finance_head', 'nibret_hisab_head']),

@@ -2,17 +2,39 @@
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Auth\Pages\Login as BaseLogin;
-use Filament\Forms\Components\TextInput;
-use Filament\Facades\Filament;
-use Filament\Schemas\Components\Component;
+use App\Models\User;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
-use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Filament\Auth\Pages\Login as BaseLogin;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\ValidationException;
 
 class Login extends BaseLogin
 {
+    public function mount(): void
+    {
+        if (Filament::auth()->check()) {
+            $user = Filament::auth()->user();
+            if ($user instanceof User && $user->isStudentOnly()) {
+                throw new HttpResponseException(new RedirectResponse($user->postLoginUrl()));
+            }
+
+            parent::mount();
+
+            return;
+        }
+
+        throw new HttpResponseException(new RedirectResponse(route('login')));
+    }
+
+    public function authenticate(): ?LoginResponse
+    {
+        throw new HttpResponseException(new RedirectResponse(route('login')));
+    }
+
     protected function getEmailFormComponent(): Component
     {
         return TextInput::make('phone')
@@ -27,37 +49,6 @@ class Login extends BaseLogin
             ->prefix(config('finot.phone_prefix', '+251'))
             ->regex('/^[0-9]{9}$/')
             ->maxLength(9);
-    }
-
-    public function authenticate(): ?LoginResponse
-    {
-        try {
-            $this->rateLimit(5);
-        } catch (\DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException $exception) {
-            $this->getRateLimitedNotification($exception)?->send();
-
-            return null;
-        }
-
-        $data = $this->form->getState();
-        $credentials = $this->getCredentialsFromFormData($data);
-
-        /** @var \Illuminate\Auth\SessionGuard $authGuard */
-        $authGuard = Filament::auth();
-
-        if (! $authGuard->attemptWhen($credentials, function (Authenticatable $user): bool {
-            if (! ($user instanceof FilamentUser)) {
-                return true;
-            }
-
-            return $user->canAccessPanel(Filament::getCurrentOrDefaultPanel());
-        }, $data['remember'] ?? false)) {
-            $this->throwFailureValidationException();
-        }
-
-        session()->regenerate();
-
-        return app(LoginResponse::class);
     }
 
     protected function getCredentialsFromFormData(array $data): array
@@ -75,15 +66,5 @@ class Login extends BaseLogin
         throw ValidationException::withMessages([
             'data.phone' => __('filament-panels::auth/pages/login.messages.failed'),
         ]);
-    }
-
-    public function mount(): void
-    {
-        parent::mount();
-
-        // Check for session expired message
-        if (session('session_expired')) {
-            $this->notify('warning', session('session_expired'));
-        }
     }
 }

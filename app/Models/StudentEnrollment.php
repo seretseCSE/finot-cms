@@ -22,11 +22,13 @@ class StudentEnrollment extends BaseModel
         'enrolled_by',
         'completed_by',
         'promoted_to_enrollment_id',
+        'removed_at',
     ];
 
     protected $casts = [
         'enrolled_date' => 'date',
         'completion_date' => 'date',
+        'removed_at' => 'datetime',
     ];
 
     public function member()
@@ -62,6 +64,16 @@ class StudentEnrollment extends BaseModel
     public function promotedFrom()
     {
         return $this->hasOne(self::class, 'promoted_to_enrollment_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'Enrolled')->whereNull('removed_at');
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'Enrolled' && $this->removed_at === null;
     }
 
     /**

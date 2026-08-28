@@ -280,6 +280,19 @@ class Member extends BaseModel
         return $this->hasMany(StudentEnrollment::class);
     }
 
+    public function portalUser()
+    {
+        return $this->hasOne(User::class, 'member_id');
+    }
+
+    public function hasActiveEnrollment(): bool
+    {
+        return $this->studentEnrollments()
+            ->where('status', 'Enrolled')
+            ->whereNull('removed_at')
+            ->exists();
+    }
+
     /**
      * Get contributions.
      *

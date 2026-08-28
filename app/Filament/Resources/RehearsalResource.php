@@ -3,13 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RehearsalResource\Pages;
-use Filament\Schemas\Schema;
 use App\Models\Rehearsal;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class RehearsalResource extends BaseResource
 {

@@ -3,15 +3,20 @@
 namespace App\Observers;
 
 use App\Models\Member;
+use App\Services\Identity\ProvisionStudentUser;
 
 class MemberObserver
 {
+    public function saved(Member $member): void
+    {
+        app(ProvisionStudentUser::class)->sync($member);
+    }
+
     /**
      * Handle the Member "force deleting" event.
      */
     public function forceDeleting(Member $member): void
     {
-        // Clean up relationships that may not have FK coverage or need explicit handling
         $member->parentGuardians()->forceDelete();
         $member->children()->delete();
         $member->childrenNames()->delete();
@@ -30,7 +35,6 @@ class MemberObserver
             return;
         }
 
-        // Soft-delete related parent guardians so they can be restored along with member
         $member->parentGuardians()->delete();
         $member->groupAssignments()->update(['effective_to' => now()]);
     }
@@ -40,7 +44,6 @@ class MemberObserver
      */
     public function restored(Member $member): void
     {
-        // Restore soft-deleted parent guardians
         $member->parentGuardians()->withTrashed()->restore();
     }
 }

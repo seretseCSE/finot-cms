@@ -9,6 +9,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
@@ -41,7 +42,9 @@ class User extends Authenticatable implements FilamentUser
         'locked_by',
         'locked_at',
         'department_id',
+        'member_id',
         'language_preference',
+        'tour_version',
         'last_login_at',
     ];
 
@@ -170,7 +173,37 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(\Filament\Panel $panel): bool
     {
-        return $this->isActive();
+        return $this->isActive() && $this->hasAnyRole(\App\Enums\Roles::STAFF);
+    }
+
+    public function isStudentOnly(): bool
+    {
+        return $this->hasRole(\App\Enums\Roles::STUDENT) && ! $this->isStaff();
+    }
+
+    public function postLoginUrl(): string
+    {
+        if ($this->isStudentOnly()) {
+            return $this->temp_password_changed
+                ? route('portal.home')
+                : route('portal.profile');
+        }
+
+        if (! $this->temp_password_changed) {
+            return route('change-initial-password');
+        }
+
+        return url('/admin');
+    }
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class);
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->hasAnyRole(\App\Enums\Roles::STAFF);
     }
 
     /**
@@ -245,6 +278,25 @@ class User extends Authenticatable implements FilamentUser
             'password_history' => $history,
             'temp_password_changed' => true,
         ]);
+
+        $this->persistAuthPasswordHashInSession();
+    }
+
+    /**
+     * Keep the current browser session valid after a password change.
+     * Without this, AuthenticateSession logs the user out because the
+     * hash stored in the session no longer matches.
+     */
+    public function persistAuthPasswordHashInSession(): void
+    {
+        if (! app()->bound('session')) {
+            return;
+        }
+
+        session()->put(
+            'password_hash_'.Auth::getDefaultDriver(),
+            $this->getAuthPassword()
+        );
     }
 
     /**
