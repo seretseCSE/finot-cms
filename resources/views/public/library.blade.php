@@ -8,7 +8,7 @@
     :title="__('Resource Library')"
     :subtitle="__('Access our curated collection of spiritual books, educational documents, and sacred texts for your growth.')"
     :eyebrow="__('Knowledge Center')"
-    :image="asset('images/unsplash/library-books.jpg')"
+    :image="asset('images/masonry-portfolio/masonry-portfolio-8.jpg')"
 />
 
 {{-- ═══════════════════════════════════════════════════════

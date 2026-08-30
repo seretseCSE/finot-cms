@@ -16,8 +16,8 @@ class EthiopianOrthodoxSampleDataSeeder extends Seeder
     public function run(): void
     {
         // Get admin user for created_by
-        $adminUser = User::where('email', 'admin@finotetsidik.org')->first();
-        $userId = $adminUser ? $adminUser->id : User::first()->id;
+        $adminUser = User::where('email', 'admin@finot.org')->first();
+        $userId = $adminUser?->id ?? User::first()?->id ?? 1;
         // ========== SONG CATEGORIES ==========
         $songCategories = [
             ['name' => 'Orthodox Hymns', 'description' => 'Traditional Ethiopian Orthodox Tewahedo Church hymns and mezmur.'],

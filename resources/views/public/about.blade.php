@@ -8,7 +8,7 @@
     :title="($page?->title ?? __('About')) . ' ' . __('Us')"
     :subtitle="__('Discover the journey, mission, and community of Finot-Tsidik Sunday School — a legacy of faith since 1984 E.C.')"
     :eyebrow="__('Our Identity')"
-    :image="asset('images/features-bg.webp')"
+    :image="asset('images/cta-bg.webp')"
 />
 
 <section class="ft-section">
@@ -72,7 +72,7 @@
 
                             <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ $title }}</h3>
                             <div class="prose prose-gray dark:prose-invert max-w-none text-gray-600 dark:text-slate-400 leading-relaxed">
-                                {!! $content !!}
+                                @sanitize($content)
                             </div>
                         </div>
                     @endif
@@ -142,7 +142,7 @@
                     <h2 class="text-2xl md:text-3xl font-bold text-secondary-500 dark:text-secondary-400 mb-8 text-center font-['Noto_Sans_Ethiopic']">{{ $page->title_am }}</h2>
                 @endif
                 <div class="text-gray-700 dark:text-slate-300 leading-relaxed text-lg font-['Noto_Sans_Ethiopic']">
-                    {!! $page->content_am !!}
+                    @sanitize($page->content_am)
                 </div>
             </div>
         @endif

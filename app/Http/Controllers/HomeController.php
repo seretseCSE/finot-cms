@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\FAQ;
 use App\Models\FundraisingCampaign;
 use App\Models\MediaItem;
 use App\Models\Member;
@@ -44,6 +45,18 @@ class HomeController extends Controller
         }
 
         try {
+            $faqs = Cache::remember('homepage.faqs', now()->addMinutes(30), function () {
+                return FAQ::where('is_active', true)
+                    ->where('is_featured', true)
+                    ->orderBy('display_order')
+                    ->take(6)
+                    ->get();
+            });
+        } catch (\Exception $e) {
+            $faqs = collect();
+        }
+
+        try {
             $stats = Cache::remember('homepage.member_stats', now()->addMinutes(10), function () {
                 $memberCounts = Member::withoutDepartmentScope()
                     ->selectRaw('member_type, COUNT(*) as count')
@@ -57,6 +70,7 @@ class HomeController extends Controller
                     'adults' => $memberCounts->get('Adult', 0),
                     'groups' => MemberGroup::count(),
                     'parents' => ParentModel::count(),
+                    'departments' => \App\Models\Department::count(),
                 ];
             });
         } catch (\Exception $e) {
@@ -67,6 +81,7 @@ class HomeController extends Controller
                 'adults' => 0,
                 'groups' => 0,
                 'parents' => 0,
+                'departments' => 0,
             ];
         }
 
@@ -74,6 +89,7 @@ class HomeController extends Controller
             'upcomingEvents',
             'recentPhotos',
             'campaigns',
+            'faqs',
             'stats',
         ));
     }

@@ -22,8 +22,8 @@ class AttendanceTestDataSeeder extends Seeder
         $this->command->info('Creating attendance test data...');
 
         // Get admin user for created_by
-        $adminUser = User::where('email', 'admin@finotetsidik.org')->first();
-        $createdBy = $adminUser ? $adminUser->id : User::first()->id;
+        $adminUser = User::where('email', 'admin@finot.org')->first();
+        $createdBy = $adminUser?->id ?? User::first()?->id ?? 1;
 
         // Use existing departments
         $departments = Department::limit(4)->get();

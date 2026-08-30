@@ -49,7 +49,6 @@ class ContributionMatrix extends Page
         return \App\Support\RoleGate::can('page.report.contribution-matrix');
     }
 
-    // Filter properties
     public ?int $academicYear = null;
 
     public ?int $department = null;
@@ -58,14 +57,25 @@ class ContributionMatrix extends Page
 
     public ?string $type = null;
 
-    // Data properties
+    public ?string $status = null;
+
     public Collection $members;
 
-    // Table state
-    public array $grid = []; // [member_id][month_index] => boolean
-    public array $originalGrid = []; // [member_id][month_index] => boolean (original state)
+    public array $grid = [];
+
+    public array $originalGrid = [];
 
     public bool $isDirty = false;
+
+    /**
+     * Pre-loaded contribution amounts: [group_id][month_name] => amount
+     */
+    protected array $amountCache = [];
+
+    /**
+     * Pre-loaded group names: [group_id] => name
+     */
+    protected array $groupNameCache = [];
 
     public array $months = [
         1 => 'Meskerem', 2 => 'Tikimt', 3 => 'Hidar', 4 => 'Tahsas',
@@ -75,213 +85,164 @@ class ContributionMatrix extends Page
 
     public function mount(): void
     {
-        $this->academicYear = AcademicYear::where('status', 'Active')->first()?->id ?? AcademicYear::latest()->first()?->id;
+        $this->academicYear = AcademicYear::where('status', 'Active')->first()?->id
+            ?? AcademicYear::latest()->first()?->id;
 
-        // Try direct assignment
         $this->members = collect();
 
-        // Test with a simple query including relationships
-        $testMembers = DB::table('members')
-            ->whereNull('deleted_at')
-            ->orderBy('first_name')
-            ->get();
-
-        \Log::info('ContributionMatrix: Direct DB query result', ['count' => $testMembers->count()]);
-
-        if ($testMembers->isNotEmpty()) {
-            // Convert to Member models with relationships
-            $this->members = Member::hydrate($testMembers->toArray());
-
-            // Load current group assignments for all members
-            $memberIds = $this->members->pluck('id');
-            $assignments = DB::table('member_group_assignments')
-                ->whereIn('member_id', $memberIds)
-                ->whereNull('effective_to')
-                ->get();
-
-            // Attach assignments to members with proper group relationship
-            $this->members->each(function ($member) use ($assignments) {
-                $assignment = $assignments->firstWhere('member_id', $member->id);
-                if ($assignment) {
-                    // Create a proper assignment object with group relationship
-                    $assignmentObject = new \stdClass();
-                    $assignmentObject->group_id = $assignment->group_id;
-
-                    // Create group object for the relationship
-                    $groupObject = new \stdClass();
-                    $groupObject->id = $assignment->group_id;
-
-                    $memberGroup = \App\Models\MemberGroup::find($assignment->group_id);
-                    $groupObject->name = $memberGroup ? $memberGroup->name : 'Unknown Group';
-
-                    $assignmentObject->group = $groupObject;
-
-                    $member->setRelation('currentGroupAssignment', $assignmentObject);
-                }
-            });
-
-            \Log::info('ContributionMatrix: Hydrated members with assignments', ['count' => $this->members->count()]);
-        }
-
+        $this->loadMembersWithAssignments();
+        $this->warmAmountCache();
         $this->loadGrid();
     }
 
-    public function loadMembers(): void
-    {
-        // Debug: Check if we can access the Member model
-        try {
-            // Test database connection
-            $dbTest = DB::select('SELECT 1 as test');
-            \Log::info('ContributionMatrix: DB test', ['result' => $dbTest]);
-
-            $totalMembers = Member::count();
-            \Log::info('ContributionMatrix: Total members in database', ['count' => $totalMembers]);
-
-            // Always load all members initially
-            $query = Member::query();
-            $sql = $query->toSql();
-            \Log::info('ContributionMatrix: Query SQL', ['sql' => $sql]);
-
-            // Try with raw SQL
-            $rawMembers = DB::select('SELECT * FROM members WHERE deleted_at IS NULL ORDER BY first_name LIMIT 3');
-            \Log::info('ContributionMatrix: Raw SQL result', ['count' => count($rawMembers)]);
-
-            $this->members = $query->orderBy('first_name')->get();
-
-            \Log::info('ContributionMatrix: Loaded all members', ['count' => $this->members->count()]);
-
-            // Debug: Log first few member IDs
-            if ($this->members->isNotEmpty()) {
-                \Log::info('ContributionMatrix: First member IDs', $this->members->take(3)->pluck('id')->toArray());
-            }
-        } catch (\Exception $e) {
-            \Log::error('ContributionMatrix: Error loading members', ['error' => $e->getMessage()]);
-            $this->members = collect();
-        }
-    }
-
-    public function loadMembersWithFilters(): void
+    /**
+     * Load members with their group assignments in 2 queries (no N+1).
+     */
+    protected function loadMembersWithAssignments(?callable $queryModifier = null): void
     {
         $query = DB::table('members')->whereNull('deleted_at');
 
-        if ($this->department) {
-            $query->where('department_id', $this->department);
-        }
-
-        if ($this->group) {
-            $query->whereExists(function ($subQuery) {
-                $subQuery->select(DB::raw(1))
-                    ->from('member_group_assignments')
-                    ->whereColumn('member_group_assignments.member_id', 'members.id')
-                    ->where('group_id', $this->group)
-                    ->whereNull('effective_to');
-            });
-        }
-
-        if ($this->type) {
-            $query->where('member_type', $this->type);
-        }
-
-        if ($this->status) {
-            $query->where('status', $this->status);
+        if ($queryModifier) {
+            $queryModifier($query);
         }
 
         $membersData = $query->orderBy('first_name')->get();
 
-        if ($membersData->isNotEmpty()) {
-            // Convert to Member models
-            $this->members = Member::hydrate($membersData->toArray());
-
-            // Load current group assignments
-            $memberIds = $this->members->pluck('id');
-            $assignments = DB::table('member_group_assignments')
-                ->whereIn('member_id', $memberIds)
-                ->whereNull('effective_to')
-                ->get();
-
-            // Attach assignments to members
-            $this->members->each(function ($member) use ($assignments) {
-                $assignment = $assignments->firstWhere('member_id', $member->id);
-                if ($assignment) {
-                    $member->setRelation('currentGroupAssignment', (object) [
-                        'group_id' => $assignment->group_id,
-                    ]);
-                }
-            });
-        } else {
+        if ($membersData->isEmpty()) {
             $this->members = collect();
+
+            return;
         }
 
-        \Log::info('ContributionMatrix: Loaded members with filters', [
-            'count' => $this->members->count(),
-            'department' => $this->department,
-            'group' => $this->group,
-            'type' => $this->type,
-            'status' => $this->status,
-        ]);
+        $this->members = Member::hydrate($membersData->toArray());
+        $memberIds = $this->members->pluck('id');
+
+        // Single query for all current group assignments
+        $assignments = DB::table('member_group_assignments')
+            ->whereIn('member_id', $memberIds)
+            ->whereNull('effective_to')
+            ->get()
+            ->keyBy('member_id');
+
+        // Single query for all group names we need
+        $groupIds = $assignments->pluck('group_id')->unique()->filter();
+        $this->groupNameCache = $groupIds->isNotEmpty()
+            ? MemberGroup::whereIn('id', $groupIds)->pluck('name', 'id')->all()
+            : [];
+
+        // Attach assignments with group info (no extra queries)
+        $this->members->each(function ($member) use ($assignments) {
+            $assignment = $assignments->get($member->id);
+            if ($assignment) {
+                $assignmentObject = new \stdClass();
+                $assignmentObject->group_id = $assignment->group_id;
+                $assignmentObject->group = (object) [
+                    'id' => $assignment->group_id,
+                    'name' => $this->groupNameCache[$assignment->group_id] ?? 'Unknown Group',
+                ];
+                $member->setRelation('currentGroupAssignment', $assignmentObject);
+            }
+        });
+    }
+
+    public function loadMembers(): void
+    {
+        $this->loadMembersWithAssignments();
+        $this->warmAmountCache();
+    }
+
+    public function loadMembersWithFilters(): void
+    {
+        $this->loadMembersWithAssignments(function ($query) {
+            if ($this->department) {
+                $query->where('department_id', $this->department);
+            }
+
+            if ($this->group) {
+                $query->whereExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('member_group_assignments')
+                        ->whereColumn('member_group_assignments.member_id', 'members.id')
+                        ->where('group_id', $this->group)
+                        ->whereNull('effective_to');
+                });
+            }
+
+            if ($this->type) {
+                $query->where('member_type', $this->type);
+            }
+
+            if ($this->status) {
+                $query->where('status', $this->status);
+            }
+        });
+
+        $this->warmAmountCache();
     }
 
     /**
-     * Load payment status from DB into the matrix grid
+     * Pre-load all contribution amounts for the current academic year and
+     * the groups that appear in the current member set (1 query total).
+     */
+    protected function warmAmountCache(): void
+    {
+        $this->amountCache = [];
+
+        if (! $this->academicYear) {
+            return;
+        }
+
+        $groupIds = $this->members
+            ->map(fn ($m) => $m->currentGroupAssignment?->group_id)
+            ->filter()
+            ->unique();
+
+        if ($groupIds->isEmpty()) {
+            return;
+        }
+
+        DB::table('contribution_amounts')
+            ->where('academic_year_id', $this->academicYear)
+            ->whereIn('group_id', $groupIds)
+            ->get(['group_id', 'month_name', 'amount'])
+            ->each(function ($row) {
+                $this->amountCache[$row->group_id][$row->month_name] = (float) $row->amount;
+            });
+    }
+
+    /**
+     * Load payment status from DB into the matrix grid (1 query).
      */
     public function loadGrid(): void
     {
         $this->grid = [];
+        $this->originalGrid = [];
         $this->isDirty = false;
 
-        // Load existing contributions if academic year is selected
-        if ($this->academicYear) {
-            $memberIds = $this->members->pluck('id');
-            \Log::info('ContributionMatrix: Loading grid', [
-                'academicYear' => $this->academicYear,
-                'memberCount' => $memberIds->count(),
-                'memberIds' => $memberIds->take(5)->toArray()
-            ]);
-
-            $existing = Contribution::where('academic_year_id', $this->academicYear)
-                ->whereIn('member_id', $memberIds)
-                ->where('is_archived', false)
-                ->get(['member_id', 'month_name', 'amount']);
-
-            \Log::info('ContributionMatrix: Found contributions', ['count' => $existing->count()]);
-
-            // Map month names to numbers (Ethiopian calendar)
-            $monthMap = [
-                'Meskerem' => 1, 'Tikimt' => 2, 'Hidar' => 3, 'Tahsas' => 4,
-                'Tir' => 5, 'Yekatit' => 6, 'Megabit' => 7, 'Miazia' => 8,
-                'Ginbot' => 9, 'Sene' => 10, 'Hamle' => 11, 'Nehasse' => 12,
-            ];
-
-            foreach ($existing as $contribution) {
-                $memberId = $contribution->member_id;
-                $monthNum = $monthMap[$contribution->month_name] ?? null;
-
-                if ($memberId && $monthNum && $contribution->amount > 0) {
-                    $this->grid[$memberId][$monthNum] = true;
-
-                    // Only set originalGrid on first load
-                    if (empty($this->originalGrid[$memberId][$monthNum] ?? null)) {
-                        $this->originalGrid[$memberId][$monthNum] = true;
-                    }
-                }
-            }
-
-            \Log::info('ContributionMatrix: Grid populated', [
-                'gridCount' => count($this->grid),
-                'sampleGrid' => array_slice($this->grid, 0, 3, true)
-            ]);
+        if (! $this->academicYear || $this->members->isEmpty()) {
+            return;
         }
+
+        $monthMap = array_flip($this->months);
+
+        Contribution::where('academic_year_id', $this->academicYear)
+            ->whereIn('member_id', $this->members->pluck('id'))
+            ->where('is_archived', false)
+            ->get(['member_id', 'month_name', 'amount'])
+            ->each(function ($c) use ($monthMap) {
+                $monthNum = $monthMap[$c->month_name] ?? null;
+                if ($monthNum && $c->amount > 0) {
+                    $this->grid[$c->member_id][$monthNum] = true;
+                    $this->originalGrid[$c->member_id][$monthNum] = true;
+                }
+            });
     }
 
-    /**
-     * Handle state changes
-     */
     public function toggle(int $memberId, int $month): void
     {
         $this->grid[$memberId][$month] = ! ($this->grid[$memberId][$month] ?? false);
         $this->isDirty = true;
 
-        // Auto-save when checkbox is toggled
         $this->autoSaveToggle($memberId, $month);
     }
 
@@ -310,13 +271,7 @@ class ContributionMatrix extends Page
             return;
         }
 
-        $monthNames = [
-            1 => 'Meskerem', 2 => 'Tikimt', 3 => 'Hidar', 4 => 'Tahsas',
-            5 => 'Tir', 6 => 'Yekatit', 7 => 'Megabit', 8 => 'Miazia',
-            9 => 'Ginbot', 10 => 'Sene', 11 => 'Hamle', 12 => 'Nehasse',
-        ];
-
-        $monthName = $monthNames[$month] ?? null;
+        $monthName = $this->months[$month] ?? null;
         $isPaid = $this->grid[$memberId][$month] ?? false;
         $groupAmount = $this->getMemberGroupAmount($member, $month);
 
@@ -336,29 +291,22 @@ class ContributionMatrix extends Page
         DB::beginTransaction();
         try {
             if ($isPaid && $groupAmount > 0) {
-                // Check if contribution already exists
-                $existing = Contribution::where('member_id', $memberId)
-                    ->where('academic_year_id', $this->academicYear)
-                    ->where('month_name', $monthName)
-                    ->where('is_archived', false)
-                    ->first();
-
-                if (! $existing) {
-                    // Create new contribution
-                    Contribution::create([
+                Contribution::firstOrCreate(
+                    [
                         'member_id' => $memberId,
                         'academic_year_id' => $this->academicYear,
                         'month_name' => $monthName,
+                        'is_archived' => false,
+                    ],
+                    [
                         'amount' => $groupAmount,
                         'payment_date' => now(),
                         'payment_method' => 'Cash',
                         'recorded_by' => Auth::id(),
                         'is_paid' => true,
-                        'is_archived' => false,
-                    ]);
-                }
+                    ]
+                );
             } else {
-                // Archive existing contribution if unchecked
                 Contribution::where('member_id', $memberId)
                     ->where('academic_year_id', $this->academicYear)
                     ->where('month_name', $monthName)
@@ -371,7 +319,6 @@ class ContributionMatrix extends Page
 
             DB::commit();
 
-            // Dispatch event to show autosave indicator
             $this->dispatch('autosave-completed', [
                 'memberId' => $memberId,
                 'month' => $month,
@@ -388,13 +335,11 @@ class ContributionMatrix extends Page
         }
     }
 
-    /**
-     * Filter update hook
-     */
     public function updated($property): void
     {
-        if (in_array($property, ['academicYear', 'department', 'group', 'type'])) {
+        if (in_array($property, ['academicYear', 'department', 'group', 'type', 'status'])) {
             if ($property === 'academicYear') {
+                $this->warmAmountCache();
                 $this->loadGrid();
             } else {
                 $this->loadMembersWithFilters();
@@ -404,44 +349,25 @@ class ContributionMatrix extends Page
     }
 
     /**
-     * Get the constant amount for a member's group
+     * Look up the amount from the pre-warmed cache (0 queries).
      */
     public function getMemberGroupAmount(Member $member, ?int $month = null): float
     {
         $groupId = $member->currentGroupAssignment?->group_id;
-        if (! $groupId || ! $this->academicYear) {
+        if (! $groupId || ! $this->academicYear || ! $month) {
             return 0.0;
         }
 
-        // If no month specified, return 0 (we need month-specific amounts)
-        if (! $month) {
-            return 0.0;
-        }
-
-        // Map month numbers to Ethiopian month names
-        $monthNames = [
-            1 => 'Meskerem', 2 => 'Tikimt', 3 => 'Hidar', 4 => 'Tahsas',
-            5 => 'Tir', 6 => 'Yekatit', 7 => 'Megabit', 8 => 'Miazia',
-            9 => 'Ginbot', 10 => 'Sene', 11 => 'Hamle', 12 => 'Nehasse',
-        ];
-
-        $monthName = $monthNames[$month] ?? null;
+        $monthName = $this->months[$month] ?? null;
         if (! $monthName) {
             return 0.0;
         }
 
-        // Get the month-specific amount from contribution_amounts table
-        $amount = DB::table('contribution_amounts')
-            ->where('group_id', $groupId)
-            ->where('academic_year_id', $this->academicYear)
-            ->where('month_name', $monthName)
-            ->value('amount');
-
-        return is_numeric($amount) ? (float) $amount : 0.0;
+        return $this->amountCache[$groupId][$monthName] ?? 0.0;
     }
 
     /**
-     * Bulk save using optimized upsert
+     * Bulk save — single existence-check query + bulk insert + bulk archive.
      */
     public function save(): void
     {
@@ -449,7 +375,6 @@ class ContributionMatrix extends Page
             return;
         }
 
-        // Require academic year to save contributions
         if (! $this->academicYear) {
             Notification::make()
                 ->title('Academic Year Required')
@@ -463,98 +388,72 @@ class ContributionMatrix extends Page
         DB::beginTransaction();
 
         try {
-            $monthNames = [
-                1 => 'Meskerem', 2 => 'Tikimt', 3 => 'Hidar', 4 => 'Tahsas',
-                5 => 'Tir', 6 => 'Yekatit', 7 => 'Megabit', 8 => 'Miazia',
-                9 => 'Ginbot', 10 => 'Sene', 11 => 'Hamle', 12 => 'Nehasse',
-            ];
+            $memberIds = $this->members->pluck('id');
+
+            // 1 query: load all existing non-archived contributions for the year
+            $existing = Contribution::where('academic_year_id', $this->academicYear)
+                ->whereIn('member_id', $memberIds)
+                ->where('is_archived', false)
+                ->get(['id', 'member_id', 'month_name'])
+                ->groupBy('member_id')
+                ->map(fn ($group) => $group->pluck('id', 'month_name'));
 
             $toInsert = [];
+            $toArchiveIds = [];
             $skippedCount = 0;
 
             foreach ($this->members as $member) {
+                $memberExisting = $existing->get($member->id, collect());
+
                 foreach (range(1, 12) as $monthNum) {
-                    $groupAmount = $this->getMemberGroupAmount($member, $monthNum);
+                    $monthName = $this->months[$monthNum];
                     $isPaid = $this->grid[$member->id][$monthNum] ?? false;
-                    $monthName = $monthNames[$monthNum];
+                    $groupAmount = $this->getMemberGroupAmount($member, $monthNum);
+                    $hasExisting = $memberExisting->has($monthName);
 
                     if ($isPaid && $groupAmount === 0.0) {
                         $this->grid[$member->id][$monthNum] = false;
                         $skippedCount++;
+
                         continue;
                     }
 
-                    if ($isPaid && $groupAmount > 0) {
-                        // Check if contribution already exists
-                        $existing = Contribution::where('member_id', $member->id)
-                            ->where('academic_year_id', $this->academicYear)
-                            ->where('month_name', $monthName)
-                            ->where('is_archived', false)
-                            ->first();
-
-                        if (! $existing) {
-                            $toInsert[] = [
-                                'member_id' => $member->id,
-                                'academic_year_id' => $this->academicYear,
-                                'month_name' => $monthName,
-                                'amount' => $groupAmount,
-                                'payment_date' => now(),
-                                'payment_method' => 'Cash',
-                                'recorded_by' => Auth::id(),
-                                'is_paid' => true,
-                                'status' => 'Paid',
-                                'is_archived' => false,
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ];
-                        }
-                    } else {
-                        // Archive existing contribution if unchecked
-                        Contribution::where('member_id', $member->id)
-                            ->where('academic_year_id', $this->academicYear)
-                            ->where('month_name', $monthName)
-                            ->where('is_archived', false)
-                            ->update([
-                                'is_archived' => true,
-                                'archived_at' => now(),
-                            ]);
+                    if ($isPaid && $groupAmount > 0 && ! $hasExisting) {
+                        $toInsert[] = [
+                            'member_id' => $member->id,
+                            'academic_year_id' => $this->academicYear,
+                            'month_name' => $monthName,
+                            'amount' => $groupAmount,
+                            'payment_date' => now(),
+                            'payment_method' => 'Cash',
+                            'recorded_by' => Auth::id(),
+                            'is_paid' => true,
+                            'status' => 'Paid',
+                            'is_archived' => false,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    } elseif (! $isPaid && $hasExisting) {
+                        $toArchiveIds[] = $memberExisting->get($monthName);
                     }
                 }
             }
 
-            // Insert new contributions
-            $insertCount = 0;
-            $updateCount = 0;
+            $insertCount = count($toInsert);
+            $archiveCount = count($toArchiveIds);
 
-            if (! empty($toInsert)) {
-                Contribution::insert($toInsert);
-                $insertCount = count($toInsert);
+            if ($insertCount > 0) {
+                foreach (array_chunk($toInsert, 500) as $chunk) {
+                    Contribution::insert($chunk);
+                }
             }
 
-            // Count contributions that are checked (new + archived)
-            foreach ($this->members as $member) {
-                foreach (range(1, 12) as $monthNum) {
-                    $isPaid = $this->grid[$member->id][$monthNum] ?? false;
-                    $monthName = $monthNames[$monthNum];
-
-                    if ($isPaid) {
-                        // Check if contribution already exists
-                        $existing = Contribution::where('member_id', $member->id)
-                            ->where('academic_year_id', $this->academicYear)
-                            ->where('month_name', $monthName)
-                            ->where('is_archived', false)
-                            ->first();
-
-                        if (!$existing) {
-                            $insertCount++;
-                        } else {
-                            // Only count as update if we're actually changing the state
-                            $wasOriginallyPaid = $this->originalGrid[$member->id][$monthNum] ?? false;
-                            if ($wasOriginallyPaid !== $isPaid) {
-                                $updateCount++;
-                            }
-                        }
-                    }
+            if ($archiveCount > 0) {
+                foreach (array_chunk($toArchiveIds, 500) as $chunk) {
+                    Contribution::whereIn('id', $chunk)->update([
+                        'is_archived' => true,
+                        'archived_at' => now(),
+                    ]);
                 }
             }
 
@@ -563,7 +462,7 @@ class ContributionMatrix extends Page
             $this->isDirty = false;
             $this->loadGrid();
 
-            $totalChanges = $insertCount + $updateCount;
+            $totalChanges = $insertCount + $archiveCount;
 
             if ($skippedCount > 0) {
                 Notification::make()
@@ -574,7 +473,7 @@ class ContributionMatrix extends Page
             } else {
                 Notification::make()
                     ->title('Contributions Updated')
-                    ->body("{$totalChanges} contributions have been recorded ({$insertCount} new, {$updateCount} updated).")
+                    ->body("{$totalChanges} contributions have been recorded ({$insertCount} new, {$archiveCount} archived).")
                     ->success()
                     ->send();
             }
@@ -584,7 +483,7 @@ class ContributionMatrix extends Page
 
             Notification::make()
                 ->title('Save Failed')
-                ->body('An error occurred: '.$e->getMessage())
+                ->body('An error occurred: ' . $e->getMessage())
                 ->danger()
                 ->send();
         }
@@ -625,9 +524,6 @@ class ContributionMatrix extends Page
         ];
     }
 
-    /**
-     * Get summary statistics for the current filters
-     */
     public function getSummaryStats(): array
     {
         if ($this->members->isEmpty() || ! $this->academicYear) {
@@ -673,9 +569,6 @@ class ContributionMatrix extends Page
         ];
     }
 
-    /**
-     * Export contributions to Excel
-     */
     public function export(): void
     {
         if (! $this->academicYear) {
@@ -690,44 +583,43 @@ class ContributionMatrix extends Page
 
         try {
             $academicYear = AcademicYear::find($this->academicYear);
-            $filename = 'contribution_matrix_'.str_replace(' ', '_', strtolower($academicYear->name)).'_'.date('Y-m-d').'.xlsx';
+            $filename = 'contribution_matrix_' . str_replace(' ', '_', strtolower($academicYear->name)) . '_' . date('Y-m-d') . '.xlsx';
 
             response()->streamDownload(function () {
                 $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                 $sheet = $spreadsheet->getActiveSheet();
 
-                // Headers
                 $headers = ['Member Name', 'Member ID', 'Group'];
-                foreach ($this->months as $monthNum => $monthName) {
+                foreach ($this->months as $monthName) {
                     $headers[] = $monthName;
                 }
                 $headers[] = 'Total';
                 $sheet->fromArray($headers, null, 'A1');
 
-                // Data
                 $row = 2;
                 foreach ($this->members as $member) {
+                    $groupName = $this->groupNameCache[$member->currentGroupAssignment?->group_id ?? 0] ?? 'N/A';
+
                     $rowData = [
-                        $member->first_name.' '.$member->father_name,
+                        $member->first_name . ' ' . $member->father_name,
                         $member->id,
-                        $member->currentGroupAssignment?->group_id ? MemberGroup::find($member->currentGroupAssignment->group_id)?->name : 'N/A',
+                        $groupName,
                     ];
 
                     $total = 0;
                     foreach (range(1, 12) as $month) {
-                        $amount = $this->grid[$member->id][$month] ?? false
+                        $amount = ($this->grid[$member->id][$month] ?? false)
                             ? $this->getMemberGroupAmount($member, $month)
                             : 0;
-                        $rowData[] = $amount > 0 ? 'Birr '.number_format($amount, 2) : '-';
+                        $rowData[] = $amount > 0 ? 'Birr ' . number_format($amount, 2) : '-';
                         $total += $amount;
                     }
-                    $rowData[] = 'Birr '.number_format($total, 2);
+                    $rowData[] = 'Birr ' . number_format($total, 2);
 
-                    $sheet->fromArray($rowData, null, 'A'.$row);
+                    $sheet->fromArray($rowData, null, 'A' . $row);
                     $row++;
                 }
 
-                // Auto-size columns
                 foreach (range('A', 'Z') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
@@ -739,15 +631,12 @@ class ContributionMatrix extends Page
         } catch (\Exception $e) {
             Notification::make()
                 ->title('Export Failed')
-                ->body('An error occurred while exporting: '.$e->getMessage())
+                ->body('An error occurred while exporting: ' . $e->getMessage())
                 ->danger()
                 ->send();
         }
     }
 
-    /**
-     * Refresh data from the database
-     */
     public function refreshData(): void
     {
         $this->loadMembersWithFilters();
@@ -760,9 +649,6 @@ class ContributionMatrix extends Page
             ->send();
     }
 
-    /**
-     * Mark all members as paid for a specific month
-     */
     public function markAllPaid(int $month): void
     {
         if (! $this->academicYear) {
@@ -792,9 +678,6 @@ class ContributionMatrix extends Page
             ->send();
     }
 
-    /**
-     * Mark all members as unpaid for a specific month
-     */
     public function markAllUnpaid(int $month): void
     {
         if (! $this->academicYear) {

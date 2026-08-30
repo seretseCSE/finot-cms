@@ -8,7 +8,7 @@
     :title="__('Get in Touch')"
     :subtitle="__('Have questions about our programs, events, or how to get involved? We are here to listen and guide you.')"
     :eyebrow="__('Reach Out')"
-    :image="asset('images/unsplash/volunteer-helping.jpg')"
+    :image="asset('images/cta-bg.webp')"
 />
 
 {{-- ═══════════════════════════════════════════════════════
@@ -51,18 +51,18 @@
                     @csrf
                     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:20px;">
                     <div>
-                        <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Full Name') }}</label>
-                        <input type="text" name="name" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'">
+                        <label for="contact-name" style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Full Name') }}</label>
+                        <input type="text" name="name" id="contact-name" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'">
                     </div>
                     <div>
-                        <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Email Address') }}</label>
-                        <input type="email" name="email" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'">
+                        <label for="contact-email" style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Email Address') }}</label>
+                        <input type="email" name="email" id="contact-email" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'">
                     </div>
                 </div>
                 
                 <div>
-                    <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Subject') }}</label>
-                    <select name="subject" style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;cursor:pointer;font-size:16px;">
+                    <label for="contact-subject" style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Subject') }}</label>
+                    <select name="subject" id="contact-subject" style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;cursor:pointer;font-size:16px;">
                         <option value="General Inquiry">{{ __('General Inquiry') }}</option>
                         <option value="Registration">{{ __('Program Registration') }}</option>
                         <option value="Volunteer">{{ __('Volunteering') }}</option>
@@ -71,8 +71,8 @@
                 </div>
 
                 <div>
-                    <label style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Message') }}</label>
-                    <textarea name="message" rows="5" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;resize:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'"></textarea>
+                    <label for="contact-message" style="display:block;font-size:.8rem;color:var(--text-60);margin-bottom:8px;">{{ __('Message') }}</label>
+                    <textarea name="message" id="contact-message" rows="5" required style="width:100%;background:var(--bg-800);border:1px solid var(--border-subtle);border-radius:8px;padding:12px 16px;color:var(--text-main);outline:none;resize:none;transition:border-color .2s;font-size:16px;" onfocus="this.style.borderColor='var(--blue-primary)'" onblur="this.style.borderColor='var(--border-subtle)'"></textarea>
                 </div>
 
                     <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:1rem;">
@@ -90,7 +90,7 @@
      3.  MAP PLACEHOLDER
      ═══════════════════════════════════════════════════════ --}}
 <section style="height:clamp(300px, 50vh, 500px);background:var(--dark-950);position:relative;overflow:hidden;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d563.6919225342599!2d38.690934976793315!3d8.99371953474218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b87a03c2140e5%3A0x53abbfcd9c417317!2sfenote%20sedq%20sunday%20school!5e1!3m2!1sen!2set!4v1777196727633!5m2!1sen!2set" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d563.6919225342599!2d38.690934976793315!3d8.99371953474218!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b87a03c2140e5%3A0x53abbfcd9c417317!2sfenote%20sedq%20sunday%20school!5e1!3m2!1sen!2set!4v1777196727633!5m2!1sen!2set" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="{{ __('Map showing Finote Tsidik Sunday School location in Addis Ababa, Ayertena') }}"></iframe>
 </section>
 
 @endsection

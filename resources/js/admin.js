@@ -1,4 +1,4 @@
-import './bootstrap';
+import './bootstrap-admin';
 
 // Dynamically import PWA install prompt logic so it is only loaded on admin pages.
 if (document.querySelector('.fi-main-sidebar') || document.querySelector('[href^="/admin/"]')) {

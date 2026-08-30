@@ -69,7 +69,7 @@ class SecurityHeaders
             "connect-src 'self'",
             
             // Frame sources - needed for YouTube/Vimeo embeds on public pages
-            "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vimeo.com",
+            "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://vimeo.com https://www.google.com",
 
             // Frame ancestors - restrict to same origin
             "frame-ancestors 'self'",

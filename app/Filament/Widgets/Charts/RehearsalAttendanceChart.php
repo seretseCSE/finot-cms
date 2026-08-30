@@ -18,14 +18,14 @@ class RehearsalAttendanceChart extends LineChartWidget
             $labels = [];
             $data = [];
 
-            $rehearsals = Rehearsal::where('date', '>=', now()->subDays(30))
-                ->orderBy('date')
-                ->withCount(['attendances', 'attendances as present_count' => fn ($q) => $q->where('status', 'Present')])
+            $rehearsals = Rehearsal::where('date_time', '>=', now()->subDays(30))
+                ->orderBy('date_time')
+                ->withCount(['attendance', 'attendance as present_count' => fn ($q) => $q->where('status', 'Present')])
                 ->get();
 
             foreach ($rehearsals as $rehearsal) {
-                $labels[] = $rehearsal->date?->format('M j') ?? 'N/A';
-                $total = $rehearsal->attendances_count;
+                $labels[] = $rehearsal->date_time?->format('M j') ?? 'N/A';
+                $total = $rehearsal->attendance_count;
                 $present = $rehearsal->present_count;
                 $data[] = $total > 0 ? round(($present / $total) * 100, 1) : 0;
             }

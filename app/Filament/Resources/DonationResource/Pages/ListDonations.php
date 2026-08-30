@@ -51,7 +51,7 @@ class ListDonations extends ListRecords
                             filename: $filename,
                         );
 
-                        $url = route('exports.download', ['filename' => $filename]);
+                        $url = \App\Http\Controllers\ExportDownloadController::signedUrl($filename);
 
                         Notification::make()
                             ->title('Export Ready')

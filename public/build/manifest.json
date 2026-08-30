@@ -1,11 +1,4 @@
 {
-  "_bootstrap-D7V-y4i6.js": {
-    "file": "assets/bootstrap-D7V-y4i6.js",
-    "name": "bootstrap",
-    "imports": [
-      "_vendor-DQIN4Xuk.js"
-    ]
-  },
   "_chart-vendor-BNIhJ1E0.js": {
     "file": "assets/chart-vendor-BNIhJ1E0.js",
     "name": "chart-vendor",
@@ -30,8 +23,8 @@
     "name": "tour-pages",
     "isDynamicEntry": true
   },
-  "_tour-roles-4BezQJND.js": {
-    "file": "assets/tour-roles-4BezQJND.js",
+  "_tour-roles-DzWvRe-A.js": {
+    "file": "assets/tour-roles-DzWvRe-A.js",
     "name": "tour-roles",
     "isDynamicEntry": true
   },
@@ -51,7 +44,7 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BCMLJ9vo.css",
+    "file": "assets/app-CYYdEkXb.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -60,17 +53,16 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-f5XAProP.js",
+    "file": "assets/admin-CGnxYcSX.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
     "imports": [
       "resources/js/tours/filament-init.js",
-      "_bootstrap-D7V-y4i6.js",
+      "_vendor-DQIN4Xuk.js",
       "_tour-core-CPC7FGMp.js",
       "_tour-vendor-wyFz-SqW.js",
-      "_vendor-DQIN4Xuk.js",
-      "_tour-roles-4BezQJND.js"
+      "_tour-roles-DzWvRe-A.js"
     ],
     "dynamicImports": [
       "resources/js/pwa-install.js",
@@ -78,14 +70,13 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-D67deiiy.js",
+    "file": "assets/app-C1OGNL6a.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_bootstrap-D7V-y4i6.js",
-      "_gsap-vendor-a3sj5zmn.js",
-      "_vendor-DQIN4Xuk.js"
+      "_vendor-DQIN4Xuk.js",
+      "_gsap-vendor-a3sj5zmn.js"
     ]
   },
   "resources/js/financial-charts.js": {
@@ -105,25 +96,27 @@
     "isDynamicEntry": true
   },
   "resources/js/tours/filament-init.js": {
-    "file": "assets/filament-init-DnqHdm8D.js",
+    "file": "assets/filament-init-C8zLRzQC.js",
     "name": "filament-init",
     "src": "resources/js/tours/filament-init.js",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_tour-core-CPC7FGMp.js",
-      "_tour-roles-4BezQJND.js",
+      "_tour-roles-DzWvRe-A.js",
       "_tour-vendor-wyFz-SqW.js",
       "_vendor-DQIN4Xuk.js"
     ],
     "dynamicImports": [
-      "_tour-roles-4BezQJND.js",
-      "_tour-roles-4BezQJND.js",
-      "_tour-roles-4BezQJND.js",
-      "_tour-roles-4BezQJND.js",
-      "_tour-roles-4BezQJND.js",
-      "_tour-roles-4BezQJND.js",
-      "_tour-roles-4BezQJND.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
+      "_tour-roles-DzWvRe-A.js",
       "_tour-pages-CIdMOsiM.js",
       "_tour-pages-CIdMOsiM.js",
       "_tour-pages-CIdMOsiM.js",

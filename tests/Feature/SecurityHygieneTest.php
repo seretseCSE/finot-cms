@@ -25,7 +25,8 @@ class SecurityHygieneTest extends TestCase
     #[Test]
     public function guests_cannot_download_exports(): void
     {
-        $this->get(route('exports.download', ['filename' => 'donations_2026-01-01_120000.xlsx']))
+        $url = \App\Http\Controllers\ExportDownloadController::signedUrl('donations_2026-01-01_120000.xlsx');
+        $this->get($url)
             ->assertRedirect();
     }
 
@@ -54,9 +55,24 @@ class SecurityHygieneTest extends TestCase
 
         $user = $this->createAdminUser();
 
+        $url = \App\Http\Controllers\ExportDownloadController::signedUrl('donations_2026-01-01_120000.xlsx');
+
+        $this->actingAs($user)
+            ->get($url)
+            ->assertOk();
+    }
+
+    #[Test]
+    public function unsigned_export_urls_are_rejected(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('exports/donations_2026-01-01_120000.xlsx', 'xlsx-bytes');
+
+        $user = $this->createAdminUser();
+
         $this->actingAs($user)
             ->get(route('exports.download', ['filename' => 'donations_2026-01-01_120000.xlsx']))
-            ->assertOk();
+            ->assertForbidden();
     }
 
     #[Test]

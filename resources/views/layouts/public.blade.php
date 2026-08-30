@@ -8,6 +8,19 @@
     <title>@hasSection('title')@yield('title') | {{ config('app.name') }}@else{{ config('app.name') }}@endif</title>
     <meta name="description" content="@yield('meta_description', __('Finote Tsidik Sunday School — Faith, service, and fellowship since 1984 E.C.'))">
 
+    @hasSection('seo_title')
+        <x-public.seo-meta
+            :title="$__env->yieldContent('seo_title')"
+            :description="$__env->yieldContent('seo_description', __('Finote Tsidik Sunday School — Faith, service, and fellowship since 1984 E.C.'))"
+            :image="$__env->yieldContent('seo_image', asset('images/hero-bg.jpg'))"
+            :type="$__env->yieldContent('seo_type', 'website')"
+        />
+    @else
+        <x-public.seo-meta />
+    @endif
+
+    @stack('structured-data')
+
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#1A44F7" id="theme-color-meta">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -41,6 +54,26 @@
 </head>
 <body class="min-h-screen flex flex-col ft-page transition-colors duration-300">
 
+    {{-- Site-wide Organization structured data --}}
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "Finote Tsidik Sunday School",
+        "alternateName": "ፍኖተ ጽድቅ ሰንበት ት/ቤት",
+        "url": "{{ config('app.url') }}",
+        "logo": "{{ asset('images/logo2.png') }}",
+        "description": "{{ __('Finote Tsidik Sunday School — Faith, service, and fellowship since 1984 E.C.') }}",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Ayertena",
+            "addressRegion": "Addis Ababa",
+            "addressCountry": "ET"
+        },
+        "sameAs": []
+    }
+    </script>
+
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[300] focus:px-4 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-lg focus:shadow-lg">{{ __('Skip to content') }}</a>
 
     <div id="scroll-progress" class="fixed top-0 left-0 right-0 h-0.5 z-[200] pointer-events-none" style="transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#1A44F7,#F3BA15,#1A44F7);background-size:200% 100%;" aria-hidden="true"></div>
@@ -65,13 +98,14 @@
     <div id="offline-storage-meter" class="fixed bottom-20 right-5 z-[500] max-w-[280px] text-xs text-slate-400 bg-black/40 backdrop-blur px-3 py-2 rounded-lg hidden sm:block"></div>
     <button type="button" data-offline-clear class="fixed bottom-20 right-5 translate-y-8 z-[500] text-[10px] uppercase tracking-wide text-slate-500 hover:text-white bg-transparent border-none cursor-pointer">Clear offline</button>
 
+    <div id="pwa-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[700] max-w-[420px] w-[calc(100%-40px)] hidden" role="status">
         <div class="glass-card p-4 flex items-center gap-3">
             <div class="flex-1">
                 <div class="font-semibold text-sm text-white">{{ __('Install App') }}</div>
                 <div class="text-xs text-slate-400">{{ __('Add to home screen for quick access.') }}</div>
             </div>
             <button onclick="window.installPWA()" class="btn-primary text-xs px-4 py-2">{{ __('Install') }}</button>
-            <button onclick="window.dismissPWA();document.getElementById('pwa-banner').style.display='none'" aria-label="Dismiss" class="text-slate-400 hover:text-white bg-transparent border-none cursor-pointer text-xl leading-none">&times;</button>
+            <button onclick="window.dismissPWA();document.getElementById('pwa-banner').style.display='none'" aria-label="{{ __('Dismiss') }}" class="text-slate-400 hover:text-white bg-transparent border-none cursor-pointer text-xl leading-none">&times;</button>
         </div>
     </div>
 
@@ -110,16 +144,24 @@
 
         document.querySelectorAll('.faq-btn').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                var isOpen = btn.classList.contains('open');
+                var isOpen = btn.getAttribute('aria-expanded') === 'true';
                 document.querySelectorAll('.faq-btn').forEach(function (b) {
+                    b.setAttribute('aria-expanded', 'false');
                     b.classList.remove('open');
                     var body = b.nextElementSibling;
-                    if (body && body.classList.contains('faq-body')) body.classList.remove('open');
+                    if (body && body.classList.contains('faq-body')) {
+                        body.classList.remove('open');
+                        body.style.maxHeight = null;
+                    }
                 });
                 if (!isOpen) {
+                    btn.setAttribute('aria-expanded', 'true');
                     btn.classList.add('open');
                     var body = btn.nextElementSibling;
-                    if (body && body.classList.contains('faq-body')) body.classList.add('open');
+                    if (body && body.classList.contains('faq-body')) {
+                        body.classList.add('open');
+                        body.style.maxHeight = body.scrollHeight + 'px';
+                    }
                 }
             });
         });

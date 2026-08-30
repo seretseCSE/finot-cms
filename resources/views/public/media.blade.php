@@ -8,7 +8,7 @@
     :title="__('Visual Gallery')"
     :subtitle="__('Photos, videos, and songs from our spiritual life and community.')"
     :eyebrow="__('Moments in Time')"
-    :image="asset('images/unsplash/worship-music.jpg')"
+    :image="asset('images/masonry-portfolio/masonry-portfolio-4.jpg')"
 />
 
 <section class="ft-section pt-10">
@@ -57,7 +57,7 @@
                         @php $item = $group['main']; @endphp
                         <a href="{{ route('media.show', $item) }}" class="ft-surface rounded-2xl overflow-hidden no-underline group reveal">
                             <div class="aspect-[4/3] overflow-hidden bg-slate-200 dark:bg-slate-800">
-                                <img src="{{ $item->file_url ?? asset('images/unsplash/worship-music.jpg') }}" alt="{{ $item->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                                <img src="{{ $item->file_url ?? asset('images/masonry-portfolio/masonry-portfolio-4.jpg') }}" alt="{{ $item->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
                             </div>
                             <div class="p-4">
                                 <h3 class="font-semibold ft-ink group-hover:text-primary-500">{{ $item->title }}</h3>
@@ -78,7 +78,7 @@
                     @foreach($songs as $song)
                         <a href="{{ route('songs.show', $song->id) }}" class="ft-surface rounded-2xl p-5 no-underline group reveal flex gap-4 items-center">
                             <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-primary-500/10 flex items-center justify-center">
-                                <img src="{{ asset('images/unsplash/worship-music.jpg') }}" alt="" class="w-full h-full object-cover opacity-80">
+                                <img src="{{ asset('images/masonry-portfolio/masonry-portfolio-1.jpg') }}" alt="" class="w-full h-full object-cover opacity-80">
                             </div>
                             <div>
                                 <h3 class="font-semibold ft-ink group-hover:text-primary-500 font-['Noto_Sans_Ethiopic']">{{ $song->title ?? $song->name }}</h3>

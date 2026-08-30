@@ -12,21 +12,23 @@ class SessionTimeoutMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check()) {
-            $sessionToken = session('session_token');
+        if (! Auth::check() || $request->hasHeader('X-Livewire')) {
+            return $next($request);
+        }
 
-            if ($sessionToken) {
-                $userSession = UserSession::where('user_id', Auth::id())
-                    ->where('session_token', $sessionToken)
-                    ->first();
+        $sessionToken = session('session_token');
 
-                if ($userSession) {
-                    $userSession->updateLastActivity();
-                } else {
-                    Auth::logout();
-                    session()->flash('session_expired', 'Your session has expired. Please login again.');
-                    return redirect()->route('login');
-                }
+        if ($sessionToken) {
+            $userSession = UserSession::where('user_id', Auth::id())
+                ->where('session_token', $sessionToken)
+                ->first();
+
+            if ($userSession) {
+                $userSession->updateLastActivity();
+            } else {
+                Auth::logout();
+                session()->flash('session_expired', 'Your session has expired. Please login again.');
+                return redirect()->route('login');
             }
         }
 

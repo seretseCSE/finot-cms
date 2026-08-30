@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\Event;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class UpcomingEventsWidget extends StatsOverviewWidget
 {
@@ -12,7 +13,7 @@ class UpcomingEventsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $count = Event::where('start_date', '>=', today())->count();
+        $count = Cache::remember('dashboard_upcoming_events', 300, fn () => Event::where('date_time', '>=', today())->count());
 
         return [
             Stat::make('Upcoming Events', $count)

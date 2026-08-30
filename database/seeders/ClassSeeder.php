@@ -10,7 +10,9 @@ class ClassSeeder extends Seeder
 {
     public function run(): void
     {
-        $createdBy = User::first()?->id ?? 1;
+        $createdBy = User::where('email', 'admin@finot.org')->first()?->id
+            ?? User::first()?->id
+            ?? 1;
 
         DB::table('classes')->delete();
 

@@ -50,7 +50,7 @@
     
     <div style="max-width:800px;margin:0 auto;position:relative;z-index:1;">
         <div class="am announcement-content" style="font-size:1.1rem;color:var(--text-60);line-height:1.8;">
-            {!! app()->getLocale() === 'am' ? ($announcement->content_am ?? $announcement->content) : $announcement->content !!}
+            @sanitize(app()->getLocale() === 'am' ? ($announcement->content_am ?? $announcement->content) : $announcement->content)
         </div>
 
         <div style="margin-top:64px;padding-top:40px;border-top:1px solid var(--border-subtle);display:flex;justify-content:center;">

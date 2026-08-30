@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\TourUpdateStatusCommand::class,
         \App\Console\Commands\SessionCleanupCommand::class,
         \App\Console\Commands\DashboardCacheWarmCommand::class,
+        \App\Console\Commands\GenerateSitemap::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -84,5 +85,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('dashboard:cache-warm')->everyFiveMinutes()
             ->description('Pre-warm dashboard widget caches');
+
+        // Daily sitemap regeneration
+        $schedule->command('sitemap:generate')->daily()
+            ->description('Regenerate public sitemap.xml for search engines');
     }
 }

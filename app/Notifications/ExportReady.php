@@ -27,7 +27,7 @@ class ExportReady extends Notification
             'body' => "Your {$this->filename} export is ready for download.",
             'action' => [
                 'label' => 'Download',
-                'url' => route('exports.download', ['filename' => $this->filename]),
+                'url' => \App\Http\Controllers\ExportDownloadController::signedUrl($this->filename),
             ],
         ];
     }

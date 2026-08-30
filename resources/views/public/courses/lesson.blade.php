@@ -150,7 +150,7 @@ html[data-reading="true"] {
 
         <div id="content-en">
             @if($lesson->content)
-                {!! $lesson->content !!}
+                @sanitize($lesson->content)
             @else
                 <p style="text-align:center;color:var(--text-parchment-40);padding:60px 0;">{{ __('Content coming soon.') }}</p>
             @endif
@@ -158,7 +158,7 @@ html[data-reading="true"] {
 
         <div id="content-am" style="display:none;" lang="am" class="am">
             @if($lesson->content_am)
-                {!! $lesson->content_am !!}
+                @sanitize($lesson->content_am)
             @else
                 <p style="text-align:center;color:var(--text-parchment-40);padding:60px 0;">{{ __('ይዘት ገና አልተጨመረም።') }}</p>
             @endif

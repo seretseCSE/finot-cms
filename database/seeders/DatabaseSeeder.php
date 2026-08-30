@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             TeacherSeeder::class,
             SubjectSeeder::class,
             ClassSeeder::class,
+            StudentUserSeeder::class,
             TeacherSubjectAssignmentSeeder::class,
 
             // Content Management

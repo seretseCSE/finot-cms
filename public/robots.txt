@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /portal
+Disallow: /api/
+Disallow: /exports/
+Disallow: /livewire/
+Allow: /
+
+Sitemap: https://finottsidik.org/sitemap.xml

@@ -76,4 +76,22 @@ return [
     |
     */
     'tour_passenger_code_prefix' => 'TP-',
+
+    /*
+    |--------------------------------------------------------------------------
+    | SMS Gateway (YegnaTele by Tiltek Technology)
+    |--------------------------------------------------------------------------
+    |
+    | Configure your YegnaTele SMS gateway credentials here.
+    | Set YEGNATELE_API_KEY and YEGNATELE_BASE_URL in .env once Tiltek
+    | provides your production credentials.
+    |
+    */
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'null'),
+        'base_url' => env('YEGNATELE_BASE_URL', ''),
+        'api_key' => env('YEGNATELE_API_KEY', ''),
+        'sender_id' => env('YEGNATELE_SENDER_ID', 'FinotTsidik'),
+        'timeout' => env('YEGNATELE_TIMEOUT', 15),
+    ],
 ];

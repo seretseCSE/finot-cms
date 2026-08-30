@@ -1,6 +1,37 @@
 @extends('layouts.public')
 
 @section('title', $event->name . ' - ' . __('Event Details'))
+@section('seo_title', $event->name)
+@section('seo_description', Str::limit(strip_tags($event->description ?? ''), 160))
+@section('seo_type', 'article')
+
+@push('structured-data')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "Event",
+    "name": @json($event->name),
+    "startDate": "{{ $event->date_time->toIso8601String() }}",
+    @if($event->location)
+    "location": {
+        "@type": "Place",
+        "name": @json($event->location),
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Addis Ababa",
+            "addressCountry": "ET"
+        }
+    },
+    @endif
+    "organizer": {
+        "@type": "Organization",
+        "name": "Finote Tsidik Sunday School",
+        "url": "{{ config('app.url') }}"
+    },
+    "description": @json(Str::limit(strip_tags($event->description ?? ''), 200))
+}
+</script>
+@endpush
 
 @section('content')
 
@@ -8,7 +39,7 @@
     :title="$event->name"
     :subtitle="$event->date_time->format('F j, Y \\a\\t g:i A') . ($event->location ? ' · ' . $event->location : '')"
     :eyebrow="__('Event Details')"
-    :image="$event->featured_image_url ?? asset('images/unsplash/event-celebration.jpg')"
+    :image="$event->featured_image_url ?? asset('images/hero-bg.webp')"
 />
 
 {{-- ═══════════════════════════════════════════════════════
@@ -70,7 +101,7 @@
                     <div style="margin-bottom:60px;">
                         <h2 class="display" style="font-size:1.8rem;margin-bottom:24px;color:var(--text-display);">{{ __('About This Event') }}</h2>
                         <div style="color:var(--text-60);line-height:1.8;font-size:1.05rem;">
-                            {!! $event->description !!}
+                            @sanitize($event->description)
                         </div>
                     </div>
                 @endif

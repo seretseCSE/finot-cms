@@ -90,7 +90,7 @@
                         <h2 class="display" style="font-size:1.6rem;">{{ __('Lyrics') }}</h2>
                     </div>
                     <div class="am" style="font-size:1.15rem;line-height:2;color:var(--text-60);white-space:pre-line;text-align:center;">
-                        {!! $song->formatted_lyrics !!}
+                        @sanitize($song->formatted_lyrics)
                     </div>
                 </div>
             @endif

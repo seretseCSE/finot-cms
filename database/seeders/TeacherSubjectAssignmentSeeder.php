@@ -13,8 +13,8 @@ class TeacherSubjectAssignmentSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminUser = User::where('email', 'admin@finotetsidik.org')->first();
-        $createdBy = $adminUser?->id ?? User::first()->id;
+        $adminUser = User::where('email', 'admin@finot.org')->first();
+        $createdBy = $adminUser?->id ?? User::first()?->id ?? 1;
 
         DB::table('teacher_assignments')->delete();
 

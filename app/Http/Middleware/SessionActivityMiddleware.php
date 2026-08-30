@@ -59,17 +59,18 @@ class SessionActivityMiddleware
      */
     protected function shouldSkip(Request $request): bool
     {
-        // Skip for API endpoints (PWA background sync)
         if ($request->is('api/*') || $request->isJson()) {
             return true;
         }
 
-        // Skip for unauthenticated users
+        if ($request->hasHeader('X-Livewire')) {
+            return true;
+        }
+
         if (!Auth::check()) {
             return true;
         }
 
-        // Skip for logout and login routes to avoid redirect loops
         $skipRoutes = [
             'filament.admin.auth.login',
             'filament.admin.logout',

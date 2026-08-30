@@ -13,9 +13,8 @@ class CustomOptionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $superadmin = User::whereHas('roles', function ($query) {
-            $query->where('name', 'Superadmin');
-        })->first();
+        $superadmin = User::where('email', 'superadmin@finot.org')->first()
+            ?? User::role('superadmin')->first();
 
         if (!$superadmin) {
             return;

@@ -8,7 +8,7 @@
     :title="__('News & Events')"
     :subtitle="__('Stay informed with announcements, events, and stories from our community.')"
     :eyebrow="__('Updates')"
-    :image="asset('images/unsplash/event-celebration.jpg')"
+    :image="asset('images/hero-bg.webp')"
 />
 
 <section class="ft-section pt-10">
@@ -36,7 +36,7 @@
                     @foreach($announcements as $announcement)
                         <a href="{{ route('announcements.show', $announcement->id) }}" class="ft-surface rounded-2xl overflow-hidden no-underline group reveal">
                             <div class="aspect-[16/10] overflow-hidden bg-slate-200 dark:bg-slate-800">
-                                <img src="{{ $announcement->image_url ?? asset('images/unsplash/bible-study.jpg') }}" alt="{{ $announcement->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                                <img src="{{ $announcement->image_url ?? asset('images/masonry-portfolio/masonry-portfolio-8.jpg') }}" alt="{{ $announcement->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
                             </div>
                             <div class="p-5">
                                 @if($announcement->is_urgent)
@@ -66,7 +66,7 @@
                     @php $date = \Carbon\Carbon::parse($event->date_time); @endphp
                     <a href="{{ route('events.show', $event) }}" class="ft-event-row reveal no-underline group">
                         <div class="ft-event-row__thumb">
-                            <img src="{{ $event->featured_image_url ?? asset('images/unsplash/event-celebration.jpg') }}" alt="{{ $event->name }}" loading="lazy">
+                            <img src="{{ $event->featured_image_url ?? asset('images/hero-bg.webp') }}" alt="{{ $event->name }}" loading="lazy">
                         </div>
                         <div class="flex-1 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                             <div class="sm:w-16 text-center sm:text-left shrink-0">
@@ -95,7 +95,7 @@
                     @foreach($blogPosts as $post)
                         <a href="{{ route('blog.show', $post->slug) }}" class="ft-surface rounded-2xl overflow-hidden no-underline group reveal">
                             <div class="aspect-[16/10] overflow-hidden bg-slate-200 dark:bg-slate-800">
-                                <img src="{{ $post->featured_image_url ?? asset('images/unsplash/library-books.jpg') }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                                <img src="{{ $post->featured_image_url ?? asset('images/blog/blog-1.jpg') }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
                             </div>
                             <div class="p-5">
                                 <h3 class="font-semibold ft-ink group-hover:text-primary-500 transition-colors">{{ $post->title }}</h3>

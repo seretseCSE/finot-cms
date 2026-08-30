@@ -1,6 +1,39 @@
 @extends('layouts.public')
 
 @section('title', $post->title)
+@section('seo_title', $post->title)
+@section('seo_description', Str::limit(strip_tags($post->content), 160))
+@section('seo_type', 'article')
+@if($post->featured_image)
+@section('seo_image', $post->featured_image_url)
+@endif
+
+@push('structured-data')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": @json($post->title),
+    "datePublished": "{{ $post->published_at?->toIso8601String() }}",
+    "dateModified": "{{ $post->updated_at?->toIso8601String() }}",
+    @if($post->author)
+    "author": {
+        "@type": "Person",
+        "name": @json($post->author->name)
+    },
+    @endif
+    "publisher": {
+        "@type": "Organization",
+        "name": "Finote Tsidik Sunday School",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "{{ asset('images/logo2.png') }}"
+        }
+    },
+    "description": @json(Str::limit(strip_tags($post->content), 200))
+}
+</script>
+@endpush
 
 @section('content')
 
@@ -8,7 +41,7 @@
     :title="$post->title"
     :subtitle="$post->published_at?->format('F j, Y') . ($post->author ? ' · ' . $post->author->name : '')"
     :eyebrow="__('Article')"
-    :image="$post->featured_image_url ?? asset('images/unsplash/library-books.jpg')"
+    :image="$post->featured_image_url ?? asset('images/blog/blog-1.jpg')"
 />
 
 {{-- ═══════════════════════════════════════════════════════
@@ -26,14 +59,14 @@
 
             <div style="padding:60px 48px;line-height:1.8;color:var(--parchment-60);">
                 <div class="prose prose-invert max-w-none" style="font-size:1.1rem;">
-                    {!! $post->content !!}
+                    @sanitize($post->content)
                 </div>
 
                 @if($post->content_am)
                     <div style="margin-top:60px;padding-top:40px;border-top:1px solid rgba(255,255,255,.05);">
                         <h3 class="am" style="font-size:1.5rem;color:var(--gold);margin-bottom:24px;">በአማርኛ</h3>
                         <div class="am prose prose-invert max-w-none" style="font-size:1.1rem;">
-                            {!! $post->content_am !!}
+                            @sanitize($post->content_am)
                         </div>
                     </div>
                 @endif

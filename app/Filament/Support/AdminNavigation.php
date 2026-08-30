@@ -35,6 +35,7 @@ class AdminNavigation
     protected static function group(string $label, array $primaryRoles): NavigationGroup
     {
         return NavigationGroup::make($label)
-            ->collapsed(fn (): bool => ! RoleGate::isAny($primaryRoles));
+            ->collapsed(fn (): bool => ! RoleGate::isAny($primaryRoles))
+            ->collapsible(true);
     }
 }

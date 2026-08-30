@@ -105,7 +105,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/withdrawals/{withdrawal}/print', WithdrawalPrintController::class)->name('withdrawals.print');
     Route::get('/exports/download/{filename}', ExportDownloadController::class)
         ->where('filename', '[A-Za-z0-9._-]+')
-        ->name('exports.download');
+        ->name('exports.download')
+        ->middleware('signed');
 });
 
 Route::middleware(['auth', 'throttle:30,1'])->group(function () {

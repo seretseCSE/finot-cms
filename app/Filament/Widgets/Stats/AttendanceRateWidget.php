@@ -2,10 +2,10 @@
 
 namespace App\Filament\Widgets\Stats;
 
-use App\Models\StudentAttendance;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceRateWidget extends StatsOverviewWidget
 {
@@ -14,14 +14,16 @@ class AttendanceRateWidget extends StatsOverviewWidget
     protected function getStats(): array
     {
         $rate = Cache::remember('dashboard_attendance_rate', 300, function () {
-            $total = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [now()->startOfWeek(), now()->endOfWeek()]))
-                ->count();
+            $row = DB::table('student_attendances')
+                ->join('attendance_sessions', 'student_attendances.session_id', '=', 'attendance_sessions.id')
+                ->whereBetween('attendance_sessions.session_date', [now()->startOfWeek(), now()->endOfWeek()])
+                ->selectRaw("
+                    COUNT(*) as total,
+                    SUM(CASE WHEN student_attendances.status = 'Present' THEN 1 ELSE 0 END) as present
+                ")
+                ->first();
 
-            $present = StudentAttendance::whereHas('session', fn ($q) => $q->whereBetween('session_date', [now()->startOfWeek(), now()->endOfWeek()]))
-                ->where('status', 'Present')
-                ->count();
-
-            return $total > 0 ? round(($present / $total) * 100, 1) : 0;
+            return $row && $row->total > 0 ? round(($row->present / $row->total) * 100, 1) : 0;
         });
 
         return [

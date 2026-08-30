@@ -5,6 +5,7 @@ namespace App\Filament\Widgets\Stats;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class TotalRegisteredUsersWidget extends StatsOverviewWidget
 {
@@ -12,12 +13,16 @@ class TotalRegisteredUsersWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $total = User::count();
-        $activeToday = User::whereDate('last_login_at', today())->count();
+        $data = Cache::remember('dashboard_registered_users', 300, function () {
+            return [
+                'total' => User::count(),
+                'active_today' => User::whereDate('last_login_at', today())->count(),
+            ];
+        });
 
         return [
-            Stat::make('Registered Users', $total)
-                ->description("{$activeToday} active today")
+            Stat::make('Registered Users', $data['total'])
+                ->description("{$data['active_today']} active today")
                 ->icon('heroicon-o-user-group')
                 ->color('primary'),
         ];

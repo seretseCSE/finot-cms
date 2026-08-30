@@ -8,7 +8,7 @@
     :title="__('Courses')"
     :subtitle="__('Structured courses on the Orthodox faith, scripture, and church tradition.')"
     :eyebrow="__('Learning')"
-    :image="asset('images/unsplash/bible-study.jpg')"
+    :image="asset('images/masonry-portfolio/masonry-portfolio-8.jpg')"
 />
 
 <section class="ft-section">
@@ -58,7 +58,7 @@
                 @foreach($courses as $course)
                     <a href="{{ route('courses.show', $course) }}" class="ft-surface overflow-hidden group flex flex-col rounded-2xl no-underline">
                         <div class="h-44 overflow-hidden bg-slate-200 dark:bg-slate-800">
-                            <img src="{{ $course->featured_image ?: asset('images/unsplash/bible-study.jpg') }}" alt="{{ $course->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
+                            <img src="{{ $course->featured_image ?: asset('images/masonry-portfolio/masonry-portfolio-8.jpg') }}" alt="{{ $course->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
                         </div>
                         <div class="p-6 flex-1 flex flex-col">
                             <div class="flex items-center gap-2 mb-3 flex-wrap">

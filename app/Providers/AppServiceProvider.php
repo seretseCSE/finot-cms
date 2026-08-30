@@ -83,6 +83,14 @@ class AppServiceProvider extends ServiceProvider
 
         // Override default Filament login response to handle password change and API redirects
         $this->app->bind(LoginResponseContract::class, CustomLoginResponse::class);
+
+        // SMS gateway — swap driver via SMS_DRIVER env
+        $this->app->singleton(\App\Contracts\SmsGateway::class, function ($app) {
+            return match (config('finot.sms.driver')) {
+                'yegnatele' => new \App\Services\Sms\YegnaTeleGateway(),
+                default     => new \App\Services\Sms\NullGateway(),
+            };
+        });
     }
 
     /**
@@ -94,6 +102,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Set default string length for MySQL compatibility
         Schema::defaultStringLength(191);
+
+        // Register Blade directive for sanitized HTML output
+        \Illuminate\Support\Facades\Blade::directive('sanitize', function (string $expression) {
+            return "<?php echo \App\Services\HtmlSanitizer::clean($expression); ?>";
+        });
 
         // Register event listeners for session tracking
         \Event::listen(Login::class, RecordUserSession::class);

@@ -8,7 +8,7 @@
     :title="__('Tours & Shop')"
     :subtitle="__('Explore sacred pilgrimages across Ethiopia and browse our collection of spiritual resources.')"
     :eyebrow="__('Journeys & Store')"
-    :image="asset('images/unsplash/mountain-faith.jpg')"
+    :image="asset('images/hero-bg.webp')"
 />
 
 {{-- ═══════════════════════════════════════════════════════

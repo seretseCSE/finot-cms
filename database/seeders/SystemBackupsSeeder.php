@@ -16,9 +16,8 @@ class SystemBackupsSeeder extends Seeder
         // Clear existing system backups to avoid duplicates
         SystemBackup::query()->delete();
 
-        $superadmin = User::whereHas('roles', function ($query) {
-            $query->where('name', 'Superadmin');
-        })->first();
+        $superadmin = User::where('email', 'superadmin@finot.org')->first()
+            ?? User::role('superadmin')->first();
 
         if (!$superadmin) {
             return;

@@ -67,7 +67,7 @@ class ProcessExportJob implements ShouldQueue
                 $user,
                 'exports.ready',
                 ['filename' => $filename],
-                route('exports.download', $filename)
+                \App\Http\Controllers\ExportDownloadController::signedUrl($filename)
             );
         }
     }

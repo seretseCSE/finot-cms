@@ -2,6 +2,7 @@
 
 namespace App\Services\Notifications;
 
+use App\Contracts\SmsGateway;
 use App\Models\InAppNotification;
 use App\Models\PlatformSetting;
 use App\Models\User;
@@ -9,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 class Notifier
 {
+    public function __construct(
+        protected SmsGateway $sms,
+    ) {}
+
     public const CATALOG = [
         'academics.marklist_submitted' => ['category' => 'approvals', 'importance' => 'important', 'sms' => false],
         'academics.marklist_decided' => ['category' => 'academics', 'importance' => 'important', 'sms' => false],
@@ -67,7 +72,7 @@ class Notifier
             ]);
 
             if (self::smsAllowed($event)) {
-                $this->sendSmsNoop($user, $event, $data);
+                $this->sendSms($user, $event, $data);
             }
         };
 
@@ -102,8 +107,24 @@ class Notifier
         });
     }
 
-    protected function sendSmsNoop(User $user, string $event, array $data): void
+    protected function sendSms(User $user, string $event, array $data): void
     {
-        // Phase 1: no SMS provider.
+        $phone = $user->phone ?? $user->member?->phone ?? null;
+        if (! $phone) {
+            return;
+        }
+
+        $meta = self::CATALOG[$event] ?? [];
+        $message = $data['sms_body'] ?? ('[Finot Tsidik] ' . ($meta['category'] ?? $event));
+
+        try {
+            $this->sms->send($phone, $message);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('SMS dispatch failed', [
+                'event' => $event,
+                'user' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

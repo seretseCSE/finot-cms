@@ -88,7 +88,18 @@ class DocumentResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::check();
+        $user = Auth::user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasRole('superadmin')
+            || $user->can('documents.view')
+            || $user->can('documents.create')
+            || $user->can('documents.upload')
+            || static::isDepartmentHead()
+            || static::isDepartmentSecretary();
     }
 
     public static function canCreate(): bool
