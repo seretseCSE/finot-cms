@@ -26,12 +26,16 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\TourUpdateStatusCommand::class,
         \App\Console\Commands\SessionCleanupCommand::class,
         \App\Console\Commands\DashboardCacheWarmCommand::class,
+        \App\Console\Commands\SystemAutoBackupCommand::class,
         \App\Console\Commands\GenerateSitemap::class,
     ];
 
     protected function schedule(Schedule $schedule): void
     {
         // Daily
+        $schedule->command('backup:auto')->dailyAt('01:30')
+            ->description('Create a daily automatic system backup');
+
         $schedule->command('attendance:auto-lock')->daily()
             ->description('Auto-lock attendance sessions older than 30 days');
 

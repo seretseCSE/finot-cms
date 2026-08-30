@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\LibraryCategoryResource\Pages;
 use App\Filament\Resources\LibraryCategoryResource\RelationManagers;
 use Filament\Schemas\Schema;
@@ -13,6 +15,8 @@ use Filament\Tables\Table;
 
 class LibraryCategoryResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = LibraryCategory::class;
 
     public static function getNavigationIcon(): ?string

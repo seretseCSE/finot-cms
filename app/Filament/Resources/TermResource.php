@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\TermResource\Pages;
 use App\Models\Term;
 use App\Services\Academics\DeactivateTermService;
@@ -13,6 +15,8 @@ use Filament\Tables\Table;
 
 class TermResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Term::class;
 
     public static function getNavigationGroup(): ?string

@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+
+use App\Filament\Support\EmbeddableInHub;
+use App\Filament\Support\HidesFromNavigation;
 use App\Exports\ContributionExport;
 use App\Jobs\ProcessExportJob;
 use Filament\Schemas\Schema;
@@ -19,6 +22,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ContributionReport extends Page
 {
+    use EmbeddableInHub;
+    use HidesFromNavigation;
+
     public static function getNavigationIcon(): ?string
     {
         return 'heroicon-o-chart-bar';
@@ -174,14 +180,27 @@ class ContributionReport extends Page
         // Convert contributions to arrays to avoid JSON serialization issues
         $contributionsArray = $contributions->map(function ($contribution) {
             $member = $contribution->member;
+            $groupName = $member?->currentGroupAssignment?->group?->name ?? 'N/A';
+            $paymentMethod = $contribution->payment_method ?: 'Cash';
+            $paymentLabel = $contribution->custom_payment_method ?: $paymentMethod;
+            $memberName = $member?->full_name ?? 'N/A';
+
             return [
                 'id' => $contribution->id,
-                'payment_date' => $contribution->payment_date instanceof \Carbon\Carbon ? $contribution->payment_date->format('Y-m-d') : $contribution->payment_date,
-                'amount' => $contribution->amount,
-                'member_name' => $member?->full_name ?? 'N/A',
+                'member_id' => $contribution->member_id,
+                'payment_date' => $contribution->payment_date instanceof \Carbon\Carbon
+                    ? $contribution->payment_date->format('Y-m-d')
+                    : $contribution->payment_date,
+                'amount' => (float) $contribution->amount,
+                'member_name' => $memberName,
+                'member_initial' => $memberName !== 'N/A' ? mb_substr($memberName, 0, 1) : '?',
                 'member_code' => $member?->member_code ?? 'N/A',
+                'group_name' => $groupName,
                 'month_name' => $contribution->month_name,
-                'is_archived' => $contribution->is_archived,
+                'payment_method' => $paymentMethod,
+                'formatted_payment_method' => $paymentLabel,
+                'recorded_by_name' => $contribution->recordedBy?->name ?? '—',
+                'is_archived' => (bool) $contribution->is_archived,
             ];
         })->toArray();
 

@@ -32,17 +32,6 @@ class SystemSettingsTest extends TestCase
     }
 
     #[Test]
-    public function global_oversight_accessible_to_superadmin(): void
-    {
-        $user = $this->createSuperadminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/global-oversight');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
     public function backup_restore_accessible_to_superadmin(): void
     {
         $user = $this->createSuperadminUser();
@@ -82,17 +71,6 @@ class SystemSettingsTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->get('/admin/duplicate-records');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
-    public function temporary_filters_resource_accessible(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/temporary-filters');
         $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
         $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
     }

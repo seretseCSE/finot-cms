@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\FAQResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\FAQ;
@@ -12,6 +14,8 @@ use Filament\Tables\Table;
 
 class FAQResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = FAQ::class;
 
     public static function getNavigationIcon(): ?string

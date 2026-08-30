@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\EventRegistrationResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\EventRegistration;
@@ -13,6 +15,8 @@ use Filament\Tables\Table;
 
 class EventRegistrationResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = EventRegistration::class;
 
     public static function getNavigationIcon(): ?string

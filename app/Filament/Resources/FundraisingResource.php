@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use App\Filament\Resources\FundraisingCampaigns\Schemas\FundraisingCampaignForm;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\FundraisingCampaigns\Tables\FundraisingCampaignsTable;
@@ -16,6 +17,8 @@ use UnitEnum;
 
 class FundraisingResource extends Resource
 {
+    use EnsuresTableCreateAction;
+
     protected static ?string $model = FundraisingCampaign::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-banknotes';

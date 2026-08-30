@@ -2,12 +2,12 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
+use App\Services\SystemZipBackupService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
+use Filament\Pages\Page;
 use Illuminate\Support\Facades\Artisan;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use ZipArchive;
 
 class BackupRestore extends Page
@@ -26,12 +26,17 @@ class BackupRestore extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Settings & Logs';
     }
 
     public function getView(): string
     {
         return 'filament.pages.backup-restore';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Nightly automatic backups at 1:30 AM. You can also create one now.';
     }
 
     public static function canAccess(): bool
@@ -41,67 +46,17 @@ class BackupRestore extends Page
 
     public function getBackups(): array
     {
-        $backups = [];
-        $backupPath = storage_path('app/backups');
-
-        if (!is_dir($backupPath)) {
-            mkdir($backupPath, 0755, true);
-        }
-
-        $files = glob($backupPath . '/*.zip');
-
-        foreach ($files as $file) {
-            $filename = basename($file);
-            $timestamp = $this->extractTimestampFromFilename($filename);
-
-            $backups[] = [
-                'filename' => $filename,
-                'path' => $file,
-                'size' => $this->formatFileSize(filesize($file)),
-                'created_at' => Carbon::createFromTimestamp($timestamp)->format('Y-m-d H:i:s'),
-                'type' => $this->getBackupType($filename),
-            ];
-        }
-
-        // Sort by creation date (newest first)
-        usort($backups, function ($a, $b) {
-            return strtotime($b['created_at']) - strtotime($a['created_at']);
-        });
-
-        return array_slice($backups, 0, 30); // Keep only last 30 backups
+        return app(SystemZipBackupService::class)->list();
     }
 
-    private function extractTimestampFromFilename(string $filename): int
+    public function lastAutomaticAt(): ?string
     {
-        // Extract timestamp from filename like: backup_20240228_120000.zip
-        if (preg_match('/(\d{8})_(\d{6})/', $filename, $matches)) {
-            $date = $matches[1];
-            $time = $matches[2];
-            return Carbon::createFromFormat('YmdHis', $date . $time)->timestamp;
-        }
-        return filemtime(storage_path('app/backups/' . $filename));
+        return app(SystemZipBackupService::class)->lastAutomaticAt()?->format('M j, Y g:i A');
     }
 
-    private function getBackupType(string $filename): string
+    public function nextAutomaticAt(): string
     {
-        if (str_contains($filename, 'manual')) {
-            return 'Manual';
-        } elseif (str_contains($filename, 'auto')) {
-            return 'Automatic';
-        }
-        return 'Unknown';
-    }
-
-    private function formatFileSize(int $bytes): string
-    {
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return app(SystemZipBackupService::class)->nextAutomaticAt()->format('M j, Y g:i A');
     }
 
     protected function getHeaderActions(): array
@@ -132,67 +87,29 @@ class BackupRestore extends Page
     public function createBackup(): void
     {
         try {
-            $timestamp = now()->format('Ymd_His');
-            $backupName = "backup_manual_{$timestamp}.zip";
-            $backupPath = storage_path("app/backups/{$backupName}");
+            $result = app(SystemZipBackupService::class)->create('manual');
 
-            // Ensure backup directory exists
-            $backupDir = storage_path('app/backups');
-            if (!is_dir($backupDir)) {
-                mkdir($backupDir, 0755, true);
-            }
+            activity()
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'action' => 'create_backup',
+                    'backup_name' => $result['filename'],
+                    'backup_size' => $result['size'],
+                ])
+                ->log('Created manual system backup');
 
-            // Create zip archive
-            $zip = new ZipArchive();
-            if ($zip->open($backupPath, ZipArchive::CREATE) === true) {
-                // Add database dump
-                $dbDumpPath = storage_path("app/backups/db_dump_{$timestamp}.sql");
-                $this->createDatabaseDump($dbDumpPath);
-                $zip->addFile($dbDumpPath, "database.sql");
-
-                // Add uploaded files
-                $uploadPath = public_path('storage');
-                if (is_dir($uploadPath)) {
-                    $this->addFolderToZip($zip, $uploadPath, 'storage');
-                }
-
-                // Add .env file (without sensitive data)
-                $envContent = $this->sanitizeEnvFile();
-                $zip->addFromString('.env', $envContent);
-
-                $zip->close();
-
-                // Clean up temporary files
-                unlink($dbDumpPath);
-
-                // Log the action
-                activity()
-                    ->causedBy(Auth::user())
-                    ->withProperties([
-                        'action' => 'create_backup',
-                        'backup_name' => $backupName,
-                        'backup_size' => filesize($backupPath),
-                    ])
-                    ->log('Created manual system backup');
-
-                Notification::make()
-                    ->title('Backup Created')
-                    ->body("System backup '{$backupName}' has been created successfully.")
-                    ->success()
-                    ->send();
-
-            } else {
-                throw new \Exception('Failed to create backup archive');
-            }
-
+            Notification::make()
+                ->title('Backup Created')
+                ->body("Saved {$result['filename']}.")
+                ->success()
+                ->send();
         } catch (\Exception $e) {
             Notification::make()
                 ->title('Backup Failed')
-                ->body('Failed to create backup: ' . $e->getMessage())
+                ->body($e->getMessage())
                 ->danger()
                 ->send();
 
-            // Log the error
             activity()
                 ->causedBy(Auth::user())
                 ->withProperties([
@@ -203,80 +120,11 @@ class BackupRestore extends Page
         }
     }
 
-    private function createDatabaseDump(string $path): void
-    {
-        $dbHost = config('database.connections.mysql.host');
-        $dbPort = config('database.connections.mysql.port');
-        $dbName = config('database.connections.mysql.database');
-        $dbUser = config('database.connections.mysql.username');
-        $dbPassword = config('database.connections.mysql.password');
-
-        $command = "mysqldump --host={$dbHost} --port={$dbPort} --user={$dbUser} --password={$dbPassword} --single-transaction --routines --triggers {$dbName} > {$path}";
-
-        exec($command, $output, $returnCode);
-
-        if ($returnCode !== 0) {
-            throw new \Exception('Database dump failed');
-        }
-    }
-
-    private function addFolderToZip(ZipArchive $zip, string $folder, string $zipFolder): void
-    {
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($folder),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $file) {
-            if (!$file->isDir()) {
-                $filePath = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($folder) + 1);
-                $zip->addFile($filePath, $zipFolder . '/' . $relativePath);
-            }
-        }
-    }
-
-    private function sanitizeEnvFile(): string
-    {
-        $envFile = base_path('.env');
-        if (!file_exists($envFile)) {
-            return '';
-        }
-
-        $content = file_get_contents($envFile);
-
-        // Remove sensitive values
-        $sensitiveKeys = ['DB_PASSWORD', 'MAIL_PASSWORD', 'AWS_SECRET_ACCESS_KEY', 'STRIPE_SECRET_KEY'];
-
-        foreach ($sensitiveKeys as $key) {
-            $content = preg_replace("/^{$key}=.*$/m", "{$key}=*****", $content);
-        }
-
-        return $content;
-    }
-
     public function cleanupOldBackups(): void
     {
         try {
-            $backupPath = storage_path('app/backups');
-            $files = glob($backupPath . '/*.zip');
+            $deletedCount = app(SystemZipBackupService::class)->retainNewest(30);
 
-            // Sort by creation time
-            usort($files, function ($a, $b) {
-                return filemtime($b) - filemtime($a);
-            });
-
-            // Keep only the 30 most recent
-            $filesToDelete = array_slice($files, 30);
-            $deletedCount = 0;
-
-            foreach ($filesToDelete as $file) {
-                if (unlink($file)) {
-                    $deletedCount++;
-                }
-            }
-
-            // Log the action
             activity()
                 ->causedBy(Auth::user())
                 ->withProperties([
@@ -287,14 +135,15 @@ class BackupRestore extends Page
 
             Notification::make()
                 ->title('Cleanup Completed')
-                ->body("Deleted {$deletedCount} old backup files.")
+                ->body($deletedCount === 0
+                    ? 'Nothing to remove. The 30 newest backups are already kept.'
+                    : "Deleted {$deletedCount} old backup files.")
                 ->success()
                 ->send();
-
         } catch (\Exception $e) {
             Notification::make()
                 ->title('Cleanup Failed')
-                ->body('Failed to cleanup old backups: ' . $e->getMessage())
+                ->body($e->getMessage())
                 ->danger()
                 ->send();
         }

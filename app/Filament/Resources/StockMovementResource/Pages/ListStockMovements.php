@@ -4,7 +4,7 @@ namespace App\Filament\Resources\StockMovementResource\Pages;
 
 use App\Filament\Resources\StockMovementResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListStockMovements extends ListRecords
 {

@@ -4,7 +4,7 @@ namespace App\Filament\Resources\TourPassengerResource\Pages;
 
 use App\Filament\Resources\TourPassengerResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListTourPassengers extends ListRecords
 {

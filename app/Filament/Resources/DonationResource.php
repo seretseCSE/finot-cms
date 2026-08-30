@@ -34,7 +34,7 @@ class DonationResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Revenue & Banking';
+        return 'Donations';
     }
 
     public static function getNavigationSort(): ?int

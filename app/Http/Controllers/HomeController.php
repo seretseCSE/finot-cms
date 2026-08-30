@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogPost;
 use App\Models\Event;
 use App\Models\FAQ;
 use App\Models\FundraisingCampaign;
@@ -16,30 +17,48 @@ class HomeController extends Controller
     public function index()
     {
         try {
-            $upcomingEvents = Event::where('date_time', '>=', now())
-                ->where('status', 'Published')
-                ->orderBy('date_time', 'asc')
-                ->take(3)
-                ->get();
+            $upcomingEvents = Cache::remember('homepage.upcoming_events', now()->addMinutes(10), fn () =>
+                Event::where('date_time', '>=', now())
+                    ->where('status', 'Published')
+                    ->orderBy('date_time', 'asc')
+                    ->take(3)
+                    ->get()
+            );
         } catch (\Exception $e) {
             $upcomingEvents = collect();
         }
 
         try {
-            $recentPhotos = MediaItem::where('visibility', 'Public')
-                ->where('type', 'Photo')
-                ->latest()
-                ->take(12)
-                ->get();
+            $recentPhotos = Cache::remember('homepage.recent_photos', now()->addMinutes(30), fn () =>
+                MediaItem::where('visibility', 'Public')
+                    ->where('type', 'Photo')
+                    ->latest()
+                    ->take(12)
+                    ->get()
+            );
         } catch (\Exception $e) {
             $recentPhotos = collect();
         }
 
         try {
-            $campaigns = FundraisingCampaign::where('status', 'Active')
-                ->latest()
-                ->take(3)
-                ->get();
+            $recentPosts = Cache::remember('homepage.recent_posts', now()->addMinutes(10), fn () =>
+                BlogPost::where('status', 'Published')
+                    ->where('published_at', '<=', now())
+                    ->latest('published_at')
+                    ->take(3)
+                    ->get()
+            );
+        } catch (\Exception $e) {
+            $recentPosts = collect();
+        }
+
+        try {
+            $campaigns = Cache::remember('homepage.campaigns', now()->addMinutes(15), fn () =>
+                FundraisingCampaign::where('status', 'Active')
+                    ->latest()
+                    ->take(3)
+                    ->get()
+            );
         } catch (\Exception $e) {
             $campaigns = collect();
         }
@@ -88,6 +107,7 @@ class HomeController extends Controller
         return view('public.home', compact(
             'upcomingEvents',
             'recentPhotos',
+            'recentPosts',
             'campaigns',
             'faqs',
             'stats',

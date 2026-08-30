@@ -22,7 +22,6 @@ class Notifier
         'movement.withdrawal' => ['category' => 'movement', 'importance' => 'important', 'sms' => false],
         'messages.broadcast' => ['category' => 'chat', 'importance' => 'info', 'sms' => false],
         'messages.emergency' => ['category' => 'chat', 'importance' => 'critical', 'sms' => false],
-        'imports.committed' => ['category' => 'system', 'importance' => 'info', 'sms' => false],
         'bookings.requested' => ['category' => 'system', 'importance' => 'info', 'sms' => false],
         'exports.ready' => ['category' => 'system', 'importance' => 'info', 'sms' => false],
     ];

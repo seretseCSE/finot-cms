@@ -34,6 +34,16 @@ class OfflineAttendanceSyncResource extends BaseResource
         return 5;
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
     public static function table(Table $table): Table
     {
         return $table

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use App\Filament\Resources\BankAccountResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\BankAccount;
@@ -23,6 +24,8 @@ use Illuminate\Support\Facades\Auth;
 
 class BankAccountResource extends Resource
 {
+    use EnsuresTableCreateAction;
+
     protected static ?string $model = BankAccount::class;
 
     public static function getNavigationIcon(): ?string
@@ -37,7 +40,7 @@ class BankAccountResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Revenue & Banking';
+        return 'Finance';
     }
 
     public static function getNavigationSort(): ?int

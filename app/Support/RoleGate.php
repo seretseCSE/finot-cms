@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Auth;
  */
 class RoleGate
 {
+    /** Roles that may message every member, with advanced audience filters. */
+    public const GLOBAL_BROADCAST_ROLES = [
+        'superadmin',
+        'admin',
+        'hr_head',
+        'internal_relations_head',
+        'education_head',
+    ];
+
     public static function user(): ?User
     {
         $user = Auth::user();
@@ -48,5 +57,22 @@ class RoleGate
         }
 
         return $user->can($permission);
+    }
+
+    public static function canBroadcastGlobal(): bool
+    {
+        $user = static::user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $user->can('messages.broadcast_global')
+            || $user->hasAnyRole(self::GLOBAL_BROADCAST_ROLES);
+    }
+
+    public static function canApproveBookings(): bool
+    {
+        return static::isAny(['superadmin', 'admin']);
     }
 }

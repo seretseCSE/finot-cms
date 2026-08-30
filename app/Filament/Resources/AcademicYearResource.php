@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Forms\Components\EthiopianDatePicker;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\AcademicYearResource\Pages;
@@ -20,6 +22,8 @@ use Illuminate\Support\Facades\DB;
 
 class AcademicYearResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = AcademicYear::class;
 
     public static function getNavigationGroup(): ?string

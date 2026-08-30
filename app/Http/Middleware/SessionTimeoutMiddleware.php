@@ -16,6 +16,16 @@ class SessionTimeoutMiddleware
             return $next($request);
         }
 
+        if ($request->routeIs([
+            'login',
+            'login.submit',
+            'logout',
+            'change-initial-password',
+            'change-initial-password.submit',
+        ])) {
+            return $next($request);
+        }
+
         $sessionToken = session('session_token');
 
         if ($sessionToken) {
@@ -26,9 +36,15 @@ class SessionTimeoutMiddleware
             if ($userSession) {
                 $userSession->updateLastActivity();
             } else {
-                Auth::logout();
-                session()->flash('session_expired', 'Your session has expired. Please login again.');
-                return redirect()->route('login');
+                UserSession::query()->updateOrCreate(
+                    ['session_token' => $sessionToken],
+                    [
+                        'user_id' => Auth::id(),
+                        'device_info' => $request->userAgent(),
+                        'ip_address' => $request->ip(),
+                        'last_activity' => now(),
+                    ]
+                );
             }
         }
 

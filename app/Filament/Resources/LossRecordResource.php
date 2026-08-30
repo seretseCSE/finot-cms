@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\LossRecordResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\LossRecord;
@@ -15,6 +18,9 @@ use Illuminate\Support\Facades\Auth;
 
 class LossRecordResource extends Resource
 {
+    use EnsuresTableCreateAction;
+    use HidesFromNavigation;
+
     protected static ?string $model = LossRecord::class;
 
     protected static ?int $navigationSort = 3;
@@ -37,7 +43,7 @@ class LossRecordResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Inventory';
+        return 'Inventory Management';
     }
 
     public static function canAccess(array $parameters = []): bool

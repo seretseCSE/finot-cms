@@ -59,7 +59,7 @@
                         <div style="flex:1;min-width:300px;">
                             <div style="font-size:.7rem;text-transform:uppercase;color:var(--text-40);margin-bottom:12px;font-weight:700;">{{ __('Listen to Audio') }}</div>
                             <audio controls style="width:100%;height:40px;filter:invert(1) hue-rotate(180deg) brightness(1.5);">
-                                <source src="{{ $song->audio_url }}" type="audio/mpeg">
+                                <source src="{{ $song->audio_url }}" type="{{ $song->audio_mime_type }}">
                             </audio>
                             <button type="button" class="btn btn-ghost" data-offline-url="{{ $song->audio_url }}" data-offline-title="{{ $song->title }}" style="margin-top:12px;padding:8px 16px;font-size:.75rem;">{{ __('Save offline') }}</button>
                         </div>

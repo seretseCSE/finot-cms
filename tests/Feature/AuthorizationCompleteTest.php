@@ -228,7 +228,7 @@ class AuthorizationCompleteTest extends TestCase
 
         // Even without explicit permissions, superadmin should access
         $response = $this->actingAs($superadmin)
-            ->get('/admin/global-oversight');
+            ->get('/admin/system-health-monitoring');
 
         $response->assertStatus(200);
     }

@@ -6,7 +6,6 @@ use App\Enums\Roles;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
@@ -131,7 +130,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => $profile['name'],
                     'phone' => $phone,
-                    'password' => Hash::make('Admin1234'),
+                    'password' => 'Admin1234',
                     'is_active' => true,
                     'is_locked' => false,
                     'failed_login_attempts' => 0,
@@ -152,8 +151,8 @@ class UserSeeder extends Seeder
 
         $count = count($roleUsers);
         $this->command->info("Created {$count} role test users successfully.");
-        $this->command->info('All users have temp_password_changed = false and will be required to change password on first login.');
-        $this->command->info('Default password is "Admin1234"');
+        $this->command->info('Login with 9 digits after +251. Super Admin: 911000001 / Admin1234');
+        $this->command->info('You must change the password on first login.');
         $this->command->info('Email format: {role}@finot.org (e.g. superadmin@finot.org)');
     }
 }

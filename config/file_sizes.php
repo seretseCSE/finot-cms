@@ -63,11 +63,18 @@ return [
         ],
         'audio' => [
             'audio/mpeg',
+            'audio/mp3',
             'audio/wav',
+            'audio/x-wav',
+            'audio/wave',
             'audio/ogg',
             'audio/flac',
+            'audio/x-flac',
             'audio/aac',
+            'audio/x-aac',
             'audio/mp4',
+            'audio/m4a',
+            'audio/x-m4a',
             'audio/x-ms-wma',
         ],
         'documents' => [

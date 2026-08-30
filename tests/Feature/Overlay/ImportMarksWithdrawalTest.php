@@ -3,13 +3,8 @@
 namespace Tests\Feature\Overlay;
 
 use App\Enums\MarklistStatus;
-use App\Enums\MemberImportRowStatus;
 use App\Enums\RubricScore;
 use App\Enums\WithdrawalRequestStatus;
-use App\Jobs\CommitMemberImportJob;
-use App\Models\Member;
-use App\Models\MemberImport;
-use App\Models\MemberImportRow;
 use App\Models\StudentEnrollment;
 use App\Models\Subject;
 use App\Models\Term;
@@ -23,46 +18,6 @@ use Tests\TestCase;
 class ImportMarksWithdrawalTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[Test]
-    public function csv_commit_does_not_auto_create_users(): void
-    {
-        $admin = User::factory()->admin()->create();
-        $year = \App\Models\AcademicYear::factory()->active()->create();
-        $class = \App\Models\SchoolClass::factory()->create();
-
-        $import = MemberImport::query()->create([
-            'academic_year_id' => $year->id,
-            'class_id' => $class->id,
-            'file_name' => 'students.csv',
-            'status' => 'draft',
-            'created_by' => $admin->id,
-            'total_count' => 1,
-        ]);
-
-        MemberImportRow::query()->create([
-            'member_import_id' => $import->id,
-            'row_number' => 1,
-            'status' => MemberImportRowStatus::Ready,
-            'data' => [
-                'first_name' => 'Abebe',
-                'father_name' => 'Kebede',
-                'phone' => '+251911000111',
-                'gender' => 'Male',
-                'emergency_contact_name' => 'Parent',
-                'emergency_contact_phone' => '+251911000112',
-            ],
-        ]);
-
-        $before = User::query()->count();
-        (new CommitMemberImportJob($import->id, $admin->id))->handle(app(\App\Services\Notifications\Notifier::class));
-
-        $member = Member::query()->where('phone', '+251911000111')->first();
-        $this->assertNotNull($member);
-        $this->assertTrue(StudentEnrollment::query()->where('member_id', $member->id)->exists());
-        $this->assertNull(User::query()->where('member_id', $member->id)->first());
-        $this->assertSame($before, User::query()->count());
-    }
 
     #[Test]
     public function encoder_records_marks_and_education_head_can_approve_even_if_assisted(): void

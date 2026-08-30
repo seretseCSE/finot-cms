@@ -29,13 +29,9 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo2.png') }}">
     <link rel="shortcut icon" href="{{ asset('images/logo2.png') }}">
 
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="image" href="{{ asset('images/logo2.png') }}" fetchpriority="high">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/fonts/public/fonts.css">
 
     <script>
     (function() {

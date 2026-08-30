@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\BlogPostResource\Pages;
 
 use App\Filament\Resources\BlogPostResource;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListBlogPosts extends ListRecords
 {

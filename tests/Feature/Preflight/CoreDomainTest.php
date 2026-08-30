@@ -39,7 +39,8 @@ class CoreDomainTest extends TestCase
         $this->assertTrue(Schema::hasTable('in_app_notifications'));
         $this->assertTrue(Schema::hasTable('platform_settings'));
         $this->assertTrue(Schema::hasTable('page_views'));
-        $this->assertTrue(Schema::hasTable('member_imports'));
+        $this->assertFalse(Schema::hasTable('member_imports'));
+        $this->assertFalse(Schema::hasTable('member_import_rows'));
         $this->assertDatabaseHas('platform_settings', ['key' => 'notifications.sms_whitelist']);
     }
 }

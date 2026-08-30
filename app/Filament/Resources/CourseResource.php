@@ -39,7 +39,12 @@ class CourseResource extends BaseResource
 
     public static function canViewAny(): bool
     {
-        return \App\Support\RoleGate::isAny(['superadmin', 'admin', 'education_head']);
+        return \App\Support\RoleGate::isAny(['superadmin', 'education_head', 'education_monitor']);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return \App\Support\RoleGate::isAny(['education_head', 'education_monitor']);
     }
 
     public static function form(Schema $schema): Schema

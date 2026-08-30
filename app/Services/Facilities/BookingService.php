@@ -45,7 +45,7 @@ class BookingService
         ]);
 
         $this->notifier->toUsers(
-            User::permission('facilities.manage')->get(),
+            User::role(['admin', 'superadmin'])->get(),
             'bookings.requested',
             ['purpose' => $booking->purpose, 'facility_id' => $booking->facility_id],
             null,
@@ -63,8 +63,8 @@ class BookingService
 
     public function confirm(Booking $booking, User $actor): Booking
     {
-        if (! $actor->can('facilities.manage') && ! $actor->hasRole(['admin', 'superadmin'])) {
-            throw ValidationException::withMessages(['actor' => 'Admin must confirm bookings.']);
+        if (! $actor->hasRole(['admin', 'superadmin'])) {
+            throw ValidationException::withMessages(['actor' => 'Only Admin or Super Admin can confirm bookings.']);
         }
 
         if ($booking->status !== BookingStatus::Pending) {

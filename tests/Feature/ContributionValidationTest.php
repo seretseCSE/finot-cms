@@ -143,7 +143,7 @@ class ContributionValidationTest extends TestCase
     }
 
     /**
-     * Build the validation closure used in ContributionResource form.
+     * Amount must match the active ContributionAmount for the member's group and month.
      */
     private function getAmountValidationRule(): \Closure
     {

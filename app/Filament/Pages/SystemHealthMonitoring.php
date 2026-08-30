@@ -4,15 +4,20 @@ namespace App\Filament\Pages;
 
 use App\Services\SystemMonitoringService;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class SystemHealthMonitoring extends Page
 {
-    protected static ?string $title = 'System Health Monitoring';
+    protected static ?string $title = 'System Health';
 
     protected static ?int $navigationSort = 1;
+
+    public function getSubheading(): ?string
+    {
+        return 'Storage, database, errors, and sessions at a glance.';
+    }
 
     public static function getNavigationIcon(): ?string
     {
@@ -21,7 +26,7 @@ class SystemHealthMonitoring extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Settings & Logs';
     }
 
     public function getView(): string
@@ -38,7 +43,7 @@ class SystemHealthMonitoring extends Page
     {
         return [
             Action::make('refresh')
-                ->label('Refresh Data')
+                ->label('Refresh')
                 ->icon('heroicon-o-arrow-path')
                 ->action(fn () => $this->refreshData()),
         ];
@@ -47,35 +52,50 @@ class SystemHealthMonitoring extends Page
     public function refreshData()
     {
         Cache::forget('system_health_data');
-        $this->notify('success', 'System health data refreshed');
+        Cache::forget('system_health_metrics');
+
+        Notification::make()
+            ->title('Health data refreshed')
+            ->success()
+            ->send();
     }
 
     public function getSystemHealthData(): array
     {
-        return Cache::remember('system_health_data', 300, function () {
+        $data = Cache::remember('system_health_data', 300, function () {
             $monitoringService = app(SystemMonitoringService::class);
 
             return $monitoringService->getSystemHealthMetrics();
         });
+
+        return $this->normalizeHealthData($data);
     }
 
-    public function getHealthStatusColor(string $status): string
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function normalizeHealthData(array $data): array
     {
-        return match ($status) {
-            'healthy' => 'success',
-            'warning' => 'warning',
-            'critical' => 'danger',
-            default => 'gray',
-        };
-    }
+        if (is_array($data['error_rate'] ?? null)) {
+            $data['error_rate'] = $data['error_rate']['rate'] ?? 0;
+        }
 
-    public function getHealthStatusIcon(string $status): string
-    {
-        return match ($status) {
-            'healthy' => 'heroicon-o-check-circle',
-            'warning' => 'heroicon-o-exclamation-triangle',
-            'critical' => 'heroicon-o-x-circle',
-            default => 'heroicon-o-question-mark-circle',
-        };
+        if (is_array($data['uptime'] ?? null)) {
+            $data['uptime'] = $data['uptime']['formatted'] ?? 'Unknown';
+        }
+
+        if (is_array($data['memory_usage'] ?? null)) {
+            $memory = $data['memory_usage'];
+            $data['memory_usage'] = isset($memory['percentage'])
+                ? $memory['percentage'].'% ('.($memory['used'] ?? '?').' / '.($memory['total'] ?? '?').')'
+                : 'Unknown';
+        }
+
+        if (is_array($data['cpu_usage'] ?? null)) {
+            $data['cpu_usage'] = round((float) ($data['cpu_usage']['load_1min'] ?? 0) * 100, 2).'%';
+        }
+
+        return $data;
     }
 }

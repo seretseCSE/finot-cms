@@ -4,7 +4,7 @@ namespace App\Filament\Resources\LibrarySubcategoryResource\Pages;
 
 use App\Filament\Resources\LibrarySubcategoryResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListLibrarySubcategories extends ListRecords
 {

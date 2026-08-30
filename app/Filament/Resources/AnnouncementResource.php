@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\AnnouncementResource\Pages;
 use App\Services\UploadSanitizer;
 use Filament\Schemas\Schema;
@@ -16,6 +18,8 @@ use Illuminate\Support\Facades\Storage;
 
 class AnnouncementResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Announcement::class;
 
     public static function getNavigationIcon(): ?string

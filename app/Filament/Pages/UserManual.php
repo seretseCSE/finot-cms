@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Support\RoleGate;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use UnitEnum;
@@ -26,12 +27,12 @@ class UserManual extends Page
 
     public static function canAccess(array $parameters = []): bool
     {
-        return \App\Support\RoleGate::check();
+        return RoleGate::check();
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return true;
+        return false;
     }
 
     public function getHeading(): string
@@ -41,9 +42,12 @@ class UserManual extends Page
 
     public function getSubheading(): ?string
     {
-        return 'Role-specific guides to help you navigate the system';
+        return 'Full training guide: what each role can do, and how work moves from one person to the next';
     }
 
+    /**
+     * Preferred tab for the signed-in user.
+     */
     public function getUserRole(): string
     {
         $user = Auth::user();
@@ -52,131 +56,137 @@ class UserManual extends Page
             return 'superadmin';
         }
 
-        $roles = $user->roles->pluck('name')->toArray();
+        $known = array_keys($this->allRoleTabs());
 
-        foreach ($roles as $role) {
-            if (in_array($role, ['superadmin', 'admin', 'hr_head', 'finance_head',
-                'nibret_hisab_head', 'inventory_staff', 'education_head', 'education_monitor',
-                'worship_monitor', 'mezmur_head', 'av_head', 'charity_head', 'tour_head',
-                'internal_relations_head', 'revenue_and_charity_head', ], true)) {
+        foreach ($user->roles->pluck('name') as $role) {
+            if (in_array($role, $known, true)) {
                 return $role;
             }
         }
 
-        return 'superadmin';
+        return array_key_first($this->getTabs()) ?: 'superadmin';
     }
 
+    /**
+     * Super Admin and Admin see every role (for training and printing).
+     * Other users see only the guides for roles they actually have.
+     *
+     * @return array<string, array{label: string, icon: string, color: string}>
+     */
     public function getTabs(): array
     {
-        $tabs = [];
+        $all = $this->allRoleTabs();
 
-        if (Auth::user()?->can('system.settings')) {
-            $tabs['superadmin'] = [
+        if (RoleGate::isAny(['superadmin', 'admin'])) {
+            return $all;
+        }
+
+        $owned = Auth::user()?->roles->pluck('name')->all() ?? [];
+
+        return array_filter(
+            $all,
+            fn (string $key): bool => in_array($key, $owned, true),
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    /**
+     * @return array<string, array{label: string, icon: string, color: string}>
+     */
+    protected function allRoleTabs(): array
+    {
+        return [
+            'superadmin' => [
                 'label' => 'Super Admin',
                 'icon' => 'heroicon-o-shield-check',
                 'color' => 'danger',
-            ];
-        }
-
-        if (Auth::user()?->can('dashboard.view')) {
-            $tabs['admin'] = [
+            ],
+            'admin' => [
                 'label' => 'Admin',
                 'icon' => 'heroicon-o-user-group',
                 'color' => 'primary',
-            ];
-        }
-
-        if (Auth::user()?->can('members.view')) {
-            $tabs['hr_head'] = [
+            ],
+            'hr_head' => [
                 'label' => 'HR Head',
                 'icon' => 'heroicon-o-users',
                 'color' => 'success',
-            ];
-        }
-
-        if (Auth::user()?->can('contributions.view')) {
-            $tabs['finance_head'] = [
-                'label' => 'Finance',
-                'icon' => 'heroicon-o-banknotes',
-                'color' => 'warning',
-            ];
-
-            if (Auth::user()?->can('inventory_items.view')) {
-                $tabs['nibret_hisab_head'] = [
-                    'label' => 'Nibret Hisab',
-                    'icon' => 'heroicon-o-calculator',
-                    'color' => 'warning',
-                ];
-            }
-        }
-
-        if (Auth::user()?->can('inventory_items.view')) {
-            $tabs['inventory_staff'] = [
-                'label' => 'Inventory',
-                'icon' => 'heroicon-o-archive-box',
-                'color' => 'success',
-            ];
-        }
-
-        if (Auth::user()?->can('academic_years.view')) {
-            $tabs['education_head'] = [
-                'label' => 'Education',
-                'icon' => 'heroicon-o-academic-cap',
-                'color' => 'info',
-            ];
-        }
-
-        if (Auth::user()?->can('songs.view')) {
-            $tabs['worship_monitor'] = [
-                'label' => 'Worship',
-                'icon' => 'heroicon-o-musical-note',
-                'color' => 'info',
-            ];
-        }
-
-        if (Auth::user()?->can('media_items.view')) {
-            $tabs['av_head'] = [
-                'label' => 'AV / Media',
-                'icon' => 'heroicon-o-camera',
-                'color' => 'primary',
-            ];
-        }
-
-        if (Auth::user()?->can('beneficiaries.view')) {
-            $tabs['charity_head'] = [
-                'label' => 'Charity',
-                'icon' => 'heroicon-o-heart',
-                'color' => 'danger',
-            ];
-        }
-
-        if (Auth::user()?->can('tours.view')) {
-            $tabs['tour_head'] = [
-                'label' => 'Tours',
-                'icon' => 'heroicon-o-globe-alt',
-                'color' => 'warning',
-            ];
-        }
-
-        if (Auth::user()?->can('contact_messages.view')) {
-            $tabs['internal_relations_head'] = [
+            ],
+            'internal_relations_head' => [
                 'label' => 'Internal Relations',
                 'icon' => 'heroicon-o-hand-raised',
                 'color' => 'info',
-            ];
-        }
-
-        if (Auth::user()?->can('tours.view') && Auth::user()?->can('beneficiaries.view')) {
-            $tabs['revenue_and_charity_head'] = [
+            ],
+            'finance_head' => [
+                'label' => 'Finance',
+                'icon' => 'heroicon-o-banknotes',
+                'color' => 'warning',
+            ],
+            'nibret_hisab_head' => [
+                'label' => 'Nibret Hisab',
+                'icon' => 'heroicon-o-calculator',
+                'color' => 'warning',
+            ],
+            'inventory_staff' => [
+                'label' => 'Inventory',
+                'icon' => 'heroicon-o-archive-box',
+                'color' => 'success',
+            ],
+            'education_head' => [
+                'label' => 'Education Head',
+                'icon' => 'heroicon-o-academic-cap',
+                'color' => 'info',
+            ],
+            'education_monitor' => [
+                'label' => 'Education Monitor',
+                'icon' => 'heroicon-o-clipboard-document-check',
+                'color' => 'info',
+            ],
+            'data_encoder' => [
+                'label' => 'Data Encoder',
+                'icon' => 'heroicon-o-pencil-square',
+                'color' => 'info',
+            ],
+            'student' => [
+                'label' => 'Student',
+                'icon' => 'heroicon-o-identification',
+                'color' => 'gray',
+            ],
+            'mezmur_head' => [
+                'label' => 'Mezmur Head',
+                'icon' => 'heroicon-o-musical-note',
+                'color' => 'info',
+            ],
+            'worship_monitor' => [
+                'label' => 'Worship Monitor',
+                'icon' => 'heroicon-o-musical-note',
+                'color' => 'info',
+            ],
+            'av_head' => [
+                'label' => 'AV / Media',
+                'icon' => 'heroicon-o-camera',
+                'color' => 'primary',
+            ],
+            'charity_head' => [
+                'label' => 'Charity',
+                'icon' => 'heroicon-o-heart',
+                'color' => 'danger',
+            ],
+            'tour_head' => [
+                'label' => 'Tours',
+                'icon' => 'heroicon-o-globe-alt',
+                'color' => 'warning',
+            ],
+            'revenue_and_charity_head' => [
                 'label' => 'Revenue & Charity',
                 'icon' => 'heroicon-o-currency-dollar',
                 'color' => 'success',
-            ];
-        }
-
-        return $tabs;
+            ],
+        ];
     }
 
+    /**
+     * @return list<array{name: string, label: string}>
+     */
     public function getUserDisplayRoles(): array
     {
         $user = Auth::user();
@@ -187,7 +197,7 @@ class UserManual extends Page
 
         return $user->roles->map(fn ($role) => [
             'name' => $role->name,
-            'label' => ucwords(str_replace('_', ' ', $role->name)),
+            'label' => $role->label ?: ucwords(str_replace('_', ' ', $role->name)),
         ])->toArray();
     }
 }

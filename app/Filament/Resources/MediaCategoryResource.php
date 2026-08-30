@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\MediaCategoryResource\Pages;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\MediaCategoryResource\RelationManagers;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 
 class MediaCategoryResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = MediaCategory::class;
 
     public static function getNavigationIcon(): ?string

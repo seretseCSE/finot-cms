@@ -4,7 +4,7 @@ namespace App\Filament\Resources\FundraisingCampaigns\Pages;
 
 use App\Filament\Resources\FundraisingCampaigns\FundraisingCampaignResource;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListFundraisingCampaigns extends ListRecords
 {

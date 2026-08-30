@@ -4,7 +4,7 @@ namespace App\Filament\Resources\AcademicYearResource\Pages;
 
 use App\Filament\Resources\AcademicYearResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListAcademicYears extends ListRecords
 {

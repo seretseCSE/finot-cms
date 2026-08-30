@@ -4,7 +4,7 @@ namespace App\Filament\Resources\RehearsalAttendanceResource\Pages;
 
 use App\Filament\Resources\RehearsalAttendanceResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListRehearsalAttendances extends ListRecords
 {

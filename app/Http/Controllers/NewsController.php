@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
-use App\Models\BlogPost;
 use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -41,20 +40,18 @@ class NewsController extends Controller
             return $event->date_time->format('Y-m-d');
         });
 
-        $blogPosts = BlogPost::where('status', 'Published')
-            ->where('published_at', '<=', now())
-            ->latest('published_at')
-            ->paginate(12, ['*'], 'blog_page');
+        if ($request->query('tab') === 'blog') {
+            return redirect()->route('blog.index', status: 301);
+        }
 
         $currentPage = 'news';
         $activeTab = $request->query('tab', 'announcements');
-        if (! in_array($activeTab, ['announcements', 'events', 'blog'], true)) {
+        if (! in_array($activeTab, ['announcements', 'events'], true)) {
             $activeTab = 'announcements';
         }
 
         return view('public.news', compact(
             'announcements',
-            'blogPosts',
             'events',
             'upcomingEvents',
             'calendarEvents',

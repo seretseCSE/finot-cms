@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\BeneficiaryResource\Pages;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\BeneficiaryResource\RelationManager\AidDistributionsRelationManager;
@@ -13,6 +15,8 @@ use Filament\Tables\Table;
 
 class BeneficiaryResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Beneficiary::class;
 
     public static function getNavigationIcon(): ?string

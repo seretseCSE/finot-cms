@@ -6,7 +6,7 @@
 
 <x-public.page-hero
     :title="__('News & Events')"
-    :subtitle="__('Stay informed with announcements, events, and stories from our community.')"
+    :subtitle="__('Stay informed with announcements and events from our community.')"
     :eyebrow="__('Updates')"
     :image="asset('images/hero-bg.webp')"
 />
@@ -17,9 +17,8 @@
             @foreach([
                 'announcements' => __('Announcements'),
                 'events' => __('Events'),
-                'blog' => __('Blog'),
             ] as $tab => $label)
-                <a href="{{ route('news', array_merge(request()->except('tab', 'page', 'announcements_page', 'blog_page'), ['tab' => $tab])) }}"
+                <a href="{{ route('news', array_merge(request()->except('tab', 'page', 'announcements_page'), ['tab' => $tab])) }}"
                    class="px-5 py-3 text-sm font-semibold rounded-t-xl transition-colors
                    {{ ($activeTab ?? 'announcements') === $tab
                         ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-b-0'
@@ -89,30 +88,6 @@
             </div>
         @endif
 
-        @if(($activeTab ?? 'announcements') === 'blog')
-            @if(isset($blogPosts) && $blogPosts->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($blogPosts as $post)
-                        <a href="{{ route('blog.show', $post->slug) }}" class="ft-surface rounded-2xl overflow-hidden no-underline group reveal">
-                            <div class="aspect-[16/10] overflow-hidden bg-slate-200 dark:bg-slate-800">
-                                <img src="{{ $post->featured_image_url ?? asset('images/blog/blog-1.jpg') }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
-                            </div>
-                            <div class="p-5">
-                                <h3 class="font-semibold ft-ink group-hover:text-primary-500 transition-colors">{{ $post->title }}</h3>
-                                @if($post->published_at)
-                                    <p class="text-xs mt-2" style="color: var(--ft-ink-muted);">{{ $post->published_at->diffForHumans() }}</p>
-                                @endif
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-                <div class="mt-10">{{ $blogPosts->withQueryString()->links() }}</div>
-            @else
-                <div class="ft-surface rounded-2xl p-12 text-center">
-                    <p class="ft-ink font-semibold">{{ __('No posts yet.') }}</p>
-                </div>
-            @endif
-        @endif
     </div>
 </section>
 

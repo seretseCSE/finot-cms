@@ -92,12 +92,18 @@ class ReportPagesTest extends TestCase
     }
 
     #[Test]
-    public function predefined_reports_accessible(): void
+    public function facilities_hub_includes_bookings_tab(): void
     {
         $user = $this->createAdminUser();
-        $response = $this->actingAs($user)->get('/admin/predefined-reports');
+        $this->actingAs($user);
+
+        $this->get('/admin/bookings')->assertRedirect();
+
+        $response = $this->get('/admin/hubs?hub=facilities');
         $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
         $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
+        $response->assertSee('Bookings');
+        $response->assertSee('Facilities');
     }
 
     #[Test]

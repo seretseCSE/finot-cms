@@ -18,7 +18,7 @@ class AuthorizationTest extends TestCase
 
         $this->get('/admin/members')->assertStatus(200);
         $this->get('/admin/users')->assertStatus(200);
-        $this->get('/admin/contributions')->assertStatus(200);
+        $this->get('/admin/contribution-matrix')->assertStatus(200);
         $this->get('/admin/tours')->assertStatus(200);
     }
 
@@ -30,7 +30,7 @@ class AuthorizationTest extends TestCase
 
         $this->get('/admin/members')->assertStatus(200);
         $this->get('/admin/users')->assertStatus(200);
-        $this->get('/admin/contributions')->assertStatus(200);
+        $this->get('/admin/contribution-matrix')->assertStatus(200);
     }
 
     #[Test]
@@ -49,7 +49,7 @@ class AuthorizationTest extends TestCase
         $user = $this->createHrHeadUser();
         $this->actingAs($user);
 
-        $this->get('/admin/contributions')->assertStatus(403);
+        $this->get('/admin/contribution-matrix')->assertStatus(403);
         $this->get('/admin/donations')->assertStatus(403);
     }
 
@@ -59,7 +59,7 @@ class AuthorizationTest extends TestCase
         $user = $this->createFinanceHeadUser();
         $this->actingAs($user);
 
-        $this->get('/admin/contributions')->assertStatus(200);
+        $this->get('/admin/contribution-matrix')->assertStatus(200);
         $this->get('/admin/donations')->assertStatus(200);
         $this->get('/admin/financial-transactions')->assertStatus(200);
     }
@@ -112,7 +112,7 @@ class AuthorizationTest extends TestCase
         $this->actingAs($user);
 
         $this->get('/admin/members')->assertStatus(403);
-        $this->get('/admin/contributions')->assertStatus(403);
+        $this->get('/admin/contribution-matrix')->assertStatus(403);
     }
 
     #[Test]

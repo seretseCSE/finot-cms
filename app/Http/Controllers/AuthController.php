@@ -9,19 +9,19 @@ use App\Rules\PasswordStrengthRule;
 use App\Services\PhoneFormattingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function showLogin(): View|RedirectResponse
+    public function showLogin(): Response|RedirectResponse
     {
         if (Auth::check()) {
             return $this->redirectAfterLogin(Auth::user());
         }
 
-        return view('auth.login');
+        return $this->authPage('auth.login');
     }
 
     /**
@@ -61,6 +61,7 @@ class AuthController extends Controller
 
         Auth::login($user);
         $user->resetFailedAttempts();
+        $request->session()->forget('session_token');
         $request->session()->regenerate();
         $this->mergeGuestFavorites($request, $user);
 
@@ -102,7 +103,7 @@ class AuthController extends Controller
     /**
      * Show the change initial password form.
      */
-    public function showChangeInitialPassword(): View|RedirectResponse
+    public function showChangeInitialPassword(): Response|RedirectResponse
     {
         $user = Auth::user();
 
@@ -118,7 +119,7 @@ class AuthController extends Controller
             return redirect()->to($user->postLoginUrl());
         }
 
-        return view('auth.change-initial-password');
+        return $this->authPage('auth.change-initial-password');
     }
 
     /**
@@ -159,6 +160,17 @@ class AuthController extends Controller
      * Merge guest cookie favorites into the user's database favorites on login.
      * DB wins: only inserts favorites not already present for this user.
      */
+    /**
+     * Auth forms include a CSRF token. Browsers and the PWA must not cache them.
+     */
+    private function authPage(string $view): Response
+    {
+        return response()
+            ->view($view)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
+    }
+
     private function mergeGuestFavorites(Request $request, User $user): void
     {
         $types = [

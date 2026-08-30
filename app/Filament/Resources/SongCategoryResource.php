@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\SongCategoryResource\Pages;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\SongCategoryResource\RelationManagers;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SongCategoryResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = SongCategory::class;
 
     public static function getNavigationIcon(): ?string

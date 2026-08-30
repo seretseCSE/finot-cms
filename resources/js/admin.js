@@ -1,10 +1,5 @@
 import './bootstrap-admin';
 
-// Dynamically import PWA install prompt logic so it is only loaded on admin pages.
-if (document.querySelector('.fi-main-sidebar') || document.querySelector('[href^="/admin/"]')) {
-    import('./pwa-install');
-}
-
 // Dynamically import product tour system
 if (document.getElementById('product-tour-root')) {
     import('./tours/filament-init.js');

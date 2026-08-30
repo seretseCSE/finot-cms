@@ -175,13 +175,16 @@
         </form>
     </div>
 
-    @if(!empty($reportData['contributions']) && count($reportData['contributions']) > 0)
     @php
-        $contributions  = $reportData['contributions'];
+        $contributions = collect($reportData['contributions'] ?? [])->map(fn ($c) => is_array($c) ? (object) $c : $c);
+    @endphp
+
+    @if($contributions->isNotEmpty())
+    @php
         $totalAmount    = $contributions->sum('amount');
         $avgAmount      = $contributions->avg('amount') ?? 0;
-        $uniqueMembers  = $contributions->pluck('member_id')->unique()->count();
-        $totalCount     = count($contributions);
+        $uniqueMembers  = $contributions->pluck('member_id')->filter()->unique()->count();
+        $totalCount     = $contributions->count();
     @endphp
 
     {{-- KPI Row --}}
@@ -277,7 +280,7 @@
             </div>
             @php
                 $groups = $contributions->groupBy(function($c) {
-                    return $c->member->memberGroup?->name ?? 'Unknown';
+                    return $c->group_name ?: 'Unknown';
                 })->take(5);
                 $maxGroupAmt = $groups->map(fn($g) => $g->sum('amount'))->max() ?: 1;
             @endphp
@@ -312,10 +315,10 @@
                     <span style="font-size:12px; font-weight:400; color:var(--color-text-secondary);">— {{ $academicYears[$selectedAcademicYear] ?? '' }}</span>
                 @endif
             </div>
-            <span class="cr-count-pill">{{ count($reportData['contributions']) }} records</span>
+            <span class="cr-count-pill">{{ $contributions->count() }} records</span>
         </div>
 
-        @if(empty($reportData['contributions']) || count($reportData['contributions']) === 0)
+        @if($contributions->isEmpty())
             <div class="cr-empty">
                 <i class="ti ti-file-off" aria-hidden="true"></i>
                 <p>No contributions found</p>
@@ -340,22 +343,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($reportData['contributions'] as $i => $contribution)
+                        @foreach($contributions as $i => $contribution)
                             <tr>
                                 <td class="muted" style="font-size:11px;">{{ $i + 1 }}</td>
                                 <td>
                                     <div style="display:flex; align-items:center; gap:8px;">
                                         <div class="avatar-circle">
-                                            {{ $contribution->member ? mb_substr($contribution->member->full_name, 0, 1) : '?' }}
+                                            {{ $contribution->member_initial ?? '?' }}
                                         </div>
                                         <span style="font-weight:500; white-space:nowrap;">
-                                            {{ $contribution->member ? $contribution->member->full_name : 'Unknown Member' }}
+                                            {{ $contribution->member_name ?? 'Unknown Member' }}
                                         </span>
                                     </div>
                                 </td>
                                 <td>
                                     <span class="group-pill">
-                                        {{ $contribution->member->memberGroup?->name ?? 'N/A' }}
+                                        {{ $contribution->group_name ?? 'N/A' }}
                                     </span>
                                 </td>
                                 <td class="muted">{{ $contribution->month_name }}</td>
@@ -368,7 +371,7 @@
                                     @endphp
                                     <span class="method-pill {{ $pmClass }}">
                                         <i class="ti {{ $pmIcon }}" style="font-size:11px;" aria-hidden="true"></i>
-                                        {{ $contribution->formatted_payment_method }}
+                                        {{ $contribution->formatted_payment_method ?? $contribution->payment_method ?? 'Cash' }}
                                     </span>
                                 </td>
                                 <td class="muted" style="white-space:nowrap;">
@@ -377,7 +380,7 @@
                                     @endphp
                                     {{ $ethDate['month_name_am'] . ' ' . $ethDate['day'] . ', ' . $ethDate['year'] }}
                                 </td>
-                                <td class="muted" style="white-space:nowrap;">{{ $contribution->recordedBy->name }}</td>
+                                <td class="muted" style="white-space:nowrap;">{{ $contribution->recorded_by_name ?? '—' }}</td>
                                 @if($selectedAcademicYear && $selectedAcademicYear !== 'all')
                                     <td>
                                         @if($contribution->is_archived)

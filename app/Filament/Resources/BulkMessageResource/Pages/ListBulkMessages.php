@@ -4,7 +4,7 @@ namespace App\Filament\Resources\BulkMessageResource\Pages;
 
 use App\Filament\Resources\BulkMessageResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListBulkMessages extends ListRecords
 {

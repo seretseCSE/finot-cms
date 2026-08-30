@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\SchoolClassResource\Pages;
 use App\Filament\Resources\SchoolClassResource\RelationManagers\TeachersRelationManager;
 use App\Models\ClassModel;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SchoolClassResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = ClassModel::class;
 
     public static function getNavigationGroup(): ?string

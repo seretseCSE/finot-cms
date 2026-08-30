@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Forms\Components\EthiopianDatePicker;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ContributionAmountResource\Pages;
@@ -24,6 +26,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ContributionAmountResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = ContributionAmount::class;
 
     public static function getNavigationIcon(): ?string

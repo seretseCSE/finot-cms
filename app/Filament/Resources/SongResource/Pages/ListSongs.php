@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\SongResource\Pages;
 
 use App\Filament\Resources\SongResource;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListSongs extends ListRecords
 {

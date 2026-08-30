@@ -97,6 +97,24 @@ class Song extends BaseModel
     }
 
     /**
+     * MIME type for the uploaded audio file, based on extension.
+     */
+    public function getAudioMimeTypeAttribute(): string
+    {
+        $extension = strtolower(pathinfo((string) $this->audio_file, PATHINFO_EXTENSION));
+
+        return match ($extension) {
+            'wav' => 'audio/wav',
+            'ogg', 'oga' => 'audio/ogg',
+            'flac' => 'audio/flac',
+            'aac' => 'audio/aac',
+            'm4a', 'mp4' => 'audio/mp4',
+            'wma' => 'audio/x-ms-wma',
+            default => 'audio/mpeg',
+        };
+    }
+
+    /**
      * Get video URL (raw URL stored in database)
      */
     public function getVideoUrlAttribute(): ?string

@@ -106,21 +106,17 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Network-First for HTML pages (always fresh)
+    // Auth and form pages must never be intercepted or cached — a stale CSRF
+    // token here causes a 419 on the first login / contact submit.
+    const skipCachePaths = ['/login', '/change-initial-password', '/logout', '/contact', '/admin/login'];
+    if (skipCachePaths.some((path) => url.pathname === path || url.pathname.startsWith(path + '/'))) {
+        return;
+    }
+
+    // Network-only for HTML. Caching Blade pages stores an expired CSRF token.
     if (request.mode === 'navigate' || url.pathname.endsWith('.html')) {
         event.respondWith(
-            fetch(request).then((networkResponse) => {
-                if (networkResponse.ok && url.pathname !== '/') {
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, networkResponse.clone());
-                    });
-                }
-                return networkResponse;
-            }).catch(() => {
-                return caches.match(request).then((cached) => {
-                    return cached || caches.match('/offline');
-                });
-            })
+            fetch(request).catch(() => caches.match('/offline'))
         );
         return;
     }

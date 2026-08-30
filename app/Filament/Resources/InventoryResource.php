@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\InventoryResource\Pages;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\InventoryResource\RelationManagers;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 
 class InventoryResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = InventoryItem::class;
 
     public static function getNavigationIcon(): ?string
@@ -28,7 +32,7 @@ class InventoryResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Inventory';
+        return 'Inventory Management';
     }
 
     public static function getNavigationSort(): ?int

@@ -14,6 +14,12 @@ Schedule::command('content:publish-scheduled')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/scheduler.log'));
 
+// Daily full system backup (database + uploaded files)
+Schedule::command('backup:auto')
+    ->dailyAt('01:30')
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/scheduler.log'));
+
 // System Automation: Auto-archive old records
 Schedule::command('system:auto-archive')
     ->dailyAt('02:00')

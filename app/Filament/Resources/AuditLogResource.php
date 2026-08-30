@@ -22,7 +22,7 @@ class AuditLogResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Settings & Logs';
     }
 
     public static function getNavigationSort(): ?int

@@ -15,7 +15,15 @@ class BlogController extends Controller
 
     public function index()
     {
-        return redirect()->route('news', ['tab' => 'blog'], 301);
+        $posts = BlogPost::where('status', 'Published')
+            ->where('published_at', '<=', now())
+            ->latest('published_at')
+            ->paginate(12);
+
+        return view('public.blog.index', [
+            'posts' => $posts,
+            'currentPage' => 'blog',
+        ]);
     }
 
     public function show($slug)

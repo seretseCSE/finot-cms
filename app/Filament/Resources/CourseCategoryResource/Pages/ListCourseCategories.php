@@ -4,7 +4,7 @@ namespace App\Filament\Resources\CourseCategoryResource\Pages;
 
 use App\Filament\Resources\CourseCategoryResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListCourseCategories extends ListRecords
 {

@@ -1,7 +1,7 @@
 
-const BUILD_INFO = {"timestamp":1788065965800,"hash":"0ohzfxo4m","assets":["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-CYYdEkXb.css","/assets/vendor-DQIN4Xuk.js","/assets/gsap-vendor-a3sj5zmn.js","/assets/chart-vendor-BNIhJ1E0.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CPC7FGMp.js","/assets/tour-roles-DzWvRe-A.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-C8zLRzQC.js","/assets/app-DvdtxQk9.js","/assets/app-C1OGNL6a.js","/assets/admin-CGnxYcSX.js","/assets/financial-charts-OV3SpZ5U.js","/assets/pwa-install-BWgOSQDS.js"]};
-const CACHE_NAME = 'finot-cache-0ohzfxo4m';
-const API_CACHE_NAME = 'finot-api-cache-0ohzfxo4m';
+const BUILD_INFO = {"timestamp":1788065965801,"hash":"login419fix","assets":["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-CYYdEkXb.css","/assets/vendor-DQIN4Xuk.js","/assets/gsap-vendor-a3sj5zmn.js","/assets/chart-vendor-BNIhJ1E0.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CPC7FGMp.js","/assets/tour-roles-DzWvRe-A.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-C8zLRzQC.js","/assets/app-DvdtxQk9.js","/assets/app-C1OGNL6a.js","/assets/admin-CGnxYcSX.js","/assets/financial-charts-OV3SpZ5U.js","/assets/pwa-install-BWgOSQDS.js"]};
+const CACHE_NAME = 'finot-cache-login419fix';
+const API_CACHE_NAME = 'finot-api-cache-login419fix';
 
 // Dynamic assets from build
 const DYNAMIC_ASSETS = ["/assets/tour-vendor-DB0Q8XAf.css","/assets/filament-init-51LSC3_h.css","/assets/app-CYYdEkXb.css","/assets/vendor-DQIN4Xuk.js","/assets/gsap-vendor-a3sj5zmn.js","/assets/chart-vendor-BNIhJ1E0.js","/assets/tour-vendor-wyFz-SqW.js","/assets/tour-core-CPC7FGMp.js","/assets/tour-roles-DzWvRe-A.js","/assets/tour-pages-CIdMOsiM.js","/assets/filament-init-C8zLRzQC.js","/assets/app-DvdtxQk9.js","/assets/app-C1OGNL6a.js","/assets/admin-CGnxYcSX.js","/assets/financial-charts-OV3SpZ5U.js","/assets/pwa-install-BWgOSQDS.js"];
@@ -65,21 +65,17 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Network-First for HTML pages (always fresh)
+    // Auth and form pages must never be intercepted or cached — a stale CSRF
+    // token here causes a 419 on the first login / contact submit.
+    const skipCachePaths = ['/login', '/change-initial-password', '/logout', '/contact', '/admin/login'];
+    if (skipCachePaths.some((path) => url.pathname === path || url.pathname.startsWith(path + '/'))) {
+        return;
+    }
+
+    // Network-only for HTML. Caching Blade pages stores an expired CSRF token.
     if (request.mode === 'navigate' || url.pathname.endsWith('.html')) {
         event.respondWith(
-            fetch(request).then((networkResponse) => {
-                if (networkResponse.ok && url.pathname !== '/') {
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, networkResponse.clone());
-                    });
-                }
-                return networkResponse;
-            }).catch(() => {
-                return caches.match(request).then((cached) => {
-                    return cached || caches.match('/offline');
-                });
-            })
+            fetch(request).catch(() => caches.match('/offline'))
         );
         return;
     }

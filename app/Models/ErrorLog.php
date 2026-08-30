@@ -63,27 +63,4 @@ class ErrorLog extends BaseModel
         return 'error_logs';
     }
 
-    /**
-     * Get navigation label for resource
-     */
-    public static function getNavigationLabel(): string
-    {
-        return 'Error Logs';
-    }
-
-    /**
-     * Get navigation icon for resource
-     */
-    public static function getNavigationIcon(): ?string
-    {
-        return 'heroicon-o-bug-ant';
-    }
-
-    /**
-     * Get navigation group for resource
-     */
-    public static function getNavigationGroup(): ?string
-    {
-        return 'System';
-    }
 }

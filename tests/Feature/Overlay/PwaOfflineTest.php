@@ -18,7 +18,9 @@ class PwaOfflineTest extends TestCase
         $this->get('/library')->assertOk()->assertSee('data-offline-clear', false);
         $this->get('/service-worker.js')
             ->assertOk()
-            ->assertSee('finot-media-opt-in', false);
+            ->assertSee('finot-media-opt-in', false)
+            ->assertSee('/login', false)
+            ->assertSee('skipCachePaths', false);
     }
 
     #[Test]

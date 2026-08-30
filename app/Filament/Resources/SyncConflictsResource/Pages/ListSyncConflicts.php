@@ -4,7 +4,7 @@ namespace App\Filament\Resources\SyncConflictsResource\Pages;
 
 use App\Filament\Resources\SyncConflictsResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Collection;
 
 class ListSyncConflicts extends ListRecords

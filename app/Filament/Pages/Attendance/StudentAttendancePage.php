@@ -25,7 +25,7 @@ class StudentAttendancePage extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance';
+        return 'Attendance & Results';
     }
 
     public static function getNavigationSort(): ?int

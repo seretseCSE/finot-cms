@@ -35,7 +35,7 @@ class Promotion extends BaseModel
      */
     public function student()
     {
-        return $this->belongsTo(Member::class);
+        return $this->belongsTo(Member::class, 'student_id');
     }
 
     /**
@@ -43,7 +43,7 @@ class Promotion extends BaseModel
      */
     public function fromClass()
     {
-        return $this->belongsTo(\App\Models\SchoolClass::class);
+        return $this->belongsTo(SchoolClass::class, 'from_class_id');
     }
 
     /**
@@ -51,7 +51,7 @@ class Promotion extends BaseModel
      */
     public function toClass()
     {
-        return $this->belongsTo(\App\Models\SchoolClass::class);
+        return $this->belongsTo(SchoolClass::class, 'to_class_id');
     }
 
     /**

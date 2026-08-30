@@ -44,28 +44,6 @@ class AdvancedAdminTest extends TestCase
     }
 
     #[Test]
-    public function superadmin_can_access_global_oversight(): void
-    {
-        $user = $this->createSuperadminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/global-oversight');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
-    public function superadmin_can_access_auto_purge_settings(): void
-    {
-        $user = $this->createSuperadminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/auto-purge-settings');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
     public function superadmin_can_access_global_church_settings(): void
     {
         $user = $this->createSuperadminUser();
@@ -88,35 +66,13 @@ class AdvancedAdminTest extends TestCase
     }
 
     #[Test]
-    public function temporary_filters_resource_accessible(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/temporary-filters');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
-    public function sync_conflicts_resource_accessible(): void
+    public function sync_conflicts_resource_is_hidden(): void
     {
         $user = $this->createAdminUser();
         $this->actingAs($user);
 
         $response = $this->get('/admin/sync-conflicts');
-        $this->assertNotEquals(404, $response->getStatusCode(), 'Route not found');
-        $this->assertNotEquals(403, $response->getStatusCode(), 'Forbidden');
-    }
-
-    #[Test]
-    public function predefined_reports_resource_accessible(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/predefined-reports');
-        $response->assertStatus(200);
+        $this->assertContains($response->getStatusCode(), [403, 404]);
     }
 
     #[Test]

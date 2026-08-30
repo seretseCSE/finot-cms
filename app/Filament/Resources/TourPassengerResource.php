@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\TourPassengerResource\Pages;
 use App\Models\Member;
 use App\Models\Tour;
@@ -24,6 +26,8 @@ use Illuminate\Support\Facades\Auth;
 
 class TourPassengerResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = TourPassenger::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';

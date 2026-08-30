@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\SubjectResource\Pages;
 use App\Models\Subject;
 use Filament\Actions;
@@ -13,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SubjectResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Subject::class;
 
     public static function getNavigationGroup(): ?string

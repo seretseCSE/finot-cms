@@ -4,7 +4,7 @@ namespace App\Filament\Resources\TermResource\Pages;
 
 use App\Filament\Resources\TermResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListTerms extends ListRecords
 {

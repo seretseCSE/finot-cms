@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\MediaResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\MediaResource;
 
 class ListMedia extends ListRecords

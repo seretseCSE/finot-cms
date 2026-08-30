@@ -4,7 +4,7 @@ namespace App\Filament\Resources\LossRecordResource\Pages;
 
 use App\Filament\Resources\LossRecordResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListLossRecords extends ListRecords
 {

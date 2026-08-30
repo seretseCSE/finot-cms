@@ -12,21 +12,22 @@ class BlogFeatureTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function blog_index_redirects_to_news(): void
+    public function blog_index_lists_published_posts(): void
     {
-        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
+        $this->get('/blog')->assertOk();
     }
 
     #[Test]
-    public function news_blog_tab_shows_only_published_posts(): void
+    public function news_blog_tab_redirects_to_blog_index(): void
     {
         BlogPost::factory()->published()->create(['title' => 'Published Post']);
         BlogPost::factory()->draft()->create(['title' => 'Draft Post']);
         BlogPost::factory()->archived()->create(['title' => 'Archived Post']);
 
-        $response = $this->get('/news?tab=blog');
+        $this->get('/news?tab=blog')->assertRedirect(route('blog.index'));
 
-        $response->assertStatus(200);
+        $response = $this->get('/blog');
+        $response->assertOk();
         $response->assertSee('Published Post');
         $response->assertDontSee('Draft Post');
         $response->assertDontSee('Archived Post');

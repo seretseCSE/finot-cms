@@ -17,7 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocaleMiddleware::class,
             \App\Http\Middleware\ErrorLoggingMiddleware::class,
             \App\Http\Middleware\TrackUserSessions::class,
-            \App\Http\Middleware\SessionTimeoutMiddleware::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
@@ -31,6 +30,24 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         Integration::handles($exceptions);
+
+        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $e, \Illuminate\Http\Request $request) {
+            if ($response->getStatusCode() !== 419) {
+                return $response;
+            }
+
+            $message = __('Your session expired. Please try again.');
+
+            if ($request->expectsJson() || $request->is('livewire*')) {
+                return response()->json(['message' => $message], 419);
+            }
+
+            $target = $request->is('login') || $request->routeIs('login.submit')
+                ? route('login')
+                : (url()->previous() ?: route('login'));
+
+            return redirect()->to($target)->with('error', $message);
+        });
 
         $exceptions->render(function (\InvalidArgumentException $e, \Illuminate\Http\Request $request) {
             if (str_contains($e->getMessage(), 'Malformed UTF-8 characters')) {

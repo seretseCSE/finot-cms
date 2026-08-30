@@ -25,6 +25,13 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $connection = config('database.default');
+        $database = config("database.connections.{$connection}.database");
+        if ($connection === 'mysql' && $database === 'finot_cms') {
+            throw new \RuntimeException('Tests must not run against the local MySQL finot_cms database.');
+        }
+
         $this->app->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
         if (! in_array(static::class, self::$seededClasses)) {

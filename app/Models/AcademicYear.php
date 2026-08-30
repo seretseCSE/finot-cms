@@ -133,6 +133,15 @@ class AcademicYear extends Model
     }
 
     /**
+     * Get the current academic year (phase = current, else the Active row).
+     */
+    public static function currentYear(): ?self
+    {
+        return static::current()->first()
+            ?? static::active()->first();
+    }
+
+    /**
      * Get the next (upcoming) academic year.
      */
     public static function nextYear(): ?self

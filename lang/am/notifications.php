@@ -29,10 +29,6 @@ return [
         'title' => 'አስቸኳይ መልእክት',
         'body' => ':body',
     ],
-    'imports.committed' => [
-        'title' => 'ማስገባት ተጠናቋል',
-        'body' => ':imported ገብተዋል፣ :skipped ታልፈዋል፣ :failed አልተሳኩም።',
-    ],
     'bookings.requested' => [
         'title' => 'የቦታ ቦታ ማስያዝ ተጠይቋል',
         'body' => ':purpose',

@@ -22,6 +22,8 @@ class CreateBulkMessage extends CreateRecord
             'class_ids' => $this->data['audience']['class_ids'] ?? [],
             'group_ids' => $this->data['audience']['group_ids'] ?? [],
             'member_ids' => $this->data['audience']['member_ids'] ?? [],
+            'member_types' => $this->data['audience']['member_types'] ?? [],
+            'search' => $this->data['audience']['search'] ?? '',
         ];
 
         return $data;

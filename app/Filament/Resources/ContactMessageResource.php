@@ -28,7 +28,7 @@ class ContactMessageResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Operations';
     }
 
     public static function getNavigationSort(): ?int

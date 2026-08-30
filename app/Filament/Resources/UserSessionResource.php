@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use App\Filament\Resources\UserSessionResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\UserSession;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UserSessionResource extends Resource
 {
+    use EnsuresTableCreateAction;
+
     protected static ?string $model = UserSession::class;
 
     public static function getNavigationIcon(): ?string
@@ -23,7 +26,7 @@ class UserSessionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Users & Access';
     }
 
     public static function getNavigationSort(): ?int

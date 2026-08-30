@@ -23,9 +23,11 @@ class MemberBulkActions
     public static function getActions(): array
     {
         return [
-            DeleteBulkAction::make(),
-            self::exportAction(),
             self::assignToGroupAction(),
+            self::removeFromGroupAction(),
+            self::exportAction(),
+            DeleteBulkAction::make()
+                ->label('Delete selected'),
             self::assignToDepartmentAction(),
         ];
     }
@@ -113,6 +115,48 @@ class MemberBulkActions
                 Notification::make()
                     ->title('Assignment queued')
                     ->body('The group assignment is being processed in the background.')
+                    ->success()
+                    ->send();
+            });
+    }
+
+    /**
+     * Remove selected members from their current group.
+     */
+    private static function removeFromGroupAction(): BulkAction
+    {
+        return BulkAction::make('remove_from_group')
+            ->label('Remove from Group')
+            ->icon('heroicon-o-user-minus')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading('Remove from group')
+            ->modalDescription('Selected members who are in a group will be removed from that group. Members with no group are skipped.')
+            ->deselectRecordsAfterCompletion()
+            ->action(function (BulkAction $action): void {
+                $removed = 0;
+                $skipped = 0;
+
+                foreach ($action->getSelectedRecords() as $member) {
+                    $group = $member->currentGroup;
+
+                    if (! $group) {
+                        $skipped++;
+
+                        continue;
+                    }
+
+                    try {
+                        $group->removeMember($member->id);
+                        $removed++;
+                    } catch (\Exception $e) {
+                        $skipped++;
+                    }
+                }
+
+                Notification::make()
+                    ->title('Group removal complete')
+                    ->body("{$removed} member(s) removed from their group. {$skipped} skipped.")
                     ->success()
                     ->send();
             });

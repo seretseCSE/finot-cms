@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Overlay;
 
-use App\Filament\Resources\MemberImportResource;
 use App\Filament\Resources\MemberResource;
 use App\Models\User;
 use Filament\Panel;
@@ -39,13 +38,11 @@ class OverlayRbacTest extends TestCase
         $this->assertTrue($encoder->can('classes.view'));
         $this->assertTrue($encoder->can('subjects.view'));
         $this->assertTrue($encoder->can('students.view'));
-        $this->assertFalse($encoder->can('imports.commit'));
         $this->assertFalse($encoder->can('members.create'));
         $this->assertFalse($encoder->can('members.update'));
         $this->assertFalse($encoder->can('members.delete'));
 
         $this->actingAs($encoder);
-        $this->assertFalse(MemberImportResource::canViewAny());
         $this->assertFalse(MemberResource::canCreate());
         $this->assertTrue($encoder->canAccessPanel(Panel::make()->id('admin')));
     }
@@ -67,7 +64,6 @@ class OverlayRbacTest extends TestCase
 
         $this->assertTrue($user->canAccessPanel(Panel::make()->id('admin')));
         $this->assertTrue($user->can('withdrawal.approve'));
-        $this->assertTrue($user->can('imports.commit'));
         $this->assertTrue($user->can('results.approve'));
     }
 }

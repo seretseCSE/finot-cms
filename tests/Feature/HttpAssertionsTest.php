@@ -16,20 +16,17 @@ class HttpAssertionsTest extends TestCase
     // ==================== GET ASSERTIONS ====================
 
     #[Test]
-    public function get_blog_redirects_to_news(): void
+    public function get_blog_returns_html(): void
     {
-        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
+        $this->get('/blog')->assertOk();
     }
 
     #[Test]
-    public function get_news_blog_tab_returns_html(): void
+    public function get_news_blog_tab_redirects_to_blog(): void
     {
         \App\Models\BlogPost::factory()->published()->create();
 
-        $response = $this->get('/news?tab=blog');
-
-        $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+        $this->get('/news?tab=blog')->assertRedirect(route('blog.index'));
     }
 
     #[Test]

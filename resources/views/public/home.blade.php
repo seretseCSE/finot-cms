@@ -195,8 +195,43 @@
     </div>
 </section>
 
-{{-- 7. LEADERSHIP --}}
+{{-- 6b. BLOG — latest stories --}}
+@if(isset($recentPosts) && $recentPosts->isNotEmpty())
 <section class="ft-section" style="background: var(--ft-canvas-soft);">
+    <div class="ft-container">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
+            <x-public.section-heading
+                :eyebrow="__('Blog')"
+                :title="__('Stories & Reflections')"
+            />
+            <a href="{{ route('blog.index') }}" class="ft-text-link shrink-0">{{ __('Read the Blog') }}</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @foreach($recentPosts as $i => $post)
+                <a href="{{ route('blog.show', $post->slug) }}" class="ft-surface rounded-2xl overflow-hidden no-underline group reveal" data-delay="{{ $i * 0.08 }}">
+                    <div class="aspect-[16/10] overflow-hidden bg-slate-200 dark:bg-slate-800">
+                        <img src="{{ $post->featured_image_url ?? $img('blog/blog-1.jpg') }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold ft-ink group-hover:text-primary-500 transition-colors">
+                            {{ Str::limit(app()->getLocale() === 'am' ? ($post->title_am ?? $post->title) : $post->title, 70) }}
+                        </h3>
+                        <p class="text-sm mt-2 line-clamp-2" style="color: var(--ft-ink-muted);">
+                            {{ Str::limit(strip_tags(app()->getLocale() === 'am' ? ($post->content_am ?? $post->content) : $post->content), 120) }}
+                        </p>
+                        @if($post->published_at)
+                            <p class="text-xs mt-3" style="color: var(--ft-ink-muted);">{{ $post->published_at->diffForHumans() }}</p>
+                        @endif
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- 7. LEADERSHIP --}}
+<section class="ft-section">
     <div class="ft-container">
         <x-public.section-heading
             :eyebrow="__('Leadership')"

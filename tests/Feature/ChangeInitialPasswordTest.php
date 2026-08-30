@@ -12,6 +12,27 @@ class ChangeInitialPasswordTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+    }
+
+    /**
+     * @param  array<string, string>  $payload
+     */
+    private function submitPasswordChange(User $user, array $payload, ?string $from = null): \Illuminate\Testing\TestResponse
+    {
+        $request = $this->actingAs($user);
+
+        if ($from !== null) {
+            $request = $request->from($from);
+        }
+
+        return $request->post(route('change-initial-password.submit'), $payload);
+    }
+
     #[Test]
     public function change_password_page_is_shown_when_temp_password_is_unchanged(): void
     {
@@ -24,7 +45,7 @@ class ChangeInitialPasswordTest extends TestCase
         $this->actingAs($user)
             ->get(route('change-initial-password'))
             ->assertOk()
-            ->assertSee('Change your password');
+            ->assertSee('Change Your Password');
     }
 
     #[Test]
@@ -64,8 +85,7 @@ class ChangeInitialPasswordTest extends TestCase
             'password_history' => [],
         ]);
 
-        $this->actingAs($user)
-            ->post(route('change-initial-password.submit'), [
+        $this->submitPasswordChange($user, [
                 'current_password' => 'Admin1234',
                 'password' => 'NewPass123',
                 'password_confirmation' => 'NewPass123',
@@ -88,13 +108,11 @@ class ChangeInitialPasswordTest extends TestCase
             'password_history' => [],
         ]);
 
-        $this->actingAs($user)
-            ->from(route('change-initial-password'))
-            ->post(route('change-initial-password.submit'), [
+        $this->submitPasswordChange($user, [
                 'current_password' => 'Admin1234',
                 'password' => 'Admin1234',
                 'password_confirmation' => 'Admin1234',
-            ])
+            ], route('change-initial-password'))
             ->assertRedirect(route('change-initial-password'))
             ->assertSessionHasErrors('password');
 
@@ -111,12 +129,11 @@ class ChangeInitialPasswordTest extends TestCase
             'password_history' => [],
         ]);
 
-        $this->actingAs($user)
-            ->post(route('change-initial-password.submit'), [
-                'current_password' => 'Admin1234',
-                'password' => 'NewPass123',
-                'password_confirmation' => 'NewPass123',
-            ]);
+        $this->submitPasswordChange($user, [
+            'current_password' => 'Admin1234',
+            'password' => 'NewPass123',
+            'password_confirmation' => 'NewPass123',
+        ]);
 
         $this->get('/admin')->assertOk();
     }

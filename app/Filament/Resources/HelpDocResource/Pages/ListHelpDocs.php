@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\HelpDocResource\Pages;
 
 use App\Filament\Resources\HelpDocResource;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListHelpDocs extends ListRecords
 {

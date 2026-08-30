@@ -33,12 +33,12 @@ class PageRenderTest extends TestCase
     }
 
     #[Test]
-    public function list_contributions_page_mounts_without_throwing_for_authorized_user(): void
+    public function contribution_form_page_mounts_without_throwing_for_authorized_user(): void
     {
         $user = $this->createFinanceHeadUser();
 
         $this->actingAs($user)
-            ->get('/admin/contributions')
+            ->get('/admin/contribution-matrix')
             ->assertOk();
     }
 }

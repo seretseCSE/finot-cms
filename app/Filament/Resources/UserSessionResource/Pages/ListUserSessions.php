@@ -4,7 +4,7 @@ namespace App\Filament\Resources\UserSessionResource\Pages;
 
 use App\Filament\Resources\UserSessionResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListUserSessions extends ListRecords
 {
@@ -15,7 +15,7 @@ class ListUserSessions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
+            Actions\Action::make('refresh')
                 ->label('Refresh')
                 ->icon('heroicon-o-arrow-path')
                 ->action('refreshTable')

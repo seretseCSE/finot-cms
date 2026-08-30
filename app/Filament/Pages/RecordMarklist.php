@@ -16,6 +16,8 @@ class RecordMarklist extends Page
 {
     protected string $view = 'filament.pages.record-marklist';
 
+    protected static ?string $title = 'Record Marks';
+
     public ?int $classId = null;
 
     public ?int $termId = null;
@@ -24,7 +26,14 @@ class RecordMarklist extends Page
 
     public ?int $marklistId = null;
 
+    public ?string $marklistStatus = null;
+
     public array $rows = [];
+
+    public function getSubheading(): ?string
+    {
+        return 'Score conduct, memorization, and participation for a class roster.';
+    }
 
     public static function getNavigationIcon(): ?string
     {
@@ -38,7 +47,7 @@ class RecordMarklist extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education Management';
+        return 'Attendance & Results';
     }
 
     public static function getNavigationSort(): ?int
@@ -81,12 +90,20 @@ class RecordMarklist extends Page
         $this->syncRows($marklist->fresh(['items.member']));
     }
 
+    public function isLocked(): bool
+    {
+        return $this->marklistStatus !== null && $this->marklistStatus !== 'draft';
+    }
+
     protected function syncRows(Marklist $marklist): void
     {
+        $this->marklistStatus = $marklist->status?->value;
+
         $this->rows = $marklist->items()->with('member')->get()->map(function ($item) {
             return [
                 'member_id' => $item->member_id,
                 'name' => $item->member?->full_name,
+                'code' => $item->member?->member_code,
                 'conduct' => $item->conduct?->value,
                 'memorization' => $item->memorization?->value,
                 'participation' => $item->participation?->value,

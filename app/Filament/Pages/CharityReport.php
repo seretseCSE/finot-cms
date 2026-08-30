@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+
+use App\Filament\Support\EmbeddableInHub;
+use App\Filament\Support\HidesFromNavigation;
 use App\Models\AidDistribution;
 use App\Models\Beneficiary;
 use Filament\Notifications\Notification;
@@ -11,6 +14,9 @@ use Illuminate\Support\Facades\DB;
 
 class CharityReport extends Page
 {
+    use EmbeddableInHub;
+    use HidesFromNavigation;
+
     protected static ?string $title = 'Charity Report';
 
     public static function getNavigationIcon(): ?string

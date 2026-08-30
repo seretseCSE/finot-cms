@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\MediaResource\Pages;
 use App\Services\UploadSanitizer;
 use Filament\Schemas\Schema;
@@ -15,6 +17,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MediaResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = MediaItem::class;
 
     public static function getNavigationIcon(): ?string

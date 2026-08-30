@@ -42,12 +42,12 @@ class SecurityTest extends TestCase
     }
 
     #[Test]
-    public function export_audit_logs_page_accessible_to_superadmin(): void
+    public function audit_logs_export_lives_on_audit_log_resource(): void
     {
         $user = $this->createSuperadminUser();
         $this->actingAs($user);
 
-        $response = $this->get('/admin/export-audit-logs');
+        $response = $this->get('/admin/audit-logs');
         $response->assertStatus(200);
     }
 
@@ -84,7 +84,7 @@ class SecurityTest extends TestCase
     }
 
     #[Test]
-    public function error_log_viewer_accessible_to_superadmin(): void
+    public function error_logs_accessible_to_superadmin(): void
     {
         $user = $this->createSuperadminUser();
         $this->actingAs($user);
@@ -125,7 +125,7 @@ class SecurityTest extends TestCase
         $user = $this->createSuperadminUser();
         $this->actingAs($user);
 
-        $response = $this->get('/admin/error-logs');
+        $response = $this->get('/admin/error-log-viewer');
         $response->assertStatus(200);
     }
 }

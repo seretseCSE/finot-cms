@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Enums\WithdrawalRequestStatus;
 use App\Filament\Resources\WithdrawalRequestResource\Pages;
 use App\Models\WithdrawalRequest;
@@ -16,6 +18,8 @@ use Illuminate\Support\Facades\Auth;
 
 class WithdrawalRequestResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = WithdrawalRequest::class;
 
     public static function getNavigationGroup(): ?string

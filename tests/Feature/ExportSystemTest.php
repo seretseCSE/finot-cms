@@ -17,7 +17,7 @@ class ExportSystemTest extends TestCase
         $user = $this->createFinanceHeadUser();
         $this->actingAs($user);
 
-        $response = $this->get('/admin/contributions');
+        $response = $this->get('/admin/contribution-report');
         $response->assertStatus(200);
     }
 
@@ -48,17 +48,7 @@ class ExportSystemTest extends TestCase
         $user = $this->createSuperadminUser();
         $this->actingAs($user);
 
-        $response = $this->get('/admin/export-audit-logs');
-        $response->assertStatus(200);
-    }
-
-    #[Test]
-    public function predefined_reports_accessible(): void
-    {
-        $user = $this->createAdminUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/predefined-reports');
+        $response = $this->get('/admin/audit-logs');
         $response->assertStatus(200);
     }
 

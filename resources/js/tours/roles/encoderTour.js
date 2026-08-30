@@ -23,7 +23,7 @@ export default {
             key: 'completion',
             selector: '[data-tour="dashboard-content"]',
             title: 'You are ready',
-            description: 'You cannot import members or manage enrollments. Focus on accurate marklists.',
+            description: 'You cannot manage enrollments. Focus on accurate marklists.',
             side: 'bottom',
             align: 'center',
         },

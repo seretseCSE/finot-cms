@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\FacilityType;
 use App\Filament\Resources\FacilityResource\Pages;
+use App\Filament\Support\HidesFromNavigation;
 use App\Models\Facility;
 use Filament\Actions;
 use Filament\Forms;
@@ -13,11 +14,13 @@ use Filament\Tables\Table;
 
 class FacilityResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Facility::class;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Operations';
     }
 
     public static function getNavigationSort(): ?int

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\TeacherAssignmentResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\AcademicYear;
@@ -21,6 +23,8 @@ use Illuminate\Support\Facades\Auth;
 
 class TeacherAssignmentResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = TeacherAssignment::class;
 
     public static function getNavigationIcon(): ?string
@@ -208,6 +212,13 @@ class TeacherAssignmentResource extends BaseResource
             ->actions([
                 Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
+            ])
+            ->headerActions([
+                Actions\CreateAction::make()
+                    ->label('New teacher assignment')
+                    ->icon('heroicon-o-plus')
+                    ->url(static::getUrl('create'))
+                    ->visible(fn () => static::canCreate()),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([

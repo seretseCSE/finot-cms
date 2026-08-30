@@ -126,9 +126,7 @@ class PermissionSeeder extends Seeder
         'mobile' => ['attendance_offline', 'cached_content', 'download_content'],
 
         // System admin resources
-        'predefined_reports' => [],
         'duplicate_records' => [],
-        'temporary_filters' => [],
     ];
 
     /**
@@ -139,7 +137,6 @@ class PermissionSeeder extends Seeder
         'system.backups',
         'system.error_logs',
         'system.maintenance',
-        'system.global_oversight',
         'system.health_monitor',
         'system.manual_export',
         'auth.login',
@@ -181,7 +178,6 @@ class PermissionSeeder extends Seeder
         'page.report.contribution-matrix',
         'page.report.charity',
         'page.report.beneficiary',
-        'page.settings.auto-purge',
         'page.attendance.teacher',
         'page.attendance.student',
         'page.search.archives',
@@ -198,7 +194,6 @@ class PermissionSeeder extends Seeder
         'withdrawal.apply',
         'withdrawal.approve',
         'withdrawal.finalize',
-        'imports.commit',
         'messages.broadcast',
         'messages.broadcast_global',
         'messages.moderate',
@@ -245,7 +240,6 @@ class PermissionSeeder extends Seeder
                 'reports.*',
                 // Education (limited)
                 'academic_years.*', 'classes.*', 'subjects.*',
-                'courses.*', 'course_categories.*', 'course_lessons.*',
                 'enrollments.*', 'promotions.*',
                 'students.enroll', 'students.remove', 'students.promote', 'students.bulk_promote',
                 'attendance_sessions.view', 'library_resources.upload', 'library_categories.*',
@@ -262,9 +256,9 @@ class PermissionSeeder extends Seeder
                 'tours.*', 'tour_attendances.*', 'tour_passengers.*',
                 // Events
                 'events.*', 'event_registrations.*',
-                'fundraising.create', 'fundraising.update_total', 'fundraising.delete',
+                'fundraising.view', 'fundraising.create', 'fundraising.update', 'fundraising.update_total', 'fundraising.delete',
                 // System
-                'departments.manage', 'departments.assign_roles',
+                'departments.view', 'departments.manage', 'departments.assign_roles',
                 'contact_messages.*',
                 'custom_options.*',
                 'pages.*',
@@ -279,7 +273,7 @@ class PermissionSeeder extends Seeder
                 'page.attendance.teacher', 'page.attendance.student',
                 'page.search.archives',                 'page.user-manual',
                 'results.view', 'results.record', 'results.manage', 'results.approve',
-                'withdrawal.approve', 'imports.commit',
+                'withdrawal.approve',
                 'messages.broadcast', 'messages.broadcast_global', 'messages.moderate',
                 'facilities.view', 'facilities.manage', 'facilities.book',
                 'analytics.visitors.view',
@@ -300,8 +294,9 @@ class PermissionSeeder extends Seeder
                 'ethiopian_dates.*', 'reports.*',
                 'help.documentation',
                 'page.attendance.teacher',
-                'messages.broadcast', 'facilities.view', 'facilities.book',
-                'imports.commit', 'withdrawal.finalize',
+                'messages.broadcast', 'messages.broadcast_global',
+                'facilities.view', 'facilities.book',
+                'withdrawal.finalize',
             ],
         ],
         'finance_head' => [
@@ -338,7 +333,7 @@ class PermissionSeeder extends Seeder
                 'reports.*',
                 'beneficiaries.view', 'charity.reports',
                 'tours.reports',
-                'fundraising.update_total',
+                'fundraising.view', 'fundraising.create', 'fundraising.update', 'fundraising.update_total',
                 'members.view',
                 'dashboard.view', 'profile.update', 'sessions.manage',
                 'ethiopian_dates.*',
@@ -383,8 +378,9 @@ class PermissionSeeder extends Seeder
                 'page.report.class-performance', 'page.report.attendance-summary',
                 'page.attendance.teacher', 'page.attendance.student',
                 'results.view', 'results.record', 'results.manage', 'results.approve',
-                'withdrawal.approve', 'imports.commit',
-                'messages.broadcast', 'facilities.view', 'facilities.book',
+                'withdrawal.approve',
+                'messages.broadcast', 'messages.broadcast_global',
+                'facilities.view', 'facilities.book',
                 'members.create', 'members.update',
             ],
         ],
@@ -395,6 +391,7 @@ class PermissionSeeder extends Seeder
                 'attendance_sessions.*', 'attendance_records.*',
                 'documents.*',
                 'teachers.substitute_assign',
+                'courses.*', 'course_categories.*', 'course_lessons.*',
                 'academic_years.view', 'classes.view', 'subjects.view', 'enrollments.view',
                 'teachers.view', 'school_classes.view', 'student_enrollments.view',
                 'members.view',
@@ -519,7 +516,8 @@ class PermissionSeeder extends Seeder
                 'help.documentation',
                 'page.report.attendance-summary',
                 'page.report.teacher-attendance',
-                'messages.broadcast', 'facilities.view', 'facilities.book',
+                'messages.broadcast', 'messages.broadcast_global',
+                'facilities.view', 'facilities.book',
             ],
         ],
         'data_encoder' => [

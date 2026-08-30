@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use App\Filament\Resources\DocumentResource\Pages;
 use App\Services\UploadSanitizer;
 use Filament\Schemas\Schema;
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentResource extends Resource
 {
+    use EnsuresTableCreateAction;
+
     protected static ?string $model = Document::class;
 
     public static function getNavigationIcon(): ?string

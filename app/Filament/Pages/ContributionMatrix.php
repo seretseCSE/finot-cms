@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+
+use App\Filament\Support\EmbeddableInHub;
+use App\Filament\Support\HidesFromNavigation;
 use App\Models\AcademicYear;
 use App\Models\Contribution;
 use App\Models\Department;
@@ -17,6 +20,9 @@ use Illuminate\Support\Facades\DB;
 
 class ContributionMatrix extends Page
 {
+    use EmbeddableInHub;
+    use HidesFromNavigation;
+
     protected string $view = 'filament.pages.contribution-matrix';
 
     public static function getNavigationIcon(): ?string
@@ -67,6 +73,12 @@ class ContributionMatrix extends Page
 
     public bool $isDirty = false;
 
+    public int $page = 1;
+
+    public int $perPage = 25;
+
+    public int $membersTotal = 0;
+
     /**
      * Pre-loaded contribution amounts: [group_id][month_name] => amount
      */
@@ -106,7 +118,17 @@ class ContributionMatrix extends Page
             $queryModifier($query);
         }
 
-        $membersData = $query->orderBy('first_name')->get();
+        $this->membersTotal = (clone $query)->count();
+        $lastPage = max(1, (int) ceil($this->membersTotal / $this->perPage));
+        if ($this->page > $lastPage) {
+            $this->page = $lastPage;
+        }
+
+        $membersData = $query
+            ->orderBy('first_name')
+            ->offset(($this->page - 1) * $this->perPage)
+            ->limit($this->perPage)
+            ->get();
 
         if ($membersData->isEmpty()) {
             $this->members = collect();
@@ -115,33 +137,54 @@ class ContributionMatrix extends Page
         }
 
         $this->members = Member::hydrate($membersData->toArray());
-        $memberIds = $this->members->pluck('id');
+        $this->attachCurrentGroupAssignments($this->members);
+    }
 
-        // Single query for all current group assignments
+    public function hydrate(): void
+    {
+        if (! $this->members instanceof Collection) {
+            $this->members = collect($this->members);
+        }
+
+        if ($this->members->isEmpty()) {
+            return;
+        }
+
+        $this->attachCurrentGroupAssignments($this->members);
+        $this->warmAmountCache();
+    }
+
+    /**
+     * Re-attach current group assignments after Livewire hydration.
+     */
+    protected function attachCurrentGroupAssignments(Collection $members): void
+    {
+        $memberIds = $members->pluck('id');
+
         $assignments = DB::table('member_group_assignments')
             ->whereIn('member_id', $memberIds)
             ->whereNull('effective_to')
             ->get()
             ->keyBy('member_id');
 
-        // Single query for all group names we need
         $groupIds = $assignments->pluck('group_id')->unique()->filter();
         $this->groupNameCache = $groupIds->isNotEmpty()
             ? MemberGroup::whereIn('id', $groupIds)->pluck('name', 'id')->all()
             : [];
 
-        // Attach assignments with group info (no extra queries)
-        $this->members->each(function ($member) use ($assignments) {
+        $members->each(function ($member) use ($assignments) {
             $assignment = $assignments->get($member->id);
-            if ($assignment) {
-                $assignmentObject = new \stdClass();
-                $assignmentObject->group_id = $assignment->group_id;
-                $assignmentObject->group = (object) [
-                    'id' => $assignment->group_id,
-                    'name' => $this->groupNameCache[$assignment->group_id] ?? 'Unknown Group',
-                ];
-                $member->setRelation('currentGroupAssignment', $assignmentObject);
+            if (! $assignment) {
+                return;
             }
+
+            $assignmentObject = new \stdClass();
+            $assignmentObject->group_id = $assignment->group_id;
+            $assignmentObject->group = (object) [
+                'id' => $assignment->group_id,
+                'name' => $this->groupNameCache[$assignment->group_id] ?? 'Unknown Group',
+            ];
+            $member->setRelation('currentGroupAssignment', $assignmentObject);
         });
     }
 
@@ -213,20 +256,37 @@ class ContributionMatrix extends Page
     /**
      * Load payment status from DB into the matrix grid (1 query).
      */
-    public function loadGrid(): void
+    public function loadGrid(bool $reset = true): void
     {
-        $this->grid = [];
-        $this->originalGrid = [];
-        $this->isDirty = false;
+        if ($reset) {
+            $this->grid = [];
+            $this->originalGrid = [];
+            $this->isDirty = false;
+        }
 
         if (! $this->academicYear || $this->members->isEmpty()) {
+            return;
+        }
+
+        $newIds = $this->members->pluck('id')->filter(fn ($id) => ! isset($this->grid[$id]));
+
+        foreach ($this->members as $member) {
+            if (! isset($this->grid[$member->id])) {
+                foreach (range(1, 12) as $monthNum) {
+                    $this->grid[$member->id][$monthNum] = false;
+                    $this->originalGrid[$member->id][$monthNum] = false;
+                }
+            }
+        }
+
+        if ($newIds->isEmpty()) {
             return;
         }
 
         $monthMap = array_flip($this->months);
 
         Contribution::where('academic_year_id', $this->academicYear)
-            ->whereIn('member_id', $this->members->pluck('id'))
+            ->whereIn('member_id', $newIds)
             ->where('is_archived', false)
             ->get(['member_id', 'month_name', 'amount'])
             ->each(function ($c) use ($monthMap) {
@@ -238,114 +298,76 @@ class ContributionMatrix extends Page
             });
     }
 
-    public function toggle(int $memberId, int $month): void
-    {
-        $this->grid[$memberId][$month] = ! ($this->grid[$memberId][$month] ?? false);
-        $this->isDirty = true;
-
-        $this->autoSaveToggle($memberId, $month);
-    }
-
     public function selectAllMonths(int $memberId): void
     {
-        foreach (range(1, 12) as $month) {
-            $this->grid[$memberId][$month] = true;
-        }
-        $this->isDirty = true;
-
-        Notification::make()
-            ->title('All Months Selected')
-            ->body('All 12 months have been selected for this member.')
-            ->info()
-            ->send();
-    }
-
-    protected function autoSaveToggle(int $memberId, int $month): void
-    {
-        if (! $this->academicYear) {
-            return;
-        }
-
         $member = $this->members->firstWhere('id', $memberId);
         if (! $member) {
             return;
         }
 
-        $monthName = $this->months[$month] ?? null;
-        $isPaid = $this->grid[$memberId][$month] ?? false;
-        $groupAmount = $this->getMemberGroupAmount($member, $month);
-
-        if ($isPaid && $groupAmount === 0.0) {
-            $this->grid[$memberId][$month] = false;
-            $this->isDirty = false;
-
-            Notification::make()
-                ->title('No Amount Set')
-                ->body('No contribution amount is configured for this member\'s group. Please set an amount in Contribution Settings first.')
-                ->warning()
-                ->send();
-
-            return;
-        }
-
-        DB::beginTransaction();
-        try {
-            if ($isPaid && $groupAmount > 0) {
-                Contribution::firstOrCreate(
-                    [
-                        'member_id' => $memberId,
-                        'academic_year_id' => $this->academicYear,
-                        'month_name' => $monthName,
-                        'is_archived' => false,
-                    ],
-                    [
-                        'amount' => $groupAmount,
-                        'payment_date' => now(),
-                        'payment_method' => 'Cash',
-                        'recorded_by' => Auth::id(),
-                        'is_paid' => true,
-                    ]
-                );
-            } else {
-                Contribution::where('member_id', $memberId)
-                    ->where('academic_year_id', $this->academicYear)
-                    ->where('month_name', $monthName)
-                    ->where('is_archived', false)
-                    ->update([
-                        'is_archived' => true,
-                        'archived_at' => now(),
-                    ]);
+        foreach (range(1, 12) as $month) {
+            if ($this->getMemberGroupAmount($member, $month) > 0) {
+                $this->grid[$memberId][$month] = true;
             }
-
-            DB::commit();
-
-            $this->dispatch('autosave-completed', [
-                'memberId' => $memberId,
-                'month' => $month,
-                'status' => $isPaid ? 'saved' : 'archived',
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Autosave failed for contribution toggle', [
-                'memberId' => $memberId,
-                'month' => $month,
-                'error' => $e->getMessage(),
-            ]);
         }
+
+        $this->isDirty = true;
+    }
+
+    public function clearAllMonths(int $memberId): void
+    {
+        foreach (range(1, 12) as $month) {
+            $this->grid[$memberId][$month] = false;
+        }
+
+        $this->isDirty = true;
     }
 
     public function updated($property): void
     {
-        if (in_array($property, ['academicYear', 'department', 'group', 'type', 'status'])) {
-            if ($property === 'academicYear') {
-                $this->warmAmountCache();
-                $this->loadGrid();
-            } else {
-                $this->loadMembersWithFilters();
-                $this->loadGrid();
+        if (! in_array($property, ['academicYear', 'department', 'group', 'type', 'status'], true)) {
+            return;
+        }
+
+        if ($property === 'type') {
+            $validIds = array_map('intval', array_keys($this->getGroupsForFilter()));
+            if ($this->group && ! in_array((int) $this->group, $validIds, true)) {
+                $this->group = null;
             }
         }
+
+        $this->page = 1;
+
+        if ($property === 'academicYear') {
+            $this->warmAmountCache();
+            $this->loadGrid();
+        } else {
+            $this->loadMembersWithFilters();
+            $this->loadGrid();
+        }
+    }
+
+    public function previousPage(): void
+    {
+        $this->gotoPage($this->page - 1);
+    }
+
+    public function nextPage(): void
+    {
+        $this->gotoPage($this->page + 1);
+    }
+
+    public function gotoPage(int $page): void
+    {
+        $lastPage = max(1, (int) ceil($this->membersTotal / $this->perPage));
+        $this->page = max(1, min($page, $lastPage));
+        $this->loadMembersWithFilters();
+        $this->loadGrid(false);
+    }
+
+    public function lastPage(): int
+    {
+        return max(1, (int) ceil($this->membersTotal / max(1, $this->perPage)));
     }
 
     /**
@@ -371,10 +393,6 @@ class ContributionMatrix extends Page
      */
     public function save(): void
     {
-        if (! $this->isDirty) {
-            return;
-        }
-
         if (! $this->academicYear) {
             Notification::make()
                 ->title('Academic Year Required')
@@ -388,7 +406,8 @@ class ContributionMatrix extends Page
         DB::beginTransaction();
 
         try {
-            $memberIds = $this->members->pluck('id');
+            $members = $this->membersForSave();
+            $memberIds = $members->pluck('id');
 
             // 1 query: load all existing non-archived contributions for the year
             $existing = Contribution::where('academic_year_id', $this->academicYear)
@@ -402,12 +421,12 @@ class ContributionMatrix extends Page
             $toArchiveIds = [];
             $skippedCount = 0;
 
-            foreach ($this->members as $member) {
+            foreach ($members as $member) {
                 $memberExisting = $existing->get($member->id, collect());
 
                 foreach (range(1, 12) as $monthNum) {
                     $monthName = $this->months[$monthNum];
-                    $isPaid = $this->grid[$member->id][$monthNum] ?? false;
+                    $isPaid = filter_var($this->grid[$member->id][$monthNum] ?? false, FILTER_VALIDATE_BOOLEAN);
                     $groupAmount = $this->getMemberGroupAmount($member, $monthNum);
                     $hasExisting = $memberExisting->has($monthName);
 
@@ -428,7 +447,6 @@ class ContributionMatrix extends Page
                             'payment_method' => 'Cash',
                             'recorded_by' => Auth::id(),
                             'is_paid' => true,
-                            'status' => 'Paid',
                             'is_archived' => false,
                             'created_at' => now(),
                             'updated_at' => now(),
@@ -464,7 +482,13 @@ class ContributionMatrix extends Page
 
             $totalChanges = $insertCount + $archiveCount;
 
-            if ($skippedCount > 0) {
+            if ($totalChanges === 0 && $skippedCount === 0) {
+                Notification::make()
+                    ->title('No changes to save')
+                    ->body('Tick paid months in the grid, then click Save contributions.')
+                    ->info()
+                    ->send();
+            } elseif ($skippedCount > 0) {
                 Notification::make()
                     ->title('Contributions Saved with Warnings')
                     ->body("{$totalChanges} contributions recorded. {$skippedCount} items skipped — no contribution amount is set for those members' groups. Configure amounts in Contribution Settings.")
@@ -489,14 +513,49 @@ class ContributionMatrix extends Page
         }
     }
 
+    /**
+     * Members on other pages stay in $grid until Save. Hydrate those rows so amounts resolve.
+     */
+    protected function membersForSave(): Collection
+    {
+        $current = $this->members->keyBy('id');
+        $missingIds = collect(array_keys($this->grid))->diff($current->keys());
+
+        if ($missingIds->isEmpty()) {
+            return $this->members;
+        }
+
+        $extra = Member::hydrate(
+            DB::table('members')->whereIn('id', $missingIds)->whereNull('deleted_at')->get()->toArray()
+        );
+        $this->attachCurrentGroupAssignments($extra);
+
+        $merged = $this->members->merge($extra);
+        $this->warmAmountCacheFor($merged);
+
+        return $merged;
+    }
+
+    protected function warmAmountCacheFor(Collection $members): void
+    {
+        $previous = $this->members;
+        $this->members = $members;
+        $this->warmAmountCache();
+        $this->members = $previous;
+    }
+
     protected function getHeaderActions(): array
     {
+        if ($this->embeddedInHub) {
+            return [];
+        }
+
         return [
             Action::make('save')
-                ->label('Save Changes')
+                ->label('Save contributions')
                 ->color('success')
                 ->icon('heroicon-o-check')
-                ->disabled(fn () => ! $this->isDirty)
+                ->disabled(fn () => ! $this->academicYear)
                 ->action('save'),
 
             Action::make('export')
@@ -505,12 +564,6 @@ class ContributionMatrix extends Page
                 ->icon('heroicon-o-arrow-down-tray')
                 ->visible(fn () => ! \App\Support\RoleGate::is('nibret_hisab_head'))
                 ->action('export'),
-
-            Action::make('refresh')
-                ->label('Refresh Data')
-                ->color('secondary')
-                ->icon('heroicon-o-arrow-path')
-                ->action('refreshData'),
         ];
     }
 
@@ -519,9 +572,38 @@ class ContributionMatrix extends Page
         return [
             'academic_years' => AcademicYear::latest()->pluck('name', 'id')->toArray(),
             'departments' => Department::pluck('name_en', 'id')->toArray(),
-            'groups' => MemberGroup::pluck('name', 'id')->toArray(),
-            'types' => ['Adult' => 'Adult', 'Youth' => 'Youth', 'Kids' => 'Kids'],
+            'groups' => $this->getGroupsForFilter(),
+            'types' => ['Kids' => 'Kids', 'Youth' => 'Youth', 'Adult' => 'Adult'],
         ];
+    }
+
+    /**
+     * Groups whose type belongs to the selected member type (Kids / Youth / Adult).
+     *
+     * @return array<int, string>
+     */
+    public function getGroupsForFilter(): array
+    {
+        $query = MemberGroup::query()->active()->orderBy('name');
+
+        if (filled($this->type)) {
+            $query->whereIn('group_type', $this->groupTypesForMemberType($this->type));
+        }
+
+        return $query->pluck('name', 'id')->toArray();
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function groupTypesForMemberType(string $memberType): array
+    {
+        return match ($memberType) {
+            'Kids' => ['Kids', 'Elder Kids'],
+            'Youth' => ['Youth', 'Youngsters'],
+            'Adult' => ['Adult', 'Finot Family'],
+            default => [$memberType],
+        };
     }
 
     public function getSummaryStats(): array
@@ -643,8 +725,8 @@ class ContributionMatrix extends Page
         $this->loadGrid();
 
         Notification::make()
-            ->title('Data Refreshed')
-            ->body('Contribution matrix data has been refreshed.')
+            ->title('Grid reloaded')
+            ->body('Unchecked any unsaved ticks and loaded the latest payments from the database.')
             ->success()
             ->send();
     }
@@ -666,14 +748,15 @@ class ContributionMatrix extends Page
             $amount = $this->getMemberGroupAmount($member, $month);
             if ($amount > 0 && ! ($this->grid[$member->id][$month] ?? false)) {
                 $this->grid[$member->id][$month] = true;
-                $this->autoSaveToggle($member->id, $month);
                 $count++;
             }
         }
 
+        $this->isDirty = true;
+
         Notification::make()
-            ->title('Mass Update Complete')
-            ->body("Marked {$count} members as paid for {$this->months[$month]}.")
+            ->title('Column updated')
+            ->body("Marked {$count} members as paid for {$this->months[$month]}. Click Save to record them.")
             ->success()
             ->send();
     }
@@ -694,14 +777,15 @@ class ContributionMatrix extends Page
         foreach ($this->members as $member) {
             if ($this->grid[$member->id][$month] ?? false) {
                 $this->grid[$member->id][$month] = false;
-                $this->autoSaveToggle($member->id, $month);
                 $count++;
             }
         }
 
+        $this->isDirty = true;
+
         Notification::make()
-            ->title('Mass Update Complete')
-            ->body("Unmarked {$count} members for {$this->months[$month]}.")
+            ->title('Column updated')
+            ->body("Cleared {$count} members for {$this->months[$month]}. Click Save to record them.")
             ->success()
             ->send();
     }

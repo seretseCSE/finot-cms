@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\TeacherResource\Pages;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\TeacherResource\RelationManagers;
@@ -24,6 +26,8 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Teacher::class;
 
     public static function getNavigationGroup(): ?string
@@ -207,20 +211,19 @@ class TeacherResource extends BaseResource
                             return 'N/A';
                         }
 
-                        $total = TeacherAttendance::query()
+                        $forTeacher = TeacherAttendance::query()
                             ->join('attendance_sessions', 'teacher_attendance.session_id', '=', 'attendance_sessions.id')
+                            ->join('teacher_assignments', 'teacher_attendance.teacher_assignment_id', '=', 'teacher_assignments.id')
                             ->where('attendance_sessions.academic_year_id', $activeYear->id)
-                            ->where('teacher_attendance.teacher_id', $record->getKey())
+                            ->where('teacher_assignments.teacher_id', $record->getKey())
+                            ->where('teacher_attendance.session_outcome', '!=', 'Cancelled');
+
+                        $total = (clone $forTeacher)
                             ->where('teacher_attendance.attendance_status', '!=', 'Absent')
-                            ->where('teacher_attendance.session_outcome', '!=', 'Cancelled')
                             ->count();
 
-                        $present = TeacherAttendance::query()
-                            ->join('attendance_sessions', 'teacher_attendance.session_id', '=', 'attendance_sessions.id')
-                            ->where('attendance_sessions.academic_year_id', $activeYear->id)
-                            ->where('teacher_attendance.teacher_id', $record->getKey())
+                        $present = (clone $forTeacher)
                             ->where('teacher_attendance.attendance_status', 'Present')
-                            ->where('teacher_attendance.session_outcome', '!=', 'Cancelled')
                             ->count();
 
                         $rate = $total > 0 ? round(($present / $total) * 100, 1) : 0;

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\RehearsalAttendanceResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\Member;
@@ -18,6 +20,8 @@ use Illuminate\Support\Facades\Auth;
 
 class RehearsalAttendanceResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = RehearsalAttendance::class;
 
     public static function getNavigationIcon(): ?string

@@ -223,7 +223,7 @@ class FundraisingCampaign extends Model
      */
     public static function getPermissionName($action): string
     {
-        return 'fundraising_campaigns.'.$action;
+        return 'fundraising.'.$action;
     }
 
     /**

@@ -26,15 +26,13 @@ class NotificationCatalogTest extends TestCase
     public function notifier_writes_to_integer_catalog_not_uuid_table(): void
     {
         $user = User::factory()->admin()->create();
-        app(Notifier::class)->toUser($user, 'imports.committed', [
-            'imported' => 2,
-            'skipped' => 0,
-            'failed' => 0,
+        app(Notifier::class)->toUser($user, 'exports.ready', [
+            'filename' => 'report.xlsx',
         ]);
 
         $this->assertDatabaseHas('in_app_notifications', [
             'user_id' => $user->id,
-            'event' => 'imports.committed',
+            'event' => 'exports.ready',
         ]);
         $this->assertSame(1, InAppNotification::query()->count());
     }

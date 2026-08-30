@@ -17,7 +17,7 @@ class TourReport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Reports';
+        return 'Tour Management';
     }
 
     public static function getNavigationSort(): ?int

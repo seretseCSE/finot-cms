@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +15,7 @@ class SystemMonitoringService
 
     public function getSystemHealthMetrics(): array
     {
-        return Cache::remember('system_health_metrics', 300, function () {
+        return Cache::remember('system_health_metrics_v2', 300, function () {
             return [
                 'uptime' => $this->getServerUptime(),
                 'storage_usage' => $this->getStorageUsage(),
@@ -26,27 +25,6 @@ class SystemMonitoringService
                 'failed_logins' => $this->getFailedLoginsCount(),
                 'memory_usage' => $this->getMemoryUsageString(),
                 'cpu_usage' => $this->getCpuUsageString(),
-            ];
-        });
-    }
-
-    public function getSystemOverviewStats(): array
-    {
-        return Cache::remember('global_oversight_stats', 300, function () {
-            return [
-                'total_members' => \App\Models\Member::count(),
-                'contributions_this_year' => \App\Models\Contribution::whereYear('created_at', now()->year)->sum('amount'),
-                'active_tours' => \App\Models\Tour::where('status', 'active')->count(),
-                'total_users' => \App\Models\User::count(),
-                'teachers' => \App\Models\Teacher::count(),
-                'parents' => \App\Models\ParentModel::count(),
-                'departments' => \App\Models\Department::count(),
-                'academic_years' => \App\Models\AcademicYear::count(),
-                'enrollments_this_year' => \App\Models\StudentEnrollment::whereYear('created_at', now()->year)->count(),
-                'attendance_sessions_today' => \App\Models\AttendanceSession::whereDate('created_at', today())->count(),
-                'contributions_this_month' => \App\Models\Contribution::whereMonth('created_at', now()->month)->sum('amount'),
-                'new_users_this_month' => \App\Models\User::whereMonth('created_at', now()->month)->count(),
-                'active_users_today' => \App\Models\User::whereDate('last_login_at', today())->count(),
             ];
         });
     }
@@ -83,16 +61,6 @@ class SystemMonitoringService
         }
 
         return $formattedLogs;
-    }
-
-    public function getChartData(): array
-    {
-        return [
-            'user_registrations' => $this->getUserRegistrationsChart(),
-            'contributions' => $this->getContributionsChart(),
-            'system_load' => $this->getSystemLoadChart(),
-            'error_trends' => $this->getErrorTrendsChart(),
-        ];
     }
 
     protected function getServerUptime(): array
@@ -141,8 +109,23 @@ class SystemMonitoringService
 
     protected function getStorageUsage(): array
     {
-        $total = disk_total_space('/');
-        $free = disk_free_space('/');
+        $path = PHP_OS_FAMILY === 'Windows'
+            ? (getenv('SystemDrive') ?: 'C:').DIRECTORY_SEPARATOR
+            : '/';
+
+        $total = @disk_total_space($path);
+        $free = @disk_free_space($path);
+
+        if ($total === false || $free === false || $total <= 0) {
+            return [
+                'total' => 'Unknown',
+                'used' => 'Unknown',
+                'free' => 'Unknown',
+                'percentage' => 0,
+                'status' => 'good',
+            ];
+        }
+
         $used = $total - $free;
         $percentage = ($used / $total) * 100;
 
@@ -284,78 +267,6 @@ class SystemMonitoringService
     protected function getFailedLoginsCount(): int
     {
         return \App\Models\User::where('failed_login_attempts', '>', 0)->sum('failed_login_attempts');
-    }
-
-    protected function getUserRegistrationsChart(): array
-    {
-        $data = \App\Models\User::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-            ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        return [
-            'labels' => $data->pluck('date')->map(fn ($date) => Carbon::parse($date)->format('M j')),
-            'data' => $data->pluck('count'),
-        ];
-    }
-
-    protected function getContributionsChart(): array
-    {
-        $data = \App\Models\Contribution::selectRaw('DATE(created_at) as date, SUM(amount) as total')
-            ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        return [
-            'labels' => $data->pluck('date')->map(fn ($date) => Carbon::parse($date)->format('M j')),
-            'data' => $data->pluck('total'),
-        ];
-    }
-
-    protected function getSystemLoadChart(): array
-    {
-        // Get system load average with Windows compatibility
-        if (function_exists('sys_getloadavg')) {
-            $load = sys_getloadavg();
-        } else {
-            // Windows fallback - use CPU usage as alternative metric
-            $load = $this->getWindowsCpuUsage();
-        }
-
-        return [
-            'labels' => ['1 min', '5 min', '15 min'],
-            'data' => $load,
-        ];
-    }
-
-    protected function getErrorTrendsChart(): array
-    {
-        $errorData = [];
-        $labels = [];
-
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $logFile = storage_path('logs/laravel-'.$date->format('Y-m-d').'.log');
-
-            $errorCount = 0;
-            if (file_exists($logFile)) {
-                foreach ($this->readLines($logFile) as $log) {
-                    if (str_contains($log, 'ERROR') || str_contains($log, 'CRITICAL')) {
-                        $errorCount++;
-                    }
-                }
-            }
-
-            $labels[] = $date->format('M j');
-            $errorData[] = $errorCount;
-        }
-
-        return [
-            'labels' => $labels,
-            'data' => $errorData,
-        ];
     }
 
     protected function extractTimestamp(string $line): string
@@ -532,7 +443,6 @@ class SystemMonitoringService
     public function clearCache(): void
     {
         Cache::forget('system_health_metrics');
-        Cache::forget('global_oversight_stats');
-        Cache::forget('global_oversight_error_logs');
+        Cache::forget('system_health_metrics_v2');
     }
 }

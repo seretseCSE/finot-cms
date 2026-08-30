@@ -98,7 +98,7 @@ class DuplicateRecordResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Data Management';
+        return 'Operations';
     }
 
     public static function getNavigationLabel(): string

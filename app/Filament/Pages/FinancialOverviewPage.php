@@ -26,7 +26,7 @@ class FinancialOverviewPage extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Reports';
+        return 'Finance';
     }
 
     public static function getNavigationSort(): ?int

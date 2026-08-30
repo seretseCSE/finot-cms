@@ -27,6 +27,7 @@ class ScheduleTestCommand extends Command
             'logs:purge-export-logs',
             'finance:notify-outstanding',
             'media:auto-archive',
+            'backup:auto',
         ];
 
         if (! in_array($commandName, $validCommands)) {

@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.auth')
 
 @section('title', __('Login'))
 
@@ -105,8 +105,10 @@
         <div class="login-card">
             {{-- Logo --}}
             <div class="flex flex-col items-center mb-8">
-                <img src="{{ asset('images/logo2.png') }}" alt="Finote Tsidik" class="h-14 w-auto mb-3 dark:block hidden" loading="eager">
-                <img src="{{ asset('images/logow.PNG') }}" alt="Finote Tsidik" class="h-14 w-auto mb-3 dark:hidden block" loading="eager">
+                <a href="{{ url('/') }}" class="mb-3" aria-label="{{ __('Go to homepage') }}">
+                    <img src="{{ asset('images/logo2.png') }}" alt="Finote Tsidik" class="h-14 w-auto dark:block hidden" loading="eager">
+                    <img src="{{ asset('images/logow.PNG') }}" alt="Finote Tsidik" class="h-14 w-auto dark:hidden block" loading="eager">
+                </a>
                 <h1 class="text-xl font-bold ft-ink">{{ __('Welcome Back') }}</h1>
                 <p class="text-sm mt-1" style="color: var(--ft-ink-muted);">{{ __('Sign in to your account') }}</p>
             </div>
@@ -135,9 +137,14 @@
                     {{ session('info') }}
                 </div>
             @endif
+            @if (session('error') || session('session_expired'))
+                <div class="mb-5 rounded-xl border border-red-500/30 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300" role="alert">
+                    {{ session('error') ?: session('session_expired') }}
+                </div>
+            @endif
 
             {{-- Form --}}
-            <form method="POST" action="{{ route('login.submit') }}" class="space-y-5">
+            <form method="POST" action="{{ route('login.submit', absolute: false) }}" class="space-y-5">
                 @csrf
 
                 <div>

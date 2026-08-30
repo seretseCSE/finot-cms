@@ -81,9 +81,9 @@ class ContentManagementTest extends TestCase
     }
 
     #[Test]
-    public function public_blog_redirects_to_news(): void
+    public function public_blog_page_exists(): void
     {
-        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
+        $this->get('/blog')->assertOk();
     }
 
     #[Test]

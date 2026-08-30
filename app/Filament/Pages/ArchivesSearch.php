@@ -28,7 +28,7 @@ class ArchivesSearch extends Page implements HasForms
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Operations';
     }
 
     public static function getNavigationSort(): ?int

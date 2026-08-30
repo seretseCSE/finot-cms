@@ -20,17 +20,7 @@ class FinancialSystemTest extends TestCase
         $user = $this->createFinanceHeadUser();
         $this->actingAs($user);
 
-        $response = $this->get('/admin/contributions');
-        $response->assertStatus(200);
-    }
-
-    #[Test]
-    public function finance_head_can_access_contributions_create_page(): void
-    {
-        $user = $this->createFinanceHeadUser();
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/contributions/create');
+        $response = $this->get('/admin/contribution-matrix');
         $response->assertStatus(200);
     }
 
@@ -181,7 +171,7 @@ class FinancialSystemTest extends TestCase
         $user = $this->createFinanceHeadUser();
         $this->actingAs($user);
 
-        $response = $this->get('/admin/contributions/create');
+        $response = $this->get('/admin/contribution-matrix');
         $response->assertStatus(200);
     }
 

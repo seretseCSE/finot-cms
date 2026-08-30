@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BookingResource\Pages;
 
 use App\Filament\Resources\BookingResource;
+use App\Filament\Support\NavHubRegistry;
 use App\Services\Facilities\BookingService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -23,5 +24,10 @@ class CreateBooking extends CreateRecord
         } catch (HttpException $e) {
             throw ValidationException::withMessages(['start_at' => $e->getMessage()]);
         }
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return NavHubRegistry::hubUrl('facilities', 'booking');
     }
 }

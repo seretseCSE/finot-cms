@@ -44,10 +44,33 @@ class PublicWebsiteTest extends TestCase
     }
 
     #[Test]
-    public function blog_index_redirects_to_news(): void
+    public function blog_is_a_top_level_nav_page_not_a_news_tab(): void
+    {
+        $post = BlogPost::factory()->create([
+            'status' => 'Published',
+            'title' => 'Standalone Blog Story',
+            'published_at' => now(),
+        ]);
+
+        $home = $this->get('/');
+        $home->assertOk();
+        $home->assertSee(route('blog.index'), false);
+        $home->assertSee('Standalone Blog Story');
+
+        $news = $this->get('/news');
+        $news->assertOk();
+        $news->assertSee(route('blog.index'), false);
+        $news->assertDontSee('tab=blog', false);
+
+        $this->get('/blog')->assertOk()->assertSee('Standalone Blog Story');
+        $this->get('/news?tab=blog')->assertRedirect(route('blog.index'));
+    }
+
+    #[Test]
+    public function blog_index_loads(): void
     {
         BlogPost::factory()->create(['status' => 'Published', 'published_at' => now()]);
-        $this->get('/blog')->assertRedirect(route('news', ['tab' => 'blog']));
+        $this->get('/blog')->assertOk();
     }
 
     #[Test]

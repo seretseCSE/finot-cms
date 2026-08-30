@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\FinancialTransactionResource\Pages;
 use App\Models\BankAccount;
@@ -29,6 +30,8 @@ use Illuminate\Support\Facades\Storage;
 
 class FinancialTransactionResource extends Resource
 {
+    use EnsuresTableCreateAction;
+
     protected static ?string $model = FinancialTransaction::class;
 
     public static function getNavigationIcon(): ?string
@@ -43,7 +46,7 @@ class FinancialTransactionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Revenue & Banking';
+        return 'Finance';
     }
 
     public static function getNavigationSort(): ?int

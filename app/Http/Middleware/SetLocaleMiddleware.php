@@ -26,8 +26,10 @@ class SetLocaleMiddleware
         // Set the application locale
         App::setLocale($locale);
 
-        // Store locale in session for future requests
-        session(['locale' => $locale]);
+        // Avoid dirtying database-backed sessions when the locale is unchanged.
+        if (session('locale') !== $locale) {
+            session(['locale' => $locale]);
+        }
 
         return $next($request);
     }

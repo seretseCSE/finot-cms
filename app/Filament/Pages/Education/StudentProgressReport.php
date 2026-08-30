@@ -26,7 +26,7 @@ class StudentProgressReport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education';
+        return 'Attendance & Results';
     }
 
     public static function getNavigationSort(): ?int

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\MediaCategoryResource\Pages;
 
 use App\Filament\Resources\MediaCategoryResource;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListMediaCategories extends ListRecords
 {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use App\Models\Department;
 use App\Models\User;
 use Filament\Resources\Resource;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 abstract class BaseResource extends Resource
 {
+    use EnsuresTableCreateAction;
+
     /**
      * Authenticated user, or null when the request is a guest.
      */

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\RehearsalResource\Pages;
 use App\Models\Rehearsal;
 use Filament\Actions;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 
 class RehearsalResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Rehearsal::class;
 
     public static function getNavigationIcon(): ?string

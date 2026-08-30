@@ -38,6 +38,7 @@ class AuthenticationCompleteTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertOk()->assertSee('Sign in');
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
     }
 
     /**

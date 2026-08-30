@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\PageResource\Pages;
 
 use App\Filament\Resources\PageResource;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListPages extends ListRecords
 {

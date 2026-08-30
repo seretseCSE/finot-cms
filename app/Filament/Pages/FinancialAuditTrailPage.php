@@ -29,7 +29,7 @@ class FinancialAuditTrailPage extends Page implements HasForms, HasTable
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Reports';
+        return 'Finance';
     }
 
     public static function getNavigationSort(): ?int

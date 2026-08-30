@@ -25,7 +25,7 @@ class FinancialAnalytics extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Financial Reports';
+        return 'Finance';
     }
 
     protected static ?int $navigationSort = 5;

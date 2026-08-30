@@ -1,420 +1,345 @@
 <x-filament-panels::page>
-
-@push('styles')
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-    .oc-page { font-family: 'DM Sans', sans-serif; }
+    .oc-wrap { display: flex; flex-direction: column; gap: 1.15rem; }
 
-    /* ── KPI Cards ───────────────────────────────────────────── */
-    .oc-kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 14px;
-    }
-    .oc-kpi {
+    .oc-hero {
         position: relative;
-        background: var(--color-background-primary);
-        border: 0.5px solid var(--color-border-tertiary);
-        border-radius: var(--border-radius-lg);
-        padding: 1.25rem 1.4rem 1.1rem;
         overflow: hidden;
+        border-radius: 1.15rem;
+        padding: 1.4rem 1.6rem 1.35rem;
+        color: #fff;
+        background: linear-gradient(125deg, #1A44F7 0%, #1638c9 48%, #0f1f6b 100%);
+        box-shadow: 0 12px 28px rgba(26, 68, 247, 0.22);
     }
-    /* coloured left accent bar */
-    .oc-kpi::before {
+    .oc-hero::after {
         content: '';
         position: absolute;
-        left: 0; top: 0; bottom: 0;
-        width: 3px;
-        border-radius: 99px 0 0 99px;
+        right: -40px; top: -50px;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: rgba(243, 186, 21, 0.18);
     }
-    .oc-kpi.kpi-blue::before  { background: #378ADD; }
-    .oc-kpi.kpi-green::before { background: #1D9E75; }
-    .oc-kpi.kpi-red::before   { background: #D94040; }
-    .oc-kpi.kpi-purple::before{ background: #7C6FD8; }
+    .oc-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; position: relative; z-index: 1; flex-wrap: wrap; }
+    .oc-hero-kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.72); }
+    .oc-hero h2 { margin: 6px 0 4px; font-size: 1.45rem; font-weight: 700; letter-spacing: -0.02em; }
+    .oc-hero p { margin: 0; font-size: 13px; color: rgba(255,255,255,0.78); max-width: 460px; }
+    .oc-hero-stat { text-align: right; position: relative; z-index: 1; }
+    .oc-hero-stat span { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #F3BA15; }
+    .oc-hero-stat strong { display: block; margin-top: 2px; font-size: 1.65rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 
-    .oc-kpi-top {
-        display: flex; align-items: flex-start; justify-content: space-between;
-        margin-bottom: 0.85rem;
-    }
-    .oc-kpi-icon {
-        width: 36px; height: 36px; border-radius: var(--border-radius-md);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 17px; flex-shrink: 0;
-    }
-    .oc-kpi-label {
-        font-size: 11px; font-weight: 600; text-transform: uppercase;
-        letter-spacing: 0.07em; color: var(--color-text-secondary);
-    }
-    .oc-kpi-value {
-        font-size: 21px; font-weight: 700; color: var(--color-text-primary);
-        line-height: 1.15; margin-top: 2px; font-variant-numeric: tabular-nums;
-    }
-    .oc-kpi-value.danger { color: #D94040; }
-    .oc-kpi-sub {
-        font-size: 11px; color: var(--color-text-secondary); margin-top: 5px;
-    }
-    .collection-bar-wrap {
-        height: 4px; background: var(--color-background-secondary);
-        border-radius: 99px; margin-top: 10px; overflow: hidden;
-    }
-    .collection-bar-fill {
-        height: 100%; border-radius: 99px; background: #1D9E75; transition: width 0.5s ease;
-    }
+    .oc-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 1100px) { .oc-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .oc-kpi-grid { grid-template-columns: 1fr; } }
 
-    /* ── Filter Bar ───────────────────────────────────────────── */
-    .oc-filter-bar {
-        background: var(--color-background-secondary);
-        border: 0.5px solid var(--color-border-tertiary);
-        border-radius: var(--border-radius-lg);
-        padding: 0.9rem 1.25rem;
-        display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap;
-    }
-    .oc-filter-icon-label {
-        display: flex; align-items: center; gap: 5px;
-        font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-        text-transform: uppercase; color: var(--color-text-secondary);
-        padding-bottom: 2px; /* optically align with select bottom */
-        flex-shrink: 0;
-    }
-    .oc-filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 160px; }
-    .oc-field-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
-    .oc-select-wrap { position: relative; }
-    .oc-select {
-        width: 100%; padding: 8px 30px 8px 10px;
-        border: 0.5px solid var(--color-border-secondary);
-        border-radius: var(--border-radius-md);
-        background: var(--color-background-primary);
-        color: var(--color-text-primary);
-        font-size: 13px; font-family: inherit; appearance: none; cursor: pointer;
-    }
-    .oc-select:focus { outline: none; border-color: #378ADD; }
-    .oc-select-wrap::after {
-        content: ''; position: absolute; right: 10px; top: 50%;
-        transform: translateY(-50%);
-        width: 0; height: 0;
-        border-left: 4px solid transparent; border-right: 4px solid transparent;
-        border-top: 5px solid var(--color-text-secondary); pointer-events: none;
-    }
-    .oc-btn {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 8px 14px; border-radius: var(--border-radius-md);
-        font-size: 13px; font-weight: 500; cursor: pointer;
-        border: 0.5px solid var(--color-border-secondary);
-        background: var(--color-background-primary);
-        color: var(--color-text-primary); transition: all 0.15s; font-family: inherit;
-        white-space: nowrap; flex-shrink: 0;
-    }
-    .oc-btn:hover { background: var(--color-background-secondary); }
-
-    /* ── Table Section ────────────────────────────────────────── */
-    .oc-section {
-        background: var(--color-background-primary);
-        border: 0.5px solid var(--color-border-tertiary);
-        border-radius: var(--border-radius-lg);
+    .oc-kpi {
+        position: relative;
+        background: #fff;
+        border: 1px solid #e6ebf4;
+        border-radius: 1rem;
+        padding: 1.05rem 1.15rem 1rem 1.2rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
         overflow: hidden;
     }
-    .oc-section-header {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 1rem 1.5rem;
-        border-bottom: 0.5px solid var(--color-border-tertiary);
-        background: var(--color-background-secondary);
+    .oc-kpi::before {
+        content: '';
+        position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
     }
-    .oc-section-title {
-        font-size: 13px; font-weight: 500; color: var(--color-text-primary);
-        display: flex; align-items: center; gap: 8px;
+    .oc-kpi.blue::before { background: #1A44F7; }
+    .oc-kpi.green::before { background: #1E8449; }
+    .oc-kpi.red::before { background: #C0392B; }
+    .oc-kpi.gold::before { background: #F3BA15; }
+    .oc-kpi-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .oc-kpi-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #64748b; }
+    .oc-kpi-value { margin-top: 6px; font-size: 1.28rem; font-weight: 800; color: #0f172a; font-variant-numeric: tabular-nums; line-height: 1.15; }
+    .oc-kpi-value.danger { color: #C0392B; }
+    .oc-kpi-sub { margin-top: 5px; font-size: 12px; color: #64748b; }
+    .oc-kpi-icon {
+        width: 38px; height: 38px; border-radius: 11px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .oc-section-title i { font-size: 15px; color: var(--color-text-secondary); }
-    .oc-count-pill {
-        font-size: 11px; font-weight: 500; padding: 3px 10px;
-        border-radius: 99px; background: var(--color-background-primary);
-        border: 0.5px solid var(--color-border-secondary);
-        color: var(--color-text-secondary);
+    .oc-kpi.blue .oc-kpi-icon { background: #e8edff; color: #1A44F7; }
+    .oc-kpi.green .oc-kpi-icon { background: #e6f6ee; color: #1E8449; }
+    .oc-kpi.red .oc-kpi-icon { background: #fde8e6; color: #C0392B; }
+    .oc-kpi.gold .oc-kpi-icon { background: #fff6d9; color: #b45309; }
+    .oc-bar { height: 5px; margin-top: 12px; background: #eef2f7; border-radius: 99px; overflow: hidden; }
+    .oc-bar > span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #F3BA15, #1E8449); }
+
+    .oc-filters {
+        display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
+        background: #fff;
+        border: 1px solid #e6ebf4;
+        border-radius: 1rem;
+        padding: 14px 16px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .oc-filters-title {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+        color: #1A44F7; padding-bottom: 8px; margin-right: 4px;
+    }
+    .oc-field { display: flex; flex-direction: column; gap: 5px; min-width: 170px; flex: 1; }
+    .oc-field.small { flex: 0 0 110px; min-width: 110px; }
+    .oc-field label { font-size: 12px; font-weight: 600; color: #334155; }
+    .oc-select {
+        width: 100%;
+        height: 40px;
+        padding: 0 32px 0 12px;
+        border: 1px solid #d7deed;
+        border-radius: 10px;
+        background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M1.4.6 6 5.2 10.6.6 12 2 6 8 0 2z'/%3E%3C/svg%3E") no-repeat right 12px center;
+        color: #0f172a;
+        font-size: 13.5px;
+        appearance: none;
+    }
+    .oc-select:focus { outline: none; border-color: #1A44F7; box-shadow: 0 0 0 3px rgba(26, 68, 247, 0.15); background-color: #fff; }
+    .oc-reset {
+        height: 40px; padding: 0 14px; border-radius: 10px;
+        border: 1px solid #d7deed; background: #fff; color: #334155;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    .oc-reset:hover { background: #f1f5f9; }
+
+    .oc-panel {
+        background: #fff;
+        border: 1px solid #e6ebf4;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .oc-panel-head {
+        display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+        padding: 14px 18px;
+        background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
+        border-bottom: 1px solid #e6ebf4;
+    }
+    .oc-panel-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #0f172a; }
+    .oc-chip {
+        font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px;
+        background: #e8edff; color: #1A44F7;
+    }
+    .oc-count {
+        font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px;
+        background: #0f172a; color: #fff;
     }
 
     .oc-table { width: 100%; border-collapse: collapse; }
-    .oc-table thead tr { border-bottom: 0.5px solid var(--color-border-tertiary); }
     .oc-table th {
         padding: 10px 14px; text-align: left;
-        font-size: 10px; font-weight: 600; letter-spacing: 0.07em;
-        text-transform: uppercase; color: var(--color-text-secondary);
-        white-space: nowrap;
+        font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+        color: #64748b; background: #f8fafc; white-space: nowrap;
     }
-    .oc-table th.right { text-align: right; }
-    .oc-table tbody tr {
-        border-bottom: 0.5px solid var(--color-border-tertiary);
-        transition: background 0.12s;
-    }
-    .oc-table tbody tr:last-child { border-bottom: none; }
-    .oc-table tbody tr:hover { background: var(--color-background-secondary); }
+    .oc-table th.right, .oc-table td.right { text-align: right; }
     .oc-table td {
-        padding: 10px 14px; font-size: 13px; color: var(--color-text-primary);
-        vertical-align: middle;
+        padding: 12px 14px; font-size: 13.5px; color: #0f172a; border-top: 1px solid #eef2f7; vertical-align: middle;
     }
-    .oc-table td.muted { color: var(--color-text-secondary); }
-    .oc-table td.right { text-align: right; font-variant-numeric: tabular-nums; }
+    .oc-table tbody tr:hover td { background: #f7f9ff; }
+    .oc-name { font-weight: 650; }
+    .oc-code { font-family: ui-monospace, monospace; font-size: 11px; padding: 2px 7px; border-radius: 6px; background: #f1f5f9; color: #475569; }
+    .oc-group { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: #e8edff; color: #1A44F7; }
+    .oc-month { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: #fde8e6; color: #C0392B; }
+    .oc-paid { color: #1E8449; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .oc-out { color: #C0392B; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .oc-mini { width: 56px; height: 4px; background: #f1f5f9; border-radius: 99px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 8px; }
+    .oc-mini > span { display: block; height: 100%; background: #C0392B; }
 
-    .code-pill {
-        display: inline-flex; padding: 2px 8px; border-radius: var(--border-radius-md);
-        font-size: 11px; font-weight: 500; font-family: monospace;
-        background: var(--color-background-secondary); color: var(--color-text-secondary);
-        border: 0.5px solid var(--color-border-secondary);
+    .oc-empty, .oc-none {
+        text-align: center; padding: 3.5rem 1.5rem;
     }
-    .group-pill {
-        display: inline-flex; padding: 2px 9px; border-radius: 99px;
-        font-size: 11px; font-weight: 500;
-        background: var(--color-background-secondary); color: var(--color-text-secondary);
-        border: 0.5px solid var(--color-border-secondary); white-space: nowrap;
-    }
-    .month-tag {
-        display: inline-flex; align-items: center;
-        padding: 2px 7px; border-radius: 99px;
-        font-size: 11px; font-weight: 500;
-        background: #fcebeb; color: #A32D2D; margin: 1px;
-    }
+    .oc-empty h3, .oc-none h3 { margin: 0 0 6px; font-size: 16px; color: #0f172a; }
+    .oc-empty p, .oc-none p { margin: 0 auto; max-width: 380px; font-size: 13px; color: #64748b; }
+    .oc-pager { padding: 12px 16px; border-top: 1px solid #e6ebf4; background: #f8fafc; }
 
-    .mini-bar-wrap {
-        height: 3px; background: var(--color-background-secondary);
-        border-radius: 99px; margin-top: 0; overflow: hidden;
-        width: 64px; display: inline-block; vertical-align: middle; margin-left: 8px;
-    }
-    .mini-bar-fill { height: 100%; border-radius: 99px; background: #D94040; }
-
-    .oc-empty {
-        display: flex; flex-direction: column; align-items: center;
-        justify-content: center; padding: 4rem 1rem; gap: 10px;
-    }
-    .oc-empty i { font-size: 36px; color: #1D9E75; }
-    .oc-empty p { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
-    .oc-empty span { font-size: 13px; color: var(--color-text-secondary); }
-
-    .oc-no-year {
-        display: flex; flex-direction: column; align-items: center;
-        justify-content: center; padding: 5rem 2rem; gap: 12px; text-align: center;
-        background: var(--color-background-primary);
-        border: 0.5px solid var(--color-border-tertiary);
-        border-radius: var(--border-radius-lg);
-    }
-    .oc-no-year i { font-size: 36px; color: #BA7517; }
-    .oc-no-year h3 { font-size: 16px; font-weight: 600; color: var(--color-text-primary); }
-    .oc-no-year p { font-size: 13px; color: var(--color-text-secondary); max-width: 380px; }
-
-    /* pagination wrapper */
-    .oc-pagination {
-        padding: 0.85rem 1.5rem;
-        border-top: 0.5px solid var(--color-border-tertiary);
-        background: var(--color-background-secondary);
-    }
+    .dark .oc-kpi, .dark .oc-filters, .dark .oc-panel { background: #111827; border-color: #334155; }
+    .dark .oc-kpi-value, .dark .oc-panel-title, .dark .oc-table td, .dark .oc-empty h3, .dark .oc-none h3 { color: #f8fafc; }
+    .dark .oc-kpi-label, .dark .oc-kpi-sub, .dark .oc-field label, .dark .oc-table th { color: #94a3b8; }
+    .dark .oc-select, .dark .oc-reset { background: #0f172a; border-color: #334155; color: #f8fafc; }
+    .dark .oc-table th, .dark .oc-panel-head, .dark .oc-pager { background: #0f172a; border-color: #334155; }
+    .dark .oc-table td { border-top-color: #1e293b; }
+    .dark .oc-table tbody tr:hover td { background: #1e293b; }
+    .dark .oc-code { background: #1e293b; color: #cbd5e1; }
+    .dark .oc-count { background: #e8edff; color: #1A44F7; }
 </style>
-@endpush
 
-<div class="oc-page" style="display:flex; flex-direction:column; gap:1.25rem; padding-bottom:2rem;">
-
-@if(!$activeYear)
-    <div class="oc-no-year">
-        <i class="ti ti-calendar-off" aria-hidden="true"></i>
-        <h3>No Active Academic Year</h3>
-        <p>There is currently no active academic year. Please contact the Education Head to activate one.</p>
-    </div>
-@else
-
-    {{-- ── KPI Cards ── --}}
-    <div class="oc-kpi-grid">
-        <div class="oc-kpi kpi-blue">
-            <div class="oc-kpi-top">
+<div class="oc-wrap">
+    @if(! $activeYear)
+        <div class="oc-none oc-panel">
+            <h3>No active academic year</h3>
+            <p>Ask the Education Head to activate a year before outstanding contributions can be calculated.</p>
+        </div>
+    @else
+        <div class="oc-hero">
+            <div class="oc-hero-top">
                 <div>
-                    <div class="oc-kpi-label">Total Expected</div>
-                    <div class="oc-kpi-value">Birr {{ number_format($summaryData['total_expected'], 2) }}</div>
-                    <div class="oc-kpi-sub">For {{ $activeYear->name }}</div>
+                    <div class="oc-hero-kicker">{{ $activeYear->name }}</div>
+                    <h2>Outstanding contributions</h2>
+                    <p>Track who still owes for this year, filter by group or Ethiopian month, and see how collection is moving.</p>
                 </div>
-                <div class="oc-kpi-icon" style="background:#e6f1fb; color:#185FA5;">
-                    <i class="ti ti-calculator" aria-hidden="true"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="oc-kpi kpi-green">
-            <div class="oc-kpi-top">
-                <div>
-                    <div class="oc-kpi-label">Total Collected</div>
-                    <div class="oc-kpi-value">Birr {{ number_format($summaryData['total_collected'], 2) }}</div>
-                    <div class="oc-kpi-sub">Payments received</div>
-                </div>
-                <div class="oc-kpi-icon" style="background:#eaf3de; color:#3B6D11;">
-                    <i class="ti ti-cash" aria-hidden="true"></i>
+                <div class="oc-hero-stat">
+                    <span>Still to collect</span>
+                    <strong>Birr {{ number_format($summaryData['total_outstanding'], 2) }}</strong>
                 </div>
             </div>
         </div>
 
-        <div class="oc-kpi kpi-red">
-            <div class="oc-kpi-top">
-                <div>
-                    <div class="oc-kpi-label">Outstanding</div>
-                    <div class="oc-kpi-value danger">Birr {{ number_format($summaryData['total_outstanding'], 2) }}</div>
-                    <div class="oc-kpi-sub">Remaining to collect</div>
+        <div class="oc-kpi-grid">
+            <div class="oc-kpi blue">
+                <div class="oc-kpi-row">
+                    <div>
+                        <div class="oc-kpi-label">Expected</div>
+                        <div class="oc-kpi-value">Birr {{ number_format($summaryData['total_expected'], 2) }}</div>
+                        <div class="oc-kpi-sub">Full year target</div>
+                    </div>
+                    <div class="oc-kpi-icon">
+                        <x-filament::icon icon="heroicon-o-calculator" class="h-5 w-5" />
+                    </div>
                 </div>
-                <div class="oc-kpi-icon" style="background:#fcebeb; color:#A32D2D;">
-                    <i class="ti ti-alert-circle" aria-hidden="true"></i>
+            </div>
+            <div class="oc-kpi green">
+                <div class="oc-kpi-row">
+                    <div>
+                        <div class="oc-kpi-label">Collected</div>
+                        <div class="oc-kpi-value">Birr {{ number_format($summaryData['total_collected'], 2) }}</div>
+                        <div class="oc-kpi-sub">Payments received</div>
+                    </div>
+                    <div class="oc-kpi-icon">
+                        <x-filament::icon icon="heroicon-o-banknotes" class="h-5 w-5" />
+                    </div>
                 </div>
+            </div>
+            <div class="oc-kpi red">
+                <div class="oc-kpi-row">
+                    <div>
+                        <div class="oc-kpi-label">Outstanding</div>
+                        <div class="oc-kpi-value danger">Birr {{ number_format($summaryData['total_outstanding'], 2) }}</div>
+                        <div class="oc-kpi-sub">Still unpaid</div>
+                    </div>
+                    <div class="oc-kpi-icon">
+                        <x-filament::icon icon="heroicon-o-exclamation-circle" class="h-5 w-5" />
+                    </div>
+                </div>
+            </div>
+            <div class="oc-kpi gold">
+                <div class="oc-kpi-row">
+                    <div>
+                        <div class="oc-kpi-label">Collection rate</div>
+                        <div class="oc-kpi-value">{{ $summaryData['collection_rate'] }}%</div>
+                        <div class="oc-kpi-sub">Of expected collected</div>
+                    </div>
+                    <div class="oc-kpi-icon">
+                        <x-filament::icon icon="heroicon-o-chart-pie" class="h-5 w-5" />
+                    </div>
+                </div>
+                <div class="oc-bar"><span style="width: {{ min($summaryData['collection_rate'], 100) }}%"></span></div>
             </div>
         </div>
 
-        <div class="oc-kpi kpi-purple">
-            <div class="oc-kpi-top">
-                <div>
-                    <div class="oc-kpi-label">Collection Rate</div>
-                    <div class="oc-kpi-value">{{ $summaryData['collection_rate'] }}%</div>
-                    <div class="oc-kpi-sub">Of expected collected</div>
-                </div>
-                <div class="oc-kpi-icon" style="background:#eeedfe; color:#534AB7;">
-                    <i class="ti ti-chart-pie" aria-hidden="true"></i>
-                </div>
+        <div class="oc-filters">
+            <div class="oc-filters-title">
+                <x-filament::icon icon="heroicon-o-funnel" class="h-4 w-4" />
+                Filters
             </div>
-            <div class="collection-bar-wrap">
-                <div class="collection-bar-fill" style="width: {{ min($summaryData['collection_rate'], 100) }}%;"></div>
-            </div>
-        </div>
-    </div>
-
-    {{-- ── Horizontal Filters ── --}}
-    <div class="oc-filter-bar">
-        <div class="oc-filter-icon-label">
-            <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
-            Filters
-        </div>
-
-        <div class="oc-filter-group">
-            <div class="oc-field-label">Member Group</div>
-            <div class="oc-select-wrap">
-                <select wire:model.live="group_id" class="oc-select">
-                    <option value="">All Groups</option>
-                    @foreach(\App\Models\MemberGroup::pluck('name', 'id') as $id => $name)
+            <div class="oc-field">
+                <label for="oc-group">Member group</label>
+                <select id="oc-group" wire:model.live="group_id" class="oc-select">
+                    <option value="">All groups</option>
+                    @foreach(\App\Models\MemberGroup::query()->orderBy('name')->pluck('name', 'id') as $id => $name)
                         <option value="{{ $id }}">{{ $name }}</option>
                     @endforeach
                 </select>
             </div>
-        </div>
-
-        <div class="oc-filter-group">
-            <div class="oc-field-label">Ethiopian Month</div>
-            <div class="oc-select-wrap">
-                <select wire:model.live="month" class="oc-select">
-                    <option value="">All Months</option>
-                    @php
-                        $ethMonths = ['Meskerem','Tikimt','Hidar','Tahsas','Tir','Yekatit','Megabit','Miazia','Ginbot','Sene','Hamle','Nehasse','Pagume'];
-                    @endphp
-                    @foreach($ethMonths as $i => $mname)
-                        <option value="{{ $i + 1 }}">{{ $mname }} (Month {{ $i + 1 }})</option>
+            <div class="oc-field">
+                <label for="oc-month">Ethiopian month</label>
+                <select id="oc-month" wire:model.live="month" class="oc-select">
+                    <option value="">All months</option>
+                    @foreach($ethiopianMonths as $num => $name)
+                        <option value="{{ $num }}">{{ $name }}</option>
                     @endforeach
                 </select>
             </div>
-        </div>
-
-        <div class="oc-filter-group" style="flex:0 0 auto; min-width:120px;">
-            <div class="oc-field-label">Per Page</div>
-            <div class="oc-select-wrap">
-                <select wire:model.live="perPage" class="oc-select">
+            <div class="oc-field small">
+                <label for="oc-per-page">Per page</label>
+                <select id="oc-per-page" wire:model.live="perPage" class="oc-select">
                     <option value="10">10</option>
                     <option value="20">20</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                 </select>
             </div>
+            <button type="button" wire:click="resetFilters" class="oc-reset">
+                <x-filament::icon icon="heroicon-o-arrow-path" class="h-4 w-4" />
+                Reset
+            </button>
         </div>
 
-        <button type="button" wire:click="resetFilters" class="oc-btn">
-            <i class="ti ti-refresh" aria-hidden="true"></i> Reset
-        </button>
-    </div>
-
-    {{-- ── Outstanding Table ── --}}
-    <div class="oc-section">
-        <div class="oc-section-header">
-            <div class="oc-section-title">
-                <i class="ti ti-clock-exclamation" aria-hidden="true"></i>
-                Outstanding Contributions — {{ $activeYear->name }}
-                @if(!$this->month)
-                    <span style="font-size:11px; font-weight:400; color:var(--color-text-secondary);">Annual View</span>
-                @endif
-            </div>
-            @php $paginator = $this->getTableDataPaginator(); @endphp
-            <span class="oc-count-pill">
-                {{ $paginator->total() }} members
-            </span>
-        </div>
-
-        @php $rows = $paginator->items(); @endphp
-
-        @if(empty($rows))
-            <div class="oc-empty">
-                <i class="ti ti-circle-check" aria-hidden="true"></i>
-                <p>All caught up!</p>
-                <span>No outstanding contributions for the selected criteria.</span>
-            </div>
-        @else
-            @php $maxOutstanding = collect($rows)->max('outstanding') ?: 1; @endphp
-            <div style="overflow-x:auto;">
-                <table class="oc-table">
-                    <thead>
-                        <tr>
-                            <th style="width:32px;">#</th>
-                            <th>Member</th>
-                            <th>Code</th>
-                            <th>Group</th>
-                            <th>{{ $this->month ? 'Month' : 'Outstanding Months' }}</th>
-                            <th class="right">Expected</th>
-                            <th class="right">Paid</th>
-                            <th class="right">Outstanding</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($rows as $i => $row)
-                            @php $outPct = ($row['outstanding'] / $maxOutstanding) * 100; @endphp
-                            <tr>
-                                <td class="muted" style="font-size:11px;">
-                                    {{ $paginator->firstItem() + $i }}
-                                </td>
-                                <td style="font-weight:500; white-space:nowrap;">{{ $row['member_name'] }}</td>
-                                <td><span class="code-pill">{{ $row['member_code'] }}</span></td>
-                                <td><span class="group-pill">{{ $row['group_name'] }}</span></td>
-                                <td>
-                                    @if($this->month)
-                                        <span style="font-size:13px; color:var(--color-text-secondary);">{{ $row['month'] }}</span>
-                                    @else
-                                        <div style="display:flex; flex-wrap:wrap; gap:3px; max-width:260px;">
-                                            @foreach(explode(', ', $row['month_name']) as $mn)
-                                                <span class="month-tag">{{ trim($mn) }}</span>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="right muted">Birr {{ number_format($row['expected'], 2) }}</td>
-                                <td class="right" style="color:#1D9E75;">Birr {{ number_format($row['paid'], 2) }}</td>
-                                <td>
-                                    <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px;">
-                                        <span style="font-size:13px; font-weight:600; color:#D94040; font-variant-numeric:tabular-nums;">
-                                            Birr {{ number_format($row['outstanding'], 2) }}
-                                        </span>
-                                        <div class="mini-bar-wrap">
-                                            <div class="mini-bar-fill" style="width:{{ $outPct }}%;"></div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            @if($paginator->hasPages())
-                <div class="oc-pagination">
-                    {{ $paginator->links() }}
+        @php $paginator = $this->getTableDataPaginator(); $rows = $paginator->items(); @endphp
+        <div class="oc-panel">
+            <div class="oc-panel-head">
+                <div class="oc-panel-title">
+                    Members who still owe
+                    @if(! $this->month)
+                        <span class="oc-chip">Annual view</span>
+                    @endif
                 </div>
+                <span class="oc-count">{{ $paginator->total() }} members</span>
+            </div>
+
+            @if(empty($rows))
+                <div class="oc-empty">
+                    <h3>All caught up</h3>
+                    <p>No outstanding contributions for these filters.</p>
+                </div>
+            @else
+                @php $maxOutstanding = collect($rows)->max('outstanding') ?: 1; @endphp
+                <div style="overflow-x:auto;">
+                    <table class="oc-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Member</th>
+                                <th>Code</th>
+                                <th>Group</th>
+                                <th>{{ $this->month ? 'Month' : 'Outstanding months' }}</th>
+                                <th class="right">Expected</th>
+                                <th class="right">Paid</th>
+                                <th class="right">Outstanding</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($rows as $i => $row)
+                                @php $outPct = ($row['outstanding'] / $maxOutstanding) * 100; @endphp
+                                <tr>
+                                    <td style="color:#64748b; font-size:12px;">{{ $paginator->firstItem() + $i }}</td>
+                                    <td class="oc-name">{{ $row['member_name'] }}</td>
+                                    <td><span class="oc-code">{{ $row['member_code'] }}</span></td>
+                                    <td><span class="oc-group">{{ $row['group_name'] }}</span></td>
+                                    <td>
+                                        @if($this->month)
+                                            {{ $ethiopianMonths[$this->month] ?? $row['month_name'] }}
+                                        @else
+                                            <div style="display:flex; flex-wrap:wrap; gap:4px; max-width:280px;">
+                                                @foreach(explode(', ', $row['month_name']) as $mn)
+                                                    <span class="oc-month">{{ trim($mn) }}</span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="right" style="color:#64748b;">Birr {{ number_format($row['expected'], 2) }}</td>
+                                    <td class="right oc-paid">Birr {{ number_format($row['paid'], 2) }}</td>
+                                    <td class="right">
+                                        <span class="oc-out">Birr {{ number_format($row['outstanding'], 2) }}</span>
+                                        <span class="oc-mini"><span style="width: {{ $outPct }}%"></span></span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @if($paginator->hasPages())
+                    <div class="oc-pager">{{ $paginator->onEachSide(1)->links() }}</div>
+                @endif
             @endif
-        @endif
-    </div>
-
-@endif
+        </div>
+    @endif
 </div>
-
 </x-filament-panels::page>

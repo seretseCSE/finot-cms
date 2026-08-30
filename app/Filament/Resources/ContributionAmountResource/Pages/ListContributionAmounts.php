@@ -10,7 +10,7 @@ use App\Models\MemberGroup;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

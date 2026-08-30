@@ -18,7 +18,6 @@ use App\Models\Member;
 use App\Models\MemberGroup;
 use Filament\Actions;
 use Filament\Actions\Action;
-use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -189,7 +188,6 @@ class MemberResource extends BaseResource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                // Use Tables\Actions for individual row actions
                 Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
                 Actions\RestoreAction::make(),
@@ -199,37 +197,10 @@ class MemberResource extends BaseResource
                     ->icon('heroicon-o-clock')
                     ->url(fn ($record): string => static::getUrl('timeline', ['record' => $record]))
                     ->color('primary'),
-
-                Action::make('remove_from_group')
-                    ->label('Remove from Group')
-                    ->icon('heroicon-o-user-minus')
-                    ->color('danger')
-                    ->visible(fn ($record) => $record->currentGroup)
-                    ->requiresConfirmation()
-                    ->modalHeading('Remove Member from Group')
-                    ->modalDescription(
-                        fn ($record) => "Are you sure you want to remove {$record->full_name} from {$record->currentGroup->name}?"
-                    )
-                    ->action(function ($record) {
-                        try {
-                            if ($record->currentGroup) {
-                                $record->currentGroup->removeMember($record->id);
-                                Notification::make()
-                                    ->title('Member Removed')
-                                    ->body("{$record->full_name} has been removed from {$record->currentGroup->name}")
-                                    ->success()
-                                    ->send();
-                            }
-                        } catch (\Exception $e) {
-                            Notification::make()
-                                ->title('Removal Failed')
-                                ->body($e->getMessage())
-                                ->danger()
-                                ->send();
-                        }
-                    }),
             ])
-            ->bulkActions(MemberBulkActions::getActions())
+            ->bulkActions([
+                Actions\BulkActionGroup::make(MemberBulkActions::getActions()),
+            ])
             ->headerActions([
                 Actions\CreateAction::make()
                     ->label('New Member')

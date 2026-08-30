@@ -40,7 +40,7 @@ class ManageCustomOptions extends Page implements HasTable
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Operations';
     }
 
     public function getView(): string

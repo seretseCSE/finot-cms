@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\StockMovementResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\InventoryMovement;
@@ -13,6 +15,8 @@ use Filament\Tables\Table;
 
 class StockMovementResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = InventoryMovement::class;
 
     protected static ?int $navigationSort = 2;
@@ -35,7 +39,7 @@ class StockMovementResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Inventory';
+        return 'Inventory Management';
     }
 
 

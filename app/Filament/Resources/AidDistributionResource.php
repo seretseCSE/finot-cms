@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\AidDistributionResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\AidDistribution;
@@ -14,6 +16,8 @@ use Filament\Tables\Table;
 
 class AidDistributionResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = AidDistribution::class;
 
     public static function getNavigationIcon(): ?string

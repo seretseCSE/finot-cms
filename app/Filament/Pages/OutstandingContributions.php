@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+
+use App\Filament\Support\EmbeddableInHub;
+use App\Filament\Support\HidesFromNavigation;
 use App\Helpers\EthiopianDateHelper;
 use App\Models\AcademicYear;
 use App\Models\Contribution;
@@ -12,6 +15,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class OutstandingContributions extends Page
 {
+    use EmbeddableInHub;
+    use HidesFromNavigation;
+
     public static function getNavigationIcon(): ?string
     {
         return 'heroicon-o-exclamation-triangle';
@@ -31,9 +37,9 @@ class OutstandingContributions extends Page
 
     protected string $view = 'filament.pages.outstanding-contributions';
 
-    public ?int $group_id = null;
+    public $group_id = null;
 
-    public ?int $month = null;
+    public $month = null;
 
     public $activeYear;
 
@@ -50,6 +56,22 @@ class OutstandingContributions extends Page
 
     public $page = 1;
 
+    public array $ethiopianMonths = [
+        1 => 'Meskerem',
+        2 => 'Tikimt',
+        3 => 'Hidar',
+        4 => 'Tahsas',
+        5 => 'Tir',
+        6 => 'Yekatit',
+        7 => 'Megabit',
+        8 => 'Miazia',
+        9 => 'Ginbot',
+        10 => 'Sene',
+        11 => 'Hamle',
+        12 => 'Nehasse',
+        13 => 'Pagume',
+    ];
+
     protected function getQueryString(): array
     {
         return ['page' => ['except' => 1]];
@@ -58,12 +80,13 @@ class OutstandingContributions extends Page
     public function getTableDataPaginator(): LengthAwarePaginator
     {
         $page = max(1, (int) $this->page);
+        $perPage = max(1, (int) $this->perPage);
         $total = count($this->tableData);
 
         return new LengthAwarePaginator(
-            array_slice($this->tableData, ($page - 1) * $this->perPage, $this->perPage),
+            array_slice($this->tableData, ($page - 1) * $perPage, $perPage),
             $total,
-            $this->perPage,
+            $perPage,
             $page,
             ['path' => request()->url(), 'query' => request()->query()]
         );
@@ -83,16 +106,18 @@ class OutstandingContributions extends Page
         }
     }
 
-    public function updatedGroupId(): void
+    public function updatedGroupId($value): void
     {
+        $this->group_id = filled($value) ? (int) $value : null;
         $this->page = 1;
         if ($this->activeYear) {
             $this->calculateData();
         }
     }
 
-    public function updatedMonth(): void
+    public function updatedMonth($value): void
     {
+        $this->month = filled($value) ? (int) $value : null;
         $this->page = 1;
         if ($this->activeYear) {
             $this->calculateData();
@@ -101,6 +126,7 @@ class OutstandingContributions extends Page
 
     public function updatedPerPage(): void
     {
+        $this->perPage = max(1, (int) $this->perPage);
         $this->page = 1;
         if ($this->activeYear) {
             $this->calculateData();

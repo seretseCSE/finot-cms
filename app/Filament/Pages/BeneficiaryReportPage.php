@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+
+use App\Filament\Support\EmbeddableInHub;
+use App\Filament\Support\HidesFromNavigation;
 use Filament\Schemas\Schema;
 use App\Models\AidDistribution;
 use App\Models\Beneficiary;
@@ -14,6 +17,9 @@ use Illuminate\Support\Facades\Auth;
 
 class BeneficiaryReportPage extends Page
 {
+    use EmbeddableInHub;
+    use HidesFromNavigation;
+
     use InteractsWithForms;
 
     public static function getNavigationIcon(): ?string

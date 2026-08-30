@@ -2,17 +2,34 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\ErrorLog;
+use App\Services\SystemMonitoringService;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Filament\Panel;
+use Illuminate\Support\Collection;
 
 class ErrorLogViewer extends Page
 {
-    protected static ?string $title = 'Error Logs';
+    protected static ?string $title = 'Error Log Viewer';
 
     protected static ?int $navigationSort = 3;
+
+    protected string $view = 'filament.pages.error-log-viewer';
+
+    public string $source = 'recorded';
+
+    public string $level = '';
+
+    public int $tablePage = 1;
+
+    public int $perPage = 25;
+
+    public static function getSlug(?Panel $panel = null): string
+    {
+        return 'error-log-viewer';
+    }
 
     public static function getNavigationIcon(): ?string
     {
@@ -21,134 +38,117 @@ class ErrorLogViewer extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Settings & Logs';
     }
 
-    public function getView(): string
+    public function getSubheading(): ?string
     {
-        return 'filament.pages.error-log-viewer';
+        return 'Recorded request errors and recent lines from the Laravel log.';
     }
 
     public static function canAccess(): bool
     {
-        return \App\Support\RoleGate::can('error_logs.view');
+        return \App\Support\RoleGate::can('error_logs.view')
+            || \App\Support\RoleGate::can('system.error_logs');
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('clearOld')
-                ->label('Clear Old Logs (2+ months)')
-                ->icon('heroicon-o-trash')
-                ->color('danger')
-                ->requiresConfirmation()
-                ->action(fn () => $this->clearOldLogs()),
-
             Action::make('refresh')
                 ->label('Refresh')
                 ->icon('heroicon-o-arrow-path')
-                ->action(fn () => $this->refreshData()),
+                ->action(function (): void {
+                    $this->tablePage = 1;
+                    Notification::make()->title('Logs refreshed')->success()->send();
+                }),
         ];
     }
 
-    public function clearOldLogs()
+    public function updatedSource(): void
     {
-        $deleted = DB::table('error_logs')
-            ->where('created_at', '<', now()->subMonths(2))
-            ->delete();
-
-        $this->notify('success', "Deleted {$deleted} old error log entries");
+        $this->tablePage = 1;
+        $this->level = '';
     }
 
-    public function refreshData()
+    public function updatedLevel(): void
     {
-        $this->notify('success', 'Error logs refreshed');
+        $this->tablePage = 1;
     }
 
-    public function getErrorLogs(): array
+    public function previousPage(): void
     {
-        return DB::table('error_logs')
-            ->orderBy('created_at', 'desc')
-            ->limit(100)
-            ->get()
-            ->map(function ($log) {
-                return [
-                    'id' => $log->id,
-                    'level' => $this->normalizeErrorLevel($log->error_type),
-                    'message' => $log->error_message,
-                    'exception' => $log->stack_trace,
-                    'file' => null,
-                    'line' => null,
-                    'url' => $log->url,
-                    'method' => $log->http_method,
-                    'ip_address' => null,
-                    'user_agent' => $log->user_agent,
-                    'user_id' => $log->user_id,
-                    'created_at' => Carbon::parse($log->created_at),
-                ];
-            })
-            ->toArray();
+        $this->gotoPage($this->tablePage - 1);
     }
 
-    protected function normalizeErrorLevel(?string $errorType): string
+    public function nextPage(): void
     {
-        if (! $errorType) {
-            return 'error';
+        $this->gotoPage($this->tablePage + 1);
+    }
+
+    public function gotoPage(int $page): void
+    {
+        $this->tablePage = max(1, min($page, $this->lastPage()));
+    }
+
+    public function lastPage(): int
+    {
+        return max(1, (int) ceil($this->total() / max(1, $this->perPage)));
+    }
+
+    public function total(): int
+    {
+        return $this->source === 'laravel'
+            ? $this->laravelRows()->count()
+            : $this->recordedQuery()->count();
+    }
+
+    /**
+     * @return Collection<int, array{timestamp: string, level: string, message: string, context: string}>
+     */
+    public function rows(): Collection
+    {
+        if ($this->source === 'laravel') {
+            return $this->laravelRows()
+                ->forPage($this->tablePage, $this->perPage)
+                ->values();
         }
 
-        $type = strtolower($errorType);
-
-        return match (true) {
-            str_contains($type, 'critical') => 'critical',
-            str_contains($type, 'emergency') => 'emergency',
-            str_contains($type, 'alert') => 'alert',
-            str_contains($type, 'error') => 'error',
-            str_contains($type, 'warning') => 'warning',
-            str_contains($type, 'notice') => 'notice',
-            str_contains($type, 'info') => 'info',
-            str_contains($type, 'debug') => 'debug',
-            default => 'error',
-        };
+        return $this->recordedQuery()
+            ->forPage($this->tablePage, $this->perPage)
+            ->get()
+            ->map(fn (ErrorLog $log) => [
+                'timestamp' => optional($log->created_at)->format('Y-m-d H:i:s') ?? '—',
+                'level' => $log->error_type ?: 'ERROR',
+                'message' => $log->error_message ?: '—',
+                'context' => trim(($log->http_method ? $log->http_method.' ' : '').($log->url ?? '')),
+            ]);
     }
 
-    public function getErrorLevelColor(string $level): string
+    protected function recordedQuery()
     {
-        return match ($level) {
-            'emergency', 'alert' => 'danger',
-            'critical' => 'danger',
-            'error' => 'danger',
-            'warning' => 'warning',
-            'notice' => 'info',
-            'info' => 'info',
-            'debug' => 'gray',
-            default => 'gray',
-        };
+        $query = ErrorLog::query()->latest();
+
+        if ($this->level !== '') {
+            $query->where('error_type', $this->level);
+        }
+
+        return $query;
     }
 
-    public function getRecentErrorStats(): array
+    /**
+     * @return Collection<int, array{timestamp: string, level: string, message: string, context: string}>
+     */
+    protected function laravelRows(): Collection
     {
-        $last24h = DB::table('error_logs')
-            ->where('created_at', '>=', now()->subHours(24))
-            ->count();
+        $rows = collect(app(SystemMonitoringService::class)->getErrorLogs(250));
 
-        $lastWeek = DB::table('error_logs')
-            ->where('created_at', '>=', now()->subWeek())
-            ->count();
+        if ($this->level !== '') {
+            $rows = $rows->filter(
+                fn (array $log) => strcasecmp((string) ($log['level'] ?? ''), $this->level) === 0
+            )->values();
+        }
 
-        $criticalErrors = DB::table('error_logs')
-            ->where(function ($query) {
-                $query->where('error_type', 'like', '%critical%')
-                    ->orWhere('error_type', 'like', '%emergency%')
-                    ->orWhere('error_type', 'like', '%alert%')
-                    ->orWhere('error_type', 'like', '%error%');
-            })
-            ->where('created_at', '>=', now()->subHours(24))
-            ->count();
-
-        return [
-            'last_24h' => $last24h,
-            'last_week' => $lastWeek,
-            'critical_24h' => $criticalErrors,
-        ];
+        return $rows;
     }
 }

@@ -3,7 +3,8 @@
 @php
     $resolvedPage = $currentPage;
     if (Request::is('/') || Request::is('')) $resolvedPage = $resolvedPage ?: 'home';
-    if (Request::is('announcements*') || Request::is('events*') || Request::is('blog*') || Request::is('news*')) $resolvedPage = 'news';
+    if (Request::is('announcements*') || Request::is('events*') || Request::is('news*')) $resolvedPage = 'news';
+    if (Request::is('blog*')) $resolvedPage = 'blog';
     if (Request::is('courses*') || Request::is('course*') || Request::is('study*') || Request::is('library*')) $resolvedPage = 'learn';
     if (Request::is('media*') || Request::is('songs*') || Request::is('gallery*')) $resolvedPage = 'media';
     if (Request::is('about*')) $resolvedPage = 'about';
@@ -68,6 +69,8 @@
                 $navLink('home', '/', __('Home')),
                 $navLink('about', route('about'), __('About')),
                 $navLink('news', route('news'), __('News')),
+                $navLink('blog', route('blog.index'), __('Blog')),
+                $navLink('media', route('media'), __('Gallery')),
             ] as $link)
                 <a href="{{ $link['href'] }}" class="relative px-3 py-2 text-xs font-medium tracking-widest uppercase rounded-lg transition-all duration-300 {{ $link['class'] }}" @if($resolvedPage === $link['page']) aria-current="page" @endif>
                     {{ $link['label'] }}
@@ -95,7 +98,6 @@
             </div>
 
             @foreach([
-                $navLink('media', route('media'), __('Media')),
                 $navLink('contact', route('contact'), __('Contact')),
             ] as $link)
                 <a href="{{ $link['href'] }}" class="relative px-3 py-2 text-xs font-medium tracking-widest uppercase rounded-lg transition-all duration-300 {{ $link['class'] }}" @if($resolvedPage === $link['page']) aria-current="page" @endif>
@@ -173,6 +175,8 @@
                 ['href' => '/', 'label' => __('Home'), 'page' => 'home', 'am' => 'መነሻ'],
                 ['href' => route('about'), 'label' => __('About'), 'page' => 'about', 'am' => 'ስለ እኛ'],
                 ['href' => route('news'), 'label' => __('News'), 'page' => 'news', 'am' => 'ዜና'],
+                ['href' => route('blog.index'), 'label' => __('Blog'), 'page' => 'blog', 'am' => 'ብሎግ'],
+                ['href' => route('media'), 'label' => __('Gallery'), 'page' => 'media', 'am' => 'ጋለሪ'],
             ] as $item)
                 <a href="{{ $item['href'] }}"
                    class="flex items-center justify-between px-4 py-3 text-sm font-medium tracking-widest uppercase rounded-lg transition-all duration-200
@@ -202,7 +206,6 @@
             </div>
 
             @foreach([
-                ['href' => route('media'), 'label' => __('Media'), 'page' => 'media', 'am' => 'ሚዲያ'],
                 ['href' => route('contact'), 'label' => __('Contact'), 'page' => 'contact', 'am' => 'ያግኙን'],
             ] as $item)
                 <a href="{{ $item['href'] }}"

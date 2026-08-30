@@ -4,7 +4,7 @@ namespace App\Filament\Resources\ClassroomResource\Pages;
 
 use App\Filament\Resources\ClassroomResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListClassrooms extends ListRecords
 {

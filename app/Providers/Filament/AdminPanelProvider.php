@@ -6,6 +6,7 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\EditProfile;
 use App\Filament\Pages\ManageActiveSessions;
 use App\Filament\Support\AdminNavigation;
+use App\Filament\Support\NavHubRegistry;
 use App\Http\Middleware\ForcePasswordChange;
 use App\Services\ProductTour\ProductTourService;
 use App\Support\RoleGate;
@@ -39,15 +40,17 @@ class AdminPanelProvider extends PanelProvider
             ->darkModeBrandLogo(fn () => asset('images/logo2.png'))
             ->brandLogoHeight('2.75rem')
             ->colors([
-                'primary' => '#1941F5',
+                'primary' => '#1A44F7',
                 'danger' => '#C0392B',
                 'success' => '#1E8449',
                 'warning' => '#D4AC0D',
             ])
+            ->sidebarFullyCollapsibleOnDesktop()
             ->font('Inter', provider: LocalFontProvider::class)
             ->topNavigation(false)
             ->collapsibleNavigationGroups(true)
             ->navigationGroups(AdminNavigation::groups())
+            ->navigationItems(NavHubRegistry::navigationItems())
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->favicon(asset('images/logo2.png'))
@@ -90,7 +93,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn (): string => '<link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#1B4F72"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="FINOTE">',
+                fn (): string => '<link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#1A44F7"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="FINOTE"><link rel="stylesheet" href="'.asset('css/filament-admin.css').'?v=6">',
+            )
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_FOOTER,
+                fn (): string => auth()->check() ? (string) view('filament.components.user-manual-link')->render() : '',
             )
             ->renderHook(
                 PanelsRenderHook::BODY_END,

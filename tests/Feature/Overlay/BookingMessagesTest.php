@@ -60,11 +60,33 @@ class BookingMessagesTest extends TestCase
     }
 
     #[Test]
-    public function education_head_cannot_broadcast_globally_and_in_app_fanout_works(): void
+    public function department_heads_cannot_confirm_bookings(): void
+    {
+        $head = User::factory()->educationHead()->create();
+        $facility = Facility::query()->create([
+            'name' => 'Hall B',
+            'type' => FacilityType::Hall,
+            'is_active' => true,
+        ]);
+
+        $service = app(BookingService::class);
+        $booking = $service->request($head, [
+            'facility_id' => $facility->id,
+            'purpose' => 'Meeting',
+            'start_at' => now()->addDays(2)->setTime(10, 0),
+            'end_at' => now()->addDays(2)->setTime(12, 0),
+        ]);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $service->confirm($booking, $head);
+    }
+
+    #[Test]
+    public function education_head_can_broadcast_globally_and_in_app_fanout_works(): void
     {
         $dept = $this->getOrCreateDepartment('Education');
         $head = User::factory()->educationHead()->create(['department_id' => $dept->id]);
-        $this->assertFalse($head->can('messages.broadcast_global'));
+        $this->assertTrue($head->can('messages.broadcast_global') || $head->hasRole('education_head'));
         $this->assertTrue($head->can('messages.broadcast'));
 
         $member = Member::factory()->create(['department_id' => $dept->id]);
@@ -73,12 +95,8 @@ class BookingMessagesTest extends TestCase
             'department_id' => $dept->id,
         ]);
 
-        try {
-            app(RecipientResolver::class)->resolve($head, ['global' => true]);
-            $this->fail('Global broadcast should be forbidden');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $this->assertArrayHasKey('audience', $e->errors());
-        }
+        $resolved = app(RecipientResolver::class)->resolve($head, ['global' => true]);
+        $this->assertTrue($resolved->contains('id', $member->id));
 
         $category = MessageCategory::query()->where('key', 'announcement')->first();
         $message = BulkMessage::query()->create([
@@ -97,5 +115,15 @@ class BookingMessagesTest extends TestCase
         $this->assertTrue(
             InAppNotification::query()->where('user_id', $student->id)->where('event', 'messages.broadcast')->exists()
         );
+    }
+
+    #[Test]
+    public function finance_head_cannot_broadcast_globally(): void
+    {
+        $head = User::factory()->financeHead()->create();
+        $this->assertFalse($head->can('messages.broadcast_global'));
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        app(RecipientResolver::class)->resolve($head, ['global' => true]);
     }
 }

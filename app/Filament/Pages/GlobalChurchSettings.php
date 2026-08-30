@@ -37,7 +37,7 @@ class GlobalChurchSettings extends Page implements HasForms
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Settings & Logs';
     }
 
     public function getView(): string

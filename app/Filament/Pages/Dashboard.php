@@ -77,7 +77,6 @@ class Dashboard extends BaseDashboard
 
         if (\App\Support\RoleGate::is('superadmin')) {
             return [
-                OnboardingProgressWidget::class,
                 TotalRegisteredUsersWidget::class,
                 ActiveSessionsWidget::class,
                 FailedLoginsWidget::class,

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\BookingStatus;
 use App\Filament\Resources\BookingResource\Pages;
+use App\Filament\Support\HidesFromNavigation;
 use App\Models\Booking;
 use App\Services\Facilities\BookingService;
 use Filament\Actions;
@@ -17,11 +18,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BookingResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Booking::class;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Operations';
     }
 
     public static function getNavigationSort(): ?int
@@ -37,6 +40,19 @@ class BookingResource extends BaseResource
     public static function getNavigationLabel(): string
     {
         return 'Bookings';
+    }
+
+    public static function canViewAny(): bool
+    {
+        $user = static::authUser();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasRole('superadmin')
+            || $user->can('facilities.view')
+            || $user->can('facilities.book');
     }
 
     public static function form(Schema $schema): Schema
@@ -69,7 +85,7 @@ class BookingResource extends BaseResource
                 Actions\EditAction::make(),
                 Actions\Action::make('confirm')
                     ->visible(fn (Booking $record) => $record->status === BookingStatus::Pending
-                        && (Auth::user()?->can('facilities.manage') || Auth::user()?->hasRole(['admin', 'superadmin'])))
+                        && \App\Support\RoleGate::canApproveBookings())
                     ->requiresConfirmation()
                     ->action(function (Booking $record) {
                         try {

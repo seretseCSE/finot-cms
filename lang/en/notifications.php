@@ -29,10 +29,6 @@ return [
         'title' => 'Emergency message',
         'body' => ':body',
     ],
-    'imports.committed' => [
-        'title' => 'Import finished',
-        'body' => ':imported imported, :skipped skipped, :failed failed.',
-    ],
     'bookings.requested' => [
         'title' => 'Facility booking requested',
         'body' => ':purpose',

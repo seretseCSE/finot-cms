@@ -44,12 +44,10 @@ class DatabaseSeeder extends Seeder
 
             // Specialized Data
             EthiopianOrthodoxSampleDataSeeder::class,
-            PredefinedReportSeeder::class,
             SystemBackupsSeeder::class,
         ]);
 
-        // Call attendance test data seeder for testing bulk attendance features
-        if ($this->command->confirm('Do you want to create attendance test data for bulk attendance testing?', false)) {
+        if (filter_var(env('SEED_ATTENDANCE_TEST_DATA', false), FILTER_VALIDATE_BOOLEAN)) {
             $this->call(AttendanceTestDataSeeder::class);
         }
     }

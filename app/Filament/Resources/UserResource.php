@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Forms\Components\Traits\HasPhoneFormatting;
 use Filament\Schemas\Schema;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
+    use EnsuresTableCreateAction;
     use HasPhoneFormatting;
     protected static ?string $model = User::class;
 
@@ -34,7 +36,7 @@ class UserResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Users & Access';
     }
 
     public static function getNavigationSort(): ?int

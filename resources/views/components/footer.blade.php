@@ -39,6 +39,7 @@
                         ['href' => '/', 'label' => __('Home')],
                         ['href' => route('about'), 'label' => __('About Us')],
                         ['href' => route('news'), 'label' => __('News')],
+                        ['href' => route('blog.index'), 'label' => __('Blog')],
                         ['href' => route('contact'), 'label' => __('Contact')],
                     ] as $link)
                         <a href="{{ $link['href'] }}" class="text-sm transition-colors no-underline hover:text-primary-500" style="color: var(--ft-ink-muted);">{{ $link['label'] }}</a>
@@ -52,7 +53,7 @@
                     @foreach([
                         ['href' => route('courses.index'), 'label' => __('Courses')],
                         ['href' => route('library'), 'label' => __('Library')],
-                        ['href' => route('media'), 'label' => __('Media')],
+                        ['href' => route('media'), 'label' => __('Gallery')],
                         ['href' => route('media', ['tab' => 'songs']), 'label' => __('Songs')],
                     ] as $link)
                         <a href="{{ $link['href'] }}" class="text-sm transition-colors no-underline hover:text-primary-500" style="color: var(--ft-ink-muted);">{{ $link['label'] }}</a>

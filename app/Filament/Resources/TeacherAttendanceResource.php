@@ -20,12 +20,12 @@ class TeacherAttendanceResource extends BaseResource
 
     public static function getNavigationLabel(): string
     {
-        return 'Teacher Attendance';
+        return 'Teacher Attendance Records';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Education Management';
+        return 'Attendance & Results';
     }
 
     public static function getNavigationSort(): ?int

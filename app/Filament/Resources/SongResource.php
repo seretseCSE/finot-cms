@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\SongResource\Pages;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SongResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = Song::class;
 
     public static function getNavigationIcon(): ?string
@@ -98,9 +102,9 @@ class SongResource extends BaseResource
                             ->label('Audio File')
                             ->disk('songs-audio')
                             ->directory('songs-audio')
-                            ->acceptedFileTypes(['audio/mpeg', 'audio/wav'])
-                            ->maxSize(20480) // 20MB
-                            ->helperText('MP3 or WAV files, max 20MB')
+                            ->acceptedFileTypes(config('file_sizes.mime_types.audio'))
+                            ->maxSize(config('file_sizes.max_sizes.audio', 20480))
+                            ->helperText('MP3, WAV, M4A, OGG, FLAC, AAC, or WMA. Max 20MB')
                             ->visibility('public'),
 
                         Forms\Components\TextInput::make('video_url')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\Concerns\EnsuresTableCreateAction;
 use App\Filament\Resources\DepartmentResource\Pages;
 use Filament\Schemas\Schema;
 use App\Models\Department;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 
 class DepartmentResource extends Resource
 {
+    use EnsuresTableCreateAction;
+
     protected static ?string $model = Department::class;
 
     public static function getNavigationIcon(): ?string
@@ -29,7 +32,7 @@ class DepartmentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'System';
+        return 'Users & Access';
     }
 
     public static function getNavigationSort(): ?int

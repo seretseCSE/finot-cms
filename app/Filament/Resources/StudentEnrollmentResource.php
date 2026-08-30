@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+
+use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\StudentEnrollmentResource\Pages;
 use Filament\Schemas\Schema;
 use App\Helpers\EthiopianDateHelper;
@@ -21,6 +23,8 @@ use Illuminate\Support\Facades\DB;
 
 class StudentEnrollmentResource extends BaseResource
 {
+    use HidesFromNavigation;
+
     protected static ?string $model = StudentEnrollment::class;
 
     public static function getNavigationGroup(): ?string

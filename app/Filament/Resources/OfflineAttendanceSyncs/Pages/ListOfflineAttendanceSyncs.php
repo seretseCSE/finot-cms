@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\OfflineAttendanceSyncs\Pages;
 
 use App\Filament\Resources\OfflineAttendanceSyncs\OfflineAttendanceSyncResource;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListOfflineAttendanceSyncs extends ListRecords
 {

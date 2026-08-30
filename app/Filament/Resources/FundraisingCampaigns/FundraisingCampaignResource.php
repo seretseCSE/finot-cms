@@ -23,9 +23,9 @@ class FundraisingCampaignResource extends BaseResource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Events';
+    protected static string|\UnitEnum|null $navigationGroup = 'Donations';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 12;
 
     public static function form(Schema $schema): Schema
     {

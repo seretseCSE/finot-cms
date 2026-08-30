@@ -16,6 +16,12 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
+        $connection = $app['config']->get('database.default');
+        $database = $app['config']->get("database.connections.{$connection}.database");
+        if ($connection === 'mysql' && $database === 'finot_cms') {
+            throw new \RuntimeException('Tests must not run against the local MySQL finot_cms database.');
+        }
+
         return $app;
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\FundraisingResource\Pages;
 
 use App\Filament\Resources\FundraisingResource;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\Pages\ListRecords;
 
 class ListFundraisingCampaigns extends ListRecords
 {

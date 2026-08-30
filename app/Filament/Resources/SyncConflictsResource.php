@@ -34,6 +34,16 @@ class SyncConflictsResource extends BaseResource
         return 6;
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
 
     public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
     {
