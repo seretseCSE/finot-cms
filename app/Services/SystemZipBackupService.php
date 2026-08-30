@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use Symfony\Component\Process\Process;
 use ZipArchive;
 
 class SystemZipBackupService
@@ -125,24 +126,81 @@ class SystemZipBackupService
 
     protected function dumpDatabase(string $path): void
     {
-        $connection = config('database.default');
+        $connection = (string) config('database.default');
         $db = config("database.connections.{$connection}");
 
-        $command = sprintf(
-            'mysqldump --host=%s --port=%s --user=%s --password=%s --single-transaction --routines --triggers %s > %s',
-            $db['host'] ?? '127.0.0.1',
-            $db['port'] ?? '3306',
-            $db['username'] ?? 'root',
-            $db['password'] ?? '',
-            $db['database'] ?? '',
-            $path
-        );
+        if (is_array($db) === false) {
+            throw new \RuntimeException('Database connection is not configured.');
+        }
 
-        exec($command, $output, $returnCode);
+        $host = $this->safeDumpToken((string) ($db['host'] ?? '127.0.0.1'), 'host');
+        $port = (string) ((int) ($db['port'] ?? 3306));
+        $user = $this->safeDumpToken((string) ($db['username'] ?? 'root'), 'username');
+        $database = $this->safeDumpToken((string) ($db['database'] ?? ''), 'database');
 
-        if ($returnCode !== 0 || ! is_file($path)) {
+        $process = new Process([
+            $this->mysqldumpBinary(),
+            '--host='.$host,
+            '--port='.$port,
+            '--user='.$user,
+            '--single-transaction',
+            '--routines',
+            '--triggers',
+            $database,
+        ]);
+        $process->setTimeout(300);
+        $env = [];
+        foreach (array_merge($_SERVER, $_ENV) as $key => $value) {
+            if (is_string($key) && is_string($value)) {
+                $env[$key] = $value;
+            }
+        }
+        $env['MYSQL_PWD'] = (string) ($db['password'] ?? '');
+        $process->setEnv($env);
+
+        $handle = fopen($path, 'wb');
+        if ($handle === false) {
+            throw new \RuntimeException('Could not write the database dump file.');
+        }
+
+        try {
+            $process->run(function (string $type, string $buffer) use ($handle): void {
+                if ($type === Process::OUT) {
+                    fwrite($handle, $buffer);
+                }
+            });
+        } finally {
+            fclose($handle);
+        }
+
+        if ($process->isSuccessful() === false || is_file($path) === false || filesize($path) === 0) {
+            if (is_file($path) === true) {
+                unlink($path);
+            }
+
             throw new \RuntimeException('Database dump failed. Check that mysqldump is available.');
         }
+    }
+
+    protected function mysqldumpBinary(): string
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $xampp = 'C:\\xampp\\mysql\\bin\\mysqldump.exe';
+            if (is_file($xampp) === true) {
+                return $xampp;
+            }
+        }
+
+        return 'mysqldump';
+    }
+
+    protected function safeDumpToken(string $value, string $label): string
+    {
+        if ($value === '' || preg_match('/^[A-Za-z0-9._:\\[\\]-]+$/', $value) !== 1) {
+            throw new \RuntimeException("Invalid database {$label}.");
+        }
+
+        return $value;
     }
 
     protected function addFolderToZip(ZipArchive $zip, string $folder, string $zipFolder): void
