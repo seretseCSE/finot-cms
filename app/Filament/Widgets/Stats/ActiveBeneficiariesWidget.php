@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\BeneficiaryResource;
 use App\Models\Beneficiary;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -20,7 +21,8 @@ class ActiveBeneficiariesWidget extends StatsOverviewWidget
         return [
             Stat::make('Active Beneficiaries', $count)
                 ->icon('heroicon-o-heart')
-                ->color('success'),
+                ->color('success')
+                ->url(BeneficiaryResource::getUrl()),
         ];
     }
 }

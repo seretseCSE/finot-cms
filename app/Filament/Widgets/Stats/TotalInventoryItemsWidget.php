@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\InventoryResource;
 use App\Models\InventoryItem;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -16,7 +17,8 @@ class TotalInventoryItemsWidget extends StatsOverviewWidget
         return [
             Stat::make('Inventory Items', Cache::remember('dashboard_total_inventory', 300, fn () => InventoryItem::count()))
                 ->icon('heroicon-o-cube')
-                ->color('primary'),
+                ->color('primary')
+                ->url(InventoryResource::getUrl()),
         ];
     }
 }

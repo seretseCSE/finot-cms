@@ -13,13 +13,8 @@ class CustomLoginResponse implements LoginResponse
     {
         $user = auth()->user();
 
-        if ($user instanceof User && $user->isStudentOnly()) {
-            $redirect = redirect()->to($user->postLoginUrl());
-            if (! $user->temp_password_changed) {
-                $redirect->with('info', 'Please update your password.');
-            }
-
-            return $redirect;
+        if ($user instanceof User) {
+            \App\Support\RoleGate::rememberDefault($user);
         }
 
         $intended = session()->pull('url.intended');

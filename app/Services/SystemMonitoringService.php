@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\LaravelLogFiles;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -31,32 +32,27 @@ class SystemMonitoringService
 
     public function getErrorLogs(int $limit = 100): array
     {
-        $logFile = storage_path('logs/laravel.log');
-        $logs = [];
-
-        if (! file_exists($logFile)) {
-            return [];
-        }
-
         $cutoffDate = now()->subMonths(2)->format('Y-m-d');
         $formattedLogs = [];
 
-        foreach ($this->readLinesReverse($logFile, 5000) as $line) {
-            $timestamp = $this->extractTimestamp($line);
-            if ($timestamp && $timestamp >= $cutoffDate) {
-                if (str_contains($line, 'ERROR') || str_contains($line, 'CRITICAL') || str_contains($line, 'WARNING')) {
-                    $formattedLogs[] = [
-                        'timestamp' => $timestamp,
-                        'level' => $this->extractLogLevel($line),
-                        'message' => $this->extractLogMessage($line),
-                        'context' => $this->extractLogContext($line),
-                        'full_line' => trim($line),
-                    ];
+        foreach (LaravelLogFiles::paths() as $logFile) {
+            foreach ($this->readLinesReverse($logFile, 5000) as $line) {
+                $timestamp = $this->extractTimestamp($line);
+                if ($timestamp && $timestamp >= $cutoffDate) {
+                    if (str_contains($line, 'ERROR') || str_contains($line, 'CRITICAL') || str_contains($line, 'WARNING')) {
+                        $formattedLogs[] = [
+                            'timestamp' => $timestamp,
+                            'level' => $this->extractLogLevel($line),
+                            'message' => $this->extractLogMessage($line),
+                            'context' => $this->extractLogContext($line),
+                            'full_line' => trim($line),
+                        ];
+                    }
                 }
-            }
 
-            if (count($formattedLogs) >= $limit) {
-                break;
+                if (count($formattedLogs) >= $limit) {
+                    return $formattedLogs;
+                }
             }
         }
 
@@ -241,11 +237,10 @@ class SystemMonitoringService
 
     protected function getErrorRate(): array
     {
-        $logFile = storage_path('logs/laravel.log');
         $totalLogs = 0;
         $errorLogs = 0;
 
-        if (file_exists($logFile)) {
+        foreach (LaravelLogFiles::paths(2) as $logFile) {
             foreach ($this->readLines($logFile) as $log) {
                 $totalLogs++;
                 if (str_contains($log, 'ERROR') || str_contains($log, 'CRITICAL')) {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\TourPassengerResource;
 use App\Models\TourPassenger;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -20,7 +21,8 @@ class TourPassengersWidget extends StatsOverviewWidget
         return [
             Stat::make('Passengers (YTD)', $count)
                 ->icon('heroicon-o-users')
-                ->color('primary'),
+                ->color('primary')
+                ->url(TourPassengerResource::getUrl()),
         ];
     }
 }

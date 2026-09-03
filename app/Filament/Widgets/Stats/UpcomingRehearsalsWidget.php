@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\RehearsalResource;
 use App\Models\Rehearsal;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -20,7 +21,8 @@ class UpcomingRehearsalsWidget extends StatsOverviewWidget
         return [
             Stat::make('Upcoming Rehearsals', $count)
                 ->icon('heroicon-o-calendar')
-                ->color('primary'),
+                ->color('primary')
+                ->url(RehearsalResource::getUrl()),
         ];
     }
 }

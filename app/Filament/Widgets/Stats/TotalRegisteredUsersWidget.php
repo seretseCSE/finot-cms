@@ -2,9 +2,10 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\UserResource;
+use App\Filament\Support\ClickableStat;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 
 class TotalRegisteredUsersWidget extends StatsOverviewWidget
@@ -21,7 +22,7 @@ class TotalRegisteredUsersWidget extends StatsOverviewWidget
         });
 
         return [
-            Stat::make('Registered Users', $data['total'])
+            ClickableStat::make('Registered Users', $data['total'], ClickableStat::resourceUrl(UserResource::class))
                 ->description("{$data['active_today']} active today")
                 ->icon('heroicon-o-user-group')
                 ->color('primary'),

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\SongResource;
 use App\Models\Song;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -18,7 +19,8 @@ class TotalSongsWidget extends StatsOverviewWidget
         return [
             Stat::make('Songs in Library', $count)
                 ->icon('heroicon-o-musical-note')
-                ->color('primary'),
+                ->color('primary')
+                ->url(SongResource::getUrl()),
         ];
     }
 }

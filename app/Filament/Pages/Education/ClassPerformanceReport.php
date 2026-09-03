@@ -104,14 +104,33 @@ class ClassPerformanceReport extends Page
             ];
         }
 
+        $ranking = app(\App\Services\Academics\RankingService::class);
         $studentTests = [];
         foreach ($students as $student) {
+            $items = \App\Models\MarklistItem::query()
+                ->with('marklist.subject')
+                ->where('member_id', $student->id)
+                ->whereHas('marklist', function ($query) {
+                    $query->where('class_id', $this->class_id)
+                        ->where('status', 'approved')
+                        ->whereHas('term', fn ($term) => $term->where('academic_year_id', $this->academic_year_id));
+                })
+                ->whereNotNull('score')
+                ->get();
+
+            $percents = $items->map(fn ($item) => $ranking->percent($item));
             $studentTests[$student->id] = [
-                'total_tests' => 0,
-                'average_score' => 0,
-                'highest_score' => 0,
-                'lowest_score' => 0,
-                'test_results' => [],
+                'total_tests' => $items->count(),
+                'average_score' => $percents->count() > 0 ? round((float) $percents->avg(), 2) : 0,
+                'highest_score' => $percents->count() > 0 ? round((float) $percents->max(), 2) : 0,
+                'lowest_score' => $percents->count() > 0 ? round((float) $percents->min(), 2) : 0,
+                'test_results' => $items->map(fn ($item) => [
+                    'subject' => $item->marklist?->subject?->name,
+                    'score' => $item->score,
+                    'max_score' => $item->max_score,
+                    'rank' => $item->rank,
+                    'letter' => $ranking->letterGrade($item->score !== null ? (float) $item->score : null, $item->max_score),
+                ])->all(),
             ];
         }
 

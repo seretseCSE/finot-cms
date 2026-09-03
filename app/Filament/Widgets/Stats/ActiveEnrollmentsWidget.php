@@ -2,9 +2,10 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\StudentEnrollmentResource;
+use App\Filament\Support\ClickableStat;
 use App\Models\StudentEnrollment;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 
 class ActiveEnrollmentsWidget extends StatsOverviewWidget
@@ -18,7 +19,7 @@ class ActiveEnrollmentsWidget extends StatsOverviewWidget
         );
 
         return [
-            Stat::make('Active Enrollments', $count)
+            ClickableStat::make('Active Enrollments', $count, ClickableStat::resourceUrl(StudentEnrollmentResource::class))
                 ->icon('heroicon-o-academic-cap')
                 ->color('primary'),
         ];

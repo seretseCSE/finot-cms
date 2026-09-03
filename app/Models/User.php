@@ -173,7 +173,10 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(\Filament\Panel $panel): bool
     {
-        return $this->isActive() && $this->hasAnyRole(\App\Enums\Roles::STAFF);
+        return $this->isActive() && (
+            $this->hasAnyRole(\App\Enums\Roles::STAFF)
+            || $this->hasRole(\App\Enums\Roles::STUDENT)
+        );
     }
 
     public function isStudentOnly(): bool
@@ -183,12 +186,6 @@ class User extends Authenticatable implements FilamentUser
 
     public function postLoginUrl(): string
     {
-        if ($this->isStudentOnly()) {
-            return $this->temp_password_changed
-                ? route('portal.home')
-                : route('portal.profile');
-        }
-
         if (! $this->temp_password_changed) {
             return route('change-initial-password');
         }

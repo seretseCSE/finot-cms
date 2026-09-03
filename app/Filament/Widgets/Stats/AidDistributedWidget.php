@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\AidDistributionResource;
 use App\Models\AidDistribution;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -22,7 +23,8 @@ class AidDistributedWidget extends StatsOverviewWidget
         return [
             Stat::make('Aid Distributed (MTD)', number_format($total, 2) . ' ETB')
                 ->icon('heroicon-o-gift')
-                ->color('primary'),
+                ->color('primary')
+                ->url(AidDistributionResource::getUrl()),
         ];
     }
 }

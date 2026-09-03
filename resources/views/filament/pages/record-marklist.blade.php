@@ -2,7 +2,7 @@
     @php
         $locked = $this->isLocked();
         $total = count($this->rows);
-        $scored = collect($this->rows)->filter(fn ($row) => filled($row['conduct'] ?? null) && filled($row['memorization'] ?? null) && filled($row['participation'] ?? null))->count();
+        $scored = collect($this->rows)->filter(fn ($row) => filled($row['score'] ?? null) || (filled($row['conduct'] ?? null) && filled($row['memorization'] ?? null) && filled($row['participation'] ?? null)))->count();
         $status = $this->marklistStatus;
         $statusLabel = match ($status) {
             'submitted' => 'Submitted',
@@ -130,9 +130,9 @@
                     @error('classId') <p class="rm-error">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="rm-label" for="rm-term">Term</label>
+                    <label class="rm-label" for="rm-term">Semester</label>
                     <select id="rm-term" wire:model="termId" class="rm-select">
-                        <option value="">Select term</option>
+                        <option value="">Select semester</option>
                         @foreach ($terms as $id => $name)
                             <option value="{{ $id }}">{{ $name }}</option>
                         @endforeach
@@ -160,7 +160,7 @@
         @if ($total === 0)
             <div class="rm-card rm-empty">
                 <strong>No roster loaded</strong>
-                Choose a class, term, and subject, then load the roster to start scoring.
+                Choose a class, semester, and subject, then load the roster to start scoring.
             </div>
         @else
             <div class="rm-card rm-toolbar">
@@ -187,6 +187,9 @@
                     <thead>
                         <tr>
                             <th>Student</th>
+                            <th>Score</th>
+                            <th>Max</th>
+                            <th>Rank</th>
                             <th>Conduct</th>
                             <th>Memorization</th>
                             <th>Participation</th>
@@ -201,6 +204,29 @@
                                     @if (filled($row['code'] ?? null))
                                         <span class="rm-code">{{ $row['code'] }}</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        wire:model="rows.{{ $index }}.score"
+                                        @disabled($locked)
+                                        class="rm-input"
+                                        placeholder="0"
+                                    >
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        wire:model="rows.{{ $index }}.max_score"
+                                        @disabled($locked)
+                                        class="rm-input"
+                                    >
+                                </td>
+                                <td>
+                                    <span class="rm-chip">{{ $row['rank'] ?? '—' }}</span>
                                 </td>
                                 @foreach (['conduct', 'memorization', 'participation'] as $field)
                                     <td>

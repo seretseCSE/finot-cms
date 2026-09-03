@@ -48,12 +48,12 @@ class OverlayRbacTest extends TestCase
     }
 
     #[Test]
-    public function student_only_cannot_access_filament(): void
+    public function student_can_access_filament(): void
     {
         $student = User::factory()->student()->create();
 
-        $this->assertFalse($student->canAccessPanel(Panel::make()->id('admin')));
-        $this->actingAs($student)->get('/admin')->assertForbidden();
+        $this->assertTrue($student->canAccessPanel(Panel::make()->id('admin')));
+        $this->actingAs($student)->get('/admin')->assertOk();
     }
 
     #[Test]

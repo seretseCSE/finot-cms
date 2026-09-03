@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\TourResource;
 use App\Models\Tour;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -22,7 +23,8 @@ class UpcomingToursWidget extends StatsOverviewWidget
         return [
             Stat::make('Upcoming Tours', $count)
                 ->icon('heroicon-o-truck')
-                ->color('primary'),
+                ->color('primary')
+                ->url(TourResource::getUrl()),
         ];
     }
 }

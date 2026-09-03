@@ -40,6 +40,7 @@ use App\Filament\Resources\TourPassengerResource;
 use App\Filament\Resources\TourResource;
 use App\Filament\Resources\WithdrawalRequestResource;
 use App\Filament\Pages\ResourceTabHub;
+use App\Support\RoleGate;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
@@ -83,7 +84,7 @@ class NavHubRegistry
                 'sort' => 1,
                 'tabs' => [
                     ['label' => 'Academic Years', 'target' => AcademicYearResource::class],
-                    ['label' => 'Terms', 'target' => TermResource::class],
+                    ['label' => 'Semesters', 'target' => TermResource::class],
                 ],
             ],
             [
@@ -258,7 +259,8 @@ class NavHubRegistry
                 ->group($hub['group'])
                 ->icon($hub['icon'])
                 ->sort($hub['sort'])
-                ->visible(fn (): bool => static::accessibleTabs($hub) !== [])
+                ->visible(fn (): bool => (! RoleGate::is('student') || in_array($hub['key'], ['library', 'site-notices'], true))
+                    && static::accessibleTabs($hub) !== [])
                 ->url(fn (): string => static::hubUrl($hub['key']))
                 ->isActiveWhen(fn (): bool => static::hubIsActive($hub['key']));
         }

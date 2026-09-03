@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\BlogPostResource;
 use App\Models\BlogPost;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -22,7 +23,8 @@ class BlogPostsWidget extends StatsOverviewWidget
         return [
             Stat::make('Posts This Month', $count)
                 ->icon('heroicon-o-document-text')
-                ->color('primary'),
+                ->color('primary')
+                ->url(BlogPostResource::getUrl()),
         ];
     }
 }

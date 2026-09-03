@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets\Stats;
 
 use App\Enums\MemberType;
+use App\Filament\Resources\MemberResource;
 use App\Models\Member;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -19,7 +20,8 @@ class AdultMembersWidget extends StatsOverviewWidget
         return [
             Stat::make('Adult Members', $count)
                 ->icon('heroicon-o-user-group')
-                ->color('primary'),
+                ->color('primary')
+                ->url(MemberResource::getUrl()),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\MemberResource;
 use App\Models\Member;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -23,7 +24,8 @@ class ActiveMembersWidget extends StatsOverviewWidget
             Stat::make('Active Members', $data['count'])
                 ->description("{$data['rate']}% of total")
                 ->icon('heroicon-o-user-group')
-                ->color('success'),
+                ->color('success')
+                ->url(MemberResource::getUrl()),
         ];
     }
 }

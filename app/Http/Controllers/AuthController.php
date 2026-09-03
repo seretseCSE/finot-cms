@@ -63,6 +63,7 @@ class AuthController extends Controller
         $user->resetFailedAttempts();
         $request->session()->forget('session_token');
         $request->session()->regenerate();
+        \App\Support\RoleGate::rememberDefault($user);
         $this->mergeGuestFavorites($request, $user);
 
         return $this->redirectAfterLogin($user);
@@ -71,15 +72,6 @@ class AuthController extends Controller
     public function redirectAfterLogin(User $user): RedirectResponse
     {
         $url = $user->postLoginUrl();
-
-        if ($user->isStudentOnly()) {
-            $redirect = redirect()->to($url);
-            if (! $user->temp_password_changed) {
-                $redirect->with('info', 'Please update your password.');
-            }
-
-            return $redirect;
-        }
 
         if (! $user->temp_password_changed) {
             return redirect()->to($url);
@@ -109,10 +101,6 @@ class AuthController extends Controller
 
         if (! $user instanceof User) {
             return redirect()->route('login');
-        }
-
-        if ($user->isStudentOnly()) {
-            return redirect()->to($user->postLoginUrl());
         }
 
         if ($user->temp_password_changed) {

@@ -17,6 +17,7 @@ class ClassModel extends BaseModel
     protected $fillable = [
         'name',
         'description',
+        'program_year',
         'is_active',
         'created_by',
         'facility_id',
@@ -24,6 +25,7 @@ class ClassModel extends BaseModel
 
     protected $casts = [
         'is_active' => 'boolean',
+        'program_year' => 'integer',
     ];
 
     public static function getResourceName(): string

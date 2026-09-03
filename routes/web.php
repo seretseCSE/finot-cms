@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ActiveRoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InAppNotificationController;
 use App\Http\Controllers\Portal\PortalAuthController;
@@ -101,6 +102,7 @@ Route::middleware(['auth', 'throttle:5,1'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('/admin/active-role', [ActiveRoleController::class, 'update'])->name('admin.active-role');
     Route::get('/admin/profile', [EditProfileController::class, '__invoke'])->name('admin.edit-profile');
     Route::get('/withdrawals/{withdrawal}/print', WithdrawalPrintController::class)->name('withdrawals.print');
     Route::get('/exports/download/{filename}', ExportDownloadController::class)
@@ -123,15 +125,17 @@ Route::middleware('throttle:5,1')->group(function () {
 Route::post('/portal/logout', [PortalAuthController::class, 'logout'])->middleware('auth')->name('portal.logout');
 
 Route::middleware(['auth', 'student'])->prefix('portal')->name('portal.')->group(function () {
-    Route::get('/', [PortalController::class, 'home'])->name('home');
-    Route::get('/results', [PortalController::class, 'results'])->name('results');
-    Route::get('/attendance', [PortalController::class, 'attendance'])->name('attendance');
+    Route::get('/', fn () => redirect('/admin'))->name('home');
+    Route::get('/results', fn () => redirect('/admin/my-results'))->name('results');
+    Route::get('/attendance', fn () => redirect('/admin/my-attendance'))->name('attendance');
     Route::get('/offline-snapshot', [PortalController::class, 'offlineSnapshot'])->name('offline-snapshot');
-    Route::get('/withdrawal', [PortalController::class, 'withdrawalForm'])->name('withdrawal');
-    Route::post('/withdrawal', [PortalController::class, 'applyWithdrawal'])->name('withdrawal.apply');
-    Route::get('/withdrawal/{withdrawal}/print', [PortalController::class, 'printWithdrawal'])->name('withdrawal.print');
-    Route::get('/profile', [PortalController::class, 'profile'])->name('profile');
-    Route::post('/profile', [PortalController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/withdrawal', fn () => redirect('/admin/request-withdrawal'))->name('withdrawal');
+    Route::post('/withdrawal', fn () => redirect('/admin/request-withdrawal'))->name('withdrawal.apply');
+    Route::get('/withdrawal/{withdrawal}/print', function (\App\Models\WithdrawalRequest $withdrawal) {
+        return redirect()->route('withdrawals.print', $withdrawal);
+    })->name('withdrawal.print');
+    Route::get('/profile', fn () => redirect('/admin'))->name('profile');
+    Route::post('/profile', fn () => redirect('/admin'))->name('profile.update');
 });
 
 Route::middleware('auth')->group(function () {

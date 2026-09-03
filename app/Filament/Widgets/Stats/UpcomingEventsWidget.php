@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\EventResource;
 use App\Models\Event;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -18,7 +19,8 @@ class UpcomingEventsWidget extends StatsOverviewWidget
         return [
             Stat::make('Upcoming Events', $count)
                 ->icon('heroicon-o-calendar-days')
-                ->color('primary'),
+                ->color('primary')
+                ->url(EventResource::getUrl()),
         ];
     }
 }

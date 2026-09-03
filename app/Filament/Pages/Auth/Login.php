@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages\Auth;
 
-use App\Models\User;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Facades\Filament;
@@ -17,11 +16,6 @@ class Login extends BaseLogin
     public function mount(): void
     {
         if (Filament::auth()->check()) {
-            $user = Filament::auth()->user();
-            if ($user instanceof User && $user->isStudentOnly()) {
-                throw new HttpResponseException(new RedirectResponse($user->postLoginUrl()));
-            }
-
             parent::mount();
 
             return;

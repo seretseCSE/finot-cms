@@ -9,10 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class MarklistItem extends Model
 {
     protected $fillable = [
-        'marklist_id', 'member_id', 'conduct', 'memorization', 'participation', 'remarks', 'recorded_by',
+        'marklist_id', 'member_id', 'score', 'max_score', 'rank',
+        'conduct', 'memorization', 'participation', 'remarks', 'recorded_by',
     ];
 
     protected $casts = [
+        'score' => 'float',
+        'max_score' => 'integer',
+        'rank' => 'integer',
         'conduct' => RubricScore::class,
         'memorization' => RubricScore::class,
         'participation' => RubricScore::class,

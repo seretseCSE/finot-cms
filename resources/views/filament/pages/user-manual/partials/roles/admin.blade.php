@@ -62,7 +62,7 @@
             <li>Change Global Church Settings, backups, error logs, or system health</li>
             <li>Manage inventory items, stock movements, or loss records</li>
             <li><strong>Finalize</strong> a student withdrawal — that last step belongs to HR Head</li>
-            <li>Apply for a withdrawal as if you were the student (students do that from the portal)</li>
+            <li>Apply for a withdrawal as if you were the student (students do that from My Learning)</li>
         </ul>
     </x-filament::section>
 

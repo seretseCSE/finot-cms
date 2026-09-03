@@ -2,9 +2,10 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\TeacherResource;
+use App\Filament\Support\ClickableStat;
 use App\Models\Teacher;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 
 class ActiveTeachersWidget extends StatsOverviewWidget
@@ -14,7 +15,7 @@ class ActiveTeachersWidget extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Active Teachers', Cache::remember('dashboard_active_teachers', 300, fn () => Teacher::count()))
+            ClickableStat::make('Active Teachers', Cache::remember('dashboard_active_teachers', 300, fn () => Teacher::count()), ClickableStat::resourceUrl(TeacherResource::class))
                 ->icon('heroicon-o-users')
                 ->color('primary'),
         ];

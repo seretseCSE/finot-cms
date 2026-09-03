@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Pages\FinancialOverviewPage;
 use App\Models\FinancialTransaction;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -34,7 +35,8 @@ class NetPositionWidget extends StatsOverviewWidget
         return [
             Stat::make('Net Position (MTD)', number_format($net, 2) . ' ETB')
                 ->icon('heroicon-o-banknotes')
-                ->color($net >= 0 ? 'success' : 'danger'),
+                ->color($net >= 0 ? 'success' : 'danger')
+                ->url(FinancialOverviewPage::getUrl()),
         ];
     }
 }

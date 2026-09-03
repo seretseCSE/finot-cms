@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\FinancialTransactionResource;
 use App\Models\FinancialTransaction;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -18,7 +19,8 @@ class PendingApprovalsWidget extends StatsOverviewWidget
         return [
             Stat::make('Pending Approvals', $count)
                 ->icon('heroicon-o-clock')
-                ->color($count > 0 ? 'warning' : 'success'),
+                ->color($count > 0 ? 'warning' : 'success')
+                ->url(FinancialTransactionResource::getUrl()),
         ];
     }
 }

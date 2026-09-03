@@ -21,7 +21,7 @@
             <div>
                 <h3 class="font-semibold text-base text-gray-900 dark:text-white">A student wants to leave a class</h3>
                 <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-2">
-                    <li>The <strong>Student</strong> applies from the student portal (their own enrollment only).</li>
+                    <li>The <strong>Student</strong> applies from the dashboard (their own enrollment only).</li>
                     <li>The request is <strong>Pending</strong>. People who can approve are notified.</li>
                     <li><strong>Education Head</strong> or <strong>Admin</strong> approves or rejects it.</li>
                     <li>If rejected, the student stays enrolled. The flow stops.</li>
@@ -38,7 +38,7 @@
                 <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-2">
                     <li><strong>Data Encoder</strong> or <strong>Education Head</strong> types the marks and submits the list.</li>
                     <li><strong>Education Head</strong> or <strong>Admin</strong> approves the list.</li>
-                    <li>The student can then see <strong>their own</strong> results in the portal.</li>
+                    <li>The student can then see <strong>their own</strong> results on the dashboard.</li>
                 </ol>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                     The person who typed the marks cannot approve that same list (except Education Head, who may).

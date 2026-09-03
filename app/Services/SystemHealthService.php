@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\LaravelLogFiles;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -154,21 +155,21 @@ class SystemHealthService
         try {
             // Get error rate from logs (last 24 hours)
             $errorRate = Cache::remember('health_error_rate', 300, function () {
-                $logFile = storage_path('logs/laravel.log');
-                if (!file_exists($logFile)) {
-                    return 0;
-                }
-
                 $yesterday = now()->subDay()->format('Y-m-d');
                 $today = now()->format('Y-m-d');
-
                 $errorCount = 0;
-                $lines = file($logFile);
 
-                foreach ($lines as $line) {
-                    if (strpos($line, $yesterday) !== false || strpos($line, $today) !== false) {
-                        if (strpos($line, 'ERROR') !== false || strpos($line, 'Exception') !== false) {
-                            $errorCount++;
+                foreach (LaravelLogFiles::paths(1) as $logFile) {
+                    $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                    if ($lines === false) {
+                        continue;
+                    }
+
+                    foreach ($lines as $line) {
+                        if (strpos($line, $yesterday) !== false || strpos($line, $today) !== false) {
+                            if (strpos($line, 'ERROR') !== false || strpos($line, 'Exception') !== false) {
+                                $errorCount++;
+                            }
                         }
                     }
                 }
@@ -425,17 +426,23 @@ class SystemHealthService
     protected function getCriticalErrors(): int
     {
         try {
-            $logFile = storage_path('logs/laravel.log');
-            if (!file_exists($logFile)) {
-                return 0;
-            }
-
             $criticalCount = 0;
-            $lines = file($logFile);
+            $remaining = 1000;
 
-            foreach (array_slice($lines, -1000) as $line) { // Check last 1000 lines
-                if (strpos($line, 'CRITICAL') !== false || strpos($line, 'FATAL') !== false) {
-                    $criticalCount++;
+            foreach (LaravelLogFiles::paths(2) as $logFile) {
+                $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                if ($lines === false) {
+                    continue;
+                }
+
+                foreach (array_slice($lines, -$remaining) as $line) {
+                    if (strpos($line, 'CRITICAL') !== false || strpos($line, 'FATAL') !== false) {
+                        $criticalCount++;
+                    }
+                    $remaining--;
+                    if ($remaining <= 0) {
+                        return $criticalCount;
+                    }
                 }
             }
 

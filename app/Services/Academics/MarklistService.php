@@ -13,8 +13,10 @@ use Illuminate\Validation\ValidationException;
 
 class MarklistService
 {
-    public function __construct(private Notifier $notifier)
-    {
+    public function __construct(
+        private Notifier $notifier,
+        private RankingService $ranking,
+    ) {
     }
 
     public function ensure(int $classId, int $termId, ?int $subjectId, User $actor): Marklist
@@ -45,7 +47,7 @@ class MarklistService
             $this->syncRoster($marklist, $actor);
         }
 
-        return $marklist->fresh(['items']);
+        return $marklist->fresh(['items', 'subject']);
     }
 
     public function saveItems(Marklist $marklist, array $rows, User $actor): Marklist
@@ -68,13 +70,23 @@ class MarklistService
                 $changed = $item->conduct?->value !== ($row['conduct'] ?? null)
                     || $item->memorization?->value !== ($row['memorization'] ?? null)
                     || $item->participation?->value !== ($row['participation'] ?? null)
-                    || ($item->remarks ?? null) !== ($row['remarks'] ?? null);
+                    || ($item->remarks ?? null) !== ($row['remarks'] ?? null)
+                    || (string) ($item->score ?? '') !== (string) ($row['score'] ?? '')
+                    || (string) ($item->max_score ?? '') !== (string) ($row['max_score'] ?? '');
+
+                $maxScore = isset($row['max_score']) && $row['max_score'] !== '' && $row['max_score'] !== null
+                    ? (int) $row['max_score']
+                    : ($item->max_score ?: $marklist->subject?->max_score ?: 100);
 
                 $item->fill([
                     'conduct' => $row['conduct'] ?? $item->conduct,
                     'memorization' => $row['memorization'] ?? $item->memorization,
                     'participation' => $row['participation'] ?? $item->participation,
                     'remarks' => $row['remarks'] ?? $item->remarks,
+                    'score' => array_key_exists('score', $row) && $row['score'] !== '' && $row['score'] !== null
+                        ? (float) $row['score']
+                        : $item->score,
+                    'max_score' => $maxScore,
                 ]);
 
                 if ($changed) {
@@ -82,6 +94,8 @@ class MarklistService
                 }
                 $item->save();
             }
+
+            $this->ranking->recalculateMarklist($marklist->fresh(['items', 'subject']));
         });
 
         activity()->causedBy($actor)->performedOn($marklist)->log('marklist.saved');
@@ -98,11 +112,14 @@ class MarklistService
         }
 
         $filled = $marklist->items->contains(function (MarklistItem $item) {
-            return $item->conduct || $item->memorization || $item->participation;
+            return $item->score !== null
+                || $item->conduct
+                || $item->memorization
+                || $item->participation;
         });
 
         if (! $filled) {
-            throw ValidationException::withMessages(['items' => 'At least one rubric dimension must be filled.']);
+            throw ValidationException::withMessages(['items' => 'At least one score or rubric dimension must be filled.']);
         }
 
         $marklist->update([
@@ -151,6 +168,8 @@ class MarklistService
             'approved_by' => $actor->id,
         ]);
 
+        $this->ranking->recalculateMarklist($marklist->fresh(['items', 'subject']));
+
         activity()->causedBy($actor)->performedOn($marklist)->log('marklist.approved');
 
         return $marklist->fresh();
@@ -191,7 +210,10 @@ class MarklistService
         foreach ($memberIds as $memberId) {
             MarklistItem::query()->firstOrCreate(
                 ['marklist_id' => $marklist->id, 'member_id' => $memberId],
-                ['recorded_by' => $actor->id]
+                [
+                    'recorded_by' => $actor->id,
+                    'max_score' => $marklist->subject?->max_score ?: 100,
+                ]
             );
         }
     }

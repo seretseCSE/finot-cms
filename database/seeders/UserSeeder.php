@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 class UserSeeder extends Seeder
 {
     /**
-     * One admin-panel user per staff role (student accounts are provisioned separately).
+     * One admin-panel user per role (enrolled students are also provisioned from members).
      *
      * @return array<string, array{name: string, department_id: int|null, language_preference: string}>
      */
@@ -96,6 +96,11 @@ class UserSeeder extends Seeder
             Roles::INTERNAL_RELATIONS_HEAD => [
                 'name' => 'Internal Relations Head User',
                 'department_id' => 1,
+                'language_preference' => 'am',
+            ],
+            Roles::STUDENT => [
+                'name' => 'Student User',
+                'department_id' => 3,
                 'language_preference' => 'am',
             ],
         ];

@@ -156,6 +156,7 @@ class Dashboard extends BaseDashboard
                 ActiveEnrollmentsWidget::class,
                 ActiveTeachersWidget::class,
                 AttendanceRateWidget::class,
+                \App\Filament\Widgets\Stats\AcademicAveragesWidget::class,
 
                 EnrollmentTrendChart::class,
                 AttendanceTrendChart::class,
@@ -263,6 +264,13 @@ class Dashboard extends BaseDashboard
         if (\App\Support\RoleGate::is('data_encoder')) {
             return [
                 OnboardingProgressWidget::class,
+            ];
+        }
+
+        if (\App\Support\RoleGate::is('student')) {
+            return [
+                \App\Filament\Widgets\Stats\StudentOverviewWidget::class,
+                \App\Filament\Widgets\StudentQuickLinksWidget::class,
             ];
         }
 

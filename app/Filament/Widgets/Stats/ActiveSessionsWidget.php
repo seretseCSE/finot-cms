@@ -2,8 +2,9 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Pages\ManageActiveSessions;
+use App\Filament\Support\ClickableStat;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,7 @@ class ActiveSessionsWidget extends StatsOverviewWidget
         $count = Cache::remember('dashboard_active_sessions', 60, fn () => DB::table('sessions')->count());
 
         return [
-            Stat::make('Active Sessions', $count)
+            ClickableStat::make('Active Sessions', $count, ClickableStat::pageUrl(ManageActiveSessions::class))
                 ->icon('heroicon-o-globe-alt')
                 ->color($count > 0 ? 'success' : 'gray'),
         ];

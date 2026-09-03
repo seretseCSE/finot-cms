@@ -19,6 +19,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Enums\Roles;
+use App\Services\PhoneFormattingService;
+use App\Services\UserCreationService;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -117,7 +120,25 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(255),
 
-                        HasPhoneFormatting::uniquePhoneInput('phone', 'Phone Number', true),
+                        HasPhoneFormatting::uniquePhoneInput('phone', 'Phone Number', true)
+                            ->helperText(PhoneFormattingService::helperText().'. If this phone belongs to a registered member, name and email fill automatically.')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                if ($state === null || trim($state) === '') {
+                                    return;
+                                }
+
+                                $service = app(UserCreationService::class);
+                                $member = $service->findMemberByPhone($state);
+
+                                if (! $member) {
+                                    return;
+                                }
+
+                                foreach ($service->attributesFromMember($member) as $key => $value) {
+                                    $set($key, $value);
+                                }
+                            }),
 
                         TextInput::make('email')
                             ->label('Email Address')
@@ -128,6 +149,7 @@ class UserResource extends Resource
 
                         Select::make('roles')
                             ->label('Roles')
+                            ->helperText('Select every role this person holds (e.g. AV Head and Student).')
                             ->multiple()
                             ->relationship('roles', 'label', modifyQueryUsing: function ($query) {
                                 if (! Auth::user()?->can('users.delete')) {
@@ -436,25 +458,90 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Actions\BulkAction::make('lock')
-                    ->label('Lock Selected')
+                    ->label('Lock Account')
                     ->icon('heroicon-o-lock-closed')
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalHeading('Lock Selected Accounts')
                     ->modalDescription('This will prevent selected users from logging in.')
+                    ->form([
+                        Forms\Components\Textarea::make('lock_reason')
+                            ->label('Reason')
+                            ->required()
+                            ->rows(2),
+                    ])
+                    ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
+                        $count = 0;
+                        foreach ($records as $record) {
+                            if ($record->id === Auth::id() || ! static::canEdit($record)) {
+                                continue;
+                            }
+
+                            $record->lockAccount($data['lock_reason'] ?? 'Bulk lock action', 'permanent', Auth::id());
+                            DB::table('sessions')->where('user_id', $record->id)->delete();
+                            $count++;
+                        }
+
+                        Notification::make()
+                            ->title('Accounts Locked')
+                            ->body("{$count} accounts have been locked.")
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (): bool => Auth::user()?->can('users.update') ?? false),
+
+                Actions\BulkAction::make('reset_password')
+                    ->label('Reset Password')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Reset selected passwords')
+                    ->modalDescription('Each selected user will receive a new temporary password (their 9-digit phone number when available) and must change it on next login.')
                     ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                        $count = 0;
+                        foreach ($records as $record) {
+                            if ($record->id === Auth::id() || ! Auth::user()?->can('users.update')) {
+                                continue;
+                            }
+
+                            $tempPassword = \App\Services\PhoneFormattingService::nationalDigits($record->phone) ?: Str::password(12);
+                            $record->update([
+                                'password' => $tempPassword,
+                                'temp_password_changed' => false,
+                            ]);
+                            DB::table('sessions')->where('user_id', $record->id)->delete();
+                            $count++;
+                        }
+
+                        Notification::make()
+                            ->title('Passwords reset')
+                            ->body("{$count} passwords were reset. Users must change the temporary password on next login.")
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (): bool => Auth::user()?->can('users.update') ?? false),
+
+                Actions\BulkAction::make('force_logout')
+                    ->label('Force Logout')
+                    ->icon('heroicon-o-arrow-right-on-rectangle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Force logout selected users')
+                    ->modalDescription('This will terminate all active sessions for the selected users.')
+                    ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                        $count = 0;
                         foreach ($records as $record) {
                             if ($record->id === Auth::id()) {
                                 continue;
                             }
 
-                            $record->lockAccount('Bulk lock action', 'permanent', Auth::id());
                             DB::table('sessions')->where('user_id', $record->id)->delete();
+                            $count++;
                         }
 
                         Notification::make()
-                            ->title('Accounts Locked')
-                            ->body("{$records->count()} accounts have been locked.")
+                            ->title('Users logged out')
+                            ->body("{$count} users were signed out of all sessions.")
                             ->success()
                             ->send();
                     })
@@ -481,6 +568,14 @@ class UserResource extends Resource
                     ->visible(fn (): bool => Auth::user()?->can('users.update') ?? false),
 
                 Actions\DeleteBulkAction::make()
+                    ->deselectRecordsAfterCompletion()
+                    ->before(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                        $records->each(function (User $record) use ($records): void {
+                            if (! static::canDelete($record)) {
+                                $records->forget($records->search($record));
+                            }
+                        });
+                    })
                     ->visible(fn (): bool => Auth::user()?->can('users.delete') ?? false),
             ])
             ->defaultSort('created_at', 'desc')

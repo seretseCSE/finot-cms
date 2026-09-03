@@ -95,7 +95,7 @@
             <div>
                 <h3 class="font-semibold text-base text-gray-900 dark:text-white">A student wants to leave</h3>
                 <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-1">
-                    <li>The student applies from the portal. You are notified.</li>
+                    <li>The student applies from the dashboard. You are notified.</li>
                     <li>Approve or reject. If you reject, they stay enrolled.</li>
                     <li>If you approve, HR is notified. They must finalize before the enrollment is actually closed.</li>
                 </ol>

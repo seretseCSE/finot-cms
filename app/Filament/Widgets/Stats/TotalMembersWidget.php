@@ -3,9 +3,10 @@
 namespace App\Filament\Widgets\Stats;
 
 use App\Enums\MemberType;
+use App\Filament\Resources\MemberResource;
+use App\Filament\Support\ClickableStat;
 use App\Models\Member;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 
 class TotalMembersWidget extends StatsOverviewWidget
@@ -17,7 +18,7 @@ class TotalMembersWidget extends StatsOverviewWidget
         $count = Cache::remember('dashboard_total_members', 300, fn () => Member::count());
 
         return [
-            Stat::make('Total Members', $count)
+            ClickableStat::make('Total Members', $count, ClickableStat::resourceUrl(MemberResource::class))
                 ->icon('heroicon-o-users')
                 ->color('primary'),
         ];

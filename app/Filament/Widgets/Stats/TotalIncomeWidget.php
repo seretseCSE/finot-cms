@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Pages\FinancialOverviewPage;
 use App\Models\FinancialTransaction;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -38,7 +39,8 @@ class TotalIncomeWidget extends StatsOverviewWidget
                 ->description("{$data['growth']}% vs last month")
                 ->descriptionIcon($data['growth'] >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->icon('heroicon-o-arrow-trending-up')
-                ->color($data['growth'] >= 0 ? 'success' : 'danger'),
+                ->color($data['growth'] >= 0 ? 'success' : 'danger')
+                ->url(FinancialOverviewPage::getUrl()),
         ];
     }
 }

@@ -60,7 +60,7 @@
                             <tr>
                                 <td colspan="4" class="elv-empty">
                                     @if ($this->source === 'laravel')
-                                        No matching lines in laravel.log for the last two months.
+                                        No matching lines in the Laravel daily logs for the last two months.
                                     @else
                                         No recorded errors yet.
                                     @endif

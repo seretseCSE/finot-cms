@@ -2,9 +2,10 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\UserResource;
+use App\Filament\Support\ClickableStat;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 
 class FailedLoginsWidget extends StatsOverviewWidget
@@ -16,7 +17,7 @@ class FailedLoginsWidget extends StatsOverviewWidget
         $count = Cache::remember('dashboard_failed_logins', 300, fn () => User::where('failed_login_attempts', '>', 0)->sum('failed_login_attempts'));
 
         return [
-            Stat::make('Failed Logins (24h)', $count)
+            ClickableStat::make('Failed Logins (24h)', $count, ClickableStat::resourceUrl(UserResource::class))
                 ->icon('heroicon-o-shield-exclamation')
                 ->color($count > 0 ? 'danger' : 'success'),
         ];

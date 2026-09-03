@@ -32,7 +32,7 @@ class RecordMarklist extends Page
 
     public function getSubheading(): ?string
     {
-        return 'Score conduct, memorization, and participation for a class roster.';
+        return 'Record numeric scores (and optional rubric) for a class roster. Rankings are calculated from total averages.';
     }
 
     public static function getNavigationIcon(): ?string
@@ -104,6 +104,9 @@ class RecordMarklist extends Page
                 'member_id' => $item->member_id,
                 'name' => $item->member?->full_name,
                 'code' => $item->member?->member_code,
+                'score' => $item->score,
+                'max_score' => $item->max_score ?: $marklist->subject?->max_score ?: 100,
+                'rank' => $item->rank,
                 'conduct' => $item->conduct?->value,
                 'memorization' => $item->memorization?->value,
                 'participation' => $item->participation?->value,
@@ -116,7 +119,7 @@ class RecordMarklist extends Page
     {
         return [
             'classes' => ClassModel::query()->orderBy('name')->pluck('name', 'id'),
-            'terms' => Term::query()->where('is_active', true)->orderBy('name')->pluck('name', 'id'),
+            'terms' => Term::query()->where('is_active', true)->orderBy('semester_number')->orderBy('name')->pluck('name', 'id'),
             'subjects' => Subject::query()->where('is_active', true)->orderBy('name')->pluck('name', 'id'),
             'rubric' => RubricScore::cases(),
         ];

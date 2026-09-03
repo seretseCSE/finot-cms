@@ -17,12 +17,18 @@ class Subject extends BaseModel
     protected $fillable = [
         'name',
         'description',
+        'program_year',
+        'semester_number',
+        'max_score',
         'is_active',
         'created_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'program_year' => 'integer',
+        'semester_number' => 'integer',
+        'max_score' => 'integer',
     ];
 
     public function createdBy()

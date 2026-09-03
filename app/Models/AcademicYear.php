@@ -40,6 +40,11 @@ class AcademicYear extends Model
         return $this->hasMany(StudentEnrollment::class);
     }
 
+    public function terms()
+    {
+        return $this->hasMany(Term::class);
+    }
+
     public function activatedBy()
     {
         return $this->belongsTo(User::class, 'activated_by');

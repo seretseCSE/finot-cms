@@ -57,6 +57,11 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
                 \App\Filament\Pages\Auth\ChangeInitialPassword::class,
+                \App\Filament\Pages\Student\MyResults::class,
+                \App\Filament\Pages\Student\MyAttendance::class,
+                \App\Filament\Pages\Student\RequestWithdrawal::class,
+                \App\Filament\Pages\Education\GradingScalePage::class,
+                \App\Filament\Pages\Education\AcademicResultsReport::class,
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()
@@ -109,7 +114,7 @@ class AdminPanelProvider extends PanelProvider
             )
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn (): string => auth()->check() ? (string) view('filament.components.in-app-bell')->render() : '',
+                fn (): string => auth()->check() ? (string) view('filament.components.topbar-leading')->render() : '',
             )
             ->authMiddleware([
                 Authenticate::class,

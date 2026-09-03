@@ -52,6 +52,27 @@ class SubjectResource extends BaseResource
                     ->maxLength(200)
                     ->unique(ignoreRecord: true),
 
+                Forms\Components\Select::make('program_year')
+                    ->label('Program year')
+                    ->options([
+                        1 => 'Year 1',
+                        2 => 'Year 2',
+                        3 => 'Year 3',
+                        4 => 'Year 4',
+                        5 => 'Year 5',
+                    ]),
+
+                Forms\Components\Select::make('semester_number')
+                    ->label('Program semester')
+                    ->options(collect(range(1, 10))->mapWithKeys(fn ($n) => [$n => "Semester {$n}"])->all())
+                    ->helperText('1–10 across the full program.'),
+
+                Forms\Components\TextInput::make('max_score')
+                    ->numeric()
+                    ->minValue(1)
+                    ->default(100)
+                    ->required(),
+
                 Forms\Components\Textarea::make('description')
                     ->rows(3)
                     ->maxLength(1000),
@@ -66,6 +87,9 @@ class SubjectResource extends BaseResource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('program_year')->label('Year')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('semester_number')->label('Semester')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('max_score')->label('Max')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Active')
                     ->badge()

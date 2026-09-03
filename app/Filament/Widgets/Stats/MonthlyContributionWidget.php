@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Pages\ContributionReport;
 use App\Models\Contribution;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -34,7 +35,8 @@ class MonthlyContributionWidget extends StatsOverviewWidget
             Stat::make('Contributions (MTD)', number_format($data['total'], 2) . ' ETB')
                 ->description("{$data['count']} contributors")
                 ->icon('heroicon-o-banknotes')
-                ->color('primary'),
+                ->color('primary')
+                ->url(ContributionReport::getUrl()),
         ];
     }
 }

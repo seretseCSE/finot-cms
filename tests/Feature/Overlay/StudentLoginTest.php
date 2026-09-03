@@ -26,7 +26,7 @@ class StudentLoginTest extends TestCase
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('student'));
         $this->assertSame($member->phone, $user->phone);
-        $this->assertFalse($user->canAccessPanel(\Filament\Panel::make()->id('admin')));
+        $this->assertTrue($user->canAccessPanel(\Filament\Panel::make()->id('admin')));
     }
 
     #[Test]
@@ -51,7 +51,7 @@ class StudentLoginTest extends TestCase
     }
 
     #[Test]
-    public function student_can_login_to_portal_and_not_filament(): void
+    public function student_can_login_to_admin_like_other_roles(): void
     {
         $enrollment = StudentEnrollment::factory()->enrolled()->create();
         $user = User::query()->where('member_id', $enrollment->member_id)->first();
@@ -60,10 +60,10 @@ class StudentLoginTest extends TestCase
         $this->post(route('login.submit'), [
             'phone' => preg_replace('/^\+251/', '', $user->phone),
             'password' => 'password',
-        ])->assertRedirect(route('portal.home'));
+        ])->assertRedirect(url('/admin'));
 
-        $this->actingAs($user)->get(route('portal.home'))->assertOk();
-        $this->actingAs($user)->get('/admin')->assertForbidden();
+        $this->actingAs($user)->get('/admin')->assertOk();
+        $this->actingAs($user)->get(route('portal.home'))->assertRedirect('/admin');
     }
 
     #[Test]
@@ -76,7 +76,7 @@ class StudentLoginTest extends TestCase
         $this->post(route('login.submit'), [
             'phone' => $national,
             'password' => $national,
-        ])->assertRedirect(route('portal.profile'));
+        ])->assertRedirect(route('change-initial-password'));
     }
 
     #[Test]

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Resources\InventoryResource;
 use App\Models\InventoryItem;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -20,7 +21,8 @@ class LowStockItemsWidget extends StatsOverviewWidget
         return [
             Stat::make('Low Stock Items', $count)
                 ->icon('heroicon-o-exclamation-triangle')
-                ->color($count > 0 ? 'warning' : 'success'),
+                ->color($count > 0 ? 'warning' : 'success')
+                ->url(InventoryResource::getUrl()),
         ];
     }
 }

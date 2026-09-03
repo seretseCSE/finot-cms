@@ -8,13 +8,9 @@
                 You do not need every permission. You only need the work that belongs to your office.
             </p>
             <p>
-                There are two doors after login:
-            </p>
-            <ul class="list-disc ml-5 space-y-1">
-                <li><strong>Staff</strong> (every role except Student) enter the <strong>admin office</strong>.</li>
-                <li><strong>Students</strong> enter the <strong>student portal</strong> only. They cannot open the admin office.</li>
-            </ul>
-            <p>
+                There is one door after login: the <strong>admin office</strong>.
+                The role decides which dashboard widgets and menus appear.
+                Students see their own learning pages; staff see the work of their office.
                 If the account still has a temporary password, the person must change it before they can continue.
             </p>
         </div>
@@ -25,7 +21,7 @@
         <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-2">
             <li>The person signs in with their phone (and password).</li>
             <li>If this is the first time, they must set a new password.</li>
-            <li>Staff land on a dashboard made for their role. Students land on the portal.</li>
+            <li>Everyone lands on a dashboard made for their role.</li>
             <li>The left menu shows only the work they are allowed to do.</li>
             <li>
                 Super Admin and Admin can see members from <strong>every department</strong>.

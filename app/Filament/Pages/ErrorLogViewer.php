@@ -43,7 +43,7 @@ class ErrorLogViewer extends Page
 
     public function getSubheading(): ?string
     {
-        return 'Recorded request errors and recent lines from the Laravel log.';
+        return 'Recorded request errors and recent lines from the Laravel daily logs.';
     }
 
     public static function canAccess(): bool

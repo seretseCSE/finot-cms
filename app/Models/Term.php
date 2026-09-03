@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Term extends Model
 {
     protected $fillable = [
-        'academic_year_id', 'name', 'starts_on', 'ends_on', 'is_active',
+        'academic_year_id', 'name', 'semester_number', 'starts_on', 'ends_on', 'is_active',
     ];
 
     protected $casts = [
         'starts_on' => 'date',
         'ends_on' => 'date',
         'is_active' => 'boolean',
+        'semester_number' => 'integer',
     ];
 
     public function academicYear(): BelongsTo

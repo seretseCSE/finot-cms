@@ -14,6 +14,7 @@ class SchoolClassFactory extends Factory
         return [
             'name' => fake()->unique()->words(2, true),
             'description' => fake()->sentence(),
+            'program_year' => fake()->numberBetween(1, 5),
             'is_active' => true,
             'created_by' => \App\Models\User::factory(),
         ];

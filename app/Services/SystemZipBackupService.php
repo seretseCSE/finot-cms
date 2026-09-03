@@ -151,7 +151,7 @@ class SystemZipBackupService
         $process->setTimeout(300);
         $env = [];
         foreach (array_merge($_SERVER, $_ENV) as $key => $value) {
-            if (is_string($key) && is_string($value)) {
+            if (is_string($key) === true && is_string($value) === true) {
                 $env[$key] = $value;
             }
         }

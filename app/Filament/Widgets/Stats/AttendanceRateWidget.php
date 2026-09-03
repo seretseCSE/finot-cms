@@ -2,8 +2,9 @@
 
 namespace App\Filament\Widgets\Stats;
 
+use App\Filament\Pages\Attendance\StudentAttendancePage;
+use App\Filament\Support\ClickableStat;
 use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +28,7 @@ class AttendanceRateWidget extends StatsOverviewWidget
         });
 
         return [
-            Stat::make("This Week's Attendance", "{$rate}%")
+            ClickableStat::make("This Week's Attendance", "{$rate}%", ClickableStat::pageUrl(StudentAttendancePage::class))
                 ->icon('heroicon-o-check-circle')
                 ->color($rate >= 80 ? 'success' : ($rate >= 50 ? 'warning' : 'danger')),
         ];
