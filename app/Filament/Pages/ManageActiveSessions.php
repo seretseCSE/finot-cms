@@ -173,6 +173,11 @@ class ManageActiveSessions extends Page implements HasTable
 
     public static function canAccess(array $parameters = []): bool
     {
-        return \App\Support\RoleGate::check();
+        return \App\Support\RoleGate::is('superadmin');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canAccess();
     }
 }

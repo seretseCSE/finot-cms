@@ -72,7 +72,7 @@ class AuthenticationBrowserTest extends DuskTestCase
      */
     public function test_session_management_shows_active_devices(): void
     {
-        $user = User::factory()->create([
+        $user = User::factory()->superadmin()->create([
             'phone' => '+251911234567',
             'password' => bcrypt('password'),
             'is_active' => true,
@@ -94,7 +94,7 @@ class AuthenticationBrowserTest extends DuskTestCase
      */
     public function test_session_can_be_revoked(): void
     {
-        $user = User::factory()->create([
+        $user = User::factory()->superadmin()->create([
             'phone' => '+251911234567',
             'password' => bcrypt('password'),
             'is_active' => true,

@@ -17,6 +17,8 @@ use App\Filament\Widgets\Charts\RevenueTrendChart;
 use App\Filament\Widgets\Charts\SongsByCategoryChart;
 use App\Filament\Widgets\Charts\TourStatusChart;
 use App\Filament\Widgets\Charts\UserRegistrationChart;
+use App\Filament\Widgets\Charts\VisitorChannelChart;
+use App\Filament\Widgets\Charts\VisitorTrendChart;
 use App\Filament\Widgets\Stats\ActiveBeneficiariesWidget;
 use App\Filament\Widgets\Stats\ActiveEnrollmentsWidget;
 use App\Filament\Widgets\Stats\ActiveMembersWidget;
@@ -83,6 +85,8 @@ class Dashboard extends BaseDashboard
                 VisitorStatsWidget::class,
 
                 UserRegistrationChart::class,
+                VisitorTrendChart::class,
+                VisitorChannelChart::class,
                 AttendanceTrendChart::class,
 
                 RecentAuditLogTable::class,
@@ -97,6 +101,8 @@ class Dashboard extends BaseDashboard
                 YouthMembersWidget::class,
                 AdultMembersWidget::class,
                 VisitorStatsWidget::class,
+                VisitorTrendChart::class,
+                VisitorChannelChart::class,
 
                 TotalIncomeWidget::class,
                 TotalExpensesWidget::class,
@@ -232,6 +238,8 @@ class Dashboard extends BaseDashboard
                 PublishedMediaWidget::class,
                 BlogPostsWidget::class,
                 VisitorStatsWidget::class,
+                VisitorTrendChart::class,
+                VisitorChannelChart::class,
 
                 MediaByCategoryChart::class,
 
@@ -271,6 +279,12 @@ class Dashboard extends BaseDashboard
             return [
                 \App\Filament\Widgets\Stats\StudentOverviewWidget::class,
                 \App\Filament\Widgets\StudentQuickLinksWidget::class,
+            ];
+        }
+
+        if (\App\Support\RoleGate::is('parent')) {
+            return [
+                \App\Filament\Widgets\ParentChildrenWidget::class,
             ];
         }
 

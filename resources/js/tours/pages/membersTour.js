@@ -20,6 +20,14 @@ export default {
             align: 'end',
         },
         {
+            key: 'import-students',
+            selector: '[data-tour="import-students"]',
+            title: 'Import Students',
+            description: 'Upload an Excel file to add many students at once. Download the template first, fill one student per row, then import.',
+            side: 'bottom',
+            align: 'end',
+        },
+        {
             key: 'member-actions',
             selector: '[data-tour="member-actions"]',
             title: 'Member Actions',

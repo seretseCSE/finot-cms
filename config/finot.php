@@ -94,4 +94,21 @@ return [
         'sender_id' => env('YEGNATELE_SENDER_ID', 'FinotTsidik'),
         'timeout' => env('YEGNATELE_TIMEOUT', 15),
     ],
+
+    'vapid' => [
+        'subject' => env('VAPID_SUBJECT', env('APP_URL', 'mailto:admin@finot.local')),
+        'public_key' => env('VAPID_PUBLIC_KEY'),
+        'private_key' => env('VAPID_PRIVATE_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Promotion pass mark
+    |--------------------------------------------------------------------------
+    |
+    | Minimum annual average (from computed term results) to suggest Pass on
+    | the promotion board. Subject credits on fail transfer use the same mark.
+    |
+    */
+    'promotion_pass_mark' => 50,
 ];

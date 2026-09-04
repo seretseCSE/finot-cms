@@ -114,6 +114,7 @@
             </div>
 
             {{-- ── Contribution Summary ─────────────────────────────────────── --}}
+            @if (! empty($data['contributions']))
             @php $contrib = $data['contributions']; @endphp
             <x-filament::section>
                 <x-slot name="heading">
@@ -237,6 +238,7 @@
                     </div>
                 @endif
             </x-filament::section>
+            @endif
 
             {{-- ── Attendance Breakdown ─────────────────────────────────────── --}}
             <x-filament::section>

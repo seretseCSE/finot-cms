@@ -18,11 +18,11 @@ class SiteSettingsSeeder extends Seeder
         SiteSetting::set('contact_email', 'info@finot.org', 'string', 'Primary contact email');
         SiteSetting::set('contact_phone', '+251-XXX-XXXX', 'string', 'Primary contact phone');
         SiteSetting::set('contact_address', 'Addis Ababa, Ethiopia', 'string', 'Church contact address');
-        SiteSetting::set('default_language', 'en', 'string', 'Default application language');
+        SiteSetting::set('default_language', 'am', 'string', 'Default application language');
 
         // Appearance Settings
         SiteSetting::set('primary_color', '#3b82f6', 'string', 'Primary theme color');
-        SiteSetting::set('dark_mode_default', false, 'boolean', 'Default dark mode preference');
+        SiteSetting::set('dark_mode_default', true, 'boolean', 'Default dark mode preference');
 
         // System Settings
         SiteSetting::set('maintenance_mode', false, 'boolean', 'Maintenance mode status');

@@ -6,6 +6,7 @@ use App\Filament\Pages\BeneficiaryReportPage;
 use App\Filament\Pages\CharityReport;
 use App\Filament\Pages\ContributionMatrix;
 use App\Filament\Pages\ContributionReport;
+use App\Filament\Pages\Education\PromotionBoardPage;
 use App\Filament\Pages\OutstandingContributions;
 use App\Filament\Resources\AcademicYearResource;
 use App\Filament\Resources\AidDistributionResource;
@@ -27,6 +28,7 @@ use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PromotionResource;
 use App\Filament\Resources\RehearsalAttendanceResource;
 use App\Filament\Resources\RehearsalResource;
+use App\Filament\Resources\BatchResource;
 use App\Filament\Resources\SchoolClassResource;
 use App\Filament\Resources\SongCategoryResource;
 use App\Filament\Resources\SongResource;
@@ -83,6 +85,7 @@ class NavHubRegistry
                 'icon' => 'heroicon-o-calendar-days',
                 'sort' => 1,
                 'tabs' => [
+                    ['label' => 'Batches', 'target' => BatchResource::class],
                     ['label' => 'Academic Years', 'target' => AcademicYearResource::class],
                     ['label' => 'Semesters', 'target' => TermResource::class],
                 ],
@@ -96,6 +99,7 @@ class NavHubRegistry
                 'tabs' => [
                     ['label' => 'Classes', 'target' => SchoolClassResource::class],
                     ['label' => 'Subjects', 'target' => SubjectResource::class],
+                    ['label' => 'Subject offerings', 'target' => \App\Filament\Resources\SubjectOfferingResource::class],
                 ],
             ],
             [
@@ -106,6 +110,7 @@ class NavHubRegistry
                 'sort' => 3,
                 'tabs' => [
                     ['label' => 'Enrollments', 'target' => StudentEnrollmentResource::class],
+                    ['label' => 'Promotion board', 'target' => PromotionBoardPage::class],
                     ['label' => 'Withdrawals', 'target' => WithdrawalRequestResource::class],
                     ['label' => 'Promotions', 'target' => PromotionResource::class],
                 ],
@@ -259,8 +264,21 @@ class NavHubRegistry
                 ->group($hub['group'])
                 ->icon($hub['icon'])
                 ->sort($hub['sort'])
-                ->visible(fn (): bool => (! RoleGate::is('student') || in_array($hub['key'], ['library', 'site-notices'], true))
-                    && static::accessibleTabs($hub) !== [])
+                ->visible(function () use ($hub): bool {
+                    if (RoleGate::isAny(['student', 'parent'])) {
+                        return false;
+                    }
+
+                    if (RoleGate::is('education_head') && in_array($hub['key'], [
+                        'contribution-setup',
+                        'contribution-follow-up',
+                        'inventory',
+                    ], true)) {
+                        return false;
+                    }
+
+                    return static::accessibleTabs($hub) !== [];
+                })
                 ->url(fn (): string => static::hubUrl($hub['key']))
                 ->isActiveWhen(fn (): bool => static::hubIsActive($hub['key']));
         }
@@ -319,6 +337,14 @@ class NavHubRegistry
      */
     public static function accessibleTabsForHub(string $key): array
     {
+        if (RoleGate::is('education_head') && in_array($key, [
+            'contribution-setup',
+            'contribution-follow-up',
+            'inventory',
+        ], true)) {
+            return [];
+        }
+
         $hub = static::hub($key);
         if ($hub === null) {
             return [];

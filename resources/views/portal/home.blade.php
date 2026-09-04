@@ -18,13 +18,13 @@
                 <h2 class="text-xl font-semibold">{{ __('My Attendance') }}</h2>
                 <p class="text-sm text-slate-400 mt-2">{{ __('Your recent attendance record.') }}</p>
             </a>
-            <a href="{{ route('library') }}" class="card p-6" data-tour="tile-library">
-                <h2 class="text-xl font-semibold">{{ __('Library') }}</h2>
-                <p class="text-sm text-slate-400 mt-2">{{ __('Books, worksheets, and documents.') }}</p>
+            <a href="{{ url('/admin/class-announcements-student') }}" class="card p-6" data-tour="tile-class-announcements">
+                <h2 class="text-xl font-semibold">{{ __('Class Announcements') }}</h2>
+                <p class="text-sm text-slate-400 mt-2">{{ __('Notices for your class.') }}</p>
             </a>
-            <a href="{{ route('library') }}" class="card p-6" data-tour="tile-worksheets">
-                <h2 class="text-xl font-semibold">{{ __('Worksheets') }}</h2>
-                <p class="text-sm text-slate-400 mt-2">{{ __('Opens the existing library.') }}</p>
+            <a href="{{ url('/admin/my-homework') }}" class="card p-6" data-tour="tile-homework">
+                <h2 class="text-xl font-semibold">{{ __('Homework') }}</h2>
+                <p class="text-sm text-slate-400 mt-2">{{ __('Assignments from your teachers.') }}</p>
             </a>
         </div>
         <p class="mt-8"><a href="{{ route('portal.profile') }}" class="text-sm underline">{{ __('Profile & tour replay') }}</a>

@@ -84,6 +84,7 @@ class SyncParentGuardiansAction
         $parent = ParentModel::find($parentId);
         if ($parent) {
             $parent->updateMemberCount();
+            app(\App\Services\Identity\ProvisionParentUser::class)->sync($parent);
         }
     }
 
@@ -109,5 +110,6 @@ class SyncParentGuardiansAction
         ]);
 
         $parent->updateMemberCount();
+        app(\App\Services\Identity\ProvisionParentUser::class)->sync($parent);
     }
 }

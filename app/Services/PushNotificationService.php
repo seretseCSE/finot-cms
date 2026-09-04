@@ -4,38 +4,28 @@ namespace App\Services;
 
 use App\Models\PushSubscription;
 use App\Services\Contracts\PushNotificationServiceInterface;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Minishlink\WebPush\Subscription;
+use Minishlink\WebPush\WebPush;
 
 class PushNotificationService implements PushNotificationServiceInterface
 {
-    /**
-     * Send a push notification to a specific user.
-     */
     public function sendToUser(int $userId, string $title, string $body, array $data = []): bool
     {
         $subscriptions = PushSubscription::query()
             ->where('user_id', $userId)
-            ->lazy();
+            ->get();
 
-        $isEmpty = true;
-        foreach ($subscriptions as $subscription) {
-            $isEmpty = false;
-            break;
-        }
-
-        if ($isEmpty) {
+        if ($subscriptions->isEmpty()) {
             return false;
         }
 
         $payload = json_encode([
-            'notification' => [
-                'title' => $title,
-                'body' => $body,
-                'icon' => asset('images/logo2.png'),
-                'badge' => asset('images/logo2.png'),
-                'data' => $data,
-            ],
+            'title' => $title,
+            'body' => $body,
+            'icon' => asset('images/logo2.png'),
+            'badge' => asset('images/logo2.png'),
+            'data' => $data,
         ]);
 
         foreach ($subscriptions as $subscription) {
@@ -46,24 +36,24 @@ class PushNotificationService implements PushNotificationServiceInterface
     }
 
     /**
-     * Send a push notification to multiple users.
-     *
      * @param  array<int>  $userIds
      */
     public function sendToUsers(array $userIds, string $title, string $body, array $data = []): int
     {
+        if ($userIds === []) {
+            return 0;
+        }
+
         $subscriptions = PushSubscription::query()
             ->whereIn('user_id', $userIds)
-            ->lazy();
+            ->get();
 
         $payload = json_encode([
-            'notification' => [
-                'title' => $title,
-                'body' => $body,
-                'icon' => asset('images/logo2.png'),
-                'badge' => asset('images/logo2.png'),
-                'data' => $data,
-            ],
+            'title' => $title,
+            'body' => $body,
+            'icon' => asset('images/logo2.png'),
+            'badge' => asset('images/logo2.png'),
+            'data' => $data,
         ]);
 
         $sent = 0;
@@ -76,29 +66,42 @@ class PushNotificationService implements PushNotificationServiceInterface
         return $sent;
     }
 
-    /**
-     * Send push notification using Web Push protocol.
-     */
     protected function sendPush(PushSubscription $subscription, string $payload): bool
     {
+        $publicKey = config('finot.vapid.public_key');
+        $privateKey = config('finot.vapid.private_key');
+
+        if (! $publicKey || ! $privateKey) {
+            Log::debug('VAPID keys not configured; skipping web push');
+
+            return false;
+        }
+
         try {
-            // Basic VAPID-less push for demonstration.
-            // In production, use minishlink/web-push with VAPID keys.
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'TTL' => '60',
-            ])->post($subscription->endpoint, [
-                'payload' => $payload,
+            $webPush = new WebPush([
+                'VAPID' => [
+                    'subject' => config('finot.vapid.subject', config('app.url')),
+                    'publicKey' => $publicKey,
+                    'privateKey' => $privateKey,
+                ],
             ]);
 
-            if ($response->status() === 410 || $response->status() === 404) {
-                // Subscription expired or invalid
+            $report = $webPush->sendOneNotification(
+                Subscription::create([
+                    'endpoint' => $subscription->endpoint,
+                    'publicKey' => $subscription->p256dh,
+                    'authToken' => $subscription->auth_key,
+                ]),
+                $payload
+            );
+
+            if ($report->isSubscriptionExpired()) {
                 $subscription->delete();
 
                 return false;
             }
 
-            return $response->successful();
+            return $report->isSuccess();
         } catch (\Throwable $e) {
             ExceptionHandlerService::handleServiceException($e, 'PushNotificationService');
             Log::error('Push notification failed', [
@@ -110,12 +113,8 @@ class PushNotificationService implements PushNotificationServiceInterface
         }
     }
 
-    /**
-     * Subscribe a user to push notifications.
-     */
     public function subscribe(int $userId, string $endpoint, string $p256dh, string $authKey): PushSubscription
     {
-        // Remove existing subscription with same endpoint
         PushSubscription::query()
             ->where('endpoint', $endpoint)
             ->delete();
@@ -128,9 +127,6 @@ class PushNotificationService implements PushNotificationServiceInterface
         ]);
     }
 
-    /**
-     * Unsubscribe a user from push notifications.
-     */
     public function unsubscribe(int $userId, string $endpoint): bool
     {
         return PushSubscription::query()

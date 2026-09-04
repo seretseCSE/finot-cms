@@ -11,7 +11,6 @@ use App\Models\Teacher;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class TeacherAttendanceReport extends Page
 {
@@ -24,7 +23,7 @@ class TeacherAttendanceReport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance & Results';
+        return 'Attendance';
     }
 
     public static function getNavigationSort(): ?int

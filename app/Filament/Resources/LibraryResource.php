@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-
 use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\LibraryResource\Pages;
 use Filament\Schemas\Schema;
@@ -45,6 +44,15 @@ class LibraryResource extends BaseResource
     public static function getNavigationSort(): ?int
     {
         return 8;
+    }
+
+    public static function canViewAny(): bool
+    {
+        if (\App\Support\RoleGate::isAny(['student', 'parent'])) {
+            return false;
+        }
+
+        return parent::canViewAny();
     }
 
 

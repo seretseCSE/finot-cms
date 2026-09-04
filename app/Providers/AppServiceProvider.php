@@ -12,6 +12,7 @@ use App\Models\Contribution;
 use App\Models\Department;
 use App\Models\Document;
 use App\Models\Member;
+use App\Models\ParentModel;
 use App\Models\Rehearsal;
 use App\Models\StudentEnrollment;
 use App\Models\Tour;
@@ -21,6 +22,7 @@ use App\Observers\ContributionObserver;
 use App\Observers\DepartmentObserver;
 use App\Observers\DocumentObserver;
 use App\Observers\MemberObserver;
+use App\Observers\ParentObserver;
 use App\Observers\RehearsalObserver;
 use App\Observers\StudentEnrollmentObserver;
 use App\Observers\TourObserver;
@@ -114,6 +116,7 @@ class AppServiceProvider extends ServiceProvider
 
         Member::observe(MemberObserver::class);
         StudentEnrollment::observe(StudentEnrollmentObserver::class);
+        ParentModel::observe(ParentObserver::class);
         Tour::observe(TourObserver::class);
         Department::observe(DepartmentObserver::class);
         AttendanceSession::observe(AttendanceSessionObserver::class);

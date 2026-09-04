@@ -1,0 +1,25 @@
+export const PGDT_SUBJECTS = [
+  "Educational Psychology",
+  "Curriculum Development",
+  "Assessment Techniques",
+  "Classroom Management",
+  "Instructional Methods",
+  "Practical Teaching",
+  "Educational Technology",
+  "Special Needs Education",
+  "Research Methods in Education",
+  "Pedagogical Skills",
+  "Subject Specific Pedagogy",
+  "Professional Ethics",
+  "Educational Leadership",
+  "Inclusive Education",
+  "Adolescent Development",
+  "Counseling and Guidance",
+  "Sociology of Education",
+  "Philosophy of Education",
+  "Educational Policy and Planning",
+  "Comparative Education",
+  "Masters in Teaching",
+] as const
+
+export type PgdtSubject = (typeof PGDT_SUBJECTS)[number]

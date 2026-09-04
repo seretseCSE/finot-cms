@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Term extends Model
 {
     protected $fillable = [
-        'academic_year_id', 'name', 'semester_number', 'starts_on', 'ends_on', 'is_active',
+        'academic_year_id', 'batch_year_id', 'name', 'semester_number', 'starts_on', 'ends_on', 'is_active', 'status',
     ];
 
     protected $casts = [
@@ -24,9 +24,25 @@ class Term extends Model
         return $this->belongsTo(AcademicYear::class);
     }
 
+    public function batchYear(): BelongsTo
+    {
+        return $this->belongsTo(BatchYear::class);
+    }
+
     public function marklists(): HasMany
     {
         return $this->hasMany(Marklist::class);
+    }
+
+    public function offerings(): HasMany
+    {
+        return $this->hasMany(SubjectOffering::class);
+    }
+
+    public function isWritable(): bool
+    {
+        return ($this->status === 'active' || $this->is_active)
+            && $this->status !== 'closed';
     }
 
     public static function getPermissionName(string $action): string

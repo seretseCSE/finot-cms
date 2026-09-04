@@ -18,9 +18,11 @@ return [
         'parent',
         'data_encoder',
         'student',
+        'education_head',
+        'education_monitor',
     ],
 
-    'current_version' => env('PRODUCT_TOUR_VERSION', '1.0.0'),
+    'current_version' => env('PRODUCT_TOUR_VERSION', '1.1.0'),
 
     'auto_start' => [
         'enabled' => true,
@@ -101,8 +103,8 @@ return [
         'onboarding' => [
             'label' => 'Welcome to FINOTE',
             'description' => 'Get started with your FINOTE administrative panel',
-            'version' => '1.0.0',
-            'roles' => ['superadmin', 'admin', 'finance', 'hr', 'registrar', 'teacher', 'parent', 'data_encoder', 'student'],
+            'version' => '1.1.0',
+            'roles' => ['superadmin', 'admin', 'finance', 'hr', 'registrar', 'teacher', 'parent', 'data_encoder', 'student', 'education_head', 'education_monitor'],
             'pages' => ['dashboard'],
             'auto_start' => true,
             'show_progress' => true,
@@ -112,8 +114,8 @@ return [
         'dashboard_overview' => [
             'label' => 'Dashboard Overview',
             'description' => 'Learn about your dashboard widgets and key metrics',
-            'version' => '1.0.0',
-            'roles' => ['superadmin', 'admin', 'finance', 'hr', 'registrar', 'teacher', 'parent', 'data_encoder', 'student'],
+            'version' => '1.1.0',
+            'roles' => ['superadmin', 'admin', 'finance', 'hr', 'registrar', 'teacher', 'parent', 'data_encoder', 'student', 'education_head', 'education_monitor'],
             'pages' => ['dashboard'],
             'auto_start' => false,
             'show_progress' => true,

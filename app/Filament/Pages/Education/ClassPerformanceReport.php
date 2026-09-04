@@ -9,7 +9,6 @@ use App\Models\Member;
 use App\Models\StudentAttendance;
 use Filament\Pages\Page;
 use Filament\Forms;
-use Illuminate\Support\Facades\Auth;
 
 class ClassPerformanceReport extends Page
 {
@@ -22,7 +21,7 @@ class ClassPerformanceReport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance & Results';
+        return 'Results';
     }
 
     public static function getNavigationSort(): ?int
@@ -112,7 +111,6 @@ class ClassPerformanceReport extends Page
                 ->where('member_id', $student->id)
                 ->whereHas('marklist', function ($query) {
                     $query->where('class_id', $this->class_id)
-                        ->where('status', 'approved')
                         ->whereHas('term', fn ($term) => $term->where('academic_year_id', $this->academic_year_id));
                 })
                 ->whereNotNull('score')

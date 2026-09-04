@@ -2,10 +2,10 @@
 
 namespace App\Services\Academics;
 
-use App\Enums\MarklistStatus;
 use App\Models\Term;
 use App\Models\User;
 use App\Services\Notifications\Notifier;
+use App\Support\TermGate;
 
 class DeactivateTermService
 {
@@ -15,22 +15,30 @@ class DeactivateTermService
 
     public function deactivate(Term $term): Term
     {
-        $term->update(['is_active' => false]);
+        TermGate::close($term);
 
-        $incomplete = $term->marklists()
-            ->whereIn('status', [MarklistStatus::Draft->value, MarklistStatus::Submitted->value])
+        $incompleteOfferings = $term->offerings()
+            ->whereDoesntHave('assessments.scores')
             ->count();
 
-        if ($incomplete > 0) {
-            $heads = User::permission('results.approve')->get();
+        if ($incompleteOfferings > 0) {
+            $heads = User::role(['education_head', 'admin', 'superadmin'])->get();
             $this->notifier->toUsers($heads, 'academics.term_closed_incomplete', [
                 'term' => $term->name,
-                'incomplete' => $incomplete,
+                'incomplete' => $incompleteOfferings,
             ]);
         }
 
         activity()->performedOn($term)->log('term.deactivated');
 
         return $term->fresh();
+    }
+
+    public function activate(Term $term): Term
+    {
+        $activated = TermGate::activate($term);
+        activity()->performedOn($activated)->log('term.activated');
+
+        return $activated;
     }
 }

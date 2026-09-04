@@ -1,69 +1,40 @@
-<div class="space-y-6">
+<div class="space-y-6 [&_.fi-section-content-ctn]:overflow-visible [&_p]:whitespace-normal">
     <x-filament::section>
-        <x-slot name="heading">Who this person is</x-slot>
-        <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-            A <strong>Student</strong> is an enrolled member with a phone login.
-            They use the same <strong>admin dashboard</strong> as other roles, with menus limited to their own learning.
-            This page is for staff who train students or help a parent.
+        <x-slot name="heading">Your account</x-slot>
+        <p class="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+            This guide is for <strong>you</strong> as a student. You only see your own class learning:
+            announcements, homework, materials, results, and attendance.
         </p>
     </x-filament::section>
 
     <x-filament::section>
-        <x-slot name="heading">What a student can do</x-slot>
-        <ul class="list-disc ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1">
-            <li>See <strong>their own</strong> exam results</li>
-            <li>See <strong>their own</strong> attendance</li>
-            <li>Read announcements</li>
-            <li>Browse the library</li>
-            <li>Download songs for offline use</li>
-            <li>Apply to withdraw from a class</li>
-            <li>Export their own documents</li>
-            <li>Update their profile</li>
-            <li>Log in and log out</li>
+        <x-slot name="heading">What you can do</x-slot>
+        <ul class="ml-5 list-disc space-y-1.5 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            <li>Read <strong>Class Announcements</strong> (exams, schedule changes) — you also get phone / app notifications</li>
+            <li>Open <strong>Homework</strong> and download files</li>
+            <li>Open <strong>Class Materials</strong> shared with your class</li>
+            <li>Open <strong>My Results</strong> — filter by academic year, semester, batch, and subject; expand a subject to see each assessment</li>
+            <li>Request withdrawal from your class</li>
         </ul>
     </x-filament::section>
 
     <x-filament::section>
-        <x-slot name="heading">What a student cannot do</x-slot>
-        <ul class="list-disc ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1">
-            <li>Open anyone else’s marks, attendance, or files</li>
-            <li>Open staff menus they do not have permission for</li>
-            <li>Approve their own withdrawal — Education Head decides, HR finishes</li>
-            <li>Change class, teacher, or enrollment themselves</li>
+        <x-slot name="heading">What you cannot do</x-slot>
+        <ul class="ml-5 list-disc space-y-1.5 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            <li>See other students’ marks or attendance</li>
+            <li>Open the church library, site notices, or other staff menus</li>
+            <li>Change your class or enrollment</li>
+            <li>Approve your own withdrawal</li>
         </ul>
     </x-filament::section>
 
     <x-filament::section>
-        <x-slot name="heading">How the work flows</x-slot>
-        <div class="space-y-4">
-            <div>
-                <h3 class="font-semibold text-base text-gray-900 dark:text-white">First login</h3>
-                <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-1">
-                    <li>Staff create the member and enroll them. A student login is provisioned.</li>
-                    <li>The student signs in with their phone.</li>
-                    <li>They must change the temporary password. Until they do, they stay on the change-password page.</li>
-                    <li>After that they use the dashboard: results, attendance, library, announcements.</li>
-                </ol>
-            </div>
-            <div>
-                <h3 class="font-semibold text-base text-gray-900 dark:text-white">Leaving a class</h3>
-                <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-1">
-                    <li>From the dashboard, apply for withdrawal. Give a reason. They can only apply for their own enrollment.</li>
-                    <li>They cannot apply again while another request is already pending or education-approved.</li>
-                    <li>Education Head approves or rejects. HR finalizes if approved.</li>
-                    <li>They can print the withdrawal paper when they are allowed to.</li>
-                </ol>
-            </div>
-        </div>
-    </x-filament::section>
-
-    <x-filament::section>
-        <x-slot name="heading">When staff must help</x-slot>
-        <ul class="list-disc ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1">
-            <li>No login or forgotten password → Admin or Super Admin</li>
+        <x-slot name="heading">When you need help</x-slot>
+        <ul class="ml-5 list-disc space-y-1.5 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+            <li>Cannot log in → Admin</li>
             <li>Wrong class → Education Head</li>
-            <li>Results not showing → Data Encoder may not have submitted, or Education Head has not approved</li>
-            <li>Withdrawal stuck after Education approved → HR Head</li>
+            <li>No homework or materials → ask your teacher</li>
+            <li>If you are a child without a phone, your parent logs in instead</li>
         </ul>
     </x-filament::section>
 </div>

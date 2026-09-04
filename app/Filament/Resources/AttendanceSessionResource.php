@@ -22,7 +22,7 @@ class AttendanceSessionResource extends BaseResource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance & Results';
+        return 'Attendance';
     }
 
     public static function getNavigationIcon(): ?string

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-
 use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\TermResource\Pages;
 use App\Models\Term;
@@ -45,6 +44,12 @@ class TermResource extends BaseResource
             Forms\Components\Select::make('academic_year_id')
                 ->relationship('academicYear', 'name')
                 ->required(),
+            Forms\Components\Select::make('batch_year_id')
+                ->label('Batch year')
+                ->relationship('batchYear', 'name')
+                ->searchable()
+                ->preload()
+                ->nullable(),
             Forms\Components\TextInput::make('name')->required()->maxLength(100),
             Forms\Components\Select::make('semester_number')
                 ->label('Semester in year')
@@ -56,7 +61,16 @@ class TermResource extends BaseResource
                 ->nullable(),
             Forms\Components\DatePicker::make('starts_on')->required(),
             Forms\Components\DatePicker::make('ends_on')->required(),
-            Forms\Components\Toggle::make('is_active')->default(true),
+            Forms\Components\Select::make('status')
+                ->options([
+                    'planned' => 'Planned',
+                    'active' => 'Active',
+                    'closed' => 'Closed',
+                ])
+                ->default('planned')
+                ->required(),
+            Forms\Components\Toggle::make('is_active')->default(false)
+                ->helperText('Prefer Activate action so sibling semesters in the same batch year close cleanly.'),
         ]);
     }
 
@@ -65,18 +79,38 @@ class TermResource extends BaseResource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('academicYear.name'),
+                Tables\Columns\TextColumn::make('batchYear.name')->label('Batch year'),
                 Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('semester_number')->label('Sem')->sortable(),
+                Tables\Columns\TextColumn::make('status')->badge(),
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
                 Tables\Columns\TextColumn::make('starts_on')->date(),
                 Tables\Columns\TextColumn::make('ends_on')->date(),
             ])
             ->actions([
                 Actions\EditAction::make(),
+                Actions\Action::make('activate')
+                    ->visible(fn (Term $record) => $record->status !== 'active')
+                    ->requiresConfirmation()
+                    ->action(fn (Term $record) => app(DeactivateTermService::class)->activate($record)),
                 Actions\Action::make('deactivate')
-                    ->visible(fn (Term $record) => $record->is_active)
+                    ->label('Close')
+                    ->visible(fn (Term $record) => $record->status === 'active' || $record->is_active)
                     ->requiresConfirmation()
                     ->action(fn (Term $record) => app(DeactivateTermService::class)->deactivate($record)),
+                Actions\Action::make('compute_results')
+                    ->label('Compute results')
+                    ->icon('heroicon-o-calculator')
+                    ->visible(fn () => auth()->user()?->can('results.manage') || auth()->user()?->hasRole(['education_head', 'education_monitor', 'admin', 'superadmin']))
+                    ->action(function (Term $record) {
+                        $result = app(\App\Services\Academics\ComputeTermResultsService::class)
+                            ->compute($record, auth()->user());
+                        \Filament\Notifications\Notification::make()
+                            ->title('Results computed')
+                            ->body(($result['students'] ?? 0).' students updated.')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 

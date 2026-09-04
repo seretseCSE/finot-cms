@@ -2,11 +2,11 @@
 
 namespace App\Services\Academics;
 
-use App\Enums\MarklistStatus;
 use App\Models\GradingScale;
 use App\Models\GradingScaleBand;
 use App\Models\Marklist;
 use App\Models\MarklistItem;
+use App\Models\SubjectOffering;
 use Illuminate\Support\Collection;
 
 class RankingService
@@ -105,7 +105,6 @@ class RankingService
             ->join('marklists', 'marklists.id', '=', 'marklist_items.marklist_id')
             ->where('marklists.class_id', $classId)
             ->where('marklists.term_id', $termId)
-            ->where('marklists.status', MarklistStatus::Approved->value)
             ->whereNotNull('marklist_items.score')
             ->groupBy('marklist_items.member_id')
             ->orderByDesc('average')
@@ -138,7 +137,6 @@ class RankingService
             ->join('subjects', 'subjects.id', '=', 'marklists.subject_id')
             ->join('classes', 'classes.id', '=', 'marklists.class_id')
             ->join('terms', 'terms.id', '=', 'marklists.term_id')
-            ->where('marklists.status', MarklistStatus::Approved->value)
             ->whereNotNull('marklist_items.score');
 
         if ($academicYearId) {
@@ -207,8 +205,9 @@ class RankingService
     }
 
     /**
-     * Student portal payload: each approved subject with score, max, letter, peer rank.
+     * Student portal payload: each subject with score, assessments, letter, peer rank.
      *
+     * @param  array{academic_year_id?: int|null, term_id?: int|null, batch_id?: int|null, subject_id?: int|null}  $filters
      * @return array{
      *     items: list<array<string, mixed>>,
      *     semester_average: float|null,
@@ -217,52 +216,137 @@ class RankingService
      *     cohort_size: int
      * }
      */
-    public function studentResults(int $memberId): array
+    public function studentResults(int $memberId, array $filters = []): array
     {
+        $academicYearId = isset($filters['academic_year_id']) ? (int) $filters['academic_year_id'] ?: null : null;
+        $termId = isset($filters['term_id']) ? (int) $filters['term_id'] ?: null : null;
+        $batchId = isset($filters['batch_id']) ? (int) $filters['batch_id'] ?: null : null;
+        $subjectId = isset($filters['subject_id']) ? (int) $filters['subject_id'] ?: null : null;
+
         $items = MarklistItem::query()
-            ->with(['marklist.term.academicYear', 'marklist.subject', 'marklist.class'])
+            ->with(['marklist.term.academicYear', 'marklist.term.batchYear.batch', 'marklist.subject', 'marklist.class'])
             ->where('member_id', $memberId)
-            ->whereHas('marklist', fn ($query) => $query->where('status', MarklistStatus::Approved->value))
+            ->whereHas('marklist', function ($query) use ($academicYearId, $termId, $batchId, $subjectId) {
+                if ($termId) {
+                    $query->where('term_id', $termId);
+                }
+                if ($subjectId) {
+                    $query->where('subject_id', $subjectId);
+                }
+                if ($academicYearId) {
+                    $query->whereHas('term', fn ($term) => $term->where('academic_year_id', $academicYearId));
+                }
+                if ($batchId) {
+                    $query->whereHas('term.batchYear', fn ($year) => $year->where('batch_id', $batchId));
+                }
+            })
             ->get();
 
-        $rows = [];
+        $rowsByKey = [];
         foreach ($items as $item) {
             $max = $item->max_score ?: $item->marklist?->subject?->max_score ?: 100;
             $percent = $item->score !== null ? $this->percentFromValues((float) $item->score, (int) $max) : null;
+            $rowTermId = $item->marklist?->term_id;
+            $rowSubjectId = $item->marklist?->subject_id;
+            $key = ($rowTermId ?: 0).':'.($rowSubjectId ?: 0);
 
-            $rows[] = [
+            $rowsByKey[$key] = [
                 'id' => $item->id,
+                'subject_id' => $rowSubjectId,
+                'term_id' => $rowTermId,
+                'class_id' => $item->marklist?->class_id,
+                'academic_year_id' => $item->marklist?->term?->academic_year_id,
+                'batch_id' => $item->marklist?->term?->batchYear?->batch_id,
                 'subject' => $item->marklist?->subject?->name ?? 'Subject',
                 'class' => $item->marklist?->class?->name,
                 'term' => $item->marklist?->term?->name,
                 'academic_year' => $item->marklist?->term?->academicYear?->name,
+                'batch' => $item->marklist?->term?->batchYear?->batch?->name,
                 'score' => $item->score !== null ? (float) $item->score : null,
                 'max_score' => (int) $max,
                 'percent' => $percent,
                 'letter' => $percent !== null ? $this->letterFromPercent($percent) : null,
                 'rank' => $item->rank,
                 'peers' => $item->marklist?->items()->whereNotNull('score')->count() ?? 0,
-                'conduct' => $item->conduct?->value,
-                'memorization' => $item->memorization?->value,
-                'participation' => $item->participation?->value,
+                'conduct' => $item->conduct?->value ?? null,
+                'memorization' => $item->memorization?->value ?? null,
+                'participation' => $item->participation?->value ?? null,
+                'assessments' => [],
+                'transferred' => false,
             ];
         }
 
+        $offerings = SubjectOffering::query()
+            ->with(['subject', 'term.academicYear', 'term.batchYear.batch', 'class', 'assessments.scores' => fn ($q) => $q->where('member_id', $memberId)])
+            ->whereHas('assessments.scores', fn ($q) => $q->where('member_id', $memberId))
+            ->when($termId, fn ($q) => $q->where('term_id', $termId))
+            ->when($subjectId, fn ($q) => $q->where('subject_id', $subjectId))
+            ->when($academicYearId, fn ($q) => $q->whereHas('term', fn ($term) => $term->where('academic_year_id', $academicYearId)))
+            ->when($batchId, fn ($q) => $q->whereHas('batchYear', fn ($year) => $year->where('batch_id', $batchId)))
+            ->get();
+
+        $scoreService = app(AssessmentScoreService::class);
+
+        foreach ($offerings as $offering) {
+            $key = ($offering->term_id ?: 0).':'.($offering->subject_id ?: 0);
+            $assessments = $offering->assessments
+                ->sortBy('sort_order')
+                ->map(function ($assessment) {
+                    $scoreRow = $assessment->scores->first();
+
+                    return [
+                        'name' => $assessment->name,
+                        'score' => $scoreRow && ! $scoreRow->is_absent ? $scoreRow->score : null,
+                        'max_score' => (int) $assessment->max_score,
+                        'weight' => (float) $assessment->weight,
+                        'is_absent' => (bool) ($scoreRow?->is_absent),
+                    ];
+                })
+                ->values()
+                ->all();
+
+            $percent = $scoreService->subjectTotal($offering, $memberId);
+            $existing = $rowsByKey[$key] ?? [];
+
+            $rowsByKey[$key] = array_merge($existing, [
+                'id' => $existing['id'] ?? 'offering-'.$offering->id,
+                'subject_id' => $offering->subject_id,
+                'term_id' => $offering->term_id,
+                'class_id' => $offering->class_id ?? ($existing['class_id'] ?? null),
+                'academic_year_id' => $offering->term?->academic_year_id,
+                'batch_id' => $offering->batchYear?->batch_id ?? $offering->term?->batchYear?->batch_id,
+                'subject' => $offering->subject?->name ?? ($existing['subject'] ?? 'Subject'),
+                'class' => $offering->class?->name ?? ($existing['class'] ?? null),
+                'term' => $offering->term?->name ?? ($existing['term'] ?? null),
+                'academic_year' => $offering->term?->academicYear?->name ?? ($existing['academic_year'] ?? null),
+                'batch' => $offering->batchYear?->batch?->name ?? $offering->term?->batchYear?->batch?->name ?? ($existing['batch'] ?? null),
+                'percent' => $percent ?? ($existing['percent'] ?? null),
+                'letter' => $percent !== null ? $this->letterFromPercent($percent) : ($existing['letter'] ?? null),
+                'score' => $existing['score'] ?? $percent,
+                'max_score' => $existing['max_score'] ?? 100,
+                'rank' => $existing['rank'] ?? null,
+                'peers' => $existing['peers'] ?? 0,
+                'assessments' => $assessments,
+                'transferred' => $existing['transferred'] ?? false,
+            ]);
+        }
+
+        $rows = array_values($rowsByKey);
+
         $scored = collect($rows)->filter(fn (array $row) => $row['percent'] !== null);
-        $latest = $items->sortByDesc(fn (MarklistItem $item) => $item->marklist?->term_id)->first();
-        $termId = $latest?->marklist?->term_id;
-        $classId = $latest?->marklist?->class_id;
-        $yearId = $latest?->marklist?->term?->academic_year_id;
+        $focusTermId = $termId ?: collect($rows)->pluck('term_id')->filter()->max();
+        $focusYearId = $academicYearId ?: collect($rows)->firstWhere('term_id', $focusTermId)['academic_year_id'] ?? null;
+        $classId = collect($rows)->firstWhere('term_id', $focusTermId)['class_id'] ?? null;
 
         $semesterAverage = $scored
-            ->filter(fn (array $row) => $row['term'] === ($latest?->marklist?->term?->name))
+            ->filter(fn (array $row) => (int) ($row['term_id'] ?? 0) === (int) $focusTermId)
             ->avg('percent');
 
-        $yearAverage = $items
-            ->filter(fn (MarklistItem $item) => $item->marklist?->term?->academic_year_id === $yearId && $item->score !== null)
-            ->avg(fn (MarklistItem $item) => $this->percent($item));
+        $yearAverage = $scored
+            ->filter(fn (array $row) => (int) ($row['academic_year_id'] ?? 0) === (int) $focusYearId)
+            ->avg('percent');
 
-        $standings = ($classId && $termId) ? $this->classSemesterStandings($classId, $termId) : [];
+        $standings = ($classId && $focusTermId) ? $this->classSemesterStandings((int) $classId, (int) $focusTermId) : [];
         $own = collect($standings)->firstWhere('member_id', $memberId);
 
         return [

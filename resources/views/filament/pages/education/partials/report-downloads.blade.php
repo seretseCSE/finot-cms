@@ -1,0 +1,39 @@
+@php
+    $disabled = $disabled ?? false;
+@endphp
+
+<div class="flex flex-wrap gap-2">
+    <x-filament::button
+        wire:click="export('xlsx')"
+        color="success"
+        size="sm"
+        icon="heroicon-o-arrow-down-tray"
+        :disabled="$disabled"
+        wire:loading.attr="disabled"
+        wire:target="export"
+    >
+        Excel
+    </x-filament::button>
+    <x-filament::button
+        wire:click="export('csv')"
+        color="gray"
+        size="sm"
+        icon="heroicon-o-document-text"
+        :disabled="$disabled"
+        wire:loading.attr="disabled"
+        wire:target="export"
+    >
+        CSV
+    </x-filament::button>
+    <x-filament::button
+        wire:click="export('pdf')"
+        color="danger"
+        size="sm"
+        icon="heroicon-o-document"
+        :disabled="$disabled"
+        wire:loading.attr="disabled"
+        wire:target="export"
+    >
+        PDF
+    </x-filament::button>
+</div>

@@ -23,7 +23,7 @@ class PortalController extends Controller
         $items = MarklistItem::query()
             ->with(['marklist.term', 'marklist.subject', 'marklist.class'])
             ->where('member_id', auth()->user()->member_id)
-            ->whereHas('marklist', fn ($q) => $q->where('status', 'approved'))
+            ->whereHas('marklist')
             ->latest()
             ->get();
 
@@ -49,7 +49,7 @@ class PortalController extends Controller
             'results' => MarklistItem::query()
                 ->with(['marklist.term', 'marklist.subject'])
                 ->where('member_id', $user->member_id)
-                ->whereHas('marklist', fn ($q) => $q->where('status', 'approved'))
+                ->whereHas('marklist')
                 ->latest()
                 ->limit(50)
                 ->get(),

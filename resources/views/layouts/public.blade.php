@@ -36,7 +36,8 @@
     <script>
     (function() {
         var theme = localStorage.getItem('theme');
-        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        // Default dark for the public site; only light when the visitor chose it
+        if (theme !== 'light') {
             document.documentElement.classList.add('dark');
             var meta = document.getElementById('theme-color-meta');
             if (meta) meta.content = '#0A0A0F';

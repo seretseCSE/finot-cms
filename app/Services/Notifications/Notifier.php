@@ -12,7 +12,8 @@ class Notifier
 {
     public function __construct(
         protected SmsGateway $sms,
-    ) {}
+    ) {
+    }
 
     public const CATALOG = [
         'academics.marklist_submitted' => ['category' => 'approvals', 'importance' => 'important', 'sms' => false],
@@ -24,6 +25,9 @@ class Notifier
         'messages.emergency' => ['category' => 'chat', 'importance' => 'critical', 'sms' => false],
         'bookings.requested' => ['category' => 'system', 'importance' => 'info', 'sms' => false],
         'exports.ready' => ['category' => 'system', 'importance' => 'info', 'sms' => false],
+        'class.announcement' => ['category' => 'academics', 'importance' => 'important', 'sms' => false],
+        'class.homework' => ['category' => 'academics', 'importance' => 'important', 'sms' => false],
+        'class.material' => ['category' => 'academics', 'importance' => 'info', 'sms' => false],
     ];
 
     public static function smsAllowed(string $event): bool

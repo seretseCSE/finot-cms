@@ -28,6 +28,8 @@ function loadTourDefinition(roleKey) {
         parent: () => import('./roles/parentTour.js'),
         data_encoder: () => import('./roles/encoderTour.js'),
         student: () => import('./roles/studentTour.js'),
+        education_head: () => import('./roles/educationHeadTour.js'),
+        education_monitor: () => import('./roles/educationMonitorTour.js'),
     };
 
     const loader = tours[roleKey];

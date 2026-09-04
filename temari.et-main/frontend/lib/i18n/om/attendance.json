@@ -1,0 +1,179 @@
+{
+  "title": "Argama",
+  "subtitle": "Tokkoon tokkoon kutaa argama guyyaa galmeessi",
+  "noBranch": "Argama galmeessuuf, filannoo gubbaa irraa damee filadhu.",
+  "section": "Kutaa",
+  "selectSection": "Kutaa filadhu",
+  "date": "Guyyaa",
+  "pickSection": "Argama galmeessuuf kutaa fi guyyaa filadhu.",
+  "empty": "Kutaa kana keessatti barataan galmaa'e hin jiru.",
+  "markAllPresent": "Hunda akka argamanitti mallatteessi",
+  "save": "Argama olkaa'i",
+  "saved": "Argamni olkaa'ameera.",
+  "statuses": {
+    "present": "Argameera",
+    "absent": "Hin argamne",
+    "late": "Tureera",
+    "excused": "Hayyamaan"
+  },
+  "columns": {
+    "student": "Barataa",
+    "status": "Haala"
+  },
+  "loadFailed": "Galmee fe'uun hin danda'amne.",
+  "checkIn": "Seensa",
+  "checkOut": "Ba'insa",
+  "note": "Yaadannoo",
+  "notePlaceholder": "Yaadannoo filannoo…",
+  "summary": "{total} keessaa {marked} mallatteeffameera",
+  "unmarked": "Hin mallatteeffamne",
+  "source": {
+    "label": "Madda",
+    "device": "Meeshaa",
+    "manual": "Harkaan"
+  },
+  "live": "Kallattii",
+  "reports": {
+    "title": "Gabaasota argamaa",
+    "subtitle": "Xiinxala galmee guyyaa — haalota, hafuu fi mala mallattoon itti qabamu",
+    "loadFailed": "Gabaasa fe'uun hin danda'amne.",
+    "noData": "Yeroo kana keessatti argamni galmaa'e hin jiru.",
+    "from": "Irraa",
+    "to": "Hanga",
+    "presets": {
+      "last7": "Guyyaa 7",
+      "last15": "Guyyaa 15",
+      "last30": "Guyyaa 30",
+      "thisMonth": "Ji'a kana"
+    },
+    "termWindow": {
+      "placeholder": "Seemistara / kurmaana",
+      "fullYear": "Waggaa guutuu"
+    },
+    "tabs": {
+      "overview": "Ilaalcha waliigalaa",
+      "patterns": "Haalota",
+      "students": "Barattoota"
+    },
+    "scope": {
+      "allSchools": "Mana barumsaa hunda",
+      "allBranches": "Damee hunda",
+      "homeroomOnly": "Kutaalee itti gaafatamummaa keetii qofa"
+    },
+    "filters": {
+      "allGrades": "Sadarkaa hunda",
+      "allSections": "Kutaa hunda",
+      "allSources": "Madda hunda",
+      "allDevices": "Meeshaa hunda"
+    },
+    "cards": {
+      "rate": "Hamma argamaa",
+      "rateUp": "▲ yeroo darbe irra qabxii {delta} ol",
+      "rateDown": "▼ yeroo darbe irra qabxii {delta} gadi",
+      "rateHint": "Guyyoota barnootaa {days}",
+      "students": "Barattoota hordofaman",
+      "studentsHint": "Guyyoota {days} keessatti mallattoo {marks}",
+      "absences": "Hafuu",
+      "absencesHint": "Durba {female} · dhiira {male}",
+      "late": "Turanii dhufuu",
+      "lateHint": "Barattoonni turan giddugaleessaan {time} irratti seenu",
+      "chronic": "Yeroo baay'ee hafan",
+      "chronicHint": "Guyyoota 10%+ hafan — tarree ilaaluuf tuqi",
+      "perfect": "Argama guutuu",
+      "perfectHint": "Hafuu ykn turuu tokko malee — tarree ilaaluuf tuqi",
+      "coverage": "Uwwisa galmee",
+      "coverageHint": "Kan eegamu {expected} keessaa {recorded} galmaa'eera",
+      "deviceShare": "Meeshaadhaan qabame",
+      "deviceShareHint": "{device} meeshaadhaan · {manual} harkaan"
+    },
+    "charts": {
+      "daily": {
+        "title": "Galmee guyyaa",
+        "hint": "Mallattoolee guyyaa barnootaa tokkoon tokkoon, haalaan"
+      },
+      "weekday": {
+        "title": "Haala guyyoota torbanii",
+        "hint": "Mallattoolee turuu fi hafuu guyyaa torbaniin"
+      },
+      "sources": {
+        "title": "Mala galmeessuu",
+        "hint": "Meeshaa RFID fi harkaan, guyyaa guyyaan"
+      },
+      "arrivals": {
+        "title": "Sa'aatii dhufaatii",
+        "hint": "Seensa daqiiqaa 30niin",
+        "onTime": "Yeroon",
+        "empty": "Yeroo kana keessatti sa'aatiin seensaa galmaa'e hin jiru."
+      }
+    },
+    "breakdown": {
+      "titles": {
+        "school": "Mana barumsaatiin",
+        "branch": "Dameetiin",
+        "grade": "Sadarkaadhaan",
+        "section": "Kutaadhaan"
+      },
+      "students": "Barattoota {count}"
+    },
+    "devices": {
+      "title": "Tarminaaliidhaan",
+      "hint": "Mallattoolee tarminaalli RFID tokkoon tokkoon galmeesse",
+      "late": "{count} turan"
+    },
+    "flags": {
+      "all": "Barattoota hunda",
+      "chronic": "Yeroo baay'ee hafan",
+      "frequentLate": "Yeroo baay'ee turan",
+      "perfect": "Argama guutuu"
+    },
+    "table": {
+      "title": "Barattoota",
+      "hint": "Barattoota yeroo filatame keessa jiran hunda",
+      "student": "Barataa",
+      "sectionShort": "Kutaa {name}",
+      "recent": "Dhiheenya",
+      "recorded": "Guyyoota",
+      "streak": "Walitti aansee",
+      "streakDays": "Guyyaa {count} hafe",
+      "rate": "Hamma",
+      "searchPlaceholder": "Barattoota barbaadi…",
+      "empty": "Yeroo kana keessatti argamni hin jiru."
+    }
+  },
+  "excuses": {
+    "title": "Iyyata hafuu",
+    "subtitle": "Ibsa hafuu warri galchan — yommuu hayyamamu guyyoonni hayyamaan hafe ta'u",
+    "empty": "Ammatti iyyanni hafuu hin jiru.",
+    "columns": {
+      "student": "Barataa",
+      "dates": "Guyyoota",
+      "reason": "Sababa",
+      "requester": "Kan galche",
+      "status": "Haala"
+    },
+    "statuses": {
+      "pending": "Eegamaa jira",
+      "approved": "Hayyamameera",
+      "rejected": "Kufaa ta'eera"
+    },
+    "approve": "Hayyami",
+    "reject": "Kuffisi",
+    "attachment": "Ragaa bani",
+    "approveTitle": "Iyyata kana hayyamuu barbaadduu?",
+    "rejectTitle": "Iyyata kana kuffisuu barbaadduu?",
+    "decideDesc": "{student} · {from} → {to}. Hayyamuun guyyoota hafe hayyamaan hafe godha.",
+    "notePlaceholder": "Yaadannoo filannoo maatiif…",
+    "approvedToast": "Hayyamameera — guyyoota hafe {days} hayyamaan hafe ta'aniiru.",
+    "rejectedToast": "Iyyanni kufaa ta'eera.",
+    "note": "Yaadannoo maatiif",
+    "bulk": {
+      "approveTitle": "Iyyannoowwan {count} mirkaneessi?",
+      "rejectTitle": "Iyyannoowwan {count} kuffisi?",
+      "approveDesc": "Guyyaan hafe kan daangaa guyyaa tokkoon tokkoon isaa keessa jiru hundi ni hayyamama, maatiin hundis ni beeksifama.",
+      "rejectDesc": "Galmeen argamaa akkuma jirutti hafa. Maatiin ni beeksifama, kanaafuu sababa isaa gadi barreessi.",
+      "approved": "Iyyannoowwan {count} mirkanaaʼan.",
+      "rejected": "Iyyannoowwan {count} kufan.",
+      "nonePending": "Warra filataman keessaa kan murtii eegu hin jiru."
+    }
+  }
+}

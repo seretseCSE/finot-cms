@@ -45,6 +45,14 @@ class ParentModel extends BaseModel
     }
 
     /**
+     * Portal user linked via users.parent_id
+     */
+    public function portalUser()
+    {
+        return $this->hasOne(User::class, 'parent_id');
+    }
+
+    /**
      * Get linked members through member_parent_guardians
      */
     public function members()

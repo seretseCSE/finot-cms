@@ -1,5 +1,5 @@
 <div id="product-tour-root"
-     data-user-role="{{ auth()->user()?->roles->first()?->name ?? '' }}"
+     data-user-role="{{ \App\Support\RoleGate::activeRole() ?? auth()->user()?->roles->first()?->name ?? '' }}"
      data-panel="admin"
      data-version="{{ config('product-tour.current_version', '1.0.0') }}"
      aria-hidden="true"

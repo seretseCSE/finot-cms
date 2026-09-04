@@ -1,0 +1,317 @@
+{
+  "title": "Hojjettoota",
+  "subtitle": "Hojjettoota damee fi barsiisota bulchi",
+  "noBranch": "Hojjettoota bulchuuf, filannoo gubbaa irraa damee filadhu.",
+  "create": "Hojjetaa dabali",
+  "createTitle": "Hojjetaa dabali",
+  "editTitle": "Hojjetaa gulaali",
+  "photo": {
+    "label": "Suuraa hojjetaa",
+    "hint": "JPG yookiin PNG, hanga MB 4. Filannoo dha.",
+    "remove": "Haqi",
+    "change": "Suuraa jijjiiri",
+    "addPhoto": "Suuraa dabali",
+    "updated": "Suuraan haaromfameera.",
+    "uploadFailed": "Suuraan ol kaa'amuu hin dandeenye. Irra deebi'anii yaaluuf ammas kuusi."
+  },
+  "detail": {
+    "info": "Faayilii hojjetaa",
+    "contact": "Quunnamtii",
+    "employmentHistory": "Seenaa qacarumsaa",
+    "noPositions": "Taayitaan galmaa'e hin jiru.",
+    "current": "Ammaa",
+    "tabs": {
+      "overview": "Waliigala",
+      "teaching": "Barsiisuu",
+      "qualifications": "Sadarkaa barnootaa",
+      "documents": "Sanadoota",
+      "availability": "Argamuu"
+    }
+  },
+  "sections": {
+    "identity": "Eenyummaa",
+    "employment": "Qacarrii",
+    "qualifications": "Ga'umsa",
+    "more": "Bal'ina dabalataa",
+    "personal": "Odeeffannoo dhuunfaa",
+    "address": "Teessoo",
+    "compensation": "Mindaa fi kaffaltii",
+    "schedule": "Sa'aatii seensaa/ba'insaa",
+    "attachments": "Sanadoota",
+    "positions": "Taayitaalee hojii",
+    "teaching": "Barnoota barsiisu"
+  },
+  "fields": {
+    "firstName": "Maqaa duraa",
+    "firstNamePlaceholder": "fkn Selam",
+    "fatherName": "Maqaa abbaa",
+    "fatherNamePlaceholder": "fkn Tesfaye",
+    "grandfatherName": "Maqaa akaakayyuu",
+    "grandfatherNamePlaceholder": "fkn Lemma",
+    "phone": "Bilbila",
+    "phonePlaceholder": "09…",
+    "role": "Gahee",
+    "selectRole": "Gahee filadhu",
+    "jobTitle": "Sadarkaa hojii",
+    "jobTitlePlaceholder": "Sadarkaa hojii filadhu",
+    "employmentType": "Gosa qacarrii",
+    "selectEmploymentType": "Gosa filadhu",
+    "educationLevel": "Sadarkaa barnootaa",
+    "educationLevelPlaceholder": "Sadarkaa barnootaa filadhu",
+    "fieldOfGraduation": "Damee eebbaa",
+    "fieldOfGraduationPlaceholder": "Damee filadhu",
+    "professionalLevel": "Sadarkaa ogummaa",
+    "professionalLevelPlaceholder": "Sadarkaa ogummaa filadhu",
+    "educationalInstitute": "Dhaabbata barnootaa",
+    "educationalInstitutePlaceholder": "Dhaabbata filadhu",
+    "salary": "Mindaa (ETB)",
+    "salaryPlaceholder": "fkn 12000",
+    "salaryLevel": "Sadarkaa mindaa",
+    "salaryLevelPlaceholder": "I–X",
+    "hiredOn": "Guyyaa qacarrii",
+    "birthDate": "Guyyaa dhalootaa",
+    "email": "Imeelii",
+    "emailPlaceholder": "name@example.com",
+    "maritalStatus": "Haala gaa'elaa",
+    "selectMaritalStatus": "Haala filadhu",
+    "nationality": "Lammummaa",
+    "nationalityPlaceholder": "Lammummaa filadhu",
+    "lastPromotedOn": "Guyyaa guddina sadarkaa dhumaa",
+    "retirementOn": "Guyyaa soorama bahumsaa",
+    "checkIn": "Sa'aatii seensaa",
+    "checkOut": "Sa'aatii ba'insaa",
+    "pgdt": "PGDT",
+    "pgdtPlaceholder": "Damee PGDT filadhu",
+    "fieldOfStudy": "Damee barnootaa",
+    "fieldOfStudyPlaceholder": "fkn. Herrega",
+    "institution": "Dhaabbata",
+    "institutionPlaceholder": "fkn. Yuunivarsiitii Finfinnee",
+    "graduationYear": "Bara eebbaa",
+    "graduationYearPlaceholder": "fkn. 2015",
+    "gender": "Saala",
+    "selectGender": "Saala filadhu",
+    "woreda": "Aanaa"
+  },
+  "roles": {
+    "teacher": "Barsiisaa",
+    "registrar": "Galmeessaa",
+    "finance_officer": "Itti-gaafatamaa faayinaansii",
+    "director": "Daayirektara"
+  },
+  "employmentTypes": {
+    "full_time": "Yeroo guutuu",
+    "part_time": "Yeroo gartokkee",
+    "volunteer": "Fedhiidhaan",
+    "substitute": "Bakka bu'aa",
+    "contract": "Waliigalteedhaan"
+  },
+  "columns": {
+    "name": "Maqaa",
+    "jobTitle": "Sadarkaa hojii",
+    "phone": "Bilbila",
+    "employmentType": "Gosa",
+    "status": "Haala",
+    "access": "Hayyama"
+  },
+  "empty": "Hanga ammaa hojjetaan hin jiru. Isa jalqabaa dabali.",
+  "created": "Hojjetaan dabalameera.",
+  "updated": "Hojjetaan haaromfameera.",
+  "deleted": "Hojjetaan haqameera.",
+  "loadFailed": "Hojjettoota fe'uun hin milkoofne.",
+  "error": "Wanti tokko dogoggoreera.",
+  "actions": {
+    "assignToBranch": "Gara dameetti ramadi",
+    "manageBranches": "Hayyama damee bulchi"
+  },
+  "maritalStatuses": {
+    "single": "Kan hin fuune/heerumne",
+    "married": "Kan fuudhe/heerumte",
+    "divorced": "Kan wal hiike",
+    "widowed": "Kan hiriyaan gaa'elaa jalaa du'e"
+  },
+  "allowances": {
+    "title": "Durgoo",
+    "add": "Durgoo dabali",
+    "remove": "Durgoo haqi",
+    "typePlaceholder": "Gosa durgoo",
+    "amountPlaceholder": "Qarshii",
+    "types": {
+      "Housing Allowance": "Durgoo manaa",
+      "Transport Allowance": "Durgoo geejjibaa",
+      "Medical Allowance": "Durgoo yaalaa",
+      "Education Allowance": "Durgoo barnootaa",
+      "Meal Allowance": "Durgoo nyaataa",
+      "Uniform Allowance": "Durgoo uffataa",
+      "Communication Allowance": "Durgoo quunnamtii",
+      "Overtime Allowance": "Durgoo sa'aatii dabalataa"
+    }
+  },
+  "schedule": {
+    "hint": "Sa'aatii hordoffii guyyaa — yeroo hojjetaan kun seenuu fi ba'uu qabu."
+  },
+  "attachments": {
+    "hint": "Sanadoota hojjetaa kanneen akka ragaa barnootaa ykn waraqaa eenyummaa — PDF, Word ykn suuraa hanga MB 10.",
+    "add": "Faayilii dabali",
+    "remove": "Haqi",
+    "removed": "Sanadni haqameera.",
+    "namePlaceholder": "Maqaa sanadaa",
+    "uploadFailed": "{name} olkaa'uun hin danda'amne.",
+    "anchorGeneral": "Sanada waliigalaa",
+    "attachToRecord": "Faayila qabsiisi",
+    "upload": "Olkaa'i",
+    "uploaded": "Sanadni dabalameera.",
+    "empty": "Ammatti sanadni hin jiru."
+  },
+  "positions": {
+    "add": "Taayitaa dabali",
+    "hint": "Hojjetaan tokko yeroo tokkotti taayitaalee hedduu qabaachuu danda'a (fkn. daayrektara + barsiisaa). Taayitaan ijoo mindaa walitti qabame of keessaa qaba — mindaan isaa kan ijoo keessatti hammatamu yoo ta'e, kanneen biroo irratti duwwaa dhiisaa.",
+    "new": "Taayitaa haaraa",
+    "ended": "Kan xumurame",
+    "primary": "Ijoo",
+    "remove": "Taayitaa haqi",
+    "endedOn": "Guyyaa xumurame",
+    "endedOnPlaceholder": "Taayitaan hojii irra osoo jiruu duwwaa dhiisaa",
+    "salaryCoveredByPrimary": "Taayitaa ijoon hammatama"
+  },
+  "jobTitles": {
+    "principal": "Piriinsipaala",
+    "school_admin": "Bulchaa mana barumsaa",
+    "director": "Daayrektara",
+    "vice_director": "Itti-aanaa daayrektaraa",
+    "teacher": "Barsiisaa",
+    "registrar": "Galmeessaa",
+    "finance_officer": "Ogeessa faayinaansii",
+    "department_head": "Hogganaa damee barnootaa",
+    "unit_leader": "Hogganaa garee",
+    "hr_officer": "Ogeessa humna namaa",
+    "accountant": "Herregaa",
+    "cashier": "Kaashera",
+    "secretary": "Barreessituu",
+    "librarian": "Ogeessa mana kitaabaa",
+    "counselor": "Gorsaa",
+    "lab_assistant": "Gargaaraa laaboraatorii",
+    "ict_officer": "Ogeessa ICT",
+    "nurse": "Narsii",
+    "storekeeper": "Eegduu kuusaa",
+    "security_guard": "Eegduu",
+    "janitor": "Qulqulleessaa",
+    "driver": "Konkolaachisaa",
+    "cook": "Nyaata qopheessaa",
+    "other": "Kan biraa"
+  },
+  "qualificationLevels": {
+    "certificate": "Sartifikeetii",
+    "diploma": "Dippiloomaa",
+    "bachelor": "Digirii jalqabaa",
+    "master": "Digirii lammaffaa",
+    "phd": "Dooktireetii (PhD)",
+    "pgdt": "PGDT",
+    "other": "Kan biraa"
+  },
+  "qualifications": {
+    "hint": "Ragaalee barnootaa — namni tokko hedduu qabaachuu danda'a (fkn. BEd + MSc + PGDT).",
+    "new": "Ragaa haaraa",
+    "add": "Ragaa dabali",
+    "remove": "Ragaa haqi"
+  },
+  "deductions": {
+    "title": "Hir'ifannaa",
+    "hint": "Hir'ifannaa dhaabbataa gibiraa fi soorama booda kaffaltii mindaa hunda irraa hir'ifamu.",
+    "add": "Hir'ifannaa dabali",
+    "remove": "Hir'ifannaa haqi",
+    "namePlaceholder": "fkn. Waldaa liqii",
+    "amountPlaceholder": "Qarshii"
+  },
+  "teaching": {
+    "hint": "Barnoota barsiisaan kun sadarkaa kutaa tokkoon tokkoon barsiisuu danda'u. Ramaddiin seemisteraa barsiiso­ta ofumaan guutuu­f kana fayyadama.",
+    "addGrade": "Kutaa dabali…",
+    "removeGrade": "Kutaa haqi"
+  },
+  "genders": {
+    "female": "Dubartii",
+    "male": "Dhiira"
+  },
+  "profile": {
+    "positions": "Taayitaalee",
+    "primary": "ijoo",
+    "teaching": "Kan barsiisu",
+    "qualifications": "Sadarkaa barnootaa",
+    "documents": "Sanadoota",
+    "about": "Waa'ee",
+    "workHours": "Sa'aatii hojii",
+    "stats": {
+      "joined": "Kan qacarame",
+      "positions": "Iddoo hojii hojiirra jiran",
+      "subjects": "Barnoota",
+      "documents": "Sanadoota"
+    }
+  },
+  "workload": {
+    "title": "Ba'aa barsiisuu",
+    "hint": "Waan barsiisaan kun seemistera kana keessatti dhugumaan barsiisu — gabatee ramaddii seemisteraa irraa kallattiin.",
+    "semester": "Seemistera",
+    "current": "kan ammaa",
+    "homeroom": "Itti gaafatamaa kutaa",
+    "stats": {
+      "subjects": "Barnoota",
+      "sections": "Kutaalee",
+      "periodsPerWeek": "Yeroo barnootaa / torban",
+      "students": "Barattoota"
+    },
+    "perWeek": "{n}/torban",
+    "periods": "Yeroo barnootaa {n}/torban",
+    "students": "Barattoota {n}",
+    "week": {
+      "title": "Sagantaa torbanii",
+      "published": "Sagantaa yeroo maxxanfame",
+      "notPublished": "Sagantaan yeroo seemistera kanaa ammatti hin maxxanfamne — yommuu maxxanfamu sagantaan torbanii as mul'ata.",
+      "noLessons": "Guyyaa kanatti barnoonni hin jiru."
+    },
+    "empty": "Seemistera kana keessatti ramaddiin barsiisuu hin jiru.",
+    "emptyHint": "Barnoonni barsiisotaaf kan ramadaman gabatee ramaddii seemisteraa irraa ti.",
+    "openGrid": "Gabatee ramaddii bani",
+    "noTerms": "Dameen kun ammatti seemistera hin qabu."
+  },
+  "wizard": {
+    "title": "Hojjetaa dabali",
+    "subtitle": "Qacarrii qajeelfame — kan filannoo ta'e bira darbitanii booda xumuruu dandeessu.",
+    "editSubtitle": "Piroofaayilii hojjetaa gulaali",
+    "pickBranch": "Damee hojjetaan kun itti qacaramu filadhaa.",
+    "checkErrors": "Maaloo dirreewwan agarsiifaman sirreessaa",
+    "submit": "Hojjetaa dabali",
+    "subjectCount": "Filannoo barnootaa × kutaa {count}",
+    "documentCount": "Sanadoota {count} fe'amuuf qophii",
+    "steps": {
+      "identity": "Nama",
+      "address": "Teessoo",
+      "positions": "Hojiiwwan fi herrega",
+      "teaching": "Barsiisuu",
+      "qualifications": "Ga'umsa",
+      "compensation": "Kaffaltii fi sagantaa",
+      "documents": "Sanadoota",
+      "review": "Gamaaggama"
+    }
+  },
+  "account": {
+    "create": "Herrega seensaa uumi",
+    "createHint": "Jecha darbii qopheessuuf hidhaa SMS ni argatu; Temari seenuu danda'u.",
+    "required": "Herregni seensaa ni uumama",
+    "requiredHint": "Gaheewwan barsiisaa, daayirektaraa, galmeessaa fi ogeessa faayinaansii seensa barbaadu.",
+    "exists": "Herrega seensaa qaba",
+    "existsHint": "Hojjetaan kun duraan ni seena — ID {id}.",
+    "willCreate": "Herregni seensaa ni uumama",
+    "willCreateHint": "Erga olkaa'amee booda hidhaan jecha darbii bilbila isaaniitti ergama.",
+    "willNotCreate": "Herrega seensaa hin jiru",
+    "willNotCreateHint": "Faayiliin HR seensa malee ni qabama. Booda fuula gulaalii irraa seensa kennuu dandeessu.",
+    "none": "Herrega seensaa hin jiru"
+  },
+  "createdWithAccount": "Hojjetaan dabalameera. Liinkiin PIN qopheessuu SMS'n ergameera.",
+  "bulk": {
+    "deleteTitle": "Hojjettoota {count} haqi?",
+    "deleteDesc": "Faayiliin HR isaanii galmee keessaa ni baʼa, seensi damee isaaniis ni kaʼa. Seenaan ni hafa, deebisuus ni dandeessa.",
+    "restoreTitle": "Hojjettoota {count} deebisi?",
+    "restoreDesc": "Gara galmeetti ni deebiʼu. Seensi damee ofumaan hin deebiʼu — 'Bulchiinsa damee' irraa irra deebiʼii kenni.",
+    "deleted": "Hojjettoonni {count} haqaman.",
+    "restored": "Hojjettoonni {count} deebiʼan."
+  }
+}

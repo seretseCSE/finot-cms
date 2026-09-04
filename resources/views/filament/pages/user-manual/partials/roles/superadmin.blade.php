@@ -78,7 +78,7 @@
                 <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-1">
                     <li>Confirm the person has the right role and department.</li>
                     <li>If they cannot see a member, check the member’s department.</li>
-                    <li>If a marklist or withdrawal is stuck, Super Admin can approve or finalize it.</li>
+                    <li>If Education needs help with enrollments or scores, you can step in. Withdrawals still end with HR finalize.</li>
                 </ol>
             </div>
         </div>

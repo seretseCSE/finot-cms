@@ -14,6 +14,8 @@ class StudentEnrollment extends BaseModel
         'member_id',
         'class_id',
         'academic_year_id',
+        'batch_id',
+        'batch_year_id',
         'enrolled_date',
         'completion_date',
         'status',
@@ -44,6 +46,16 @@ class StudentEnrollment extends BaseModel
     public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class, 'academic_year_id');
+    }
+
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class);
+    }
+
+    public function batchYear()
+    {
+        return $this->belongsTo(BatchYear::class);
     }
 
     public function enrolledBy()

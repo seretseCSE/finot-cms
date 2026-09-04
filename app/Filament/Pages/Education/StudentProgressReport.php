@@ -12,7 +12,7 @@ use Filament\Pages\Page;
 use Filament\Forms;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Illuminate\Support\Facades\Auth;
+use App\Support\RoleGate;
 use Filament\Notifications\Notification;
 
 class StudentProgressReport extends Page
@@ -26,7 +26,7 @@ class StudentProgressReport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance & Results';
+        return 'Results';
     }
 
     public static function getNavigationSort(): ?int
@@ -175,29 +175,6 @@ class StudentProgressReport extends Page
         // Monthly trend — populate once tests are wired up
         $monthlyProgress = collect();
 
-        // Contributions
-        $contributions = Contribution::where('member_id', $member->id)
-            ->where('academic_year_id', $filters['academic_year_id'])
-            ->orderBy('month')
-            ->get();
-
-        $totalContributions = $contributions->count();
-        $paidCount = $contributions->where('status', 'Paid')->count();
-        $unpaidCount = $totalContributions - $paidCount;
-        $totalAmount = $contributions->where('status', 'Paid')->sum('amount');
-        $expectedAmount = $contributions->sum('amount');
-        $paymentRate = $totalContributions > 0 ? round(($paidCount / $totalContributions) * 100, 2) : 0;
-
-        $monthlyDetail = $contributions->map(fn ($c) => [
-            'month_name' => $c->month_name,
-            'month' => $c->month,
-            'amount' => $c->amount,
-            'is_paid' => $c->is_paid,
-            'status' => $c->status,
-            'payment_date' => $c->payment_date,
-            'payment_method' => $c->payment_method,
-        ])->values()->toArray();
-
         $this->reportData = [
             'student'            => $member,
             'current_enrollment' => $currentEnrollment,
@@ -215,15 +192,45 @@ class StudentProgressReport extends Page
                 'results'       => $testResults,
             ],
             'progress_trend' => $monthlyProgress,
-            'contributions' => [
-                'total_months' => $totalContributions,
-                'paid_count' => $paidCount,
-                'unpaid_count' => $unpaidCount,
-                'total_paid' => $totalAmount,
-                'expected_total' => $expectedAmount,
-                'payment_rate' => $paymentRate,
-                'monthly' => $monthlyDetail,
-            ],
+            'contributions' => RoleGate::is('education_head')
+                ? null
+                : $this->contributionSummaryForMember($member, $filters['academic_year_id']),
+        ];
+    }
+
+    /**
+     * @return array{total_months: int, paid_count: int, unpaid_count: int, total_paid: float, expected_total: float, payment_rate: float, monthly: list<array<string, mixed>>}
+     */
+    protected function contributionSummaryForMember(Member $member, ?int $academicYearId): array
+    {
+        $contributions = Contribution::where('member_id', $member->id)
+            ->where('academic_year_id', $academicYearId)
+            ->orderBy('month')
+            ->get();
+
+        $totalContributions = $contributions->count();
+        $paidCount = $contributions->where('status', 'Paid')->count();
+        $unpaidCount = $totalContributions - $paidCount;
+        $totalAmount = $contributions->where('status', 'Paid')->sum('amount');
+        $expectedAmount = $contributions->sum('amount');
+        $paymentRate = $totalContributions > 0 ? round(($paidCount / $totalContributions) * 100, 2) : 0;
+
+        return [
+            'total_months' => $totalContributions,
+            'paid_count' => $paidCount,
+            'unpaid_count' => $unpaidCount,
+            'total_paid' => $totalAmount,
+            'expected_total' => $expectedAmount,
+            'payment_rate' => $paymentRate,
+            'monthly' => $contributions->map(fn ($c) => [
+                'month_name' => $c->month_name,
+                'month' => $c->month,
+                'amount' => $c->amount,
+                'is_paid' => $c->is_paid,
+                'status' => $c->status,
+                'payment_date' => $c->payment_date,
+                'payment_method' => $c->payment_method,
+            ])->values()->toArray(),
         ];
     }
 

@@ -34,7 +34,7 @@ class AcademicResultsReport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance & Results';
+        return 'Results';
     }
 
     public static function getNavigationLabel(): string

@@ -35,6 +35,15 @@ class LibrarySubcategoryResource extends BaseResource
         return 10;
     }
 
+    public static function canViewAny(): bool
+    {
+        if (\App\Support\RoleGate::isAny(['student', 'parent'])) {
+            return false;
+        }
+
+        return parent::canViewAny();
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         return false;

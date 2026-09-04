@@ -21,7 +21,7 @@ class RequestWithdrawal extends Page implements HasForms
 
     protected static ?string $title = 'Request Withdrawal';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     protected string $view = 'filament.pages.student.request-withdrawal';
 

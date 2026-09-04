@@ -47,7 +47,7 @@ class RecordMarklist extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance & Results';
+        return 'Results';
     }
 
     public static function getNavigationSort(): ?int
@@ -77,22 +77,22 @@ class RecordMarklist extends Page
     {
         $marklist = Marklist::query()->findOrFail($this->marklistId);
         $service->saveItems($marklist, $this->rows, Auth::user());
-        Notification::make()->title('Draft saved')->success()->send();
-        $this->syncRows($marklist->fresh(['items.member']));
-    }
-
-    public function submit(MarklistService $service): void
-    {
-        $marklist = Marklist::query()->findOrFail($this->marklistId);
-        $service->saveItems($marklist, $this->rows, Auth::user());
-        $service->submit($marklist, Auth::user());
-        Notification::make()->title('Marklist submitted')->success()->send();
+        Notification::make()->title('Marks saved')->success()->send();
         $this->syncRows($marklist->fresh(['items.member']));
     }
 
     public function isLocked(): bool
     {
-        return $this->marklistStatus !== null && $this->marklistStatus !== 'draft';
+        if (! $this->termId) {
+            return false;
+        }
+
+        $term = Term::query()->find($this->termId);
+        if (! $term) {
+            return false;
+        }
+
+        return $term->status === 'closed' || (! $term->is_active && $term->status !== 'active');
     }
 
     protected function syncRows(Marklist $marklist): void

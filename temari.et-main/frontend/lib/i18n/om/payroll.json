@@ -1,0 +1,60 @@
+{
+  "title": "Kaffaltii mindaa",
+  "subtitle": "Kaffaltii mindaa ji'aa: herregi, gamaaggami, mirkaneessi, kaffali.",
+  "create": "Kaffaltii mindaa haaraa",
+  "createTitle": "Kaffaltii mindaa haaraa",
+  "createDescription": "Ragaaleen kaffaltii taayitaalee, dabalataa fi hir'ifannaa ammaa irraa battalumatti herregamu. Wixineen osoo hin mirkanaa'in dura yeroo barbaadametti irra deebi'amee herregamuu danda'a.",
+  "createCta": "Wixinee uumi",
+  "created": "Kaffaltiin mindaa uumameera.",
+  "deleted": "Kaffaltiin mindaa haqameera.",
+  "loadFailed": "Odeeffannoo kaffaltii fe'uun hin milkoofne.",
+  "empty": "Ammatti kaffaltiin mindaa hin jiru. Mindaa ji'a kanaa herreguf tokko uumi.",
+  "noBranch": "Kaffaltii mindaa bulchuuf damee filadhu.",
+  "columns": {
+    "name": "Yeroo",
+    "employees": "Hojjettoota",
+    "gross": "Waliigala",
+    "net": "Kaffaltii qulqulluu"
+  },
+  "statuses": {
+    "draft": "Wixinee",
+    "approved": "Kan mirkanaa'e",
+    "paid": "Kan kaffalame"
+  },
+  "fields": {
+    "name": "Maqaa",
+    "namePlaceholder": "fkn. Fulbaana 2018",
+    "periodStart": "Jalqaba yeroo",
+    "periodEnd": "Dhuma yeroo",
+    "notes": "Yaadannoo",
+    "notesPlaceholder": "Yaadannoo filannoo"
+  },
+  "detailTitle": "Kaffaltii mindaa",
+  "employeeCount": "Hojjettoota {count}",
+  "totals": {
+    "gross": "Waliigala",
+    "tax": "Gibira galii",
+    "pension": "Soorama (7%)",
+    "deductions": "Hir'ifannaa",
+    "net": "Qulqulluu"
+  },
+  "actions": {
+    "view": "Bani",
+    "recompute": "Irra deebi'ii herregi",
+    "approve": "Mirkaneessi",
+    "markPaid": "Akka kaffalametti mallatteessi"
+  },
+  "recomputed": "Ragaaleen kaffaltii odeeffannoo ammaa irraa irra deebi'amanii herregamaniiru.",
+  "approved": "Kaffaltiin mindaa mirkanaa'eera — lakkoofsonni amma cufamaniiru.",
+  "paid": "Kaffaltiin mindaa akka kaffalametti galmaa'eera.",
+  "approveConfirmTitle": "Kaffaltii mindaa kana mirkaneessuu barbaaddaa?",
+  "approveConfirmDescription": "Mirkaneessuun ragaalee kaffaltii hunda cufa (waliigala {net}). Kana booda irra deebi'anii herreguu fi sirreessuun hin danda'amu.",
+  "payConfirmTitle": "Kaffaltiin mindaa kun akka kaffalametti haa galmaa'uu?",
+  "payConfirmDescription": "Kun {net} hojjettootaaf kaffalamuu isaa galmeessa. Kun kan xumuraa ti.",
+  "item": {
+    "gross": "Waliigala",
+    "tax": "Gibira",
+    "pension": "Soorama",
+    "net": "Qulqulluu"
+  }
+}

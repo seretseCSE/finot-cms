@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Finote Tsidik - Role Permissions Guide</title>
+    <style>
+        @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", Calibri, Arial, sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.45;
+            color: #1e293b;
+            background: #fff;
+        }
+
+        .print-header, .print-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            font-size: 8pt;
+            color: #64748b;
+        }
+        .print-header {
+            top: 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .print-footer {
+            bottom: 0;
+            padding-top: 6px;
+            border-top: 1px solid #cbd5e1;
+        }
+
+        .cover { page-break-after: always; text-align: center; padding: 36px 24px 28px; }
+        .cover img { width: 140px; height: auto; margin-bottom: 18px; border: 1px solid #e2e8f0; }
+        .cover h1 { font-size: 28pt; color: #1941F5; margin: 0 0 6px; letter-spacing: 0.02em; }
+        .cover h2 { font-size: 16pt; font-weight: 600; color: #0f172a; margin: 0 0 18px; }
+        .cover .sub { color: #475569; font-size: 11pt; max-width: 420px; margin: 0 auto 28px; }
+        .cover .meta { color: #64748b; font-size: 10pt; line-height: 1.7; }
+
+        h1.chapter {
+            font-size: 16pt;
+            color: #1941F5;
+            border-bottom: 2.5px solid #1941F5;
+            padding-bottom: 6px;
+            margin: 0 0 12px;
+        }
+        h2 {
+            font-size: 12pt;
+            color: #1d4ed8;
+            margin: 16px 0 6px;
+        }
+        h3 {
+            font-size: 10.5pt;
+            color: #0f172a;
+            margin: 12px 0 4px;
+        }
+        p { margin: 0 0 8px; }
+        ul, ol { margin: 0 0 10px 18px; padding: 0; }
+        li { margin: 0 0 3px; }
+
+        .role { page-break-before: always; }
+        .toc { page-break-after: always; }
+        .toc ol { margin-left: 22px; }
+        .toc li { margin: 0 0 5px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0 14px;
+            font-size: 10pt;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th { background: #eff6ff; color: #1e3a8a; font-weight: 700; }
+        tr:nth-child(even) td { background: #f8fafc; }
+
+        .who {
+            background: #eff6ff;
+            border-left: 4px solid #1941F5;
+            padding: 8px 12px;
+            margin: 0 0 12px;
+        }
+        .cannot { background: #fef2f2; border-left: 4px solid #C0392B; padding: 8px 12px; margin: 0 0 12px; }
+        .cannot h2, .who h2 { margin-top: 0; }
+
+        .keep { page-break-inside: avoid; }
+
+        .badge {
+            display: inline-block;
+            font-size: 8.5pt;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #1941F5;
+            background: #eff6ff;
+            padding: 2px 8px;
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="cover">
+    <img src="../../public/images/logow.PNG" alt="Finote Tsidik">
+    <h1>FINOTE TSIDIK</h1>
+    <h2>Role Permissions Guide</h2>
+    <p class="sub">A training manual for non-technical staff. What each role can do, what it cannot do, and how work moves from one office to the next.</p>
+    <p class="meta">Ayer Tena Anqetse Birhan St. Kidanemihret Cathedral<br>Sunday School office system<br>August 2026</p>
+</div>
+
+<div class="toc">
+    <h1 class="chapter">Contents</h1>
+    <ol>
+        <li>How the system works</li>
+        <li>Work that crosses offices</li>
+        <li>Who do I call?</li>
+        <li>Super Admin</li>
+        <li>Admin</li>
+        <li>HR Head</li>
+        <li>Internal Relations Head</li>
+        <li>Finance Head</li>
+        <li>Nibret Hisab Head</li>
+        <li>Inventory Staff</li>
+        <li>Education Head</li>
+        <li>Education Monitor</li>
+        <li>Data Encoder</li>
+        <li>Student</li>
+        <li>Mezmur Head</li>
+        <li>Worship Monitor</li>
+        <li>AV Head</li>
+        <li>Charity Head</li>
+        <li>Tour Head</li>
+        <li>Revenue and Charity Head</li>
+    </ol>
+    <p>This same guide is also in the admin office under Help, User Manual. Super Admin and Admin can open every role there and print from the browser.</p>
+</div>
+
+<h1 class="chapter">1. How the system works</h1>
+<p>Finote is the church office. Each person who logs in is given a <strong>role</strong>. The role decides which menus they see, what they may change, and whose records they can open. You do not need every permission. You only need the work that belongs to your office.</p>
+<p>There are two doors after login:</p>
+<ul>
+    <li><strong>Staff</strong> (every role except Student) enter the <strong>admin office</strong>.</li>
+    <li><strong>Students</strong> enter the <strong>student portal</strong> only. They cannot open the admin office.</li>
+</ul>
+<p>If the account still has a temporary password, the person must change it before they can continue.</p>
+
+<h2>What happens when someone logs in</h2>
+<ol>
+    <li>The person signs in with their phone (and password).</li>
+    <li>If this is the first time, they must set a new password.</li>
+    <li>Staff land on a dashboard made for their role. Students land on the portal.</li>
+    <li>The left menu shows only the work they are allowed to do.</li>
+    <li>Super Admin and Admin can see members from <strong>every department</strong>. Other staff who belong to a department usually see only people from <strong>their own department</strong>, unless their job is church-wide membership (HR).</li>
+</ol>
+
+<h2>Things almost every staff person can do</h2>
+<ul>
+    <li>Open their dashboard and read the numbers for their office</li>
+    <li>Update their own profile</li>
+    <li>Use Ethiopian dates</li>
+    <li>Open the User Manual and other help</li>
+    <li>Work with documents that belong to their area</li>
+</ul>
+<p>Most department heads can also send a message to their people and view or book a church facility. Students cannot do those things.</p>
+
+<h2>The seven church departments</h2>
+<p>Members and groups are tied to a department. Pick the right department when you register someone, or other offices will not see them correctly.</p>
+<ul>
+    <li>Internal Relations</li>
+    <li>Nibret ena Hisab (property and accounts)</li>
+    <li>Education</li>
+    <li>Revenue and Charity</li>
+    <li>Mezmur</li>
+    <li>Foreign Affairs</li>
+    <li>Kinetibeb</li>
+</ul>
+
+<h1 class="chapter">2. Work that crosses offices</h1>
+<p>Some jobs cannot be finished by one person. One office starts the work; another office signs it off. These are the flows every staff member should know.</p>
+
+<div class="keep">
+<h2>A new person joins the church</h2>
+<ol>
+    <li><strong>HR Head</strong> (or Education Head / Admin) creates the member record and assigns the department.</li>
+    <li><strong>HR Head</strong> or <strong>Internal Relations</strong> puts them in the right groups and adds parent details if needed.</li>
+    <li>If they will study: <strong>Education Head</strong> enrolls them in a class.</li>
+    <li>If they will sing: <strong>Mezmur Head</strong> uses them in rehearsals.</li>
+    <li>If they give offerings: <strong>Finance Head</strong> records their payments against that member.</li>
+</ol>
+</div>
+
+<div class="keep">
+<h2>A student wants to leave a class</h2>
+<ol>
+    <li>The <strong>Student</strong> applies from the student portal (their own enrollment only).</li>
+    <li>The request is <strong>Pending</strong>. People who can approve are notified.</li>
+    <li><strong>Education Head</strong> or <strong>Admin</strong> approves or rejects it.</li>
+    <li>If rejected, the student stays enrolled. The flow stops.</li>
+    <li>If approved, the request is <strong>Education approved</strong>. HR is notified.</li>
+    <li><strong>HR Head</strong> finalizes it. Only then is the enrollment marked Withdrawn.</li>
+</ol>
+<p>Super Admin can do any of these steps. HR cannot skip Education's approval.</p>
+</div>
+
+<div class="keep">
+<h2>Exam marks</h2>
+<ol>
+    <li><strong>Data Encoder</strong> or <strong>Education Head</strong> types the marks and submits the list.</li>
+    <li><strong>Education Head</strong> or <strong>Admin</strong> approves the list.</li>
+    <li>The student can then see <strong>their own</strong> results in the portal.</li>
+</ol>
+<p>The person who typed the marks cannot approve that same list (except Education Head, who may). Another supervisor must sign off.</p>
+</div>
+
+<div class="keep">
+<h2>A spreadsheet of new members</h2>
+<ol>
+    <li>Someone uploads the import file.</li>
+    <li><strong>HR Head</strong>, <strong>Education Head</strong>, or <strong>Admin</strong> must <strong>commit</strong> it.</li>
+    <li>Until it is committed, those people are not real members yet.</li>
+    <li>A Data Encoder cannot commit an import.</li>
+</ol>
+</div>
+
+<div class="keep">
+<h2>Money, property, and aid - who records what</h2>
+<table>
+    <thead><tr><th>What happened</th><th>Who records it</th></tr></thead>
+    <tbody>
+        <tr><td>Tithe or monthly contribution</td><td>Finance Head or Nibret Hisab Head</td></tr>
+        <tr><td>Donation</td><td>Finance, Nibret Hisab, or Charity (when it supports aid)</td></tr>
+        <tr><td>Item in or out of the store</td><td>Inventory Staff or Nibret Hisab Head</td></tr>
+        <tr><td>Aid given to a person</td><td>Charity Head or Revenue and Charity Head</td></tr>
+        <tr><td>Tour passengers and tour attendance</td><td>Tour Head or Revenue and Charity Head</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h1 class="chapter">3. Who do I call?</h1>
+<table>
+    <thead><tr><th>I need to...</th><th>Ask</th></tr></thead>
+    <tbody>
+        <tr><td>Add or fix a member record</td><td>HR Head</td></tr>
+        <tr><td>Put someone in a group / handle a contact message</td><td>Internal Relations Head</td></tr>
+        <tr><td>Enroll a student or change class</td><td>Education Head</td></tr>
+        <tr><td>Take class attendance</td><td>Education Monitor</td></tr>
+        <tr><td>Type exam scores</td><td>Data Encoder</td></tr>
+        <tr><td>Approve exam scores</td><td>Education Head</td></tr>
+        <tr><td>A student wants to leave</td><td>Student applies, then Education Head, then HR Head</td></tr>
+        <tr><td>Record a payment</td><td>Finance Head</td></tr>
+        <tr><td>Record store items</td><td>Inventory Staff or Nibret Hisab Head</td></tr>
+        <tr><td>Register a tour passenger</td><td>Tour Head</td></tr>
+        <tr><td>Register someone for aid</td><td>Charity Head</td></tr>
+        <tr><td>Publish news or photos</td><td>AV Head</td></tr>
+        <tr><td>Add a song or rehearsal</td><td>Mezmur Head</td></tr>
+        <tr><td>Unlock an account or change a role</td><td>Super Admin (Admin can also manage users)</td></tr>
+        <tr><td>Change church system settings or restore a backup</td><td>Super Admin only</td></tr>
+    </tbody>
+</table>
+
+<!-- ROLES -->
+
+<div class="role">
+<span class="badge">Role 1</span>
+<h1 class="chapter">Super Admin</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Super Admin is the owner of the platform itself - usually one or two trusted IT or leadership people. They can open every screen and override any blocked step. This is not a daily department clerk. Do not use this account to register members or record offerings.</p>
+</div>
+<h2>What you can do</h2>
+<h3>People and access</h3>
+<ul>
+    <li>Create user accounts, assign roles, and attach a department</li>
+    <li>Lock or unlock an account, reset a password, turn a user on or off</li>
+    <li>See who is logged in and end a session</li>
+    <li>See audit logs: who changed what, and when</li>
+    <li>Use emergency override when someone is stuck</li>
+</ul>
+<h3>The church system</h3>
+<ul>
+    <li>Change Global Church Settings (name, address, phone prefix +251, currency, branding)</li>
+    <li>Set Auto-Purge (how long old logs and deleted records are kept)</li>
+    <li>Create and restore backups</li>
+    <li>Watch System Health (disk, memory, queues)</li>
+    <li>Read the Error Log when something breaks</li>
+    <li>Export audit logs for review</li>
+</ul>
+<h3>Every department</h3>
+<p>You can do anything any other role can do: members, money, inventory, education, marks, withdrawals, imports, songs, media, charity, tours, events, and messages. You see all departments, not only one.</p>
+<div class="cannot"><h2>What you should not do day to day</h2>
+<ul>
+    <li>Do not type daily contributions or take class attendance on this account</li>
+    <li>Do not share this password. Create an Admin account for ordinary church management</li>
+    <li>Restoring a backup replaces current data and logs everyone out - treat it as last resort</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Give someone a new login</h3>
+<ol>
+    <li>Go to Users, then New User.</li>
+    <li>Enter name, email, and phone (9 digits after +251).</li>
+    <li>Assign the department they work in. This controls whose members they will see.</li>
+    <li>Choose one or more roles (for example Finance Head).</li>
+    <li>Save. They receive a temporary password and must change it on first login.</li>
+</ol>
+<h3>Keep the system safe</h3>
+<ol>
+    <li>Open System Health if the office says the site is slow.</li>
+    <li>Open Error Log Viewer if a screen fails.</li>
+    <li>Create a backup from Backup and Restore at least weekly, and before a big change.</li>
+    <li>Review audit logs monthly.</li>
+</ol>
+<h3>Unblock a department</h3>
+<ol>
+    <li>Confirm the person has the right role and department.</li>
+    <li>If they cannot see a member, check the member's department.</li>
+    <li>If a marklist or withdrawal is stuck, Super Admin can approve or finalize it.</li>
+</ol>
+<h2>Tips</h2>
+<ul>
+    <li>One person can hold more than one role if they truly do both jobs.</li>
+    <li>Use Manage Active Sessions (profile menu) to end a forgotten or suspicious login.</li>
+    <li>Print this guide when you train new heads.</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 2</span>
+<h1 class="chapter">Admin</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Admin runs the church's daily office across departments. They can manage people, money, school, worship, media, charity, tours, and events. They cannot open the technical back room (system settings, backups, error logs). They also do not run the store - that belongs to Nibret Hisab / Inventory Staff.</p>
+</div>
+<h2>What you can do</h2>
+<h3>People</h3>
+<ul>
+    <li>Create and manage users, assign roles, lock or unlock accounts, reset passwords</li>
+    <li>See who is logged in</li>
+    <li>Full member and group work, including parents</li>
+    <li>See members from every department</li>
+</ul>
+<h3>Money and reports</h3>
+<ul>
+    <li>Contributions, donations, bank accounts, and financial transactions</li>
+    <li>Financial statements, audit trail, analytics</li>
+    <li>Donation, contribution, and contribution-matrix reports</li>
+    <li>Charity and beneficiary reports; tour reports</li>
+</ul>
+<h3>School</h3>
+<ul>
+    <li>Academic years, classes, subjects, courses, enrollments, promotions</li>
+    <li>Enroll, remove, or promote students (including many at once)</li>
+    <li>View attendance sessions; open student and teacher attendance pages</li>
+    <li>Enter, manage, and <strong>approve exam results</strong></li>
+    <li><strong>Approve a student withdrawal</strong> (HR still does the last step)</li>
+    <li><strong>Commit a member import</strong></li>
+</ul>
+<h3>Church life and content</h3>
+<ul>
+    <li>Songs, rehearsals, media, blogs, announcements, FAQs, documents</li>
+    <li>Schedule when content is published</li>
+    <li>Beneficiaries and aid; tours and passengers; events and registrations</li>
+    <li>Create or update fundraising totals</li>
+    <li>Manage departments and contact messages</li>
+    <li>Send messages to a group or the whole church</li>
+    <li>View, manage, and book facilities</li>
+    <li>See visitor analytics</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Change Global Church Settings, backups, error logs, or system health</li>
+    <li>Manage inventory items, stock movements, or loss records</li>
+    <li><strong>Finalize</strong> a student withdrawal - that last step belongs to HR Head</li>
+    <li>Apply for a withdrawal as if you were the student (students do that from the portal)</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>A typical week</h3>
+<ol>
+    <li>Open the dashboard: members, income, expenses, attendance trend.</li>
+    <li>Help a department that is stuck (wrong role, missing member, locked user).</li>
+    <li>If Education Head is away, approve a submitted marklist.</li>
+    <li>If a withdrawal is waiting, approve or reject it; tell HR to finalize if you approved.</li>
+    <li>Review contact messages and recent transactions.</li>
+</ol>
+<h3>Add a staff user</h3>
+<ol>
+    <li>Go to Users, then New User.</li>
+    <li>Enter name, email, phone, and department.</li>
+    <li>Assign the correct role. Save. They get an invitation with a temporary password.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Backups, settings, or a broken server - Super Admin</li>
+    <li>Store / stock counts - Inventory Staff or Nibret Hisab Head</li>
+    <li>Final step of a withdrawal - HR Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 3</span>
+<h1 class="chapter">HR Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The HR Head is the church membership office. If a person is not in the member list, almost no other office can work with them correctly. You own the register: add people, fix details, assign groups, manage parents, and close a student withdrawal after Education has approved it.</p>
+</div>
+<h2>What you can do</h2>
+<h3>Members</h3>
+<ul>
+    <li>Add, edit, search, and export members</li>
+    <li>Change a member's status</li>
+    <li>See a member's timeline</li>
+    <li>Assign people to groups, including many at once, or remove them from groups</li>
+    <li>Work across departments for membership (you are the church-wide register)</li>
+</ul>
+<h3>Families and files</h3>
+<ul>
+    <li>Create, update, and remove parent records</li>
+    <li>Upload and manage documents</li>
+    <li><strong>Commit a member import</strong> after a spreadsheet is uploaded</li>
+    <li><strong>Finalize a student withdrawal</strong> after Education has approved it</li>
+    <li>Open the teacher attendance report page</li>
+    <li>Send messages and view or book a facility</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Record contributions, donations, or bank transactions</li>
+    <li>Manage inventory</li>
+    <li>Create classes, enroll students, or enter exam marks</li>
+    <li>Approve exam results (Education Head / Admin)</li>
+    <li>Approve a withdrawal (you only do the last step, after Education)</li>
+    <li>Run tours, charity programs, songs, or the website</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Register a new member</h3>
+<ol>
+    <li>Go to Members, then New Member.</li>
+    <li>Enter full name, date of birth, gender, and marital status.</li>
+    <li>Enter phone as 9 digits after +251 (example: 911234567).</li>
+    <li>Add address, emergency contact, and spiritual information on the other tabs.</li>
+    <li>Choose the correct department. This decides who else can see them.</li>
+    <li>Save. Then assign groups and, if needed, parent records.</li>
+</ol>
+<h3>Put people in groups</h3>
+<ol>
+    <li>Create the group under Groups if it does not exist (leader, schedule, department).</li>
+    <li>Use Group Assignments to add or remove members and give them a role in the group.</li>
+    <li>For many people at once, use bulk assign.</li>
+</ol>
+<h3>Finish a student withdrawal</h3>
+<ol>
+    <li>Wait until Education Head or Admin has approved the request. You will be notified.</li>
+    <li>Open the withdrawal. Confirm the reason and the date it should take effect.</li>
+    <li>Finalize. The enrollment becomes Withdrawn. Do not finalize a request that is still Pending.</li>
+</ol>
+<h3>Commit a member import</h3>
+<ol>
+    <li>Open the uploaded import.</li>
+    <li>Check for duplicates and obvious errors.</li>
+    <li>Commit. Only then do the rows become real members.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Student must leave a class but Education has not approved yet - Education Head</li>
+    <li>The person should also be enrolled in school - Education Head after you create the member</li>
+    <li>A user account (login) is needed, not just a member record - Admin or Super Admin</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 4</span>
+<h1 class="chapter">Internal Relations Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Internal Relations Head keeps people connected: groups, parents, documents, and messages that come in through the church contact form. You are not the membership office. You usually view members and then place them in the right fellowship or service group. Creating a brand-new member from scratch belongs to HR (or Education / Admin).</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>View members</li>
+    <li>Create and update groups; assign people to groups or change those assignments</li>
+    <li>View, create, update, and delete parent records</li>
+    <li>Full document management (upload, search, download, replace)</li>
+    <li>Read contact messages from the public website</li>
+    <li>View and update departments</li>
+    <li>Open attendance-summary and teacher-attendance reports</li>
+    <li>Delete a media item when something must be taken down</li>
+    <li>Send messages and view or book a facility</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Create a new member record from scratch (ask HR)</li>
+    <li>Change member status the way HR does, or export the full register as HR does</li>
+    <li>Record money, inventory, marks, tours, or aid</li>
+    <li>Commit a member import or finalize a withdrawal</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Place someone in a group</h3>
+<ol>
+    <li>Confirm HR has already created the member.</li>
+    <li>Open Groups. Create the group if needed (name, leader, department).</li>
+    <li>Use Group Assignments to add the member and set their role in the group (leader, member, and so on).</li>
+</ol>
+<h3>Answer a contact message</h3>
+<ol>
+    <li>Open Contact Messages.</li>
+    <li>Read the message. If they need to become a member, send them to HR.</li>
+    <li>File any related letter or form under Documents.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Person is not in the system yet - HR Head</li>
+    <li>They need a login (staff or student) - Admin or Super Admin</li>
+    <li>They need to be enrolled in a class - Education Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 5</span>
+<h1 class="chapter">Finance Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Finance Head keeps the church books: offerings, donations, bank accounts, and the reports leadership uses. You look up members so you can attach a payment to the right person. You do not change their personal details or run the store.</p>
+</div>
+<h2>What you can do</h2>
+<h3>Money in and out</h3>
+<ul>
+    <li>Record and manage contributions; set expected contribution amounts</li>
+    <li>Record donations</li>
+    <li>Record financial transactions (deposit, withdrawal, transfer)</li>
+    <li>Manage bank accounts</li>
+    <li>Update a fundraising total</li>
+</ul>
+<h3>Reports and people</h3>
+<ul>
+    <li>Financial statements, financial audit trail, financial analytics</li>
+    <li>Donation report, contribution report, contribution matrix</li>
+    <li>View and export members; see the finance part of a member's timeline</li>
+    <li>View charity reports and tour reports (the money side, not running those programs)</li>
+    <li>Documents, messages, and facility booking</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Create or edit member personal details, groups, or parents</li>
+    <li>Manage inventory, stock, or losses</li>
+    <li>Run education, songs, tours, or aid distributions</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Record a contribution</h3>
+<ol>
+    <li>Confirm the person is already a member. If not, send them to HR first.</li>
+    <li>Go to Contributions, then New Contribution.</li>
+    <li>Search the member by name.</li>
+    <li>Choose the type, amount, payment method (cash, bank, mobile money), and date.</li>
+    <li>Save. It appears on statements and the contribution matrix.</li>
+</ol>
+<h3>Set expected amounts</h3>
+<p>Use Contribution Amounts so staff type the same figures every month. This also helps the outstanding-contributions report.</p>
+<h3>Record a donation</h3>
+<ol>
+    <li>Go to Donations, then New Donation.</li>
+    <li>Enter the donor, type (general fund, building, and so on), amount, date, and method.</li>
+    <li>Save. Review later under Donation Report.</li>
+</ol>
+<h3>Bank and monthly close</h3>
+<ol>
+    <li>Keep Bank Accounts up to date.</li>
+    <li>Record each deposit, withdrawal, or transfer under Financial Transactions.</li>
+    <li>At month end, open Financial Overview, Statement, and Audit Trail.</li>
+    <li>Use Contribution Matrix to see who has and has not given for the period.</li>
+</ol>
+<h2>Reports you will use</h2>
+<ul>
+    <li>Contribution Matrix - members across periods</li>
+    <li>Contribution Report and Monthly Contribution Reports</li>
+    <li>Outstanding Contributions - unpaid</li>
+    <li>Donation Report</li>
+    <li>Financial Overview, Statement, and Audit Trail</li>
+</ul>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Payer is not a member yet - HR Head</li>
+    <li>An item was bought or issued from the store - Inventory Staff or Nibret Hisab Head</li>
+    <li>Aid was given to a person (not a bank transaction) - Charity Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 6</span>
+<h1 class="chapter">Nibret Hisab Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Nibret Hisab Head is Finance Head plus the store. You keep both the books and the property register. If the church has a separate Finance Head, you still share the money screens; the extra work that is yours is inventory.</p>
+</div>
+<h2>What you can do</h2>
+<h3>Money (same as Finance Head)</h3>
+<ul>
+    <li>Contributions, contribution amounts, donations</li>
+    <li>Financial transactions and bank accounts</li>
+    <li>Financial statements, audit trail, analytics</li>
+    <li>Donation, contribution, and contribution-matrix reports</li>
+    <li>Update fundraising totals; view charity and tour reports</li>
+    <li>View members (so you can attach a payment)</li>
+</ul>
+<h3>Property</h3>
+<ul>
+    <li>Add and update inventory items</li>
+    <li>Record inventory movements and stock movements</li>
+    <li>Record losses (damage, expiry, missing items)</li>
+    <li>See inventory analytics and reports</li>
+    <li>View beneficiaries (read only) when aid and stock meet</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Register beneficiaries or record aid distributions (Charity Head)</li>
+    <li>Run education, songs, tours, or HR membership</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>A typical day</h3>
+<ol>
+    <li>Record offerings and donations the same way Finance Head does.</li>
+    <li>When an item is bought, donated, or issued, open Inventory Items / Stock Movements.</li>
+    <li>Enter the item, quantity, in or out, date, and reason.</li>
+    <li>If something is damaged or missing, create a Loss Record so the count stays honest.</li>
+    <li>Check the dashboard for low stock and recent movements.</li>
+</ol>
+<h3>Add a store item</h3>
+<ol>
+    <li>Go to Inventory Items, then New Item.</li>
+    <li>Enter name, category, quantity, unit, and unit price.</li>
+    <li>Set location and a minimum stock level so you get an alert.</li>
+    <li>Save. Later movements adjust the quantity.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Daily stock counting only - Inventory Staff can do that without touching the books</li>
+    <li>Aid given to a person - Charity Head</li>
+    <li>New member needed before you can record their offering - HR Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 7</span>
+<h1 class="chapter">Inventory Staff</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>Inventory Staff are the storekeepers. You keep the count of church property honest. You do not handle cash, members, or classes.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>Add, edit, and organize inventory items</li>
+    <li>Record inventory movements and stock movements (in, out, transfer)</li>
+    <li>Record losses</li>
+    <li>See inventory analytics and reports</li>
+    <li>Manage related documents</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>See or record contributions, donations, or bank accounts</li>
+    <li>Open member records, education, tours, or charity programs</li>
+    <li>Send church-wide messages or book facilities (unless another role is added)</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Something arrives</h3>
+<ol>
+    <li>If the item is new, create it under Inventory Items (name, category, unit, location, minimum stock).</li>
+    <li>Record a Stock Movement of type In. Enter quantity, date, and reason (purchase, donation).</li>
+    <li>Check that the quantity on the item now matches what is on the shelf.</li>
+</ol>
+<h3>Something is issued</h3>
+<ol>
+    <li>Record a movement of type Out. Say who received it and why.</li>
+    <li>If the item drops below the minimum, it appears as low stock on your dashboard.</li>
+</ol>
+<h3>Something is lost or damaged</h3>
+<ol>
+    <li>Create a Loss Record with quantity, reason, and date.</li>
+    <li>The stock count is reduced so the books match the shelf.</li>
+    <li>Tell Nibret Hisab Head if the loss is large.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>A purchase must also appear in the bank book - Nibret Hisab Head or Finance Head</li>
+    <li>Items were given as aid to a person - Charity Head should also record the distribution</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 8</span>
+<h1 class="chapter">Education Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Education Head runs the church school: years, classes, teachers, students, attendance, and exam results. You may create or update a member when you register a student. You approve marks and the first step of a withdrawal. HR finishes the withdrawal.</p>
+</div>
+<h2>What you can do</h2>
+<h3>The school structure</h3>
+<ul>
+    <li>Create academic years and turn them on or off</li>
+    <li>Manage classes, subjects, courses, and lessons</li>
+    <li>Manage enrollments and promotions, including promoting many students at once</li>
+    <li>Enroll or remove students</li>
+</ul>
+<h3>Teachers and attendance</h3>
+<ul>
+    <li>Add teachers (including external), assign them to members, classes, and subjects</li>
+    <li>Update or remove assignments and see assignment history</li>
+    <li>Assign a substitute</li>
+    <li>See teacher attendance rate</li>
+    <li>Open, lock, and unlock attendance sessions and records (including offline records)</li>
+</ul>
+<h3>Marks, people, and files</h3>
+<ul>
+    <li>View, enter, manage, and <strong>approve exam results</strong></li>
+    <li><strong>Approve or reject a student withdrawal</strong></li>
+    <li><strong>Commit a member import</strong></li>
+    <li>Create and update members; see the education part of a member's timeline</li>
+    <li>Upload library resources and manage library categories</li>
+    <li>Education reports: teacher attendance, student progress, class performance, attendance summary</li>
+    <li>Send messages and view or book a facility</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>See the finance part of a member's timeline, or record offerings</li>
+    <li><strong>Finalize</strong> a withdrawal - HR Head does that after you approve</li>
+    <li>Manage inventory, tours, charity programs, or the public website</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Start a school year</h3>
+<ol>
+    <li>Create the Academic Year (name, start, end) and mark it active.</li>
+    <li>Create or update Classes and Subjects.</li>
+    <li>Add Teachers and assign them to class and subject.</li>
+    <li>Enroll students. If the person is not a member yet, create the member first (or ask HR).</li>
+</ol>
+<h3>Enroll a student</h3>
+<ol>
+    <li>Go to Student Enrollments, then New Enrollment.</li>
+    <li>Select the member, class, and year. Set the date and status.</li>
+    <li>At year end, use Bulk Promote to move a class forward.</li>
+</ol>
+<h3>Attendance (you or the Monitor)</h3>
+<ol>
+    <li>Create an attendance session (class, date, morning / afternoon / full day).</li>
+    <li>Mark each student Present, Absent, Late, or Excused.</li>
+    <li>Mark teacher attendance the same way.</li>
+    <li>Lock the session when it is finished so it is not changed by accident.</li>
+</ol>
+<h3>Approve exam marks</h3>
+<ol>
+    <li>The Data Encoder (or you) types the marks and submits the list.</li>
+    <li>Open the submitted marklist. Check a few scores.</li>
+    <li>Approve. Students can then see their own results.</li>
+    <li>If something is wrong after approval, reopen it with a written reason (at least 10 characters) and have the scores fixed.</li>
+</ol>
+<h3>A student wants to leave</h3>
+<ol>
+    <li>The student applies from the portal. You are notified.</li>
+    <li>Approve or reject. If you reject, they stay enrolled.</li>
+    <li>If you approve, HR is notified. They must finalize before the enrollment is actually closed.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Daily attendance only - Education Monitor</li>
+    <li>Typing a long marklist - Data Encoder, then you approve</li>
+    <li>Withdrawal last step - HR Head</li>
+    <li>Church-wide member register cleanup - HR Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 9</span>
+<h1 class="chapter">Education Monitor</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Education Monitor takes and watches attendance. You do not run the school. You open a session, mark who is present, lock it, and read the reports. You may assign a substitute teacher when someone is away.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>Create and manage attendance sessions (including resolving sync conflicts)</li>
+    <li>Mark, lock, and unlock attendance records; record attendance offline</li>
+    <li>Assign a substitute teacher</li>
+    <li>View academic years, classes, subjects, enrollments, teachers, and members</li>
+    <li>Open student attendance, attendance-summary, and teacher-attendance reports</li>
+    <li>View facilities (you cannot book them)</li>
+    <li>Work with documents for attendance</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Create classes, enroll students, or promote them</li>
+    <li>Add or edit teachers (except assigning a substitute)</li>
+    <li>Enter or approve exam marks</li>
+    <li>Create or change member records</li>
+    <li>Commit imports or handle withdrawals</li>
+    <li>Record money or inventory</li>
+    <li>Send broadcasts</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Take student attendance</h3>
+<ol>
+    <li>Go to Create Attendance Session (or Student Attendance).</li>
+    <li>Choose the class, date, and session type (morning, afternoon, full day).</li>
+    <li>Create the session. The class list opens.</li>
+    <li>For each student mark Present, Absent, Late, or Excused. Add a note if needed.</li>
+    <li>Save, then lock the session so it cannot be changed by accident.</li>
+</ol>
+<h3>Teacher is absent</h3>
+<ol>
+    <li>Mark the teacher absent on Teacher Attendance.</li>
+    <li>Assign a substitute for that class and subject.</li>
+    <li>Tell Education Head if this happens often - they manage the teacher list.</li>
+</ol>
+<h3>After class</h3>
+<ol>
+    <li>Open Attendance Summary if a class looks weak.</li>
+    <li>If you recorded attendance on a phone without network, sync later and resolve any conflicts.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>A student is missing from the list - Education Head (enrollment)</li>
+    <li>Wrong class or year - Education Head</li>
+    <li>Marks, promotions, or withdrawals - Education Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 10</span>
+<h1 class="chapter">Data Encoder</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Data Encoder types class and subject marklists. That is almost the whole job. You look up classes, subjects, and students so you can enter scores. You cannot approve those scores. Education Head (or Admin) must sign them off.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>View marklists</li>
+    <li>Record (type) marks</li>
+    <li>View classes, subjects, and students</li>
+    <li>Use Ethiopian dates</li>
+    <li>Update your own profile and open help</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Approve results</li>
+    <li>Change enrollments, teachers, or attendance</li>
+    <li>Create members or commit an import</li>
+    <li>See finance, tours, charity, inventory, songs, or media</li>
+    <li>Send messages or book facilities</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Enter a marklist</h3>
+<ol>
+    <li>Open the marklist page for the class and subject.</li>
+    <li>Confirm the term is the current one. You cannot type into an inactive term (Admin / Super Admin can override).</li>
+    <li>Type each student's score. Save as you go if the list is long.</li>
+    <li>Submit the marklist when it is complete.</li>
+    <li>Tell Education Head it is ready. They approve it. Students then see their own results.</li>
+</ol>
+<h3>If you made a mistake</h3>
+<ol>
+    <li>If it is not submitted yet, just correct it.</li>
+    <li>If it is submitted or approved, ask Education Head to reopen it. They must write a reason.</li>
+    <li>You still cannot approve the corrected list. Someone else signs it off.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>A student is missing from the roster - Education Head (enrollment)</li>
+    <li>Approval, reopen, or a closed term - Education Head or Admin</li>
+    <li>Anything that is not marks - that department's head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 11</span>
+<h1 class="chapter">Student</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>A Student is an enrolled member with a phone login. They use the student portal only. They never enter the admin office. This chapter is for staff who train students or help a parent.</p>
+</div>
+<h2>What a student can do</h2>
+<ul>
+    <li>See their own exam results</li>
+    <li>See their own attendance</li>
+    <li>Read announcements</li>
+    <li>Browse the library</li>
+    <li>Download songs for offline use</li>
+    <li>Apply to withdraw from a class</li>
+    <li>Export their own documents</li>
+    <li>Update their profile</li>
+    <li>Log in and log out</li>
+</ul>
+<div class="cannot"><h2>What a student cannot do</h2>
+<ul>
+    <li>Open anyone else's marks, attendance, or files</li>
+    <li>Enter the admin office or any staff menu</li>
+    <li>Approve their own withdrawal - Education Head decides, HR finishes</li>
+    <li>Change class, teacher, or enrollment themselves</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>First login</h3>
+<ol>
+    <li>Staff create the member and enroll them. A student login is provisioned.</li>
+    <li>The student signs in with their phone.</li>
+    <li>They must change the temporary password. Until they do, they stay on the profile page.</li>
+    <li>After that they use the portal home: results, attendance, library, announcements.</li>
+</ol>
+<h3>Leaving a class</h3>
+<ol>
+    <li>From the portal, apply for withdrawal. Give a reason. They can only apply for their own enrollment.</li>
+    <li>They cannot apply again while another request is already pending or education-approved.</li>
+    <li>Education Head approves or rejects. HR finalizes if approved.</li>
+    <li>They can print the withdrawal paper when they are allowed to.</li>
+</ol>
+<h2>When staff must help</h2>
+<ul>
+    <li>No login or forgotten password - Admin or Super Admin</li>
+    <li>Wrong class - Education Head</li>
+    <li>Results not showing - Data Encoder may not have submitted, or Education Head has not approved</li>
+    <li>Withdrawal stuck after Education approved - HR Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 12</span>
+<h1 class="chapter">Mezmur Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Mezmur Head owns the song book and rehearsals. You decide what is sung, when the choir meets, and who attended. You can see members and departments so you know who belongs to Mezmur. A Worship Monitor helps you; they cannot see the full member list or send broadcasts.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>Full control of songs, song categories, and subcategories</li>
+    <li>Schedule rehearsals and take rehearsal attendance</li>
+    <li>Control whether worship media is visible</li>
+    <li>Record rehearsal attendance offline</li>
+    <li>View members and departments</li>
+    <li>Manage documents</li>
+    <li>View reports</li>
+    <li>Send messages and view or book a facility</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Create or edit member personal records (ask HR)</li>
+    <li>Record money, inventory, classes, or exam marks</li>
+    <li>Run tours, charity, or the public news site (AV Head publishes church-wide content)</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Add a song</h3>
+<ol>
+    <li>Go to Songs, then New Song.</li>
+    <li>Enter title, lyrics, and author.</li>
+    <li>Assign a category (worship, thanksgiving, communion, Lent, and so on) and optional subcategory.</li>
+    <li>Set language and key if you use them. Save.</li>
+</ol>
+<h3>Run a rehearsal</h3>
+<ol>
+    <li>Create a Rehearsal: date, time, place, choir or group.</li>
+    <li>Add the songs you will practise from the song library.</li>
+    <li>If you need a room, book the facility.</li>
+    <li>After the rehearsal, mark attendance. You can do this offline and sync later.</li>
+    <li>Decide which related media should be visible.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>A singer is not in the member list - HR Head</li>
+    <li>A recording should appear on the public site - AV Head</li>
+    <li>Daily song filing without broadcasts - Worship Monitor can help</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 13</span>
+<h1 class="chapter">Worship Monitor</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Worship Monitor helps Mezmur Head with the song book and rehearsals. You can add songs, schedule rehearsals, and take attendance. You do not see the full member list, send broadcasts, or book facilities.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>Manage songs, categories, and subcategories</li>
+    <li>Schedule rehearsals and take rehearsal attendance</li>
+    <li>Control media visibility for worship items</li>
+    <li>Record attendance offline</li>
+    <li>Work with documents and view reports</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>View the church member list</li>
+    <li>Send messages to groups</li>
+    <li>Book a facility (ask Mezmur Head)</li>
+    <li>Touch money, education, tours, or charity</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Before rehearsal</h3>
+<ol>
+    <li>Add or update songs Mezmur Head has chosen.</li>
+    <li>Open the rehearsal (or create it if you were asked to) and attach those songs.</li>
+    <li>If you need a hall booked, ask Mezmur Head.</li>
+</ol>
+<h3>During and after</h3>
+<ol>
+    <li>Mark who came. You may do this on a phone without network, then sync.</li>
+    <li>Adjust media visibility if Mezmur Head asked you to hide or show a recording.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Need a room, a message to the choir, or a member lookup - Mezmur Head</li>
+    <li>Singer not in the system - HR Head (through Mezmur Head)</li>
+    <li>Public website publish - AV Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 14</span>
+<h1 class="chapter">AV Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The AV Head is communications: photos, video, the media library, blog posts, announcements, FAQs, and when those things go public. You may look up or export members so you know who you are speaking to. You do not change their records or handle money.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>Upload and organize media items, categories, and subcategories</li>
+    <li>Set who can see each item (public or private)</li>
+    <li>Write, edit, and publish blog posts and announcements</li>
+    <li>Manage FAQs</li>
+    <li>Schedule publication for a future date</li>
+    <li>Manage documents</li>
+    <li>View and export members</li>
+    <li>See visitor analytics</li>
+    <li>Send messages and view or book a facility (for recording or an event)</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Edit member personal details or groups</li>
+    <li>Record money, inventory, marks, tours, or aid</li>
+    <li>Own the song book (Mezmur Head does; you publish recordings)</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Publish a photo or video</h3>
+<ol>
+    <li>Go to Media Items, then New Media Item.</li>
+    <li>Upload the file. Add a title and description.</li>
+    <li>Choose category and subcategory (sermons, events, choir, Sunday service).</li>
+    <li>Set visibility. Save. Check visitor stats later if it is public.</li>
+</ol>
+<h3>Announce something</h3>
+<ol>
+    <li>Create an Announcement. Set an expiry date so it disappears when it is old.</li>
+    <li>Target a department or the whole church.</li>
+    <li>Or write a Blog Post with a featured image and schedule it if it should not go live yet.</li>
+</ol>
+<h3>Keep FAQs and files tidy</h3>
+<ol>
+    <li>Update FAQs that appear on public pages. Set the display order.</li>
+    <li>Put policies and forms under Documents with the right access.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>A choir recording's source song - Mezmur Head</li>
+    <li>A member list for invitations - you can export; HR owns the register if names are wrong</li>
+    <li>Something must be taken down quickly and you are away - Internal Relations can delete a media item</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 15</span>
+<h1 class="chapter">Charity Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Charity Head looks after people who receive help and the aid that goes out. You may record donations that support that work, and look up members. You do not run tours (unless you also hold Revenue and Charity Head) and you do not keep the main church books.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>Full beneficiaries: register, update, and manage status</li>
+    <li>Record aid distributions (money or goods)</li>
+    <li>Charity reports and beneficiary reports</li>
+    <li>View and create contributions; record donations</li>
+    <li>View tour reports (read the money/trip picture, not run the tour)</li>
+    <li>View and export members</li>
+    <li>Open donation, charity, and beneficiary report pages</li>
+    <li>Documents, messages, and facility booking</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Create tours or manage passengers</li>
+    <li>Manage inventory or bank accounts</li>
+    <li>Run education or change member personal records</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Register someone who needs help</h3>
+<ol>
+    <li>Go to Beneficiaries, then New Beneficiary.</li>
+    <li>Enter name, age, gender, and address.</li>
+    <li>Choose type (individual, family, orphan, widow, and so on) and need (food, shelter, medical, education).</li>
+    <li>Set status (active, inactive, completed) and notes. Save.</li>
+</ol>
+<h3>Give aid</h3>
+<ol>
+    <li>Go to Aid Distributions, then New Distribution.</li>
+    <li>Select the beneficiary and the aid type (money, food, clothing, medical).</li>
+    <li>If money, enter the amount in ETB. If goods, describe items and quantity.</li>
+    <li>Set the date. Save.</li>
+    <li>After it is checked, lock the distribution so it cannot be edited by accident. Only Charity Head can unlock it.</li>
+</ol>
+<h3>Money that supports aid</h3>
+<ol>
+    <li>Record a donation earmarked for charity, or view/create a contribution if that is how the gift arrived.</li>
+    <li>Finance Head still owns the main books. Tell them if a large gift should also appear there.</li>
+    <li>Use Charity Report and Beneficiary Report for leadership.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Goods came from the store - Inventory Staff should record the stock out</li>
+    <li>A fundraising trip brought the money - Tour Head or Revenue and Charity Head</li>
+    <li>The person should also be a church member - HR Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 16</span>
+<h1 class="chapter">Tour Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Tour Head runs church trips from plan to attendance. You create the tour, register passengers, confirm them, take attendance, and report. You do not run charity or the main finance books.</p>
+</div>
+<h2>What you can do</h2>
+<ul>
+    <li>Create and update tours</li>
+    <li>View registrations; register passengers; confirm a registration</li>
+    <li>Create tour attendance and mark who actually travelled</li>
+    <li>Use the call button and tour reports</li>
+    <li>Manage tour passengers and tour attendances</li>
+    <li>Documents, messages, and facility booking</li>
+    <li>Open the tour report page</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Manage beneficiaries or aid distributions</li>
+    <li>Record church-wide contributions or bank accounts</li>
+    <li>Change member personal records (passengers are chosen from members that already exist)</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>Plan a tour</h3>
+<ol>
+    <li>Go to Tours, then New Tour.</li>
+    <li>Enter name, destination, description, start and end dates, departure time.</li>
+    <li>Enter cost per passenger if there is a fee, and the maximum number of seats.</li>
+    <li>Save. Book a meeting room if you need a briefing.</li>
+</ol>
+<h3>Register passengers</h3>
+<ol>
+    <li>Open the tour, then Passengers, then Add Passenger.</li>
+    <li>Select a member. If they are not in the list, HR must create them first.</li>
+    <li>Record payment status if you collect a fee. Confirm the registration when it is sure.</li>
+    <li>Use the call button to reach people who have not confirmed.</li>
+</ol>
+<h3>On the trip</h3>
+<ol>
+    <li>Create tour attendance for the date.</li>
+    <li>Check off who actually travelled (not only who registered).</li>
+    <li>After return, open Tour Report for counts, attendance, and any revenue.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Passenger is not a member - HR Head</li>
+    <li>Tour fees should hit the church books - Finance Head or Nibret Hisab Head</li>
+    <li>The same office also gives aid - use Revenue and Charity Head, or work with Charity Head</li>
+</ul>
+</div>
+
+<div class="role">
+<span class="badge">Role 17</span>
+<h1 class="chapter">Revenue and Charity Head</h1>
+<div class="who"><h2>Who this person is</h2>
+<p>The Revenue and Charity Head is the combined Revenue and Charity department: trips that raise or move people, and aid that goes out to beneficiaries. You can do everything Tour Head can do and everything Charity Head can do.</p>
+</div>
+<h2>What you can do</h2>
+<h3>Tours</h3>
+<ul>
+    <li>Create and manage tours</li>
+    <li>Register and confirm passengers</li>
+    <li>Take tour attendance</li>
+    <li>Tour reports</li>
+</ul>
+<h3>Charity</h3>
+<ul>
+    <li>Manage beneficiaries and aid distributions</li>
+    <li>Charity and beneficiary reports</li>
+    <li>View and create contributions; record donations</li>
+    <li>View members</li>
+    <li>Donation, charity, and beneficiary report pages</li>
+</ul>
+<h3>Shared</h3>
+<ul>
+    <li>Documents, messages, facility booking</li>
+</ul>
+<div class="cannot"><h2>What you cannot do</h2>
+<ul>
+    <li>Keep the full finance books or bank accounts (Finance / Nibret Hisab)</li>
+    <li>Manage inventory</li>
+    <li>Run education or HR membership</li>
+    <li>Change system settings</li>
+</ul>
+</div>
+<h2>How the work flows</h2>
+<h3>A fundraising trip that also supports aid</h3>
+<ol>
+    <li>Create the tour and register passengers (see the Tour Head chapter).</li>
+    <li>Record donations or contributions that came from the trip.</li>
+    <li>After the trip, take attendance and run the tour report.</li>
+    <li>Register or update beneficiaries and record aid distributions from those gifts.</li>
+    <li>Tell Finance Head if large amounts should also appear on the church statements.</li>
+    <li>Tell Inventory Staff if goods left the store as aid.</li>
+</ol>
+<h3>Ordinary aid week (no tour)</h3>
+<ol>
+    <li>Follow the Charity Head steps: beneficiary, then distribution, then lock when verified.</li>
+    <li>Use Charity Report and Beneficiary Report for the department meeting.</li>
+</ol>
+<h2>When you need someone else</h2>
+<ul>
+    <li>Passenger or beneficiary should be a church member first - HR Head</li>
+    <li>Bank deposit or monthly contribution books - Finance Head or Nibret Hisab Head</li>
+    <li>Stock leaving the store - Inventory Staff</li>
+</ul>
+</div>
+
+</body>
+</html>

@@ -42,21 +42,30 @@ class UserManual extends Page
 
     public function getSubheading(): ?string
     {
-        return 'Full training guide: what each role can do, and how work moves from one person to the next';
+        if (RoleGate::isAny(['superadmin', 'admin'])) {
+            return 'Training view: every role guide, plus how work moves between offices.';
+        }
+
+        return 'Your role guide — only the work you can do in Finote.';
     }
 
     /**
-     * Preferred tab for the signed-in user.
+     * Preferred tab for the signed-in user (active role first, then any owned role).
      */
     public function getUserRole(): string
     {
+        $known = array_keys($this->allRoleTabs());
+        $active = RoleGate::activeRole();
+
+        if ($active && in_array($active, $known, true)) {
+            return $active;
+        }
+
         $user = Auth::user();
 
         if (! $user) {
             return 'superadmin';
         }
-
-        $known = array_keys($this->allRoleTabs());
 
         foreach ($user->roles->pluck('name') as $role) {
             if (in_array($role, $known, true)) {
@@ -150,6 +159,11 @@ class UserManual extends Page
                 'label' => 'Student',
                 'icon' => 'heroicon-o-identification',
                 'color' => 'gray',
+            ],
+            'parent' => [
+                'label' => 'Parent',
+                'icon' => 'heroicon-o-heart',
+                'color' => 'info',
             ],
             'mezmur_head' => [
                 'label' => 'Mezmur Head',

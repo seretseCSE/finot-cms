@@ -14,13 +14,19 @@ class SetLocaleMiddleware
      */
     public function handle(Request $request, Closure $next): mixed
     {
+        $defaultLocale = config('app.locale', 'am');
+
         // Check if user is authenticated
         if (Auth::check()) {
             $user = Auth::user();
-            $locale = $user->language_preference ?? 'en';
+            $locale = $user->language_preference ?: $defaultLocale;
         } else {
-            // Try to get locale from cookie for guests
-            $locale = $request->cookie('locale') ?? 'en';
+            // Explicit choice is stored in the locale cookie; otherwise Amharic
+            $locale = $request->cookie('locale') ?? $defaultLocale;
+        }
+
+        if (! in_array($locale, ['en', 'am'], true)) {
+            $locale = $defaultLocale;
         }
 
         // Set the application locale

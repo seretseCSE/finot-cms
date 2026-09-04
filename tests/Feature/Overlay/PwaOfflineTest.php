@@ -24,7 +24,7 @@ class PwaOfflineTest extends TestCase
     }
 
     #[Test]
-    public function student_dashboard_has_learning_links_and_worksheets_point_to_library(): void
+    public function student_dashboard_has_learning_links(): void
     {
         $enrollment = StudentEnrollment::factory()->enrolled()->create();
         $user = User::query()->where('member_id', $enrollment->member_id)->first();
@@ -35,12 +35,13 @@ class PwaOfflineTest extends TestCase
             ->assertOk()
             ->assertSee('My Results')
             ->assertSee('My Attendance')
-            ->assertSee('Library');
+            ->assertSee('Class Announcements')
+            ->assertSee('Homework')
+            ->assertDontSee('Church library books', false);
 
         $this->actingAs($user)->get('/admin/my-results')->assertOk();
         $this->actingAs($user)->get('/admin/my-attendance')->assertOk();
         $this->actingAs($user)->get(route('portal.offline-snapshot'))->assertOk()->assertJsonStructure(['results', 'attendance']);
-        $this->get('/library')->assertOk();
     }
 
     #[Test]

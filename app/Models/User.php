@@ -43,6 +43,7 @@ class User extends Authenticatable implements FilamentUser
         'locked_at',
         'department_id',
         'member_id',
+        'parent_id',
         'language_preference',
         'tour_version',
         'last_login_at',
@@ -176,6 +177,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->isActive() && (
             $this->hasAnyRole(\App\Enums\Roles::STAFF)
             || $this->hasRole(\App\Enums\Roles::STUDENT)
+            || $this->hasRole(\App\Enums\Roles::PARENT)
         );
     }
 
@@ -196,6 +198,16 @@ class User extends Authenticatable implements FilamentUser
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function parentRecord()
+    {
+        return $this->belongsTo(ParentModel::class, 'parent_id');
+    }
+
+    public function isParentOnly(): bool
+    {
+        return $this->hasRole(\App\Enums\Roles::PARENT) && ! $this->isStaff();
     }
 
     public function isStaff(): bool

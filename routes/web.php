@@ -5,6 +5,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ActiveRoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InAppNotificationController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\Portal\PortalAuthController;
 use App\Http\Controllers\Portal\PortalController;
 use App\Http\Middleware\RecordPageView;
@@ -141,6 +142,9 @@ Route::middleware(['auth', 'student'])->prefix('portal')->name('portal.')->group
 Route::middleware('auth')->group(function () {
     Route::get('/notifications/in-app', [InAppNotificationController::class, 'index'])->name('notifications.in-app');
     Route::post('/notifications/in-app/{notification}/read', [InAppNotificationController::class, 'markRead'])->name('notifications.in-app.read');
+    Route::get('/push/vapid-public-key', [PushSubscriptionController::class, 'publicKey'])->name('push.vapid-public-key');
+    Route::post('/push/subscribe', [PushSubscriptionController::class, 'store'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
 });
 
 Route::middleware('throttle:5,1')->group(function () {

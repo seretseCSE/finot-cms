@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-
 use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\StudentEnrollmentResource\Pages;
 use Filament\Schemas\Schema;
@@ -13,6 +12,8 @@ use App\Models\Member;
 use App\Models\MemberGroup;
 use App\Models\StudentEnrollment;
 use App\Rules\EnrollmentUniquePerYear;
+use App\Services\Academics\BatchPromotionService;
+use App\Services\Academics\PromotionBoardService;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -144,6 +145,31 @@ class StudentEnrollmentResource extends BaseResource
                     ->dehydrated()
                     ->required(),
 
+                Forms\Components\Select::make('batch_id')
+                    ->label('Batch')
+                    ->relationship('batch', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->live()
+                    ->nullable(),
+
+                Forms\Components\Select::make('batch_year_id')
+                    ->label('Batch year')
+                    ->options(function (callable $get): array {
+                        $batchId = $get('batch_id');
+                        if (! $batchId) {
+                            return [];
+                        }
+
+                        return \App\Models\BatchYear::query()
+                            ->where('batch_id', $batchId)
+                            ->orderBy('program_year')
+                            ->pluck('name', 'id')
+                            ->all();
+                    })
+                    ->searchable()
+                    ->nullable(),
+
                 Forms\Components\TextInput::make('enrolled_date')
                     ->label('Enrolled Date')
                     ->type('date')
@@ -178,7 +204,7 @@ class StudentEnrollmentResource extends BaseResource
             ->query(
                 StudentEnrollment::query()
                     ->select('student_enrollments.*')
-                    ->with(['member', 'class', 'academicYear'])
+                    ->with(['member', 'class', 'academicYear', 'batch', 'batchYear'])
             )
             ->columns([
                 Tables\Columns\TextColumn::make('student_full_name')
@@ -186,6 +212,8 @@ class StudentEnrollmentResource extends BaseResource
                     ->searchable()
                     ->formatStateUsing(fn ($record) => $record->student_full_name),
                 Tables\Columns\TextColumn::make('class.name')->label('Class')->sortable(),
+                Tables\Columns\TextColumn::make('batch.name')->label('Batch')->sortable(),
+                Tables\Columns\TextColumn::make('batchYear.name')->label('Batch year')->sortable(),
                 Tables\Columns\TextColumn::make('academicYear.name')->label('Academic Year')->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -263,11 +291,11 @@ class StudentEnrollmentResource extends BaseResource
                     }),
 
                 Actions\Action::make('promote')
-                    ->label('Promote')
+                    ->label('Pass (next class)')
                     ->icon('heroicon-o-arrow-up')
                     ->color('warning')
                     ->visible(function (StudentEnrollment $record): bool {
-                        if ($record->status !== 'Enrolled') {
+                        if ($record->status !== 'Enrolled' || ! $record->batch_year_id) {
                             return false;
                         }
 
@@ -275,102 +303,81 @@ class StudentEnrollmentResource extends BaseResource
 
                         return (bool) ($year?->is_active && $year?->status === 'Active');
                     })
+                    ->form(function (StudentEnrollment $record): array {
+                        $boards = app(PromotionBoardService::class);
+                        $options = $boards->nextClassOptions($record->class);
+
+                        return [
+                            Forms\Components\Select::make('target_class_id')
+                                ->label('Next class')
+                                ->options($options)
+                                ->default(array_key_first($options))
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->helperText('Same batch — moves to the next program year class.'),
+                            Forms\Components\Textarea::make('notes')
+                                ->label('Notes')
+                                ->maxLength(500),
+                        ];
+                    })
+                    ->action(function (StudentEnrollment $record, array $data): void {
+                        try {
+                            app(BatchPromotionService::class)->promote(
+                                $record,
+                                (int) $data['target_class_id'],
+                                Auth::user(),
+                            );
+
+                            Notification::make()
+                                ->title('Student passed to next class')
+                                ->body('Batch unchanged. Use Promotion board to pass a whole class at once.')
+                                ->success()
+                                ->send();
+                        } catch (\Illuminate\Validation\ValidationException $e) {
+                            Notification::make()
+                                ->title('Could not pass student')
+                                ->body(collect($e->errors())->flatten()->first())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+
+                Actions\Action::make('fail_transfer')
+                    ->label('Fail (leave batch)')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('danger')
+                    ->visible(fn (StudentEnrollment $record): bool => $record->status === 'Enrolled' && $record->batch_year_id)
                     ->form([
-                        Forms\Components\Select::make('target_class_id')
-                            ->label('Target Class')
+                        Forms\Components\Select::make('target_batch_year_id')
+                            ->label('Target batch year (same program year)')
                             ->options(function (StudentEnrollment $record): array {
-                                return ClassModel::query()
-                                    ->active()
-                                    ->whereKeyNot($record->class_id)
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
+                                $programYear = $record->batchYear?->program_year;
+
+                                return \App\Models\BatchYear::query()
+                                    ->with('batch')
+                                    ->when($programYear, fn ($q) => $q->where('program_year', $programYear))
+                                    ->where('batch_id', '!=', $record->batch_id)
+                                    ->get()
+                                    ->mapWithKeys(fn ($y) => [$y->id => ($y->batch?->name.' — '.$y->name)])
                                     ->all();
                             })
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Forms\Components\Textarea::make('notes')
-                            ->label('Notes')
-                            ->maxLength(500),
+                            ->required()
+                            ->searchable(),
+                        Forms\Components\Select::make('target_class_id')
+                            ->label('Target class')
+                            ->options(fn () => ClassModel::query()->active()->orderBy('name')->pluck('name', 'id')->all())
+                            ->required()
+                            ->searchable(),
                     ])
                     ->action(function (StudentEnrollment $record, array $data): void {
-                        $upcomingYear = AcademicYear::nextYear();
-
-                        if (! $upcomingYear) {
-                            Notification::make()->title('No upcoming academic year found')->danger()->body('Please create and set an academic year as Upcoming before promoting students.')->send();
-
-                            return;
-                        }
-
-                        $targetClassId = (int) $data['target_class_id'];
-
-                        // Validate student is not already enrolled in the upcoming year
-                        $alreadyEnrolled = StudentEnrollment::query()
-                            ->where('member_id', $record->member_id)
-                            ->where('academic_year_id', $upcomingYear->id)
-                            ->where('status', 'Enrolled')
-                            ->exists();
-
-                        if ($alreadyEnrolled) {
-                            Notification::make()->title('Already enrolled in upcoming year')->danger()->body('This student already has an active enrollment in the upcoming academic year.')->send();
-
-                            return;
-                        }
-
-                        DB::transaction(function () use ($record, $targetClassId, $upcomingYear, $data): void {
-                            $fromClassId = $record->class_id;
-
-                            $record->update([
-                                'status' => 'Promoted',
-                                'completion_date' => now()->toDateString(),
-                                'completed_by' => Auth::id(),
-                            ]);
-
-                            $new = StudentEnrollment::create([
-                                'member_id' => $record->member_id,
-                                'class_id' => $targetClassId,
-                                'academic_year_id' => $upcomingYear->id,
-                                'enrolled_date' => now()->toDateString(),
-                                'status' => 'Enrolled',
-                                'enrolled_by' => Auth::id(),
-                            ]);
-
-                            $record->update(['promoted_to_enrollment_id' => $new->getKey()]);
-
-                            \Log::channel('audit')->warning('Tier 2 Audit Log', [
-                                'tier' => 2,
-                                'action' => 'promoted',
-                                'entity' => 'student_enrollment',
-                                'enrollment_id' => $record->getKey(),
-                                'member_id' => $record->member_id,
-                                'academic_year_id' => $upcomingYear->id,
-                                'old_value' => [
-                                    'from_class' => $fromClassId,
-                                ],
-                                'new_value' => [
-                                    'to_class' => $targetClassId,
-                                    'notes' => $data['notes'] ?? null,
-                                ],
-                                'performed_by' => Auth::id(),
-                                'timestamp' => now()->toDateTimeString(),
-                            ]);
-
-                            \Log::channel('audit')->warning('Tier 2 Audit Log', [
-                                'tier' => 2,
-                                'action' => 'enrolled',
-                                'entity' => 'student_enrollment',
-                                'enrollment_id' => $new->getKey(),
-                                'new_value' => [
-                                    'member_id' => $new->member_id,
-                                    'class_id' => $new->class_id,
-                                    'academic_year_id' => $new->academic_year_id,
-                                ],
-                                'performed_by' => Auth::id(),
-                                'timestamp' => now()->toDateTimeString(),
-                            ]);
-                        });
-
-                        Notification::make()->title('Student promoted to upcoming year')->success()->send();
+                        app(\App\Services\Academics\BatchPromotionService::class)->failTransfer(
+                            $record,
+                            (int) $data['target_batch_year_id'],
+                            (int) $data['target_class_id'],
+                            Auth::user(),
+                        );
+                        Notification::make()->title('Student moved to new batch (passed credits kept)')->success()->send();
                     }),
 
                 Actions\Action::make('undo_promotion')
@@ -432,112 +439,6 @@ class StudentEnrollmentResource extends BaseResource
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
-                    Actions\BulkAction::make('promote_selected')
-                        ->label('Promote Selected')
-                        ->icon('heroicon-o-arrow-up')
-                        ->color('warning')
-                        ->visible(fn () => Auth::user()?->can('student_enrollments.update'))
-                        ->form([
-                            Forms\Components\Select::make('target_class_id')
-                                ->label('Target Class')
-                                ->options(fn () => ClassModel::query()
-                                    ->active()
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->all())
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                            Forms\Components\Textarea::make('notes')
-                                ->label('Notes')
-                                ->maxLength(500),
-                        ])
-                        ->action(function ($records, array $data): void {
-                            $upcomingYear = AcademicYear::nextYear();
-
-                            if (! $upcomingYear) {
-                                Notification::make()->title('No upcoming academic year found')->danger()->body('Please create and set an academic year as Upcoming before promoting students.')->send();
-
-                                return;
-                            }
-
-                            $targetClassId = (int) $data['target_class_id'];
-                            $promotedCount = 0;
-                            $skippedCount = 0;
-                            $alreadyEnrolledCount = 0;
-
-                            DB::transaction(function () use ($records, $targetClassId, $upcomingYear, $data, &$promotedCount, &$skippedCount, &$alreadyEnrolledCount): void {
-                                foreach ($records as $record) {
-                                    if ($record->status !== 'Enrolled' || $record->class_id === $targetClassId) {
-                                        $skippedCount++;
-
-                                        continue;
-                                    }
-
-                                    $alreadyEnrolled = StudentEnrollment::query()
-                                        ->where('member_id', $record->member_id)
-                                        ->where('academic_year_id', $upcomingYear->id)
-                                        ->where('status', 'Enrolled')
-                                        ->exists();
-
-                                    if ($alreadyEnrolled) {
-                                        $alreadyEnrolledCount++;
-
-                                        continue;
-                                    }
-
-                                    $fromClassId = $record->class_id;
-
-                                    $record->update([
-                                        'status' => 'Promoted',
-                                        'completion_date' => now()->toDateString(),
-                                        'completed_by' => Auth::id(),
-                                    ]);
-
-                                    $new = StudentEnrollment::create([
-                                        'member_id' => $record->member_id,
-                                        'class_id' => $targetClassId,
-                                        'academic_year_id' => $upcomingYear->id,
-                                        'enrolled_date' => now()->toDateString(),
-                                        'status' => 'Enrolled',
-                                        'enrolled_by' => Auth::id(),
-                                    ]);
-
-                                    $record->update(['promoted_to_enrollment_id' => $new->getKey()]);
-
-                                    \Log::channel('audit')->warning('Tier 2 Audit Log', [
-                                        'tier' => 2,
-                                        'action' => 'bulk_promoted',
-                                        'entity' => 'student_enrollment',
-                                        'enrollment_id' => $record->getKey(),
-                                        'member_id' => $record->member_id,
-                                        'academic_year_id' => $upcomingYear->id,
-                                        'old_value' => [
-                                            'from_class' => $fromClassId,
-                                        ],
-                                        'new_value' => [
-                                            'to_class' => $targetClassId,
-                                            'notes' => $data['notes'] ?? null,
-                                        ],
-                                        'performed_by' => Auth::id(),
-                                        'timestamp' => now()->toDateTimeString(),
-                                    ]);
-
-                                    $promotedCount++;
-                                }
-                            });
-
-                            $message = "{$promotedCount} students promoted";
-                            if ($skippedCount > 0) {
-                                $message .= ", {$skippedCount} skipped";
-                            }
-                            if ($alreadyEnrolledCount > 0) {
-                                $message .= ", {$alreadyEnrolledCount} already enrolled in upcoming year";
-                            }
-
-                            Notification::make()->title($message)->success()->send();
-                        }),
-
                     Actions\DeleteBulkAction::make(),
                 ]),
             ])

@@ -13,11 +13,11 @@ use App\Models\InventoryItem;
 use App\Models\MediaItem;
 use App\Models\Member;
 use App\Models\MemberGroup;
-use App\Models\PageView;
 use App\Models\Rehearsal;
 use App\Models\Song;
 use App\Models\StudentEnrollment;
 use App\Models\Teacher;
+use App\Services\VisitorAnalyticsService;
 use App\Models\Tour;
 use App\Models\TourPassenger;
 use App\Models\User;
@@ -141,7 +141,10 @@ class DashboardCacheWarmCommand extends Command
         Cache::remember('dashboard_pending_approvals', 60, fn () => FinancialTransaction::pending()->count());
 
         $ym = now()->format('Y_m');
-        Cache::remember("dashboard_aid_distributed_{$ym}", 300, fn () =>
+        Cache::remember(
+            "dashboard_aid_distributed_{$ym}",
+            300,
+            fn () =>
             AidDistribution::whereMonth('distribution_date', now()->month)
                 ->whereYear('distribution_date', now()->year)
                 ->sum('amount')
@@ -152,7 +155,10 @@ class DashboardCacheWarmCommand extends Command
     {
         $this->line('  Education...');
 
-        Cache::remember('dashboard_active_enrollments', 300, fn () =>
+        Cache::remember(
+            'dashboard_active_enrollments',
+            300,
+            fn () =>
             StudentEnrollment::whereHas('academicYear', fn ($q) => $q->where('status', 'Active'))->count()
         );
 
@@ -221,7 +227,10 @@ class DashboardCacheWarmCommand extends Command
             ];
         });
 
-        Cache::remember('dashboard_expense_breakdown', 300, fn () =>
+        Cache::remember(
+            'dashboard_expense_breakdown',
+            300,
+            fn () =>
             FinancialTransaction::expense()
                 ->whereYear('transaction_date', now()->year)
                 ->selectRaw('COALESCE(category, "Uncategorized") as category, SUM(amount) as total')
@@ -243,11 +252,17 @@ class DashboardCacheWarmCommand extends Command
             ];
         });
 
-        Cache::remember('dashboard_gender_distribution_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_gender_distribution_chart',
+            300,
+            fn () =>
             Member::selectRaw('gender, COUNT(*) as count')->groupBy('gender')->pluck('count', 'gender')->toArray()
         );
 
-        Cache::remember('dashboard_member_type_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_member_type_chart',
+            300,
+            fn () =>
             Member::selectRaw('member_type, COUNT(*) as count')->groupBy('member_type')->pluck('count', 'member_type')->toArray()
         );
 
@@ -273,15 +288,24 @@ class DashboardCacheWarmCommand extends Command
             ];
         });
 
-        Cache::remember('dashboard_tour_status_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_tour_status_chart',
+            300,
+            fn () =>
             Tour::selectRaw('status, COUNT(*) as count')->groupBy('status')->pluck('count', 'status')->toArray()
         );
 
-        Cache::remember('dashboard_beneficiary_type_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_beneficiary_type_chart',
+            300,
+            fn () =>
             Beneficiary::selectRaw('type, COUNT(*) as count')->groupBy('type')->pluck('count', 'type')->toArray()
         );
 
-        Cache::remember('dashboard_beneficiary_status_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_beneficiary_status_chart',
+            300,
+            fn () =>
             Beneficiary::selectRaw('status, COUNT(*) as count')->groupBy('status')->pluck('count', 'status')->toArray()
         );
 
@@ -302,16 +326,25 @@ class DashboardCacheWarmCommand extends Command
             ];
         });
 
-        Cache::remember('dashboard_songs_by_category_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_songs_by_category_chart',
+            300,
+            fn () =>
             Song::selectRaw('category_id, COUNT(*) as count')->groupBy('category_id')->with('category')->get()
                 ->mapWithKeys(fn ($item) => [$item->category?->name ?? 'Uncategorized' => $item->count])->toArray()
         );
 
-        Cache::remember('dashboard_inventory_by_category_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_inventory_by_category_chart',
+            300,
+            fn () =>
             InventoryItem::selectRaw('category, COUNT(*) as count')->groupBy('category')->pluck('count', 'category')->toArray()
         );
 
-        Cache::remember('dashboard_media_by_category_chart', 300, fn () =>
+        Cache::remember(
+            'dashboard_media_by_category_chart',
+            300,
+            fn () =>
             MediaItem::selectRaw('category_id, COUNT(*) as count')->groupBy('category_id')->with('category')->get()
                 ->mapWithKeys(fn ($item) => [$item->category?->name ?? 'Uncategorized' => $item->count])->toArray()
         );
@@ -321,23 +354,38 @@ class DashboardCacheWarmCommand extends Command
     {
         $this->line('  Misc...');
 
-        Cache::remember('dashboard_upcoming_tours', 300, fn () =>
+        Cache::remember(
+            'dashboard_upcoming_tours',
+            300,
+            fn () =>
             Tour::where('tour_date', '>=', today())->whereIn('status', ['active', 'scheduled'])->count()
         );
 
-        Cache::remember('dashboard_tour_passengers', 300, fn () =>
+        Cache::remember(
+            'dashboard_tour_passengers',
+            300,
+            fn () =>
             TourPassenger::whereYear('created_at', now()->year)->count()
         );
 
-        Cache::remember('dashboard_active_beneficiaries', 300, fn () =>
+        Cache::remember(
+            'dashboard_active_beneficiaries',
+            300,
+            fn () =>
             Beneficiary::where('status', 'Active')->count()
         );
 
-        Cache::remember('dashboard_upcoming_rehearsals', 300, fn () =>
+        Cache::remember(
+            'dashboard_upcoming_rehearsals',
+            300,
+            fn () =>
             Rehearsal::where('date_time', '>=', today())->count()
         );
 
-        Cache::remember('dashboard_upcoming_events', 300, fn () =>
+        Cache::remember(
+            'dashboard_upcoming_events',
+            300,
+            fn () =>
             Event::where('date_time', '>=', today())->count()
         );
 
@@ -347,17 +395,16 @@ class DashboardCacheWarmCommand extends Command
         Cache::remember('dashboard_low_stock_items', 300, fn () => InventoryItem::where('quantity', '<=', 5)->count());
 
         $ym = now()->format('Y_m');
-        Cache::remember("dashboard_blog_posts_{$ym}", 300, fn () =>
+        Cache::remember(
+            "dashboard_blog_posts_{$ym}",
+            300,
+            fn () =>
             BlogPost::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count()
         );
 
-        Cache::remember('dashboard_visitor_stats', 300, fn () => [
-            'today' => PageView::query()->whereDate('created_at', today())->count(),
-            'week' => PageView::query()->where('created_at', '>=', now()->subDays(7))->count(),
-            'unique' => PageView::query()
-                ->where('created_at', '>=', now()->subDays(7))
-                ->selectRaw('count(distinct session_hash) as c')
-                ->value('c'),
-        ]);
+        $analytics = app(VisitorAnalyticsService::class);
+        foreach (VisitorAnalyticsService::RANGES as $days) {
+            $analytics->forDays($days);
+        }
     }
 }

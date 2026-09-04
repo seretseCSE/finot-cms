@@ -11,7 +11,6 @@ use App\Models\AcademicYear;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class AttendanceSummaryReport extends Page
 {
@@ -24,7 +23,7 @@ class AttendanceSummaryReport extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Attendance & Results';
+        return 'Attendance';
     }
 
     public static function getNavigationSort(): ?int
@@ -322,7 +321,9 @@ class AttendanceSummaryReport extends Page
         $pdfContent = Pdf::loadHTML($html)->output();
 
         return response()->streamDownload(
-            function () use ($pdfContent) { echo $pdfContent; },
+            function () use ($pdfContent) {
+                echo $pdfContent;
+            },
             'attendance-summary.pdf',
             ['Content-Type' => 'application/pdf']
         );

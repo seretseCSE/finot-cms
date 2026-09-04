@@ -36,7 +36,7 @@ class UserSessionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->can('user_sessions.view');
+        return \App\Support\RoleGate::is('superadmin');
     }
 
     public static function canCreate(): bool

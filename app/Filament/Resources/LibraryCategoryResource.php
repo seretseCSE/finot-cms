@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-
 use App\Filament\Support\HidesFromNavigation;
 use App\Filament\Resources\LibraryCategoryResource\Pages;
 use App\Filament\Resources\LibraryCategoryResource\RelationManagers;
@@ -37,6 +36,15 @@ class LibraryCategoryResource extends BaseResource
     public static function getNavigationSort(): ?int
     {
         return 9;
+    }
+
+    public static function canViewAny(): bool
+    {
+        if (\App\Support\RoleGate::isAny(['student', 'parent'])) {
+            return false;
+        }
+
+        return parent::canViewAny();
     }
 
 

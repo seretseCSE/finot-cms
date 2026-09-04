@@ -60,8 +60,16 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\Student\MyResults::class,
                 \App\Filament\Pages\Student\MyAttendance::class,
                 \App\Filament\Pages\Student\RequestWithdrawal::class,
+                \App\Filament\Pages\Student\ClassAnnouncements::class,
+                \App\Filament\Pages\Student\MyHomework::class,
+                \App\Filament\Pages\Student\ClassMaterials::class,
+                \App\Filament\Pages\Parent\MyChildren::class,
                 \App\Filament\Pages\Education\GradingScalePage::class,
                 \App\Filament\Pages\Education\AcademicResultsReport::class,
+                \App\Filament\Pages\Education\RecordAssessments::class,
+                \App\Filament\Pages\Education\RosterReportPage::class,
+                \App\Filament\Pages\Education\MarklistReportPage::class,
+                \App\Filament\Pages\Education\PromotionBoardPage::class,
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()
@@ -72,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Manage Sessions')
                     ->url(fn (): string => ManageActiveSessions::getUrl())
                     ->icon('heroicon-o-clock')
-                    ->visible(fn (): bool => RoleGate::isAny(['superadmin', 'admin'])),
+                    ->visible(fn (): bool => RoleGate::is('superadmin')),
                 'restart_tour' => MenuItem::make()
                     ->label('Restart Tour')
                     ->icon('heroicon-o-question-mark-circle')

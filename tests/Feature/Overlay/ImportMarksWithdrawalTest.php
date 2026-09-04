@@ -20,7 +20,7 @@ class ImportMarksWithdrawalTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function encoder_records_marks_and_education_head_can_approve_even_if_assisted(): void
+    public function encoder_records_marks_and_they_are_visible_without_approval(): void
     {
         $encoder = User::factory()->dataEncoder()->create();
         $head = User::factory()->educationHead()->create();
@@ -36,6 +36,7 @@ class ImportMarksWithdrawalTest extends TestCase
             'starts_on' => now()->subMonth(),
             'ends_on' => now()->addMonth(),
             'is_active' => true,
+            'status' => 'active',
         ]);
 
         $service = app(MarklistService::class);
@@ -45,19 +46,18 @@ class ImportMarksWithdrawalTest extends TestCase
 
         $service->saveItems($marklist, [[
             'member_id' => $enrollment->member_id,
+            'score' => 88,
+            'max_score' => 100,
             'conduct' => RubricScore::Excellent->value,
             'memorization' => RubricScore::Good->value,
             'participation' => RubricScore::NeedsWork->value,
             'remarks' => 'ok',
         ]], $encoder);
 
-        $service->submit($marklist->fresh(['items']), $encoder);
-        $this->assertSame(MarklistStatus::Submitted, $marklist->fresh()->status);
-
-        $this->assertFalse($encoder->can('results.approve'));
-        $approved = $service->approve($marklist->fresh(), $head);
-        $this->assertSame(MarklistStatus::Approved, $approved->status);
-        $this->assertSame($head->id, $approved->approved_by);
+        $item = $marklist->fresh()->items()->where('member_id', $enrollment->member_id)->first();
+        $this->assertNotNull($item);
+        $this->assertEquals(88, (float) $item->score);
+        $this->assertNotNull($item->rank);
     }
 
     #[Test]

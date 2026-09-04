@@ -33,11 +33,9 @@
             <div>
                 <h3 class="font-semibold text-base text-gray-900 dark:text-white">School</h3>
                 <ul class="list-disc ml-5 space-y-1 mt-1">
-                    <li>Academic years, classes, subjects, courses, enrollments, promotions</li>
-                    <li>Enroll, remove, or promote students (including many at once)</li>
-                    <li>View attendance sessions; open student and teacher attendance pages</li>
-                    <li>Enter, manage, and <strong>approve exam results</strong></li>
-                    <li><strong>Approve a student withdrawal</strong> (HR still does the last step)</li>
+                    <li>Batches, academic years, semesters, classes, subjects, offerings, enrollments</li>
+                    <li>Enter assessment scores (live on save); compute roster results; open reports</li>
+                    <li>Promote or fail/change batch; approve student withdrawals (HR finalizes)</li>
                 </ul>
             </div>
             <div>
@@ -74,7 +72,7 @@
                 <ol class="list-decimal ml-5 text-sm text-gray-600 dark:text-gray-400 space-y-1 mt-1">
                     <li>Open the dashboard: members, income, expenses, attendance trend.</li>
                     <li>Help a department that is stuck (wrong role, missing member, locked user).</li>
-                    <li>If Education Head is away, approve a submitted marklist.</li>
+                    <li>If Education Head is away, help with enrollments, scores, or semester activation.</li>
                     <li>If a withdrawal is waiting, approve or reject it; tell HR to finalize if you approved.</li>
                     <li>Review contact messages and recent transactions.</li>
                 </ol>

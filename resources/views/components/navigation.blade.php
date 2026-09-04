@@ -133,7 +133,7 @@
             </button>
 
             @auth
-                @if(auth()->user()?->isStaff() || auth()->user()?->hasRole('student'))
+                @if(auth()->user()?->isStaff() || auth()->user()?->hasRole(['student', 'parent']))
                     <a href="{{ url('/admin') }}" class="hidden md:inline-flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);">
                         {{ __('Dashboard') }}
                     </a>
@@ -216,7 +216,7 @@
 
             <div class="mt-4 pt-4 border-t border-black/5 dark:border-white/5 flex flex-col gap-2">
                 @auth
-                    @if(auth()->user()?->isStaff() || auth()->user()?->hasRole('student'))
+                    @if(auth()->user()?->isStaff() || auth()->user()?->hasRole(['student', 'parent']))
                         <a href="{{ url('/admin') }}" class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold tracking-widest uppercase rounded-xl text-white" style="background:linear-gradient(135deg, #1A44F7, #1638D4);" @click="mobileOpen = false">
                             {{ __('Dashboard') }}
                         </a>

@@ -16,6 +16,7 @@
                             });
                         }
                     });
+                    subscribePush(registration);
                 })
                 .catch(() => {});
         });
@@ -31,5 +32,49 @@
                 }));
             }
         });
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
+    }
+
+    async function subscribePush(registration) {
+        if (!('PushManager' in window) || !window.isSecureContext) return;
+        try {
+            const keyRes = await fetch('/push/vapid-public-key', { headers: { 'Accept': 'application/json' } });
+            if (!keyRes.ok) return;
+            const { publicKey } = await keyRes.json();
+            if (!publicKey) return;
+
+            let permission = Notification.permission;
+            if (permission === 'default') {
+                permission = await Notification.requestPermission();
+            }
+            if (permission !== 'granted') return;
+
+            let subscription = await registration.pushManager.getSubscription();
+            if (!subscription) {
+                subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicKey),
+                });
+            }
+
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+            await fetch('/push/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrf || '',
+                },
+                body: JSON.stringify(subscription.toJSON()),
+            });
+        } catch (e) {
+            // Push optional — ignore failures
+        }
     }
 </script>

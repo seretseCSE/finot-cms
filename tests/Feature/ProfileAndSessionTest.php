@@ -44,6 +44,15 @@ class ProfileAndSessionTest extends TestCase
     }
 
     #[Test]
+    public function manage_active_sessions_is_forbidden_for_admin(): void
+    {
+        $user = $this->createAdminUser();
+        $this->actingAs($user);
+
+        $this->get('/admin/manage-active-sessions')->assertForbidden();
+    }
+
+    #[Test]
     public function custom_options_management_accessible_to_superadmin(): void
     {
         $user = $this->createSuperadminUser();

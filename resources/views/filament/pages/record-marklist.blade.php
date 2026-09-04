@@ -5,10 +5,8 @@
         $scored = collect($this->rows)->filter(fn ($row) => filled($row['score'] ?? null) || (filled($row['conduct'] ?? null) && filled($row['memorization'] ?? null) && filled($row['participation'] ?? null)))->count();
         $status = $this->marklistStatus;
         $statusLabel = match ($status) {
-            'submitted' => 'Submitted',
-            'approved' => 'Approved',
-            'draft' => 'Draft',
-            default => null,
+            'submitted', 'approved', 'draft' => $locked ? 'Locked' : 'Saved',
+            default => $locked ? 'Locked' : 'Saved',
         };
         $rubricLabels = [
             'excellent' => 'Excellent',
@@ -176,8 +174,7 @@
                 </div>
                 @unless ($locked)
                     <div class="rm-actions">
-                        <x-filament::button wire:click="saveDraft" color="gray">Save draft</x-filament::button>
-                        <x-filament::button wire:click="submit">Submit for approval</x-filament::button>
+                        <x-filament::button wire:click="saveDraft">Save marks</x-filament::button>
                     </div>
                 @endunless
             </div>

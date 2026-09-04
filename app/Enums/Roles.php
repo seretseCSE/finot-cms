@@ -10,6 +10,7 @@ class Roles
     public const EDUCATION_MONITOR = 'education_monitor';
     public const DATA_ENCODER = 'data_encoder';
     public const STUDENT = 'student';
+    public const PARENT = 'parent';
     public const MEZMUR_HEAD = 'mezmur_head';
     public const WORSHIP_MONITOR = 'worship_monitor';
     public const FINANCE_HEAD = 'finance_head';
@@ -50,6 +51,7 @@ class Roles
         self::EDUCATION_MONITOR,
         self::DATA_ENCODER,
         self::STUDENT,
+        self::PARENT,
         self::MEZMUR_HEAD,
         self::WORSHIP_MONITOR,
         self::FINANCE_HEAD,
