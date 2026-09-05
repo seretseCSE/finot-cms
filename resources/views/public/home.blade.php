@@ -241,13 +241,13 @@
         />
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12">
             @foreach([
-                ['name' => __('መላከ ኀይል ቄስ ሰሎሞን ሙሉጌታ'), 'en' => 'Melake Hayil Kesis Solomon Mulugeta', 'role' => __('President'), 'img' => 'cta-bg.webp'],
-                ['name' => __('ዲያቆን ዮሴፍ ተፈራ'), 'en' => 'Deacon Yosef Tefera', 'role' => __('Vice President'), 'img' => 'masonry-portfolio/masonry-portfolio-4.jpg'],
-                ['name' => __('እህት ሕይወት አበራ'), 'en' => 'Sister Hiwot Abera', 'role' => __('General Secretary'), 'img' => 'hero-bg.webp'],
+                ['name' => __('አቶ ኢዩኤል ሊበን'), 'en' => 'Mr. Eyuel Liben', 'role' => __('ሰብሳቢ'), 'img' => 'eyu.jpg'],
+                ['name' => __('አቶ ዘመን አሳዬ'), 'en' => 'Mr. Zemen Asaye', 'role' => __('ምክትል ሰብሳቢ'), 'img' => 'zemen.jpg'],
+                ['name' => __('ዲያቆን አቤል ሲሳይ'), 'en' => 'Deacon Abel Sisay', 'role' => __('ፀሃፊ'), 'img' => 'abel.jpg'],
             ] as $i => $leader)
                 <figure class="reveal text-center" data-delay="{{ $i * 0.1 }}">
                     <div class="ft-leader-photo">
-                        <img src="{{ $img($leader['img']) }}" alt="{{ $leader['en'] }}" loading="lazy">
+                        <img src="{{ $img($leader['img']) }}" alt="{{ $leader['en'] }}" loading="lazy" style="object-position: top center;">
                     </div>
                     <figcaption class="mt-5">
                         <div class="text-[0.65rem] font-semibold tracking-[0.18em] uppercase mb-1.5" style="color: var(--ft-blue);">{{ $leader['role'] }}</div>
